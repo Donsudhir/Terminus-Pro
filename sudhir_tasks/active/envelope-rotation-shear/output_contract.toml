@@ -1,0 +1,17 @@
+user_visible_outputs = [
+  "/app/output/recovery.json",
+]
+
+internal_harness_files = [
+  "/app/bin/inspect",
+  "/app/scripts/reset-fixture.sh",
+]
+
+[structured_outputs.recovery]
+target = "/app/output/recovery.json"
+format = "json"
+instruction_checks = [
+  "recovered",
+  "service",
+  "secret",
+]

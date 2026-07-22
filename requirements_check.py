@@ -20,10 +20,13 @@ import ast
 import json
 import re
 import subprocess
-import sys
 from dataclasses import asdict, dataclass, field
 from enum import Enum
 from pathlib import Path
+
+import model_policy
+import root_adapter
+import task_layout
 
 try:
     import tomllib
@@ -154,93 +157,23 @@ def is_milestone_task(task_data: dict) -> bool:
 
 
 def list_verifier_py_files(task_dir: Path, task_data: dict) -> list[Path]:
-    meta = task_data.get("metadata") or {}
-    n = meta.get("number_of_milestones", 0)
-    if isinstance(n, int) and n > 0:
-        steps = task_dir / "steps"
-        files: list[Path] = []
-        for i in range(1, n + 1):
-            p = steps / f"milestone_{i}" / "tests" / f"test_m{i}.py"
-            if p.exists():
-                files.append(p)
-        return files
-    p = task_dir / "tests" / "test_outputs.py"
-    return [p] if p.exists() else []
+    layout = task_layout.classify_task_dir(task_dir, task_data)
+    return [path for path in task_layout.verifier_paths(task_dir, layout) if path.exists()]
 
 
 def check_structural_layout(report: Report, task_dir: Path, task_data: dict) -> None:
     section = "Structural Requirements"
-    milestone = is_milestone_task(task_data)
-    meta = task_data.get("metadata") or {}
-    n_milestones = meta.get("number_of_milestones", 0)
-
-    required_common = [
-        ("task.toml", task_dir / "task.toml"),
-        ("environment/Dockerfile", task_dir / "environment" / "Dockerfile"),
-    ]
-    for label, path in required_common:
-        if path.exists():
-            report.add(section, label, Status.PASS)
-        else:
-            report.add(section, label, Status.FAIL, detail=f"missing {path.relative_to(task_dir)}")
-
-    if milestone:
-        # Edition 2 milestone layout: steps/milestone_N/{instruction,tests,solution}
-        if not (task_dir / "steps").is_dir():
-            report.add(
-                section,
-                "steps/milestone_N/ layout",
-                Status.FAIL,
-                detail="milestone task missing steps/ directory",
-            )
-        else:
-            missing_ms: list[str] = []
-            for i in range(1, int(n_milestones) + 1):
-                base = task_dir / "steps" / f"milestone_{i}"
-                for rel in ("instruction.md", "tests/test.sh", f"tests/test_m{i}.py", "solution/solve.sh", f"solution/solve{i}.sh"):
-                    if not (base / rel).exists():
-                        missing_ms.append(f"steps/milestone_{i}/{rel}")
-            if missing_ms:
-                report.add(
-                    section,
-                    "steps/milestone_N/ layout",
-                    Status.FAIL,
-                    detail="missing: " + ", ".join(missing_ms[:8])
-                    + (" …" if len(missing_ms) > 8 else ""),
-                )
-            else:
-                report.add(section, "steps/milestone_N/ layout", Status.PASS)
-
-        root_instruction = task_dir / "instruction.md"
-        if root_instruction.exists():
-            report.add(
-                section,
-                "root instruction.md (milestone tasks omit this)",
-                Status.WARN,
-                detail="milestone tasks use steps/milestone_N/instruction.md only",
-            )
-        steps_count = len(list((task_dir / "steps").glob("milestone_*"))) if (task_dir / "steps").is_dir() else 0
-        if steps_count != n_milestones:
-            report.add(
-                section,
-                "number_of_milestones matches steps/ count",
-                Status.FAIL,
-                detail=f"metadata says {n_milestones}, found {steps_count} milestone_* dirs",
-            )
-        else:
-            report.add(section, "number_of_milestones matches steps/ count", Status.PASS)
+    layout = task_layout.classify_task_dir(task_dir, task_data)
+    if layout.errors:
+        for error in layout.errors:
+            report.add(section, "canonical task layout", Status.FAIL, detail=error)
     else:
-        for label, rel in (
-            ("instruction.md", "instruction.md"),
-            ("solution/solve.sh", "solution/solve.sh"),
-            ("tests/test.sh", "tests/test.sh"),
-            ("tests/test_outputs.py", "tests/test_outputs.py"),
-        ):
-            path = task_dir / rel
-            if path.exists():
-                report.add(section, label, Status.PASS)
-            else:
-                report.add(section, label, Status.FAIL, detail=f"missing {rel}")
+        report.add(
+            section,
+            "canonical task layout",
+            Status.PASS,
+            detail=f"{layout.kind}; milestones={layout.milestone_count}",
+        )
 
     readme = task_dir / "README.md"
     if readme.exists():
@@ -303,12 +236,38 @@ def check_task_toml_fields(report: Report, task_dir: Path, task_data: dict) -> N
             detail=f"got {env.get('allow_internet')!r}",
         )
 
-    for block, key in (("agent", "timeout_sec"), ("verifier", "timeout_sec"), ("environment", "build_timeout_sec")):
+    layout = task_layout.classify_task_dir(task_dir, task_data)
+    timeout_blocks = [("environment", "build_timeout_sec")]
+    if layout.kind == task_layout.STANDARD:
+        timeout_blocks = [
+            ("agent", "timeout_sec"),
+            ("verifier", "timeout_sec"),
+            *timeout_blocks,
+        ]
+    for block, key in timeout_blocks:
         table = task_data.get(block) or {}
         if isinstance(table.get(key), (int, float)) and table[key] > 0:
             report.add(section, f"[{block}].{key}", Status.PASS)
         else:
             report.add(section, f"[{block}].{key}", Status.FAIL, detail="missing or non-positive")
+
+    if layout.kind == task_layout.MILESTONE:
+        for step in task_data.get("steps") or []:
+            if not isinstance(step, dict):
+                continue
+            name = step.get("name", "?")
+            for block in ("agent", "verifier"):
+                table = step.get(block) or {}
+                timeout = table.get("timeout_sec") if isinstance(table, dict) else None
+                if isinstance(timeout, (int, float)) and not isinstance(timeout, bool) and timeout > 0:
+                    report.add(section, f"[[steps]] {name} [{block}].timeout_sec", Status.PASS)
+                else:
+                    report.add(
+                        section,
+                        f"[[steps]] {name} [{block}].timeout_sec",
+                        Status.FAIL,
+                        detail="missing or non-positive",
+                    )
 
     codebase_size = meta.get("codebase_size")
     file_count = count_environment_files(task_dir)
@@ -338,9 +297,7 @@ def check_task_toml_fields(report: Report, task_dir: Path, task_data: dict) -> N
 
 def check_solution_standards(report: Report, task_dir: Path, task_data: dict) -> None:
     section = "Solution Requirements"
-    milestone = is_milestone_task(task_data)
-    meta = task_data.get("metadata") or {}
-    n = int(meta.get("number_of_milestones") or 0)
+    layout = task_layout.classify_task_dir(task_dir, task_data)
 
     def audit_solve(path: Path, label: str) -> None:
         if not path.exists():
@@ -361,12 +318,17 @@ def check_solution_standards(report: Report, task_dir: Path, task_data: dict) ->
                 detail="solve.sh should use set -euo pipefail per submission standards",
             )
 
-    if milestone:
-        audit_solve(task_dir / "solution" / "solve.sh", "solution/solve.sh (wrapper)")
-        for i in range(1, n + 1):
-            audit_solve(task_dir / "solution" / f"solve{i}.sh", f"solution/solve{i}.sh")
+    if layout.kind == task_layout.MILESTONE:
+        for entrypoint, implementation in zip(
+            task_layout.solution_entrypoints(task_dir, layout),
+            task_layout.solution_implementations(task_dir, layout),
+            strict=True,
+        ):
+            audit_solve(entrypoint, entrypoint.relative_to(task_dir).as_posix())
+            audit_solve(implementation, implementation.relative_to(task_dir).as_posix())
     else:
-        audit_solve(task_dir / "solution" / "solve.sh", "solution/solve.sh")
+        path = task_dir / "solution" / "solve.sh"
+        audit_solve(path, path.relative_to(task_dir).as_posix())
 
 
 def check_test_docstrings(report: Report, task_dir: Path, task_data: dict) -> None:
@@ -479,10 +441,15 @@ def run_subprocess_gate(
 
 def add_manual_checklist(report: Report, task_name: str) -> None:
     section = "Manual (required before submit)"
+    openai_model = model_policy.CURRENT_OPENAI_MODEL
+    anthropic_model = model_policy.CURRENT_ANTHROPIC_MODEL
+    task_path = root_adapter.ROOTS.task_dir(task_name)
+    zip_path = root_adapter.ROOTS.submission_zip(task_name)
     items = [
         (
             "instruction.md quality (concise, no hints/answers, absolute paths)",
-            "Review prose; optional: harbor tasks check … -m openai/gpt-5.2",
+            "Review prose; optional: harbor tasks check … "
+            f"-m {model_policy.QUALITY_CHECK_MODEL}",
         ),
         (
             "Tests cover every explicit and critical implicit requirement",
@@ -490,14 +457,14 @@ def add_manual_checklist(report: Report, task_name: str) -> None:
         ),
         (
             "Difficulty: frontier pass rate < 80% (worst model)",
-            "harbor run -a terminus-2 -m openai/@openai/gpt-5.2 -p tasks/"
-            + task_name
-            + "  (and Claude); calibrate difficulty in task.toml",
+            f"stb harbor run -m {openai_model.harbor_flag} -p {task_path}\n"
+            f"stb harbor run -m {anthropic_model.harbor_flag} -p {task_path}\n"
+            "Run 5 trials per current model; calibrate difficulty in task.toml",
         ),
         (
             "Step 2b: oracle 1x PASS + NOP score 0.0",
-            f"harbor run -p tasks/{task_name} -a oracle\n"
-            f"harbor run -p tasks/{task_name} -a nop",
+            f"harbor run -p {task_path} -a oracle\n"
+            f"harbor run -p {task_path} -a nop",
         ),
         (
             "Rubric: ≥3 distinct negative-reward criteria (e.g. -1)",
@@ -505,12 +472,17 @@ def add_manual_checklist(report: Report, task_name: str) -> None:
         ),
         (
             "LLMaJ checks (behavior_in_task_description, anti_cheating, …)",
-            "harbor tasks check tasks/" + task_name + " -m openai/gpt-5.2",
+            f"harbor tasks check {task_path} -m {model_policy.QUALITY_CHECK_MODEL}",
+        ),
+        (
+            "Delegated official CI: typos + check_task_sizes",
+            "Confirm both checks PASS in the current upstream pre-submission result; "
+            "local approval reports them as delegated, never inferred PASS",
         ),
         (
             "Preflight + packaging approval",
-            f"./scripts/check-task.sh tasks/{task_name}\n"
-            f"python3 approve_task.py --task-dir tasks/{task_name} --zip Task_Ready_To_Submit/{task_name}.zip --skip-verifier-health",
+            f"./scripts/check-task.sh {task_path}\n"
+            f"python3 approve_task.py --task-dir {task_path} --zip {zip_path} --skip-verifier-health",
         ),
     ]
     for req, cmd in items:

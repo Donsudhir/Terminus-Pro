@@ -1,0 +1,3 @@
+# DIFFICULTY — sparse-jacobian-color-contract REV-3
+
+This task is medium because one visible packed-matrix drift can come from several cooperating authorities: probe grouping, resume seed handling, per-batch magnitude context, and unpack orientation. Ordinary single-batch runs can look fine, so the failures show up when you compare permutes, resumes, and mixed-scale sequences. Fixing only the sticky magnitude path is not enough — retained packed values still have to match the structural residual coefficients implied by each batch’s terms, and the directional products have to agree with that same structure.

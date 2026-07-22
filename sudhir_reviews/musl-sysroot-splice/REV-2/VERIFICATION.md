@@ -1,0 +1,3 @@
+# VERIFICATION — musl-sysroot-splice REV-2
+
+Verification is behavioral, not string proxies. After a public rebuild through build_payload.sh, the verifier (1) replaces knit_main/pack_main with failing stubs (mtime-pinned so make does not rebuild them) and requires the entrypoint to fail, (2) re-runs knit/pack/seal and requires /app/output/stage to match those live helper outputs bit-for-bit on headers, CRT digests, pack.rsp, tag source, and seal.flags, and (3) proves the final ELF is fully static with no PT_INTERP, linked from bravo musl libc.a (digest-equal to the image musl archive) with -static and staged CRT paths, and embeds musl identity in the artifact strings. Isolated helper tests and qemu-user probe/ledger checks remain.

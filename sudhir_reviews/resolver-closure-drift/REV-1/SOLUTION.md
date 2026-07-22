@@ -1,0 +1,3 @@
+# SOLUTION — resolver-closure-drift REV-1
+
+The repair restores one consistent typed pipeline from raw records through vane casting, sill admission, and quay lace into the solved trellis. Parent histories remain independently meaningful; the merge must preserve both established edge-case selections while still admitting new package names and ranges. After `/app/bin/rebuild-forge`, `/app/bin/forge solve` emits a sorted, duplicate-free lock with exact `<name> <version> <source-id>` lines. Equivalent archive orderings and clean repeats stay byte-identical, and the bundled downstream build completes offline from the repaired tool.

@@ -1,0 +1,15 @@
+[
+  {
+    "item": {
+      "service": "archive-cell",
+      "secret": "db-key"
+    },
+    "axis": "archive-cell",
+    "epoch": 2,
+    "nonce": "5/jpqMVvktfI2yh8/ZvdSQ",
+    "body": "5c7/OJAy4KIMqw",
+    "wrapped": "z7C12d+HuIH5zuzqrDNo95mzkRD0EXPo1wWygXOb330",
+    "tag": "WQDvS5alHbimlSv2OTgygptgKiykZQ4cz9tXqPGsKMY",
+    "seq": 1200
+  }
+]

@@ -2,7 +2,7 @@
 """
 Frontier-agent difficulty calibration for Terminal-Bench tasks.
 
-Runs GPT-5.2 and Claude Opus 4.6 via Snorkel STB (stb harbor run), then
+Runs the current GPT-5.5 and Claude Opus 4.8 pair via Snorkel STB, then
 reports pass rates and difficulty bands from job artifacts under jobs/.
 
 Prerequisites:
@@ -12,7 +12,7 @@ Prerequisites:
 
 Examples:
   ./agent_test.py run tasks/my-task
-  ./agent_test.py run tasks/my-task --runs 5 --models gpt-5.2
+    ./agent_test.py run tasks/my-task --runs 5 --models gpt-5.5
   ./agent_test.py report jobs/2026-05-20__05-13-51
   ./agent_test.py report --latest --task my-task
   ./agent_test.py trial jobs/2026-05-20__05-13-51/sustained-churn-footprint__xnKe3YE
@@ -31,20 +31,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import model_policy
 
-# Harbor / STB model flags (see platform agent-testing guide).
-MODELS: dict[str, dict[str, str]] = {
-    "gpt-5.2": {
-        "label": "GPT-5.2",
-        "harbor_flag": "@openai/gpt-5.2",
-        "match": r"gpt-5\.2",
-    },
-    "claude-opus-4.6": {
-        "label": "Claude Opus 4.6",
-        "harbor_flag": "@anthropic/claude-opus-4-6",
-        "match": r"claude-opus-4-6",
-    },
-}
+# Current run targets only. Historical and unknown models remain parseable via
+# model_policy.identify_model(), but are never selected by default for new runs.
+MODELS: dict[str, dict[str, str]] = model_policy.current_agent_model_map()
 
 DEFAULT_RUNS = 5
 ACCEPTANCE_NOTE = (
@@ -463,10 +454,7 @@ def _trial_passed(trial_dir: Path) -> tuple[bool, bool]:
 
 
 def _match_model_id(eval_key: str) -> str | None:
-    for model_id, spec in MODELS.items():
-        if re.search(spec["match"], eval_key, re.IGNORECASE):
-            return model_id
-    return None
+    return model_policy.identify_model(eval_key)
 
 
 def _stats_from_job_result(job_dir: Path) -> dict[str, ModelRunStats]:
@@ -497,7 +485,7 @@ def _stats_from_job_result(job_dir: Path) -> dict[str, ModelRunStats]:
 
         stats[model_id] = ModelRunStats(
             model_id=model_id,
-            label=MODELS[model_id]["label"],
+            label=model_policy.label_for(model_id),
             passes=passes,
             trials=trials,
             errors=errors,
@@ -509,9 +497,7 @@ def _stats_from_job_result(job_dir: Path) -> dict[str, ModelRunStats]:
 
 def _stats_from_trials(job_dir: Path) -> dict[str, ModelRunStats]:
     """Fallback: walk per-trial result.json and group by model_name."""
-    buckets: dict[str, dict[str, int]] = {
-        model_id: {"passes": 0, "trials": 0, "errors": 0} for model_id in MODELS
-    }
+    buckets: dict[str, dict[str, int]] = {}
 
     for trial in _trial_dirs(job_dir):
         try:
@@ -526,6 +512,7 @@ def _stats_from_trials(job_dir: Path) -> dict[str, ModelRunStats]:
             continue
 
         passed, infra = _trial_passed(trial)
+        buckets.setdefault(model_id, {"passes": 0, "trials": 0, "errors": 0})
         buckets[model_id]["trials"] += 1
         if infra:
             buckets[model_id]["errors"] += 1
@@ -538,7 +525,7 @@ def _stats_from_trials(job_dir: Path) -> dict[str, ModelRunStats]:
         passes = counts["passes"]
         stats[model_id] = ModelRunStats(
             model_id=model_id,
-            label=MODELS[model_id]["label"],
+            label=model_policy.label_for(model_id),
             passes=passes,
             trials=trials,
             errors=counts["errors"],
@@ -705,6 +692,10 @@ def build_report(
     report: dict[str, Any] = {
         "task_dir": str(task_dir) if task_dir else None,
         "declared_difficulty": declared_difficulty,
+        "model_profile": {
+            "effective_date": model_policy.CURRENT_MODEL_EFFECTIVE_DATE,
+            "current_model_ids": list(model_policy.CURRENT_MODEL_IDS),
+        },
         "job_dirs": [str(p) for p in job_dirs],
         "models": {
             mid: {
@@ -746,7 +737,7 @@ def print_report(report: dict[str, Any]) -> None:
     if not models:
         print("  (no model trials found)")
     else:
-        for mid in ("gpt-5.2", "claude-opus-4.6"):
+        for mid in sorted(models, key=model_policy.reporting_sort_key):
             if mid not in models:
                 continue
             m = models[mid]
@@ -828,7 +819,7 @@ def print_trial_analysis(analysis: TrialFailureAnalysis) -> None:
     print(f"Trial: {analysis.trial_name}")
     print(f"Path:  {analysis.trial_dir}")
     if analysis.model_id:
-        print(f"Model: {MODELS.get(analysis.model_id, {}).get('label', analysis.model_id)}")
+        print(f"Model: {model_policy.label_for(analysis.model_id)}")
     print(f"Outcome:    {label}")
     print(f"Confidence: {analysis.confidence}")
     print(f"Category:   {analysis.category}")
@@ -954,8 +945,8 @@ def _report_job_dirs_error(
     if explicit_dirs:
         return (
             "No frontier-model trials found in the provided job directories. "
-            "agent_test only summarizes GPT-5.2 / Claude Opus runs "
-            "(not oracle or NOP Step 2b jobs)."
+            "agent_test summarizes current, legacy, and model-shaped unknown "
+            "frontier runs (not oracle or NOP Step 2b jobs)."
         )
     task_hint = f" for task {task_name!r}" if task_name else ""
     recent = _task_job_dirs(jobs_root, task_name=task_name, limit=3)
@@ -1070,7 +1061,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     run_p.add_argument(
         "--jobs-dir",
         type=Path,
-        default=Path("jobs"),
+        default=Path(os.environ.get("TB3_JOBS_DIR", "jobs")),
         help="Harbor jobs output directory (default: jobs)",
     )
     run_p.add_argument(
@@ -1115,7 +1106,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     report_p.add_argument(
         "--jobs-root",
         type=Path,
-        default=Path("jobs"),
+        default=Path(os.environ.get("TB3_JOBS_DIR", "jobs")),
         help="Root directory to scan with --latest (default: jobs)",
     )
     report_p.add_argument(

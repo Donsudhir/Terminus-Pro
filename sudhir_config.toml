@@ -1,0 +1,7 @@
+version = 1
+
+tasks_dir = "sudhir_tasks/active"
+specs_dir = "sudhir_ideas/specs"
+submissions_dir = "sudhir_tasks_ready_to_submit"
+reviews_dir = "sudhir_reviews"
+jobs_dir = "sudhir_logs/jobs"

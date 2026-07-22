@@ -1,0 +1,24 @@
+user_visible_outputs = [
+  "/app/output/geometry_report.json",
+]
+
+internal_harness_files = [
+  "/app/build/libnative.a",
+  "/app/build/libanalysis.a",
+  "/app/scripts/build.sh",
+  "/app/scripts/strict-build.sh",
+]
+
+[structured_outputs.geometry_report]
+target = "/app/output/geometry_report.json"
+format = "json"
+instruction_checks = [
+  "batches",
+  "identity",
+  "cells",
+  "adjacency",
+  "orientation",
+  "validity",
+  "topology",
+  "digest",
+]

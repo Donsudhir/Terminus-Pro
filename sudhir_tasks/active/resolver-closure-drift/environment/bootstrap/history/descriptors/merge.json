@@ -1,0 +1,9 @@
+{
+  "id": "merge",
+  "parents": ["alpha", "beta"],
+  "patch": "merge.patch",
+  "author_name": "Nadia Sol",
+  "author_email": "nadia@example.invalid",
+  "timestamp": "2025-03-03T16:05:00+0000",
+  "message": "merge profile branches"
+}

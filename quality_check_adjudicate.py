@@ -2,7 +2,7 @@
 """
 Adjudicate `harbor tasks check` findings against a per-task waiver file.
 
-The GPT-5.2 quality checker can emit hallucinated or convention-conflicting
+The current GPT-5.5 quality checker can emit hallucinated or convention-conflicting
 findings (for example, flagging the repo-mandated `curl … astral.sh/uv/0.9.5
 /install.sh | sh` line as a supply-chain risk even though
 `run_static_checks.py --only test_sh` enforces that exact line). Blocking
@@ -49,6 +49,8 @@ import json
 import subprocess
 from pathlib import Path
 from typing import Any
+
+import model_policy
 
 REPO_ROOT = Path(__file__).resolve().parent
 
@@ -431,8 +433,6 @@ def build_report(
     qc_path = qc_path.expanduser().resolve()
     adj_path = adj_path.expanduser().resolve()
 
-    errors: list[str] = []
-
     if not task_dir.is_dir():
         return {
             "task": task_dir.name,
@@ -464,7 +464,8 @@ def build_report(
             "gate": "FAIL",
             "blocking_failures": [
                 f"harbor qc output does not exist: {qc_path} "
-                f"(run `harbor tasks check {task_dir} -m openai/gpt-5.2 -o {qc_path}`)"
+                f"(run `harbor tasks check {task_dir} "
+                f"-m {model_policy.QUALITY_CHECK_MODEL} -o {qc_path}`)"
             ],
             "warnings": [],
             "findings": [],

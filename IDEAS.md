@@ -16,6 +16,28 @@ Terminal-Bench 3.0 aims to push beyond the limits of current frontier models. Ou
 
 ## TB3 Strategic Directions
 
+### Long-Horizon Investigation Tasks
+
+New ideas should model one coherent production incident rather than a list of
+independent bugs. Select 2-4 reinforcing weakness areas, outline a 4-8 stage
+causal chain, use at least three heterogeneous evidence surfaces, include two
+plausible hypotheses with deterministic falsifiers, and test a narrow failure
+beside a healthy control. The intended investigation may plausibly require
+20-100 meaningful terminal actions, but command count is never part of the
+reward and must not be inflated with volume or repetition.
+
+High-value weakness areas include stale or conflicting documentation,
+multi-component consistency, hidden runtime state, log triage, races, measured
+performance, Git/history reasoning, infrastructure, SQL, security, large
+refactors, and recovery from disproven assumptions. Cover these across the
+portfolio; do not force all of them into each task. Keep reproduction offline,
+single-container, deterministic, and outcome-verified.
+
+Domain-rich enterprise and healthcare systems are preferred when the domain is
+the substrate for real engineering. FHIR, HL7, DICOM, ICD, or SNOMED fixtures
+should create indexing, identity, ordering, migration, concurrency, integrity,
+or performance work—not obscure-fact quizzes.
+
 ### Speed & Efficiency Tasks
 - "Speed-up" tasks that measure execution performance (inspired by [SWE-fficiency](https://github.com/swe-bench/SWE-efficieny))
 - Optimization challenges where correctness alone isn't enough

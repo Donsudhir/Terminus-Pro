@@ -40,9 +40,7 @@ import unittest
 from pathlib import Path
 
 import validate_loop
-
 from repo_tests.test_validate_loop import _valid_evidence
-
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_FIXTURE = REPO_ROOT / "specs" / "validation_schema.json"
@@ -336,6 +334,14 @@ class NamingPassValidateEvidenceIntegrationTest(unittest.TestCase):
         self.assertIn(
             "recomputed_concentration",
             validation["normalized"]["naming_pass"],
+        )
+        self.assertEqual(
+            validation["normalized"]["topology_enumeration"],
+            _valid_evidence()["topology_enumeration"],
+        )
+        self.assertEqual(
+            validation["normalized"]["construction_manifest"],
+            _valid_evidence()["construction_manifest"],
         )
 
     def test_naming_pass_normalization_does_not_mutate_input(self) -> None:

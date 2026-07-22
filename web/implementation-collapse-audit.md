@@ -59,6 +59,29 @@ Examples of what **does not count**:
 
 **If the list has fewer than 3 items, or if every item reduces to "find where the code doesn't match the spec," the task is not hard. Reject or regenerate.**
 
+## Mandatory Long-Horizon Coherence Test
+
+For new ideas, arrange the planned discoveries into a 4-8 stage causal chain.
+Each stage must consume evidence produced or made relevant by an earlier stage
+and must unlock the next investigation. Also identify 3+ heterogeneous evidence
+surfaces, 2+ plausible hypotheses with deterministic falsifiers, a failing
+scenario, and a nearby healthy control.
+
+Reject or regenerate when:
+
+- stages are independent bugs that can be solved in any order;
+- one grep or one obvious log line reveals the whole chain;
+- the 20-100 meaningful-action estimate comes from huge files, noisy logs,
+	repeated commands, or setup friction;
+- a wrong hypothesis cannot be disproved without making a prescribed edit;
+- reproduction relies on sleeps, timing luck, network access, or mutable
+	external state;
+- all healthy controls fail after a broad symptom patch.
+
+The action horizon is a design estimate, not a task-test requirement. Outcome
+tests must never reward command count, planning prose, tool choice, or a
+particular diagnostic path.
+
 ### Instruction specificity hierarchy
 
 Use this to evaluate how much the instruction reveals:

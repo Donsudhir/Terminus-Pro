@@ -1,0 +1,3 @@
+# DIFFICULTY — robust-predicate-scale-parity REV-7
+
+This task is medium because one visible topology drift can come from four different numerical and representation boundaries across C, Rust, and Fortran. A copied robust-predicate routine only repairs part of the chain: the fast path must escalate under cancellation while still certifying well-conditioned sums, foreign refinement status has to survive the host mapping, per-batch scaling must not stick across transformed variants, and oriented connectivity has to agree. Named laboratory probes help discovery but do not replace that multi-boundary repair.

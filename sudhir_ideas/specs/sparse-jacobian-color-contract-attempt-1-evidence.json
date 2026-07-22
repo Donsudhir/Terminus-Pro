@@ -1,0 +1,557 @@
+{
+  "hardness_axes": [
+    {
+      "id": "discover",
+      "name": "Discover",
+      "verdict": "PASS",
+      "reasoning": "The public symptoms do not identify unsafe structural-symmetry grouping, uncleared probe-seed reuse on plan resume, cross-batch step-magnitude retention, or sparse-orientation mismatch at unpack. The solver must recover those facts from C, Rust, Fortran, and metamorphic runs."
+    },
+    {
+      "id": "synthesize",
+      "name": "Synthesize",
+      "verdict": "PASS",
+      "reasoning": "Correct packed sensitivity requires coordinated behavior across a C partitioner, a Rust plan/seed boundary, a Rust magnitude authority, and a Fortran unpack/reindex stage. No module contains the complete scientific invariant."
+    },
+    {
+      "id": "diagnose",
+      "name": "Diagnose",
+      "verdict": "PASS",
+      "reasoning": "The instruction reports incompatible packed entries, directional products, support mismatches, and summary disagreement without naming coloring, CPR, seed vectors, finite-difference step policy, CSR/CSC orientation, or fix sites."
+    },
+    {
+      "id": "navigate_coupling",
+      "name": "Navigate coupling",
+      "verdict": "PASS",
+      "reasoning": "A corrected partition still fails if seeds leak across resume, correct seeds still fail under stale magnitude, and correct upstream compression still serializes differently when the Fortran unpack orientation disagrees."
+    },
+    {
+      "id": "reason_beyond_training",
+      "name": "Reason beyond training",
+      "verdict": "PASS",
+      "reasoning": "A textbook CPR coloring routine can address only the partition shape. The custom plan lifecycle, magnitude scoping, and Fortran sparse-orientation contract create a project-specific scientific coupling that cannot be solved by copying one reference implementation."
+    }
+  ],
+  "anti_trivialization_checks": [
+    {
+      "id": "disclosure_collapse",
+      "name": "Disclosure-collapse",
+      "verdict": "PASS",
+      "reasoning": "An honest statement of packed-sensitivity parity and directional-product correctness does not reveal which partition, seed, magnitude, or unpack authority is inconsistent."
+    },
+    {
+      "id": "hidden_instance",
+      "name": "Hidden-instance",
+      "verdict": "PASS",
+      "reasoning": "The task generalizes across generated permutation, resume, scale-equivalent, and held-out directional batches rather than hiding one corrupted fixture."
+    },
+    {
+      "id": "single_artifact_repair",
+      "name": "Single-artifact repair",
+      "verdict": "PASS",
+      "reasoning": "Four coordinated locations across three languages are required, and no manifest, fixture, or report replacement can satisfy regenerated invariant checks."
+    },
+    {
+      "id": "generalization",
+      "name": "Generalization",
+      "verdict": "PASS",
+      "reasoning": "The verifier derives transformed variants and independent directional probes from raw residual families, so fixes must generalize beyond named bundles."
+    },
+    {
+      "id": "prompt_honesty",
+      "name": "Prompt-honesty",
+      "verdict": "PASS",
+      "reasoning": "The instruction names observable sensitivity failures, invocation, output, and completion conditions while withholding only implementation causes and fix sites."
+    },
+    {
+      "id": "cheating_vs_difficulty",
+      "name": "Cheating-vs-difficulty",
+      "verdict": "PASS",
+      "reasoning": "Regeneration and independent probes prevent hardcoding, but the difficulty remains the cross-language scientific diagnosis rather than those anti-cheating mechanisms."
+    },
+    {
+      "id": "mechanical_fix_filter",
+      "name": "Mechanical-fix filter",
+      "verdict": "PASS",
+      "reasoning": "The core work is not dependency placement, timeouts, reward formatting, or metadata repair."
+    },
+    {
+      "id": "localized_fix",
+      "name": "Localized-fix",
+      "verdict": "PASS",
+      "reasoning": "The selected topology contains one C location, two Rust locations, and one Fortran location, each controlling only one third of the planned tests."
+    },
+    {
+      "id": "oracle_locality",
+      "name": "Oracle-locality",
+      "verdict": "PASS",
+      "reasoning": "The planned oracle performs substantive partition, seed/plan, magnitude, and unpack changes rather than replacing one short file or toggling one compiler option."
+    },
+    {
+      "id": "small_declarative_cluster",
+      "name": "Small declarative-cluster",
+      "verdict": "PASS",
+      "reasoning": "No finite table, threshold list, schema block, or configuration cluster contains the solution."
+    },
+    {
+      "id": "grep_collapse",
+      "name": "Grep-collapse",
+      "verdict": "PASS",
+      "reasoning": "Selected fix paths and symbols use opaque lane, vault, gauge, and knit vocabulary that does not contain any noun extracted from the public instruction."
+    },
+    {
+      "id": "pre_factored_helper",
+      "name": "Pre-factored-helper",
+      "verdict": "PASS",
+      "reasoning": "The selected functions do not mirror public terms such as sensitivity, residual, probe, plan, scale, support, packed, or digest."
+    },
+    {
+      "id": "recipe_discount",
+      "name": "Recipe-discount",
+      "verdict": "PASS",
+      "reasoning": "A known CPR coloring recipe cannot repair the custom plan resume seed hygiene, batch-scoped magnitude policy, or Fortran unpack orientation."
+    },
+    {
+      "id": "security_aura_discount",
+      "name": "Security-aura discount",
+      "verdict": "PASS",
+      "reasoning": "This is a scientific-computing task and does not rely on security language or exploit framing for difficulty."
+    },
+    {
+      "id": "orthogonal_checklist",
+      "name": "Orthogonal-checklist",
+      "verdict": "PASS",
+      "reasoning": "Cross-location tests couple the C partitioner to Rust seed propagation, Rust magnitude lifecycle to permutation/scale batches, and Rust host state to the Fortran unpack."
+    },
+    {
+      "id": "harness_discount",
+      "name": "Harness-discount",
+      "verdict": "PASS",
+      "reasoning": "Docker and mixed-language compilation provide realism, while residual hardness comes from mathematical partition and representation decisions."
+    },
+    {
+      "id": "one_pass_solvability",
+      "name": "One-pass solvability",
+      "verdict": "PASS",
+      "reasoning": "Opening the obvious entrypoint does not reveal the four locations, and copying public coloring code leaves three non-C invariant failures plus custom lifecycle adaptation."
+    },
+    {
+      "id": "hard_only_gate",
+      "name": "Hard-only gate",
+      "verdict": "PASS",
+      "reasoning": "The bounded task requires professional sparse-derivative, floating-point step, FFI, and scientific-pipeline reasoning across three languages within an expert-hours scope."
+    },
+    {
+      "id": "discovery_budget_test",
+      "name": "Discovery budget test",
+      "verdict": "PASS",
+      "reasoning": "Four non-trivial discoveries are committed below, each with a distinct planned location and a reason it must remain absent from the public instruction."
+    },
+    {
+      "id": "instruction_specificity_test",
+      "name": "Instruction specificity test",
+      "verdict": "PASS",
+      "reasoning": "The drafted instruction stays at symptoms-only: no algorithm names, thresholds, schema enumerations, or named causes."
+    },
+    {
+      "id": "topology_distribution_test",
+      "name": "Topology distribution test",
+      "verdict": "PASS",
+      "reasoning": "Three distinct candidate topologies are enumerated below, each requiring at least three coordinating locations; the selected topology distributes tests across four locations at 0.3333 each."
+    }
+  ],
+  "rubric_axes": [
+    {
+      "id": "verifiable",
+      "name": "Verifiable",
+      "verdict": "PASS",
+      "reasoning": "Permutation parity, resume parity, scale parity, support containment, directional-product agreement, summary consistency, and byte determinism are all programmatic."
+    },
+    {
+      "id": "well_specified",
+      "name": "Well-specified",
+      "verdict": "PASS",
+      "reasoning": "The symptoms-only instruction clearly identifies invocation, output, preserved identities, invariant outcomes, and prohibited hardcoding without revealing implementation causes."
+    },
+    {
+      "id": "solvable",
+      "name": "Solvable",
+      "verdict": "PASS",
+      "reasoning": "The design bounds residuals and fixes to a small existing pipeline; an expert familiar with sparse derivatives and FFI can complete the coordinated changes in roughly three to eight hours."
+    },
+    {
+      "id": "difficult",
+      "name": "Difficult",
+      "verdict": "PASS",
+      "reasoning": "The task stays hard after honest disclosure because the observable packed-sensitivity failures do not identify which partition and cross-language conventions disagree."
+    },
+    {
+      "id": "interesting",
+      "name": "Interesting",
+      "verdict": "PASS",
+      "reasoning": "Reliable sparse Jacobian estimation is paid production work in optimization, PDE-constrained simulation, parameter estimation, and scientific machine learning."
+    },
+    {
+      "id": "outcome_verified",
+      "name": "Outcome-verified",
+      "verdict": "PASS",
+      "reasoning": "The tests accept any implementation producing correct mathematical and representational outcomes and do not require the oracle's exact code shape."
+    }
+  ],
+  "instruction_completeness_test": {
+    "verdict": "PASS",
+    "reasoning": "The instruction is sufficient to judge the final sensitivity report but insufficient to locate or derive the four fixes without deeply reading and running the codebase."
+  },
+  "discovery_budget": [
+    {
+      "discovery": "The column partitioner treats a structurally symmetric nonzero pattern as a safe grouping even when the residual Jacobian is numerically unsymmetric, so structurally non-orthogonal unknowns share a probe.",
+      "planned_location": "environment/native/lane.c::mix_cols",
+      "why_instruction_must_not_reveal": "Naming structural symmetry, coloring, or orthogonality would collapse the C diagnosis into a textbook CPR lookup."
+    },
+    {
+      "discovery": "Resuming a saved probe plan rebinds group slots without clearing prior seed bits, so later groups inherit leaked contributions from earlier partitions.",
+      "planned_location": "environment/host/vault.rs::bind_slot",
+      "why_instruction_must_not_reveal": "Naming seed hygiene or plan-slot clearing would directly expose the Rust plan-boundary repair."
+    },
+    {
+      "discovery": "Absolute finite-difference step magnitude is derived from a residual norm cached when the first plan is built and reused after independent scale-equivalent batches arrive.",
+      "planned_location": "environment/host/gauge.rs::reset_span",
+      "why_instruction_must_not_reveal": "Stating that step policy must reset per batch would directly expose the magnitude lifecycle repair."
+    },
+    {
+      "discovery": "Compression packs nonzero contributions using one sparse orientation while the Fortran unpack reads the opposite orientation, scrambling retained entries after otherwise correct probes.",
+      "planned_location": "environment/analysis/knit.f90::merge_slots",
+      "why_instruction_must_not_reveal": "Naming CSR/CSC or row/column major unpack would reduce the Fortran work to a disclosed layout flip."
+    }
+  ],
+  "instruction_specificity": {
+    "level": "symptoms-only",
+    "reasoning": "The public draft describes incompatible packed sensitivity reports and directional products across equivalent batches without naming algorithms, thresholds, schemas, or causes."
+  },
+  "attack_path": {
+    "summary": "Reproduce permutation and resume divergence, isolate which packed entries and directional products disagree, trace plan/seed and magnitude lifecycle, then reconcile sparse unpack orientation across the Fortran boundary.",
+    "reasoning": "The path requires experiments and cross-language model building; no prompt noun, file name, or single failed assertion reveals all four locations."
+  },
+  "smallest_plausible_patch": {
+    "summary": "Coordinated substantive edits to one C partition kernel, two Rust plan/magnitude locations, and one Fortran unpack fold, together exceeding a trivial patch.",
+    "reasoning": "Any strict subset leaves at least one permutation, resume, scale, support, directional-product, or deterministic-report property failing."
+  },
+  "collapse_audit": {
+    "verdict": "PASS",
+    "reasoning": "The editable frontier spans four non-obvious locations across three languages, the instruction remains symptoms-only, no declarative cluster or reference output exists, and the planned oracle adds substantive logic rather than deleting or toggling one feature.",
+    "residual_hardness": "After the complete file tree is visible, the solver must still identify why mathematically equivalent residual batches cross different partition and representation authorities and then preserve one invariant through four locations.",
+    "red_flags": []
+  },
+  "topology_enumeration": [
+    {
+      "id": "topology_a_selected",
+      "summary": "Partition orthogonality, plan/seed lifecycle, magnitude scoping, and unpack orientation disagree across the C, Rust, and Fortran pipeline.",
+      "locations": [
+        "native/lane.c::mix_cols",
+        "host/vault.rs::bind_slot",
+        "host/gauge.rs::reset_span",
+        "analysis/knit.f90::merge_slots"
+      ],
+      "why_no_single_location_suffices": "A correct partition can still be poisoned by leaked seeds or stale magnitude, and correct upstream probes can still unpack into a different packed matrix."
+    },
+    {
+      "id": "topology_b_probe_chain",
+      "summary": "Pattern build, seed application, compressed difference, and foreign status mapping form a four-stage probe chain.",
+      "locations": [
+        "native/lane.c::mix_cols",
+        "native/ember.c::tap_seed",
+        "native/quill.c::pack_diff",
+        "host/vault.rs::bind_slot"
+      ],
+      "why_no_single_location_suffices": "Correct groups are useless if seeds are wrong, correct seeds are useless if compression packs incorrectly, and correct compressed vectors are useless if the host rebinds the wrong plan slots."
+    },
+    {
+      "id": "topology_c_index_convention",
+      "summary": "Residual local coordinates, global unknown indexing, color-group membership, and Fortran unpack use incompatible index conventions.",
+      "locations": [
+        "kernels/ridge.f90::eval_resid",
+        "native/lane.c::mix_cols",
+        "host/gauge.rs::reset_span",
+        "analysis/knit.f90::merge_slots"
+      ],
+      "why_no_single_location_suffices": "Changing one convention only moves the disagreement to another boundary; producers and consumers must represent the same unknown-to-entry map."
+    }
+  ],
+  "construction_manifest": {
+    "symbol_table": [
+      {
+        "path": "native/lane.c",
+        "symbol": "mix_cols",
+        "kind": "function",
+        "signature": "int mix_cols(const int32_t *a, const int32_t *b, int32_t n, int32_t *c);",
+        "purpose": "Builds a partition of unknowns into probe groups from a nonzero pattern."
+      },
+      {
+        "path": "host/vault.rs",
+        "symbol": "bind_slot",
+        "kind": "function",
+        "signature": "pub(crate) fn bind_slot(a: i32, b: &mut Shelf) -> i8",
+        "purpose": "Binds a restored or fresh probe-group slot into the host shelf without leaking prior bits."
+      },
+      {
+        "path": "host/gauge.rs",
+        "symbol": "reset_span",
+        "kind": "function",
+        "signature": "pub(crate) fn reset_span(a: &mut Gauge, b: &[f64])",
+        "purpose": "Rebuilds per-run magnitude context used to choose finite-difference step sizes."
+      },
+      {
+        "path": "analysis/knit.f90",
+        "symbol": "merge_slots",
+        "kind": "function",
+        "signature": "integer(c_int) function merge_slots(a, b, c) bind(C)",
+        "purpose": "Unpacks compressed probe results into a stable sparse representation and updates support totals."
+      }
+    ],
+    "flipping_point_contract": {
+      "locations": [
+        {
+          "id": "A",
+          "path": "native/lane.c",
+          "controls_tests": [
+            "test_k01",
+            "test_k02",
+            "test_k06",
+            "test_k10"
+          ]
+        },
+        {
+          "id": "B",
+          "path": "host/vault.rs",
+          "controls_tests": [
+            "test_k03",
+            "test_k06",
+            "test_k07",
+            "test_k10"
+          ]
+        },
+        {
+          "id": "C",
+          "path": "host/gauge.rs",
+          "controls_tests": [
+            "test_k04",
+            "test_k05",
+            "test_k11",
+            "test_k12"
+          ]
+        },
+        {
+          "id": "D",
+          "path": "analysis/knit.f90",
+          "controls_tests": [
+            "test_k07",
+            "test_k08",
+            "test_k09",
+            "test_k12"
+          ]
+        }
+      ],
+      "no_single_location_flips_majority": true,
+      "concentration_cap": 0.34
+    },
+    "decoy_manifest": [
+      {
+        "path": "native/ledge.c",
+        "kind": "helper",
+        "rhymes_with": "mix_cols",
+        "non_fix_purpose": "Computes ordinary pattern statistics for diagnostic summaries."
+      },
+      {
+        "path": "host/locker.rs",
+        "kind": "helper",
+        "rhymes_with": "bind_slot",
+        "non_fix_purpose": "Maps display codes for status banners without affecting probe plans."
+      },
+      {
+        "path": "host/meter.rs",
+        "kind": "helper",
+        "rhymes_with": "reset_span",
+        "non_fix_purpose": "Clears reusable output slots after completed runs."
+      },
+      {
+        "path": "analysis/tally.f90",
+        "kind": "helper",
+        "rhymes_with": "merge_slots",
+        "non_fix_purpose": "Folds scalar diagnostic marks into aggregate counters."
+      }
+    ],
+    "code_forbidden_tokens": [
+      "residual",
+      "lab",
+      "app",
+      "sensitivity",
+      "report",
+      "batch",
+      "unknown",
+      "probe",
+      "plan",
+      "entry",
+      "matrix-vector",
+      "product",
+      "scale",
+      "support",
+      "mismatch",
+      "disagreement",
+      "matrix",
+      "audit",
+      "summary",
+      "pipeline",
+      "output",
+      "bin",
+      "senslab",
+      "variant",
+      "identity",
+      "nonzero",
+      "layout",
+      "directional",
+      "cardinality",
+      "structure",
+      "linearization",
+      "contract",
+      "reproducibility",
+      "digest",
+      "input",
+      "check",
+      "packed",
+      "json"
+    ]
+  },
+  "naming_pass": {
+    "instruction_nouns_extracted": [
+      "residual",
+      "lab",
+      "app",
+      "sensitivity",
+      "report",
+      "batch",
+      "unknown",
+      "probe",
+      "plan",
+      "entry",
+      "matrix-vector",
+      "product",
+      "scale",
+      "support",
+      "mismatch",
+      "disagreement",
+      "matrix",
+      "audit",
+      "summary",
+      "pipeline",
+      "output",
+      "bin",
+      "senslab",
+      "variant",
+      "identity",
+      "nonzero",
+      "layout",
+      "directional",
+      "cardinality",
+      "structure",
+      "linearization",
+      "contract",
+      "reproducibility",
+      "digest",
+      "input",
+      "check",
+      "packed",
+      "json"
+    ],
+    "renames_during_drafting": [
+      {
+        "original": "native/color.c",
+        "renamed_to": "native/lane.c",
+        "reason": "Removed a direct algorithmic tell for graph coloring."
+      },
+      {
+        "original": "host/plan.rs",
+        "renamed_to": "host/vault.rs",
+        "reason": "Removed the public instruction noun plan from a selected fix path."
+      },
+      {
+        "original": "host/scale.rs",
+        "renamed_to": "host/gauge.rs",
+        "reason": "Removed the public instruction noun scale from a selected fix path."
+      },
+      {
+        "original": "analysis/unpack.f90",
+        "renamed_to": "analysis/knit.f90",
+        "reason": "Removed a direct clue about the sparse-unpack fault."
+      },
+      {
+        "original": "apply_seed",
+        "renamed_to": "bind_slot",
+        "reason": "Avoided seed/probe vocabulary adjacent to the public contract."
+      }
+    ],
+    "test_names_audited": [
+      "test_k01",
+      "test_k02",
+      "test_k03",
+      "test_k04",
+      "test_k05",
+      "test_k06",
+      "test_k07",
+      "test_k08",
+      "test_k09",
+      "test_k10",
+      "test_k11",
+      "test_k12"
+    ],
+    "concentration_math": {
+      "total_tests": 12,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "D",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    },
+    "recomputed_concentration": {
+      "total_tests": 12,
+      "concentration_cap": 0.34,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "D",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    }
+  }
+}

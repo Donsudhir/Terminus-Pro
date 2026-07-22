@@ -1,0 +1,3 @@
+# SOLUTION — sparse-jacobian-color-contract REV-3
+
+The main idea is to keep one packed sensitivity story true end to end. Groups may only share a probe when unknowns do not share equation support. A resumed plan has to start clean instead of carrying old seed bits into later groups. Magnitude and step size have to come from the batch you are on now not from an earlier wide or tiny run. Unpack has to read compressed results in the same orientation they were packed. One thing that made this tricky is that each of those fixes looks small alone but they only work when you do them together and rebuild.

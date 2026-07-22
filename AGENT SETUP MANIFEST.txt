@@ -5,23 +5,22 @@
 # This file is intentionally hybrid:
 #   • Comments below are machine-readable instructions for an AI (or human) to
 #     reinstall the same toolchain versions (Python, uv, Harbor, Docker, …).
-#   • The non-comment lines are a normal pip requirements list; install with:
-#         uv venv .venv --python 3.10.12
-#         uv pip install -r requirements.txt --python .venv/bin/python
-#     (System `/usr/bin/python3` here has no `pip`; use `uv` or `ensurepip`.)
+#   • `pyproject.toml` + `uv.lock` are the installation source of truth:
+#         uv sync --frozen
+#         .venv/bin/python -m pytest -q
+#     The non-comment lines below remain a human-readable pin mirror.
 #
 # ---------------------------------------------------------------------------
-# VERIFIED ON THIS HOST (agent shell — re-run to confirm after OS upgrades)
+# VERIFIED ON THIS HOST (2026-07-18 — re-run after OS upgrades)
 # ---------------------------------------------------------------------------
-#   python3:            Python 3.10.12  (interpreter: /usr/bin/python3)
-#   .python-version:    3.10.12         (pyenv / asdf; matches host python3)
-#   uv / uvx:           0.9.5
-#   harbor:             0.1.44          (`harbor --version`)
-#   docker:             29.2.1 (build a5c7197)
-#   docker compose:     v5.1.0          (`docker compose version`)
+#   project Python:     3.12.x          (`.python-version`, `.venv`)
+#   uv / uvx:           0.11.29         (host bootstrap tool)
+#   harbor:             0.19.0          (`harbor --version`)
+#   docker client:      29.1.3
+#   docker daemon:      29.3.1          (currently Snap-managed)
+#   docker compose:     v2.32.4
 #
-#   Pip wheels below were resolved on CPython 3.10.12 via `uv pip install -r …`
-#   (not preinstalled on bare `/usr/bin/python3`).
+#   Python packages are resolved by `uv.lock`; do not install them globally.
 #
 # ---------------------------------------------------------------------------
 # AUTHORING / PACKAGING — repo-root *.py harness (stdlib-only unless noted)
@@ -82,10 +81,10 @@
 #   • Compiled tasks — may invoke cargo/cmake/make/go inside Docker images, not on host.
 #
 # ---------------------------------------------------------------------------
-# NOTES FOR PYTHON 3.10 HOSTS
+# PYTHON VERSION
 # ---------------------------------------------------------------------------
-#   • Some repo_tests fixtures use stdlib `tomllib` (3.11+). On 3.10.12, pytest pulls
-#     `tomli` transitively for some stacks; a few fixture imports may still need 3.11+.
+#   • The harness requires Python 3.12 through `pyproject.toml`.
+#   • Task containers may use other pinned Python versions independently.
 #
 # ---------------------------------------------------------------------------
 # POSIX UTILITIES (scripts/check-task.sh, packaging, gates)

@@ -1,0 +1,7 @@
+{"tick":4100,"op":"maintain.begin","catalog_entries":3,"active_epoch":3}
+{"tick":4101,"op":"frame.commit","bundle":"slice-01.bin","slot":0,"epoch":3}
+{"tick":4102,"op":"frame.observe","bundle":"slice-02.bin","slot":0,"status":"auth_refused"}
+{"tick":4103,"op":"frame.observe","bundle":"slice-03.bin","slot":0,"status":"accepted"}
+{"tick":4104,"op":"maintain.end","visited":3,"committed":1,"refused":1}
+{"tick":4120,"op":"compact.scan","segments":3,"frames":4,"duplicate_sequences":0}
+{"tick":4130,"op":"audit.scan","live_entries":3,"segment_frames":4,"status":"incomplete"}

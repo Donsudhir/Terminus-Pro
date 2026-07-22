@@ -1,0 +1,6 @@
+title = "cypress"
+profile = "plain"
+catalog = "/app/archive/catalog.json"
+roots = ["birch:200:220:stable:210"]
+apis = ["birch:beta_api", "elm:elm_api"]
+seed = "0"

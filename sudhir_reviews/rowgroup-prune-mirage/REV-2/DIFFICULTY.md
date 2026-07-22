@@ -1,0 +1,3 @@
+# DIFFICULTY — rowgroup-prune-mirage REV-2
+
+This task is hard because the wrong answers only appear when a historical artifact, a selective read, and one execution path line up. The solver has to separate damaged data from misleading metadata, then follow the same validity decision through a Rust writer and two C++ consumers. A local fix can make one mode look healthy while the archived or freshly ingested cases stays wrong, and broad fallbacks are caught because the healthy fast paths still have to do real work. The repair therefore needs diagnosis across artifacts and coordinated changes, not one lucky conditional.

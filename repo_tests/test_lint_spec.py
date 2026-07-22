@@ -26,7 +26,6 @@ from pathlib import Path
 
 import lint_spec
 
-
 V2_HEADER = """\
 ### Decision
 GO — Attempt 1.

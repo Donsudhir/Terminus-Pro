@@ -77,7 +77,7 @@ storage_mb = 10240
 
 
 GOOD_DOCKERFILE = """\
-FROM python:3.13-slim-bookworm@sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789
+FROM public.ecr.aws/docker/library/python:3.13-slim-bookworm@sha256:01f42367a0a94ad4bc17111776fd66e3500c1d87c15bbd6055b7371d39c124fb
 
 LABEL org.opencontainers.image.source="https://example.com/task"
 LABEL org.opencontainers.image.revision="deadbeef"
@@ -88,6 +88,7 @@ RUN apt-get update \\
     && apt-get install -y --no-install-recommends \\
         tmux=3.3a-3 \\
         asciinema=2.2.0-1 \\
+    && asciinema --version \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install --no-cache-dir pytest==8.4.1
@@ -105,7 +106,10 @@ class DockerfileCheckTest(unittest.TestCase):
         self.assertEqual(dockerfile_check.exit_code(report), 0)
 
     def test_missing_digest_fails(self) -> None:
-        bad = GOOD_DOCKERFILE.replace("@sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789", "")
+        bad = GOOD_DOCKERFILE.replace(
+            "@sha256:01f42367a0a94ad4bc17111776fd66e3500c1d87c15bbd6055b7371d39c124fb",
+            "",
+        )
         with tempfile.TemporaryDirectory() as tmpdir:
             task_dir = write_minimal_task(Path(tmpdir), dockerfile=bad)
             report = dockerfile_check.build_report(task_dir)
@@ -113,6 +117,188 @@ class DockerfileCheckTest(unittest.TestCase):
         messages = json.dumps(report)
         self.assertIn("pin_base_digest", messages)
         self.assertIn("@sha256", messages)
+
+    def test_non_sanctioned_final_image_fails_but_builder_is_allowed(self) -> None:
+        custom = GOOD_DOCKERFILE.replace(
+            GOOD_DOCKERFILE.splitlines()[0],
+            "FROM example.invalid/custom@sha256:" + "a" * 64,
+        )
+        builder_then_canonical = (
+            "FROM example.invalid/custom@sha256:" + "a" * 64 + " AS builder\n"
+            + GOOD_DOCKERFILE
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            bad_task = write_minimal_task(root / "bad", dockerfile=custom)
+            good_task = write_minimal_task(root / "good", dockerfile=builder_then_canonical)
+            bad = dockerfile_check.build_report(bad_task)
+            good = dockerfile_check.build_report(good_task)
+        self.assertIn("check_sanctioned_base_images", json.dumps(bad))
+        self.assertGreater(bad["fails"], 0)
+        self.assertEqual(good["fails"], 0, json.dumps(good, indent=2))
+
+    def test_scratch_is_sanctioned_without_digest(self) -> None:
+        dockerfile = "FROM scratch\nWORKDIR /app\n# tmux asciinema\n"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = write_minimal_task(Path(tmpdir), dockerfile=dockerfile)
+            report = dockerfile_check.build_report(task_dir)
+        sanctioned = next(
+            row for row in report["results"] if row["check"] == "check_sanctioned_base_images"
+        )
+        pinned = next(row for row in report["results"] if row["check"] == "pin_base_digest")
+        self.assertEqual(sanctioned["severity"], "PASS")
+        self.assertEqual(pinned["severity"], "PASS")
+
+    def test_build_context_size_limits_and_symlink_escape(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = write_minimal_task(Path(tmpdir), dockerfile=GOOD_DOCKERFILE)
+            oversized = task_dir / "environment" / "oversized.bin"
+            with oversized.open("wb") as file_handle:
+                file_handle.truncate(50 * 1024 * 1024 + 1)
+            outside = Path(tmpdir) / "outside.txt"
+            outside.write_text("outside", encoding="utf-8")
+            (task_dir / "environment" / "escape").symlink_to(outside)
+            report = dockerfile_check.build_report(task_dir)
+        text = json.dumps(report)
+        self.assertIn("exceeds 50 MiB", text)
+        self.assertIn("symlink escapes", text)
+
+    def test_compose_unsafe_capabilities_and_oracle_mount_fail(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = write_minimal_task(Path(tmpdir), dockerfile=GOOD_DOCKERFILE)
+            (task_dir / "environment" / "docker-compose.yaml").write_text(
+                "services:\n  app:\n    cap_add:\n      - NET_ADMIN\n"
+                "    volumes:\n      - ./oracle:/oracle\n",
+                encoding="utf-8",
+            )
+            report = dockerfile_check.build_report(task_dir)
+        text = json.dumps(report)
+        self.assertIn("NET_ADMIN", text)
+        self.assertIn("/oracle", text)
+
+    def test_archive_must_be_extracted_and_removed_in_same_stage(self) -> None:
+        bad = GOOD_DOCKERFILE + "\nCOPY fixtures.tar.gz /tmp/fixtures.tar.gz\n"
+        good = bad + (
+            "RUN tar -xzf /tmp/fixtures.tar.gz -C /app "
+            "&& rm /tmp/fixtures.tar.gz\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_task = write_minimal_task(Path(tmpdir) / "bad", dockerfile=bad)
+            good_task = write_minimal_task(Path(tmpdir) / "good", dockerfile=good)
+            bad_report = dockerfile_check.build_report(bad_task)
+            good_report = dockerfile_check.build_report(good_task)
+        extraction_bad = next(
+            row for row in bad_report["results"] if row["check"] == "check_file_extraction"
+        )
+        extraction_good = next(
+            row for row in good_report["results"] if row["check"] == "check_file_extraction"
+        )
+        self.assertEqual(extraction_bad["severity"], "WARN")
+        self.assertEqual(extraction_good["severity"], "PASS")
+
+    def test_layer_volatility_warns_for_copy_before_dependency_install(self) -> None:
+        bad = GOOD_DOCKERFILE + "\nCOPY . /app\nRUN pip install requests==2.32.4\n"
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = write_minimal_task(
+                Path(tmpdir),
+                dockerfile=bad,
+                dockerignore=".git\n__pycache__/\n",
+            )
+            report = dockerfile_check.build_report(task_dir)
+        volatility = next(
+            row for row in report["results"] if row["check"] == "check_layer_volatility"
+        )
+        self.assertEqual(volatility["severity"], "WARN")
+
+    def test_unjustified_runtime_build_tool_warns(self) -> None:
+        bad = GOOD_DOCKERFILE.replace(
+            "asciinema=2.2.0-1 \\\n",
+            "asciinema=2.2.0-1 \\\n        build-essential \\\n",
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = write_minimal_task(Path(tmpdir), dockerfile=bad)
+            report = dockerfile_check.build_report(task_dir)
+        runtime = next(
+            row
+            for row in report["results"]
+            if row["check"] == "check_no_build_tools_in_runtime"
+        )
+        self.assertEqual(runtime["severity"], "WARN")
+
+    def test_direct_download_requires_checksum(self) -> None:
+        bad = GOOD_DOCKERFILE + "\nRUN curl -fsSL https://example.com/tool -o /tmp/tool\n"
+        good = GOOD_DOCKERFILE + (
+            "\nRUN curl -fsSL https://example.com/tool -o /tmp/tool "
+            "&& echo 'abc  /tmp/tool' | sha256sum -c -\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            bad_task = write_minimal_task(Path(tmpdir) / "bad", dockerfile=bad)
+            good_task = write_minimal_task(Path(tmpdir) / "good", dockerfile=good)
+            bad_report = dockerfile_check.build_report(bad_task)
+            good_report = dockerfile_check.build_report(good_task)
+        self.assertGreater(bad_report["fails"], 0)
+        self.assertEqual(good_report["fails"], 0, json.dumps(good_report, indent=2))
+
+    def test_node_dependency_needs_exact_pin_or_lockfile(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = write_minimal_task(Path(tmpdir), dockerfile=GOOD_DOCKERFILE)
+            package = task_dir / "environment" / "package.json"
+            package.write_text(
+                '{"dependencies":{"left-pad":"^1.3.0"}}\n', encoding="utf-8"
+            )
+            bad = dockerfile_check.build_report(task_dir)
+            (task_dir / "environment" / "package-lock.json").write_text(
+                '{"lockfileVersion":3}\n', encoding="utf-8"
+            )
+            good = dockerfile_check.build_report(task_dir)
+        self.assertIn("left-pad", json.dumps(bad))
+        self.assertEqual(good["fails"], 0, json.dumps(good, indent=2))
+
+    def test_cargo_go_maven_and_gradle_unpinned_dependencies_fail(self) -> None:
+        cases = (
+            (
+                "Cargo.toml",
+                '[package]\nname="x"\nversion="0.1.0"\n[dependencies]\nserde = "^1"\n',
+                "serde",
+            ),
+            (
+                "go.mod",
+                "module example.invalid/x\ngo 1.24\nrequire example.invalid/dep v1.2.3\n",
+                "go.sum",
+            ),
+            (
+                "pom.xml",
+                "<project><dependencies><dependency><groupId>x</groupId>"
+                "<artifactId>dep</artifactId></dependency></dependencies></project>",
+                "dep",
+            ),
+            (
+                "build.gradle",
+                "dependencies { implementation 'com.example:dep:+' }\n",
+                "dynamic versions",
+            ),
+        )
+        for filename, content, expected in cases:
+            with self.subTest(filename=filename), tempfile.TemporaryDirectory() as tmpdir:
+                task_dir = write_minimal_task(Path(tmpdir), dockerfile=GOOD_DOCKERFILE)
+                (task_dir / "environment" / filename).write_text(content, encoding="utf-8")
+                report = dockerfile_check.build_report(task_dir)
+            self.assertGreater(report["fails"], 0, json.dumps(report, indent=2))
+            self.assertIn(expected, json.dumps(report))
+
+    def test_direct_npm_cargo_and_go_installs_require_versions(self) -> None:
+        bad = GOOD_DOCKERFILE + (
+            "\nRUN npm install left-pad\n"
+            "RUN cargo install ripgrep\n"
+            "RUN go install example.invalid/tool\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = write_minimal_task(Path(tmpdir), dockerfile=bad)
+            report = dockerfile_check.build_report(task_dir)
+        text = json.dumps(report)
+        self.assertIn("left-pad", text)
+        self.assertIn("cargo install requires", text)
+        self.assertIn("go install requires", text)
 
     def test_missing_session_tools_fails(self) -> None:
         bad = GOOD_DOCKERFILE.replace("tmux=3.3a-3 \\\n        asciinema=2.2.0-1 \\\n", "")
@@ -372,6 +558,42 @@ storage_mb = 10240
             json.dumps(report["results"], indent=2),
         )
         self.assertIn(dockerfile_check.exit_code(report), (0, 2))
+
+    def test_python_interpreter_hygiene_fails_on_usr_bin_python3_symlink(self) -> None:
+        bad = """\
+FROM python:3.13-slim-bookworm@sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789
+WORKDIR /app
+RUN apt-get update \\
+    && apt-get install -y --no-install-recommends asciinema=2.2.0-1 tmux=3.3a-3 \\
+    && rm -rf /var/lib/apt/lists/* \\
+    && asciinema --version
+RUN ln -sf /usr/local/bin/python3.13 /usr/bin/python3 \\
+    && ln -sf /usr/local/bin/python3.13 /usr/bin/python
+"""
+        with tempfile.TemporaryDirectory() as tmp:
+            task_dir = write_minimal_task(Path(tmp), dockerfile=bad)
+            report = dockerfile_check.build_report(task_dir)
+        hygiene = next(r for r in report["results"] if r["check"] == "python_interpreter_hygiene")
+        self.assertEqual(hygiene["severity"], "FAIL", json.dumps(hygiene, indent=2))
+        self.assertTrue(
+            any(issue["rule"] == "python_interpreter_hygiene" for issue in hygiene["issues"])
+        )
+
+    def test_python_interpreter_hygiene_passes_without_usr_bin_repoint(self) -> None:
+        good = """\
+FROM python:3.13-slim-bookworm@sha256:abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789
+WORKDIR /app
+RUN apt-get update \\
+    && apt-get install -y --no-install-recommends asciinema=2.2.0-1 tmux=3.3a-3 \\
+    && rm -rf /var/lib/apt/lists/* \\
+    && asciinema --version \\
+    && python3 -m pytest --version
+"""
+        result = dockerfile_check.check_python_interpreter_hygiene(
+            good,
+            dockerfile_check.normalize_dockerfile_lines(good),
+        )
+        self.assertEqual(result.severity, "PASS", result.detail or result.issues)
 
 
 if __name__ == "__main__":

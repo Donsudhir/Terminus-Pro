@@ -45,6 +45,7 @@ import re
 import sys
 from pathlib import Path
 
+import task_layout
 
 # ─── Signal A: named algorithms / primitives ────────────────────────────────
 
@@ -411,10 +412,12 @@ def classify_specificity(signals: dict[str, object]) -> dict[str, object]:
 # ─── Top-level ──────────────────────────────────────────────────────────────
 
 def load_instruction(task_dir: Path) -> str:
-    path = task_dir / "instruction.md"
-    if not path.exists():
-        return ""
-    return path.read_text(encoding="utf-8", errors="replace")
+    layout = task_layout.classify_task_dir(task_dir)
+    return "\n".join(
+        path.read_text(encoding="utf-8", errors="replace")
+        for path in task_layout.instruction_paths(task_dir, layout)
+        if path.exists()
+    )
 
 
 def audit_instruction(task_dir: Path) -> dict[str, object]:

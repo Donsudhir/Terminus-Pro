@@ -34,14 +34,14 @@ make sure task align with these files docker environment.mdc dockerfile and imag
 
 ---
 
-⁠Infrastructure failures (tmux crashes): 2–3 of the GPT-5.2 runs failed due to tmux not running or crashing. This is typically caused by missing tmux and/or asciinema in your Dockerfile. Make sure both are installed:
+⁠Infrastructure failures (tmux crashes): 2–3 of the GPT-5.5 runs failed due to tmux not running or crashing. This is typically caused by missing tmux and/or asciinema in your Dockerfile. Make sure both are installed:
 dockerfile
 RUN apt-get update \
 && apt-get install -y --no-install-recommends tmux asciinema \
 && rm -rf /var/lib/apt/lists/\*
-⁠GPT-5.2 scored 0%: Because most of its runs were infrastructure failures (not genuine task failures), the system can't confirm solvability from that model's perspective.
+⁠GPT-5.5 scored 0%: Because most of its runs were infrastructure failures (not genuine task failures), the system can't confirm solvability from that model's perspective.
 
-Fix the tmux/asciinema installation in your Dockerfile so GPT-5.2 runs don't crash on infrastructure, and the solvability check should pass on resubmission.
+Fix the tmux/asciinema installation in your Dockerfile so GPT-5.5 runs don't crash on infrastructure, and the solvability check should pass on resubmission.
 
 ---
 

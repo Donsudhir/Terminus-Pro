@@ -1,0 +1,9 @@
+{
+  "id": "alpha",
+  "parents": ["base"],
+  "patch": "alpha.patch",
+  "author_name": "Mira Chen",
+  "author_email": "mira@example.invalid",
+  "timestamp": "2025-02-04T14:10:00+0000",
+  "message": "extend alpha profile handling"
+}

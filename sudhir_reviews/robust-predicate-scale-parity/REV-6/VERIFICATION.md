@@ -1,0 +1,3 @@
+# VERIFICATION — robust-predicate-scale-parity REV-6
+
+The tests checks exact positive and negative cancellation cases, generated affine variants, mixed batch order, and a strict compiler build. They recompute orientation, in-sphere decisions, cell identity, adjacency, topology, and the report digest independently. The bundled corpus is protected, malformed input must fail closed, and repeat runs must be byte stable. A second valid implementation with a different refinement sentinel and row representation also passed, so the verifier does not require only the reference approach. The verifier script runs pytest from /tests with PYTHONSAFEPATH and --confcutdir so planted /app/pytest.py or /conftest.py cannot force reward=1.

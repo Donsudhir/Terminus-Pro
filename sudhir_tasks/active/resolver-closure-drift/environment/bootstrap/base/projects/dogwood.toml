@@ -1,0 +1,6 @@
+title = "dogwood"
+profile = "plain"
+catalog = "/app/archive/catalog.json"
+roots = ["alder:100:130:stable:120"]
+apis = ["alder:alder_api", "birch:birch_api", "elm:elm_api"]
+seed = "0"

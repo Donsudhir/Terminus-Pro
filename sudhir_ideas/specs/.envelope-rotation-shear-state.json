@@ -1,0 +1,770 @@
+{
+  "task_name": "envelope-rotation-shear",
+  "attempt": 1,
+  "best_score": [
+    0,
+    0
+  ],
+  "best_attempt": 1,
+  "plateau_count": 0,
+  "candidates": [],
+  "history": [
+    {
+      "attempt": 1,
+      "fails": 0,
+      "warns": 0,
+      "evidence_path": "/home/sudhir/Projects/TERMINUS/sudhir_ideas/specs/envelope-rotation-shear-attempt-1-evidence.json",
+      "evidence": {
+        "hardness_axes": [
+          {
+            "id": "discover",
+            "name": "Discover",
+            "verdict": "PASS",
+            "reasoning": "The public contract reports stable authentication, isolation, recovery, and repeatability symptoms without identifying the shared authority-identity representation, its divergent consumers, the surviving protected history, or the exact validation boundary. Those facts must be recovered from code, logs, runtime probes, configuration, and filesystem state."
+          },
+          {
+            "id": "synthesize",
+            "name": "Synthesize",
+            "verdict": "PASS",
+            "reasoning": "A correct repair must carry one stable authority identity through maintenance writes, scoped context construction, strict authenticated opening, and predecessor validation. No one component contains or can enforce the complete invariant."
+          },
+          {
+            "id": "diagnose",
+            "name": "Diagnose",
+            "verdict": "PASS",
+            "reasoning": "The instruction names only repeated authentication failures, namespace isolation failures, recovery outcomes, and non-repeatable maintenance. It does not name identity projection, metadata binding, historical lookup, candidate ambiguity, or any repair site."
+          },
+          {
+            "id": "navigate_coupling",
+            "name": "Navigate coupling",
+            "verdict": "PASS",
+            "reasoning": "Changing only write encoding leaves damaged state unreadable; changing only context encoding leaves existing records and history inconsistent; broad read fallback violates substitution rejection; history replay is unsafe until it validates the same stable authority identity used by writes and reads."
+          },
+          {
+            "id": "reason_beyond_training",
+            "name": "Reason beyond training",
+            "verdict": "PASS",
+            "reasoning": "Standard encryption and key-wrapping helpers are healthy. The work is a bespoke authority-lineage investigation requiring evidence correlation, hypothesis falsification, safe historical recovery, and coordinated migration rather than implementation of a familiar cryptographic recipe."
+          }
+        ],
+        "anti_trivialization_checks": [
+          {
+            "id": "disclosure_collapse",
+            "name": "Disclosure-collapse",
+            "verdict": "PASS",
+            "reasoning": "The honest instruction states every public command, output schema, and observable security property without naming the internal identity disagreement or historical recovery mechanism."
+          },
+          {
+            "id": "hidden_instance",
+            "name": "Hidden-instance",
+            "verdict": "PASS",
+            "reasoning": "The design covers a bundled incident, generated identities, healthy controls, later maintenance cycles, and generated recovery cases; it cannot be solved by locating one named corrupt record."
+          },
+          {
+            "id": "single_artifact_repair",
+            "name": "Single-artifact repair",
+            "verdict": "PASS",
+            "reasoning": "Four typed boundaries must agree, and generated recovery plus strict rejection cases prevent replacing one fixture, report, index, or record."
+          },
+          {
+            "id": "generalization",
+            "name": "Generalization",
+            "verdict": "PASS",
+            "reasoning": "Neutral generated namespace and recovery matrices exercise identities and maintenance cycles not present in the bundled incident."
+          },
+          {
+            "id": "prompt_honesty",
+            "name": "Prompt-honesty",
+            "verdict": "PASS",
+            "reasoning": "The instruction defines the four commands, the concise recovery JSON schema, affected-identity semantics, healthy preservation, isolation, repeatability, and rejection behavior while withholding implementation causes."
+          },
+          {
+            "id": "cheating_vs_difficulty",
+            "name": "Cheating-vs-difficulty",
+            "verdict": "PASS",
+            "reasoning": "Generated cases and immutable expected values prevent hardcoding, but the residual difficulty is reconstructing and repairing the shared authority-lineage invariant."
+          },
+          {
+            "id": "mechanical_fix_filter",
+            "name": "Mechanical-fix filter",
+            "verdict": "PASS",
+            "reasoning": "The intended work is not dependency installation, timeout adjustment, verifier plumbing, reward formatting, or task metadata repair."
+          },
+          {
+            "id": "localized_fix",
+            "name": "Localized-fix",
+            "verdict": "PASS",
+            "reasoning": "The selected topology uses four intrinsically distinct typed boundaries across four module roots, each controlling 4 of 12 tests, with coupled tests proving that local repairs remain incomplete."
+          },
+          {
+            "id": "oracle_locality",
+            "name": "Oracle-locality",
+            "verdict": "PASS",
+            "reasoning": "The planned oracle contributes approximately 130-190 substantive semantic-delta lines across four existing functions, with real encoding, validation, rejection, and journal-selection logic rather than whole-file replacement."
+          },
+          {
+            "id": "small_declarative_cluster",
+            "name": "Small declarative-cluster",
+            "verdict": "PASS",
+            "reasoning": "No table, policy switch, generation map, expected-value file, or report schema contains the solution; the schema only reports recovered identities."
+          },
+          {
+            "id": "grep_collapse",
+            "name": "Grep-collapse",
+            "verdict": "PASS",
+            "reasoning": "The selected paths, symbols, parameters, and opaque test names have no case-insensitive substring hit against the complete instruction noun and compound list."
+          },
+          {
+            "id": "pre_factored_helper",
+            "name": "Pre-factored-helper",
+            "verdict": "PASS",
+            "reasoning": "The four functions have opaque names and typed operational boundaries. Their baseline bodies perform plausible production work rather than presenting TODO stubs or prompt-mirroring helpers."
+          },
+          {
+            "id": "recipe_discount",
+            "name": "Recipe-discount",
+            "verdict": "PASS",
+            "reasoning": "Cryptographic primitives are already correct; a standard AEAD, KDF, or wrapping recipe does not determine which authority identity is legitimate across current and historical state."
+          },
+          {
+            "id": "security_aura_discount",
+            "name": "Security-aura discount",
+            "verdict": "PASS",
+            "reasoning": "After discounting security vocabulary, the task still requires causal diagnosis, competing-hypothesis falsification, validated data recovery, strict authority selection, and idempotent migration."
+          },
+          {
+            "id": "orthogonal_checklist",
+            "name": "Orthogonal-checklist",
+            "verdict": "PASS",
+            "reasoning": "The requirements are one coupled invariant: the identity used to create protected state must be the identity used to derive context, authorize an open, and validate a predecessor."
+          },
+          {
+            "id": "harness_discount",
+            "name": "Harness-discount",
+            "verdict": "PASS",
+            "reasoning": "The single-container Go build and deterministic fixtures provide reproducibility only; they do not supply the authority model or recovery proof."
+          },
+          {
+            "id": "one_pass_solvability",
+            "name": "One-pass solvability",
+            "verdict": "PASS",
+            "reasoning": "Opening the CLI and ordinary crypto wrappers does not reveal the divergent identity consumers, authoritative history, or safe migration order, and a first-pass compatibility fallback fails strict rejection."
+          },
+          {
+            "id": "hard_only_gate",
+            "name": "Hard-only gate",
+            "verdict": "PASS",
+            "reasoning": "The bounded incident requires professional security-storage forensics over an estimated 52 meaningful actions and a coordinated four-boundary repair, while remaining solvable in expert hours."
+          },
+          {
+            "id": "discovery_budget_test",
+            "name": "Discovery budget test",
+            "verdict": "PASS",
+            "reasoning": "Five non-trivial discoveries are committed with distinct code or runtime locations and explicit reasons the public instruction cannot disclose them."
+          },
+          {
+            "id": "instruction_specificity_test",
+            "name": "Instruction specificity test",
+            "verdict": "PASS",
+            "reasoning": "The instruction is symptoms-only. Its small JSON schema documents a required user-visible output but gives no algorithm, internal identity representation, threshold, fix location, or repair sequence."
+          },
+          {
+            "id": "topology_distribution_test",
+            "name": "Topology distribution test",
+            "verdict": "PASS",
+            "reasoning": "Three plausible topologies each coordinate four locations. The selected topology has four typed locations, no dominant location, and a maximum concentration of 4/12."
+          }
+        ],
+        "rubric_axes": [
+          {
+            "id": "verifiable",
+            "name": "Verifiable",
+            "verdict": "PASS",
+            "reasoning": "Deterministic resets, generated identities, public reads, recovery inventory, healthy hashes, complete-state hashes, and adversarial rejection are programmatically checkable."
+          },
+          {
+            "id": "well_specified",
+            "name": "Well-specified",
+            "verdict": "PASS",
+            "reasoning": "The public contract names every command, required output schema, affected-identity semantics, recovery and isolation outcomes, healthy preservation, strict rejection, and repeatability without prescribing internals."
+          },
+          {
+            "id": "solvable",
+            "name": "Solvable",
+            "verdict": "PASS",
+            "reasoning": "All keys, protected records, code, logs, runtime probes, configuration, and historical state are local and deterministic; an experienced engineer can reconstruct the invariant and repair the bounded Go system."
+          },
+          {
+            "id": "difficult",
+            "name": "Difficult",
+            "verdict": "PASS",
+            "reasoning": "One authority-lineage disagreement manifests differently at four boundaries, and safe recovery must reconcile them without accepting ambiguous or substituted records."
+          },
+          {
+            "id": "interesting",
+            "name": "Interesting",
+            "verdict": "PASS",
+            "reasoning": "Recovering secrets after a flawed envelope-key maintenance operation while preserving strict namespace authority is realistic incident-response work."
+          },
+          {
+            "id": "outcome_verified",
+            "name": "Outcome-verified",
+            "verdict": "PASS",
+            "reasoning": "Tests grade restored values, exact recovery identities, unchanged healthy data, namespace isolation, rejection, and byte-stable repetition rather than source text, command history, or oracle representation."
+          }
+        ],
+        "instruction_completeness_test": {
+          "verdict": "PASS",
+          "reasoning": "No. The instruction is complete enough to judge public correctness, including the recovery JSON schema, but it does not identify the shared authority representation, where its consumers diverge, which history is authoritative, or how to coordinate the repair."
+        },
+        "discovery_budget": [
+          {
+            "discovery": "Records touched through one maintenance placement convention bind a projection of the stable authority identity that disagrees with the projection consumed by later opens.",
+            "planned_location": "environment/conductor/arc.go, environment/model/codec.go, operation logs, and neutral header observations from /app/bin/inspect",
+            "why_instruction_must_not_reveal": "Naming an identity projection or metadata disagreement would identify the first repair boundary and collapse the initial diagnosis."
+          },
+          {
+            "discovery": "Distinct namespace labels can map to one runtime authority context because a second consumer does not preserve the complete stable identity.",
+            "planned_location": "environment/tenant/spine.go plus neutral context observations from /app/bin/inspect",
+            "why_instruction_must_not_reveal": "Naming the representation loss or its input shape would turn isolation diagnosis into a disclosed encoding edit."
+          },
+          {
+            "discovery": "Archived key generations remain usable, so the authentication failures are not caused by destruction of older key-encryption material.",
+            "planned_location": "environment/keyring/catalog.go, environment/config/ring.toml, and deterministic generation observations",
+            "why_instruction_must_not_reveal": "This is a plausible hypothesis the solver must falsify before choosing recovery authority; stating it would remove a necessary branch of the investigation."
+          },
+          {
+            "discovery": "Ordinary historical storage retains authenticated predecessor records sufficient to reconstruct every affected live record without plaintext answers.",
+            "planned_location": "environment/ledger/index.go, environment/ledger/compact.go, environment/ledger/reel.go, and protected fixture history",
+            "why_instruction_must_not_reveal": "Pointing to the retained predecessor substrate would convert forensic recovery into a treasure-map lookup."
+          },
+          {
+            "discovery": "A valid open and a valid predecessor must resolve exactly one full authority identity; accepting alternate projections restores availability but admits cross-authority substitutions.",
+            "planned_location": "environment/aperture/sill.go and deterministic rejection observations from /app/bin/inspect",
+            "why_instruction_must_not_reveal": "Naming candidate ambiguity or exact authority resolution would disclose the strict-read repair and the flaw in the tempting fallback."
+          }
+        ],
+        "instruction_specificity": {
+          "level": "symptoms-only",
+          "reasoning": "The instruction states public commands, outcomes, and the minimal recovery-inventory schema. It contains no cryptographic algorithm, internal authority representation, history location, numeric threshold, source path, function, cause statement, or repair order."
+        },
+        "investigation_profile": {
+          "weakness_areas": [
+            "security_reasoning",
+            "hidden_terminal_state",
+            "long_horizon_debugging",
+            "multi_component_reasoning"
+          ],
+          "causal_chain": [
+            {
+              "stage": 1,
+              "evidence": "Reset the deterministic corpus, run the public reads and audit, and compare the stable failing records with nearby healthy records and isolated generated identities.",
+              "finding": "Authentication and isolation failures follow the same maintenance-era authority boundary rather than unrelated physical corruption.",
+              "unlocks_next": "The shared boundary justifies correlating operation logs and protected headers by stable record and namespace identity."
+            },
+            {
+              "stage": 2,
+              "evidence": "Correlate operation logs, decoded headers, and before/after snapshots across failing and healthy controls.",
+              "finding": "Protected state created during the incident carries an authority fingerprint inconsistent with the fingerprint observed by later namespace-scoped operations.",
+              "unlocks_next": "The disagreement narrows the remaining explanations to key availability or divergent authority representation."
+            },
+            {
+              "stage": 3,
+              "evidence": "Exercise every configured archived key generation against intact controls and compare immutable protected-body digests.",
+              "finding": "Older key material remains usable and protected bodies are intact, falsifying key destruction and random corruption.",
+              "unlocks_next": "With key loss excluded, the solver can trace the stable authority identity through each typed consumer rather than weakening authentication."
+            },
+            {
+              "stage": 4,
+              "evidence": "Trace the identity created from public namespace and record inputs through maintenance binding, scoped context construction, and strict opening while comparing runtime fingerprints.",
+              "finding": "The typed boundaries consume divergent representations of one stable authority identity.",
+              "unlocks_next": "A trustworthy historical search can now use the complete stable identity instead of any ambiguous projection."
+            },
+            {
+              "stage": 5,
+              "evidence": "Follow stable record identities into ordinary historical indexes and validate candidate predecessors with the full authority identity and archived generations.",
+              "finding": "Each affected live record has one authenticated predecessor and all ambiguous or substituted candidates can be rejected.",
+              "unlocks_next": "Recovery is now possible without plaintext backups or permissive read fallback, defining the four coordinated implementation boundaries."
+            },
+            {
+              "stage": 6,
+              "evidence": "Repair write binding, scoped context construction, strict opening, and predecessor validation around the same stable authority identity, then rebuild.",
+              "finding": "Recovered, healthy, and newly maintained records share one authority-lineage model.",
+              "unlocks_next": "The repaired transition can be tested as a complete public workflow rather than as isolated local fixes."
+            },
+            {
+              "stage": 7,
+              "evidence": "Reset, recover, maintain twice, read and audit, hash complete state, and run generated isolation plus substitution controls.",
+              "finding": "All affected values are restored, the inventory is exact, healthy records are unchanged, identities remain isolated, repetition is byte-stable, and adversarial records are rejected.",
+              "unlocks_next": "This closes the incident with deterministic outcome evidence."
+            }
+          ],
+          "evidence_surfaces": [
+            {
+              "surface": "code",
+              "planned_location": "environment/conductor/, tenant/, aperture/, ledger/, model/, and keyring/",
+              "question_answered": "Which typed boundaries create, carry, authorize, retain, and restore protected state?"
+            },
+            {
+              "surface": "logs",
+              "planned_location": "environment/fixtures/logs/operations.ndjson",
+              "question_answered": "Which stable identities and maintenance phases changed during the incident?"
+            },
+            {
+              "surface": "filesystem",
+              "planned_location": "environment/fixtures/live/ and protected historical fixture storage",
+              "question_answered": "What current and superseded authenticated material exists after the damaging operation?"
+            },
+            {
+              "surface": "runtime-state",
+              "planned_location": "Deterministic neutral observations from /app/bin/inspect",
+              "question_answered": "Which generations remain usable, where authority fingerprints disagree, and which candidate opens reject?"
+            },
+            {
+              "surface": "configuration",
+              "planned_location": "environment/config/policy.toml and environment/config/ring.toml",
+              "question_answered": "Which generation and retention behavior is intended without identifying the faulty consumers?"
+            }
+          ],
+          "competing_hypotheses": [
+            {
+              "hypothesis": "Older key-encryption material was destroyed during maintenance.",
+              "why_plausible": "Authentication began failing immediately after key maintenance and affects records with older history.",
+              "falsifier": "The deterministic generation observation successfully opens intact controls under every configured archived generation."
+            },
+            {
+              "hypothesis": "Protected payloads were randomly corrupted on disk.",
+              "why_plausible": "Stable authentication failures are consistent with changed protected bytes.",
+              "falsifier": "Protected-body digests match pre-incident log entries while failure follows a logical authority boundary rather than storage geometry."
+            },
+            {
+              "hypothesis": "Cross-namespace values are caused by an in-memory cache leak unrelated to maintenance.",
+              "why_plausible": "Returning another namespace's value commonly indicates cache-key aliasing.",
+              "falsifier": "Fresh-process observations reproduce the authority-fingerprint collision before cache population and correlate it with the maintenance-era records."
+            }
+          ],
+          "conditional_failures": [
+            {
+              "scenario": "Records produced through the affected maintenance authority boundary",
+              "role": "failing",
+              "expected_behavior": "Recovery restores their original values and later maintenance preserves them."
+            },
+            {
+              "scenario": "Distinct generated namespaces that exercise the same authority boundary",
+              "role": "failing",
+              "expected_behavior": "They remain isolated for current, recovered, and newly maintained records."
+            },
+            {
+              "scenario": "Neighboring healthy records and generated identities outside the affected transition",
+              "role": "healthy-control",
+              "expected_behavior": "Recovery leaves their bytes unchanged and all matching reads continue to succeed."
+            },
+            {
+              "scenario": "Tampered records and intact records substituted across authority or history boundaries",
+              "role": "healthy-control",
+              "expected_behavior": "Strict authenticated reads reject them before and after recovery."
+            }
+          ],
+          "estimated_meaningful_actions": 52,
+          "determinism_strategy": "Ship fixed Go source, deterministic keys, protected records, logs, historical segments, and configuration in one offline container. Reset from immutable bundled inputs before each scenario, avoid clocks and runtime entropy, sort filesystem traversal, use explicit snapshots, and derive expected properties from verifier-owned fixed or generated values.",
+          "domain_reasoning": {
+            "domain": "Applied security engineering for envelope-encrypted storage, authority identity, key lineage, and forensic recovery.",
+            "why_not_trivia": "The solver does not need an obscure standard clause or a new primitive. They must reconcile identity, authenticated metadata, key generations, strict authorization, and protected history in a bespoke system while proving recovery does not weaken rejection."
+          }
+        },
+        "attack_path": {
+          "summary": "Correlate the shared authority boundary, falsify key loss and corruption, trace divergent identity consumers, validate one predecessor per affected record, then repair and verify all four typed boundaries.",
+          "reasoning": "Each stage removes a live competing explanation and supplies the identity needed by the next stage. The path spans code, logs, runtime state, configuration, and filesystem history without requiring a prescribed tool sequence."
+        },
+        "smallest_plausible_patch": {
+          "summary": "Substantive coordinated edits to conductor/arc.go, tenant/spine.go, aperture/sill.go, and ledger/reel.go, followed by recovery through the existing public CLI.",
+          "reasoning": "The typed signatures prevent one function from absorbing all responsibilities: only the writer creates a frame, only the context boundary creates a scoped context, only the opener has the ring needed for strict authentication, and only the journal boundary can select a predecessor. Expected real semantic delta is 130-190 lines."
+        },
+        "collapse_audit": {
+          "verdict": "PASS",
+          "reasoning": "The likely frontier is four opaque functions behind realistic neighboring modules and decoys. Public requirements map many-to-many onto them, generated tests do not name the intended mechanism, and no plaintext answer, permissive fallback, declarative table, or standard recipe can satisfy the complete matrix.",
+          "residual_hardness": "Even after the file tree is visible, the solver must determine that one stable authority identity is represented inconsistently, falsify key loss and corruption, identify authoritative protected history, reject ambiguous candidates, coordinate four typed boundaries, and prove the full transition is safe and idempotent.",
+          "red_flags": []
+        },
+        "topology_enumeration": [
+          {
+            "id": "topology_a_selected_typed_boundaries",
+            "summary": "Frame binding, scoped context, strict opening, and journal predecessor validation consume one stable authority identity through four typed boundaries.",
+            "locations": [
+              "conductor/arc.go::trace_q",
+              "tenant/spine.go::settle_r",
+              "aperture/sill.go::route_s",
+              "ledger/reel.go::replay_t"
+            ],
+            "why_no_single_location_suffices": "The writer cannot inspect journal history, the context builder cannot authenticate a frame, the opener cannot repair stored state, and the journal validator cannot define future write or context identity."
+          },
+          {
+            "id": "topology_b_transactional_migration",
+            "summary": "A migration planner, frame codec, historical index, and authenticated opener could coordinate an atomic authority-preserving transition.",
+            "locations": [
+              "conductor/plan.go::draft_batch",
+              "model/codec.go::pack_frame",
+              "ledger/index.go::seek_prior",
+              "aperture/open.go::open_one"
+            ],
+            "why_no_single_location_suffices": "Planning needs a validated predecessor, encoding must preserve the chosen identity, and opening must enforce that same identity; changing one leaves unrecovered state or unsafe acceptance."
+          },
+          {
+            "id": "topology_c_provenance_commit",
+            "summary": "Generation selection, stable identity mapping, historical retention, and atomic commit could coordinate through a provenance record.",
+            "locations": [
+              "keyring/catalog.go::select_epoch",
+              "tenant/table.go::axis_key",
+              "ledger/compact.go::keep_prior",
+              "conductor/commit.go::apply_set"
+            ],
+            "why_no_single_location_suffices": "A provenance record is trustworthy only when generation, identity, retained predecessor, and commit boundaries agree; any isolated change leaves aliasing, unrecoverable state, or unverifiable output."
+          }
+        ],
+        "construction_manifest": {
+          "symbol_table": [
+            {
+              "path": "conductor/arc.go",
+              "symbol": "trace_q",
+              "kind": "function",
+              "signature": "func trace_q(a model.ItemID, b model.AxisID, c keyring.Epoch, d model.Payload) (model.Frame, error)",
+              "purpose": "Builds the protected frame metadata for one transition."
+            },
+            {
+              "path": "tenant/spine.go",
+              "symbol": "settle_r",
+              "kind": "function",
+              "signature": "func settle_r(a model.AxisID, b keyring.Epoch) (crypto.Scope, error)",
+              "purpose": "Builds scoped bytes for one key operation."
+            },
+            {
+              "path": "aperture/sill.go",
+              "symbol": "route_s",
+              "kind": "function",
+              "signature": "func route_s(a model.Frame, b crypto.Scope, c *keyring.Ring) (model.Payload, error)",
+              "purpose": "Selects one candidate and performs an authenticated open."
+            },
+            {
+              "path": "ledger/reel.go",
+              "symbol": "replay_t",
+              "kind": "function",
+              "signature": "func replay_t(a *Journal, b model.ItemID, c model.AxisID, d keyring.Epoch) (*model.Frame, error)",
+              "purpose": "Locates and validates one prior protected frame."
+            }
+          ],
+          "flipping_point_contract": {
+            "locations": [
+              {
+                "id": "A",
+                "path": "conductor/arc.go",
+                "controls_tests": [
+                  "test_e01",
+                  "test_e05",
+                  "test_e09",
+                  "test_e12"
+                ]
+              },
+              {
+                "id": "B",
+                "path": "tenant/spine.go",
+                "controls_tests": [
+                  "test_e02",
+                  "test_e06",
+                  "test_e10",
+                  "test_e12"
+                ]
+              },
+              {
+                "id": "C",
+                "path": "aperture/sill.go",
+                "controls_tests": [
+                  "test_e03",
+                  "test_e07",
+                  "test_e09",
+                  "test_e11"
+                ]
+              },
+              {
+                "id": "D",
+                "path": "ledger/reel.go",
+                "controls_tests": [
+                  "test_e04",
+                  "test_e08",
+                  "test_e09",
+                  "test_e10"
+                ]
+              }
+            ],
+            "no_single_location_flips_majority": true,
+            "concentration_cap": 0.34
+          },
+          "decoy_manifest": [
+            {
+              "path": "conductor/dial.go",
+              "kind": "helper",
+              "rhymes_with": "trace_q",
+              "non_fix_purpose": "Produces dry-run timing and item-count telemetry for operator summaries."
+            },
+            {
+              "path": "tenant/relay.go",
+              "kind": "helper",
+              "rhymes_with": "settle_r",
+              "non_fix_purpose": "Normalizes display labels for diagnostics without participating in protected operations."
+            },
+            {
+              "path": "aperture/panel.go",
+              "kind": "helper",
+              "rhymes_with": "route_s",
+              "non_fix_purpose": "Routes health observations into human-readable status rows."
+            },
+            {
+              "path": "ledger/spool.go",
+              "kind": "helper",
+              "rhymes_with": "replay_t",
+              "non_fix_purpose": "Replays compaction counters into metrics without reading protected frame bodies."
+            }
+          ],
+          "code_forbidden_tokens": [
+            "maintenance",
+            "window",
+            "maintenance window",
+            "last maintenance window",
+            "services",
+            "app",
+            "secrets",
+            "records",
+            "same records",
+            "authentication",
+            "service",
+            "namespaces",
+            "service namespaces",
+            "namespace",
+            "namespace values",
+            "values",
+            "system",
+            "existing system",
+            "secret",
+            "affected secret",
+            "incident",
+            "pre-incident value",
+            "correct pre-incident value",
+            "value",
+            "bin",
+            "vaultctl",
+            "recover",
+            "command",
+            "output",
+            "recovery",
+            "recovery.json",
+            "JSON",
+            "object",
+            "JSON object",
+            "recovered",
+            "array",
+            "recovered array",
+            "items",
+            "array items",
+            "form",
+            "string",
+            "service/secret identity",
+            "affected service/secret identity",
+            "identity",
+            "healthy identity",
+            "healthy records",
+            "byte",
+            "byte-for-byte",
+            "get",
+            "bundled corpus",
+            "corpus",
+            "maintain",
+            "run",
+            "second run",
+            "state",
+            "on-disk state",
+            "complete on-disk state",
+            "audit",
+            "recovered values",
+            "tampered records",
+            "substituted records",
+            "behavior",
+            "same behavior",
+            "reset",
+            "corpus reset",
+            "clean corpus reset",
+            "generated namespaces",
+            "additional generated namespaces",
+            "cycles",
+            "maintenance cycles",
+            "later maintenance cycles"
+          ]
+        },
+        "naming_pass": {
+          "instruction_nouns_extracted": [
+            "maintenance",
+            "window",
+            "maintenance window",
+            "last maintenance window",
+            "services",
+            "app",
+            "secrets",
+            "records",
+            "same records",
+            "authentication",
+            "service",
+            "namespaces",
+            "service namespaces",
+            "namespace",
+            "namespace values",
+            "values",
+            "system",
+            "existing system",
+            "secret",
+            "affected secret",
+            "incident",
+            "pre-incident value",
+            "correct pre-incident value",
+            "value",
+            "bin",
+            "vaultctl",
+            "recover",
+            "command",
+            "output",
+            "recovery",
+            "recovery.json",
+            "JSON",
+            "object",
+            "JSON object",
+            "recovered",
+            "array",
+            "recovered array",
+            "items",
+            "array items",
+            "form",
+            "string",
+            "service/secret identity",
+            "affected service/secret identity",
+            "identity",
+            "healthy identity",
+            "healthy records",
+            "byte",
+            "byte-for-byte",
+            "get",
+            "bundled corpus",
+            "corpus",
+            "maintain",
+            "run",
+            "second run",
+            "state",
+            "on-disk state",
+            "complete on-disk state",
+            "audit",
+            "recovered values",
+            "tampered records",
+            "substituted records",
+            "behavior",
+            "same behavior",
+            "reset",
+            "corpus reset",
+            "clean corpus reset",
+            "generated namespaces",
+            "additional generated namespaces",
+            "cycles",
+            "maintenance cycles",
+            "later maintenance cycles"
+          ],
+          "renames_during_drafting": [
+            {
+              "original": "runner/arc.go",
+              "renamed_to": "conductor/arc.go",
+              "reason": "The original path contained the instruction noun run as a substring."
+            },
+            {
+              "original": "namespace/context.go",
+              "renamed_to": "tenant/spine.go",
+              "reason": "The original path contained the instruction nouns namespace and contextually mirrored the public isolation symptom."
+            },
+            {
+              "original": "recover_entry",
+              "renamed_to": "replay_t",
+              "reason": "The original symbol contained the command token recover and disclosed the historical restoration locus."
+            },
+            {
+              "original": "test_prefix_collision",
+              "renamed_to": "test_e06",
+              "reason": "The original test name disclosed a planned mechanism instead of naming only an opaque scenario."
+            }
+          ],
+          "test_names_audited": [
+            "test_e01",
+            "test_e02",
+            "test_e03",
+            "test_e04",
+            "test_e05",
+            "test_e06",
+            "test_e07",
+            "test_e08",
+            "test_e09",
+            "test_e10",
+            "test_e11",
+            "test_e12"
+          ],
+          "concentration_math": {
+            "total_tests": 12,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "B",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "C",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "D",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              }
+            ]
+          },
+          "recomputed_concentration": {
+            "total_tests": 12,
+            "concentration_cap": 0.34,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "B",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "C",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "D",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              }
+            ]
+          }
+        }
+      },
+      "evidence_errors": [],
+      "blocking_failures": []
+    }
+  ],
+  "schema_path": "/home/sudhir/Projects/TERMINUS/specs/validation_schema.json",
+  "evidence_contract_version": 3
+}

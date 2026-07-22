@@ -1,0 +1,3 @@
+# VERIFICATION — envelope-rotation-shear REV-4
+
+The tests check recovery, maintenance, reads, and audit from clean resets and verifier-generated namespaces. They require valid live records sealed under a generated service’s own public name to read without recovery, while intact substitutions fail through both read and audit paths. Other cases assert exact recovered identity inventory, prior-history recovery, healthy byte preservation, older-record re-encryption, and second-run stability without rewriting already-matching active records. Tampered records must still reject, NOP stays at zero reward, and the oracle passes the complete suite.

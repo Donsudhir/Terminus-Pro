@@ -37,13 +37,10 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import threading
 import unittest
 import zipfile
 from pathlib import Path
 from unittest import mock
-
-import zipfile
 
 import approve_task
 import collapse_check
@@ -52,8 +49,7 @@ import run_static_checks
 import task_integrity
 import validate_submission_zip
 import validation_log
-from repo_tests.cases import FIXTURE_TASKS_DIR
-
+from repo_tests.current_cases import CLEAN_FIXTURE_NAME, FIXTURE_TASKS_DIR
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / "scripts" / "check-task.sh"
@@ -65,6 +61,7 @@ class _MetricsEnvCleaner(unittest.TestCase):
     _ENV_VARS = (
         metrics_collector.TASK_DIR_ENV,
         metrics_collector.RUN_ID_ENV,
+        "TB3_SPECS_DIR",
     )
 
     def setUp(self) -> None:
@@ -668,10 +665,11 @@ def _build_minimal_zip_bytes(extra_members: dict[str, bytes]) -> bytes:
     inject. Mirrors `_build_minimal_zip` in test_validate_submission_zip."""
     base_members = {
         "instruction.md": b"Repair the imaginary widget.\n",
-        "task.toml": b'version = "2.0"\n',
+        "task.toml": b'version = "2.0"\n[metadata]\nnumber_of_milestones = 0\n',
         "environment/Dockerfile": b"FROM scratch\n",
         "solution/solve.sh": b"#!/usr/bin/env bash\n",
         "tests/test.sh": b"#!/usr/bin/env bash\n",
+        "tests/test_outputs.py": b"def test_placeholder():\n    assert True\n",
     }
     base_members.update(extra_members)
     buffer = io.BytesIO()
@@ -731,10 +729,11 @@ def _seed_min_task(task_dir: Path) -> None:
     Phase B tmp zip. Mirrors the helper in test_check_task_sh.py."""
     files = {
         "instruction.md": "Test task body.\n",
-        "task.toml": 'version = "2.0"\n',
+        "task.toml": 'version = "2.0"\n[metadata]\nnumber_of_milestones = 0\n',
         "environment/Dockerfile": "FROM scratch\n",
         "solution/solve.sh": "#!/usr/bin/env bash\nexit 0\n",
         "tests/test.sh": "#!/usr/bin/env bash\n",
+        "tests/test_outputs.py": "def test_placeholder():\n    assert True\n",
     }
     for rel, content in files.items():
         target = task_dir / rel
@@ -754,11 +753,12 @@ class CheckTaskShInstrumentationTest(unittest.TestCase):
         self.tmpdir = Path(tempfile.mkdtemp(prefix="check-task-instr-test-"))
         self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
 
-        for stub in ("run_static_checks.py", "collapse_check.py"):
+        for stub in ("run_static_checks.py", "collapse_check.py", "dockerfile_check.py"):
             (self.tmpdir / stub).write_text("import sys\nsys.exit(0)\n")
 
         for real in (
             "validate_submission_zip.py",
+            "task_layout.py",
             "task_integrity.py",
             "metrics_collector.py",
         ):
@@ -1398,13 +1398,13 @@ class ApproveTaskMetricsTest(_MetricsEnvCleaner):
     test_draft_commitments_diff_is_null_initially, and
     test_aggregate_reports_no_pass_when_second_marker_absent.
 
-    The fixture is `implicit-step-restart` (already used by
-    test_approve_task_dirty_flag.py); Phase A validators are mocked
+    The immutable current clean fixture is also used by
+    test_approve_task_dirty_flag.py. Phase A validators are mocked
     so we exercise only the metrics + dirty-flag branches of
     build_report.
     """
 
-    fixture_name = "implicit-step-restart"
+    fixture_name = CLEAN_FIXTURE_NAME
 
     def setUp(self) -> None:
         super().setUp()
@@ -1418,7 +1418,7 @@ class ApproveTaskMetricsTest(_MetricsEnvCleaner):
         shutil.copytree(fixture, self.task_dir)
         self.zip_path = self.tmp_root / f"{fixture.name}.zip"
         self.spec_path = (
-            self.tmp_root / "specs" / f"{fixture.name}.md"
+            self.tmp_root / "sudhir_ideas" / "specs" / f"{fixture.name}.md"
         )
         self.spec_path.parent.mkdir(parents=True, exist_ok=True)
         self.log_path = self.spec_path.with_name(
@@ -1793,7 +1793,7 @@ class ApproveTaskMetricsTest(_MetricsEnvCleaner):
         self.assertFalse(self.log_path.exists())
 
 
-class EndToEndAuthoringTest(unittest.TestCase):
+class EndToEndAuthoringTest(_MetricsEnvCleaner):
     """Full synthetic authoring loop end-to-end.
 
     Covers the integration surfaces that the per-tool unit tests
@@ -1816,6 +1816,7 @@ class EndToEndAuthoringTest(unittest.TestCase):
     """
 
     def setUp(self) -> None:
+        super().setUp()
         self.tmpdir = Path(tempfile.mkdtemp(prefix="e2e-authoring-"))
         self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
 
@@ -1824,6 +1825,7 @@ class EndToEndAuthoringTest(unittest.TestCase):
             "validation_log.py",
             "task_integrity.py",
             "validate_submission_zip.py",
+            "task_layout.py",
         ):
             shutil.copy(REPO_ROOT / real, self.tmpdir / real)
 
@@ -1845,6 +1847,7 @@ class EndToEndAuthoringTest(unittest.TestCase):
         (self.tmpdir / "collapse_check.py").write_text(
             stub_template.format(tool="collapse_check")
         )
+        (self.tmpdir / "dockerfile_check.py").write_text("import sys\nsys.exit(0)\n")
 
         scripts_dir = self.tmpdir / "scripts"
         scripts_dir.mkdir()
@@ -1856,7 +1859,7 @@ class EndToEndAuthoringTest(unittest.TestCase):
         self.task_dir.mkdir(parents=True)
         _seed_min_task(self.task_dir)
 
-        self.spec_path = self.tmpdir / "specs" / "synth.md"
+        self.spec_path = self.tmpdir / "sudhir_ideas" / "specs" / "synth.md"
         self.spec_path.parent.mkdir(parents=True, exist_ok=True)
         self.spec_path.write_text(
             "# Synth spec\n\nbody\n", encoding="utf-8"
@@ -1976,6 +1979,10 @@ class EndToEndAuthoringTest(unittest.TestCase):
             approve_task.collapse_check,
             "build_report",
             return_value=_build_clean_collapse_report(),
+        ), mock.patch.object(
+            approve_task.dockerfile_check,
+            "build_report",
+            return_value={"fails": 0, "warns": 0, "results": []},
         ):
             payload = approve_task.build_report(
                 self.task_dir,

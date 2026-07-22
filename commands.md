@@ -2,36 +2,99 @@
 
 All harbor, CI, validation, and debug commands for Terminal-Bench 3 task development.
 
+## Task Idea Proposal (first gate)
+
+Generate the four paste-ready fields first, then let Sudhir run Snorkel
+**Check feedback**. After the platform result returns, capture the permanent
+idea and proposal evidence before uniqueness:
+
+```bash
+python3 sudhir_task.py idea new <slug> \
+    --summary "<2-5 sentence summary>" \
+    --category <local-category-slug> \
+    --skills "<5-10 comma-separated skills>" \
+    --tags "<3-6 comma-separated tags>"
+
+python3 sudhir_task.py idea proposal <slug> passed \
+    --summary-file /tmp/<slug>-summary.txt \
+    --category "<exact platform category label>" \
+    --skills "<5-10 comma-separated skills>" \
+    --tags "<3-6 comma-separated tags>" \
+    --evidence "<platform screenshot/export/note reference>" \
+    --feedback "<Check feedback text, if present>" \
+    --source-type "<GitHub issue | SWE-bench pattern | paper | ...>" \
+    --source-reference "<URL/title/path>" \
+    --reuse-boundary "<what inspired the idea and what was not copied>"
+```
+
+Use verdict `failed` with feedback/evidence when the platform rejects the
+proposal. Revise and rerun the proposal command after rechecking. Proposal PASS
+is required before uniqueness PASS, task registration, or Step 2a; it is not a
+substitute for those later gates.
+
+## Policy Eligibility
+
+Current reviewed snapshot: `terminus-ec-2026-07-21`. Net-new
+`data-processing`, `debugging`, `software-engineering`, and milestone tasks are
+officially blocked. Net-new `ui_building` is separately blocked by repository
+house policy. Existing review/revision work needs source-backed exemption
+evidence; UI revisions must also pass Python pytest + Playwright Python
+compatibility checks.
+
+```bash
+# Inspect without changing task source.
+python3 sudhir_task.py eligibility <slug> --action view
+python3 sudhir_task.py eligibility <slug> --action package --json
+
+# Capture an existing platform review/revision exemption. Evidence is required;
+# a bare boolean is rejected.
+python3 sudhir_task.py exemption-capture <slug> \
+    --rule-id official.category.<category>.blocked \
+    --platform-state NEEDS_REVISION \
+    --source "stb submissions list <date> + live Category Status" \
+    --evidence sudhir_reviews/<slug>/REV-<n>/ELIGIBILITY.md \
+    --reason "Existing submission is already in the revision queue."
+```
+
+Eligibility is enforced before uniqueness PASS, Step 2a GO, task registration,
+package, and submitted phase. Pre-ADR records remain readable; missing evidence
+blocks only their next package/submit decision.
+
 ## Harbor — Task Validation
 
 ```bash
-# Step 2b preflight (BLOCKING, routine): oracle and NOP may be launched in
-# parallel in separate terminals. Do not edit task files during either run.
-# Oracle stress test — 10 parallel runs (no API key needed)
-harbor run -p "tasks/<task-name>" -a oracle -k 10 -n 10
+source scripts/sudhir-env.sh
+TASK="$TB3_TASKS_DIR/<task-name>"
+
+# Step 2b sanity checks (BLOCKING, routine). Do not edit task files during a run.
+# Oracle — one run only; the 10x stress test belongs to Step 4.
+harbor run -p "$TASK" -a oracle
 
 # NOP (must score 0.0, no API key needed)
-harbor run -p "tasks/<task-name>" -a nop
+harbor run -p "$TASK" -a nop
 
-# Step 3a-Q (OPT-IN): GPT-5.2 quality check. Only run when a reviewer asked
+# Step 4 final determinism stress, after every review edit is settled.
+harbor run -p "$TASK" -a oracle -k 10 -n 10
+
+# Step 3a-Q (OPT-IN): GPT-5.5 quality check. Only run when a reviewer asked
 # for it or you want to pressure-test instruction/test wording.
 set -a && source .env && set +a
-harbor tasks check "tasks/<task-name>" -m "openai/gpt-5.2" -o /tmp/<task-name>-qc.json
+harbor tasks check "$TASK" -m "openai/@openai/gpt-5.5" -o /tmp/<task-name>-qc.json
 
 # Interactive debug (shell into the container)
-harbor tasks start-env -p "tasks/<task-name>" -e docker -a -i
+harbor tasks start-env -p "$TASK" -e docker -a -i
 
 # Init new task skeleton
-harbor tasks init <task-name> --include-standard-metadata --tasks-dir tasks/
+harbor tasks init <task-name> --include-standard-metadata --tasks-dir "$TB3_TASKS_DIR"
 ```
 
 ### Parallel execution notes
 
 - `-k N` sets how many parallel runs to schedule; use `-n N` to cap how many run at once
-- Oracle: use `-k 10 -n 10` so all 10 runs execute together (no buffered batches)
+- In Step 4, use `-k 10 -n 10` so all 10 oracle runs execute together
 - Each parallel run gets its own job directory, results are aggregated automatically
-- `oracle -k 10 -n 10` and `nop` are safe to run at the same time as Step 2b preflight in separate terminals
-- Do not start Step 3a-Q (quality check) until Step 2b's oracle + NOP preflight has passed
+- Do not run Step 4's 10x oracle concurrently with NOP or review diagnostics
+- Do not start Step 3a-Q (quality check) until Step 2b's oracle 1x + NOP sanity checks have passed
 - Do not overlap `verifier_health.py` (Step 3a-V) with other harbor runs on the same task directory; it launches additional oracle jobs and temporary task copies for randomized-order and partial-oracle checks
 
 ### Interpreting results
@@ -57,11 +120,14 @@ git commit -m "local workspace init"
 ## Task Requirements Checklist
 
 ```bash
+source scripts/sudhir-env.sh
+TASK="$TB3_TASKS_DIR/<task-name>"
+
 # Map submission requirements to repo gates + manual reminders
-python3 requirements_check.py tasks/<task-name>
-python3 requirements_check.py tasks/<task-name> --quick    # skip collapse_check
-python3 requirements_check.py tasks/<task-name> --ruff     # also run ruff on tests/
-python3 requirements_check.py tasks/<task-name> --json
+python3 requirements_check.py "$TASK"
+python3 requirements_check.py "$TASK" --quick    # skip collapse_check
+python3 requirements_check.py "$TASK" --ruff     # also run ruff on tests/
+python3 requirements_check.py "$TASK" --json
 ```
 
 Runs structural/task.toml checks locally, then delegates to `run_static_checks.py`,
@@ -73,19 +139,19 @@ Runs structural/task.toml checks locally, then delegates to `run_static_checks.p
 ```bash
 # Use these while authoring and debugging.
 # Edition 2 task-scoped static checker for repo-local structural/compliance rules
-python3 run_static_checks.py --task-dir tasks/<task-name> --version edition_2
+python3 run_static_checks.py --task-dir "$TASK" --version edition_2
 
 # Focused subsets when debugging one area
-python3 run_static_checks.py --task-dir tasks/<task-name> --version edition_2 --only task_toml --only task_structure
-python3 run_static_checks.py --task-dir tasks/<task-name> --version edition_2 --only dockerfile --only compose
-python3 run_static_checks.py --task-dir tasks/<task-name> --version edition_2 --only test_sh --only test_layout
-python3 run_static_checks.py --task-dir tasks/<task-name> --version edition_2 --only instruction --only absolute_paths --only canary --only output_contract
-python3 run_static_checks.py --task-dir tasks/<task-name> --version edition_2 --only environment_hidden_instructions
+python3 run_static_checks.py --task-dir "$TASK" --version edition_2 --only task_toml --only task_structure
+python3 run_static_checks.py --task-dir "$TASK" --version edition_2 --only dockerfile --only compose
+python3 run_static_checks.py --task-dir "$TASK" --version edition_2 --only test_sh --only test_layout
+python3 run_static_checks.py --task-dir "$TASK" --version edition_2 --only instruction --only absolute_paths --only canary --only output_contract
+python3 run_static_checks.py --task-dir "$TASK" --version edition_2 --only environment_hidden_instructions
 
 # Dockerfile & image best-practices (digest pinning, apt hygiene, tmux/asciinema,
 # siloing, .dockerignore, task.toml resources). Wired into ./scripts/check-task.sh.
-python3 dockerfile_check.py tasks/<task-name>
-python3 dockerfile_check.py tasks/<task-name> --json
+python3 dockerfile_check.py "$TASK"
+python3 dockerfile_check.py "$TASK" --json
 # `--only instruction` includes a non-blocking WARN when the literal word "milestone" / "milestones"
 # appears in instruction.md (mirrors the upstream instruction-eval rule). See REPO_CONVENTIONS.md
 # § "The literal word 'milestone' in instruction.md is a (non-blocking) warning" for the rationale.
@@ -100,7 +166,7 @@ python3 dockerfile_check.py tasks/<task-name> --json
 # It covers the repo-local static rule set only.
 
 # Lint test file
-ruff check tasks/<task-name>/tests/
+ruff check "$TASK/tests/"
 ```
 
 ### Diff your task against a reference task
@@ -124,20 +190,20 @@ diff <(python3 run_static_checks.py --task-dir tasks/<task-name> 2>&1 | grep '^ 
 - Platform agent trials scored 0/10 while Step 2b's oracle + NOP look healthy
 - A specific test looks chain-dependent, order-sensitive, or flaky
 - A reviewer asked for partial-oracle ablation evidence
-- Step 2b's 10x oracle stress showed intermittent failures (add `--include-repeat-oracle`)
+- Step 4's 10x oracle stress showed intermittent failures (add `--include-repeat-oracle`)
 
 Skip it for routine tasks.
 
 ```bash
 # Default pass: randomized-order verifier runs + partial-oracle ablations.
-python3 verifier_health.py --task-dir tasks/<task-name> --output-json /tmp/<task-name>-verifier-health.json
+python3 verifier_health.py --task-dir "$TASK" --output-json /tmp/<task-name>-verifier-health.json
 
-# Expensive stress: repeated-oracle consistency. Only when Step 2b's 10x stress was flaky.
-python3 verifier_health.py --task-dir tasks/<task-name> --include-repeat-oracle \
+# Expensive stress: repeated-oracle consistency. Only when Step 4's 10x stress was flaky.
+python3 verifier_health.py --task-dir "$TASK" --include-repeat-oracle \
     --output-json /tmp/<task-name>-verifier-health.json
 
 # Optional machine-readable stdout form.
-python3 verifier_health.py --task-dir tasks/<task-name> --json
+python3 verifier_health.py --task-dir "$TASK" --json
 ```
 
 `verifier_health.py` uses temporary task copies so it can mutate `solve.sh` and `tests/test.sh` safely for automation, and it distinguishes verifier-backed behavioral failures from compile-only partial-oracle failures. Compile-only ablations do not count as verifier discrimination.
@@ -147,21 +213,25 @@ python3 verifier_health.py --task-dir tasks/<task-name> --json
 The always-blocking mechanical stack is static checks, `collapse_check.py` (RC1-RC7), submission-zip validation, manifest verification, and zip/source parity. `verifier_health.py` and the quality-check adjudication are blocking **only** when they were actually run (Step 3a-V / Step 3a-Q respectively).
 
 ```bash
+source scripts/sudhir-env.sh
+TASK="$TB3_TASKS_DIR/<task-name>"
+ZIP="$TB3_SUBMISSIONS_DIR/<task-name>.zip"
+
 # Routine path — no Step 3a-V run. --skip-verifier-health is required to
 # suppress the default WARN; omitting both flags yields WARN (no block).
-python3 approve_task.py --task-dir tasks/<task-name> \
-    --zip Task_Ready_To_Submit/<task-name>.zip \
+python3 approve_task.py --task-dir "$TASK" \
+    --zip "$ZIP" \
     --skip-verifier-health
 
 # Escalated path — Step 3a-V was run. --verifier-health strictly validates the report.
-python3 approve_task.py --task-dir tasks/<task-name> \
-    --zip Task_Ready_To_Submit/<task-name>.zip \
+python3 approve_task.py --task-dir "$TASK" \
+    --zip "$ZIP" \
     --verifier-health /tmp/<task-name>-verifier-health.json
 
 # Add --quality-check-adjudication when Step 3a-Q was run (or when a
-# tasks/<task-name>/quality_check_adjudication.json waiver file exists).
-python3 approve_task.py --task-dir tasks/<task-name> \
-    --zip Task_Ready_To_Submit/<task-name>.zip \
+# $TASK/quality_check_adjudication.json waiver file exists).
+python3 approve_task.py --task-dir "$TASK" \
+    --zip "$ZIP" \
     --skip-verifier-health \
     --quality-check-adjudication /tmp/<task-name>-quality-check-adjudication.json
 
@@ -186,10 +256,10 @@ Any future checker fix for a false positive or false negative should update this
 ```bash
 # Mechanical collapse/discoverability check (run during Step 2b; rerun only
 # if task files are edited after that — Step 3b does not repeat it by default).
-python3 collapse_check.py tasks/<task-name>
+python3 collapse_check.py "$TASK"
 
 # JSON output (for CI integration)
-python3 collapse_check.py tasks/<task-name> --json
+python3 collapse_check.py "$TASK" --json
 ```
 
 Exit codes: `0` = PASS, `1` = FAIL (blocking), `2` = WARN (needs justification).
@@ -213,8 +283,8 @@ The oracle/frontier checks are transitive: `collapse_check.py` follows `solution
 ```bash
 # Run just the RC6 instruction-specificity check without the oracle-parsing
 # overhead. Useful during instruction iteration.
-python3 instruction_audit.py tasks/<task-name>
-python3 instruction_audit.py tasks/<task-name> --json
+python3 instruction_audit.py "$TASK"
+python3 instruction_audit.py "$TASK" --json
 ```
 
 Exit codes match `collapse_check.py` (0/1/2). The JSON output includes the raw signal families so you can see exactly which algorithms, CLI flags, schema clusters, or scope closures triggered the classification.
@@ -256,7 +326,7 @@ python validate_loop.py reset <task-name>
 git checkout -b task/<task-name>
 
 # Add and commit
-git add tasks/<task-name>/
+git add "$TASK/"
 git commit -m "Add <task-name>: brief description"
 git push origin task/<task-name>
 ```
@@ -269,7 +339,7 @@ and Phase C (write `.step2b-checksum` via `task_integrity.py`). Phase C records
 the sentinel `approve_task.py` requires before packaging.
 
 ```bash
-./scripts/check-task.sh tasks/<task-name>
+./scripts/check-task.sh "$TASK"
 ```
 
 The script also appends per-task authoring metrics to
@@ -300,12 +370,12 @@ visibility rules.
 
 ```bash
 # Write the sentinel for a task (overwrites any existing one).
-python3 task_integrity.py write tasks/<task-name>
+python3 task_integrity.py write "$TASK"
 
 # Verify the sentinel matches the current task tree. Exit 0 = clean,
 # exit 1 = dirty/missing (with a per-file list of added/modified/removed entries),
 # exit 2 = bad usage.
-python3 task_integrity.py verify tasks/<task-name>
+python3 task_integrity.py verify "$TASK"
 ```
 
 Do not commit `.step2b-checksum` (different contributors will produce different
@@ -322,28 +392,16 @@ Phase B (the lists are kept in sync by
 validator call is a debugging convenience, not a required step.
 
 ```bash
-# Create submission zip (files at archive root, no wrapping folder).
-# The -x list excludes caches, pyc, task-root dotfiles (.*), and repo-internal
-# authoring artifacts. environment/.dockerignore is included (see task-creation.mdc).
-# the repo-internal authoring artifacts that validate_submission_zip.py
-# rejects at archive-root level (output_contract.toml,
-# quality_check_adjudication.json, construction_manifest.json, rubric*.txt)
-# plus AI-scaffolding filenames banned at any depth (CLAUDE.md, AGENTS.md,
-# skills.md, .cursor/, .aider/, .continue/, .claude/).
-cd tasks/<task-name>
-rm -f ../../Task_Ready_To_Submit/<task-name>.zip
-zip -rq ../../Task_Ready_To_Submit/<task-name>.zip . \
-  -x '*/__pycache__/*' '*.pyc' '.*' \
-  -x 'output_contract.toml' 'quality_check_adjudication.json' \
-  -x 'construction_manifest.json' 'rubric.txt' 'rubrics.txt' \
-  -x 'CLAUDE.md' '*/CLAUDE.md' 'AGENTS.md' '*/AGENTS.md' \
-  -x 'skills.md' '*/skills.md' \
-  -x '.cursor/*' '*/.cursor/*' \
-  -x '.aider/*' '*/.aider/*' '.continue/*' '*/.continue/*' \
-  -x '.claude/*' '*/.claude/*'
+# Canonical packaging performs exclusions, validation, approval, and current-index refresh.
+source scripts/sudhir-env.sh
+python3 sudhir_task.py package <task-name>
 
-# Standalone validator (optional — approve_task.py runs it too).
-python3 ../../validate_submission_zip.py ../../Task_Ready_To_Submit/<task-name>.zip
+# Standalone validator (optional debugging convenience).
+python3 validate_submission_zip.py "$TB3_SUBMISSIONS_DIR/<task-name>.zip"
+
+# Current index is refreshed by package/revise; both checks are read-only.
+python3 scripts/build_submission_index.py --check
+python3 scripts/build_submission_index.py --historical --check
 ```
 
 Verify the archive root shape:
@@ -378,13 +436,14 @@ with open('$HARBOR_COMPOSE', 'w') as f:
 
 ## Frontier Models (Platform)
 
-| Model             | Provider string               |
-| ----------------- | ----------------------------- |
-| GPT-5.2           | `openai/gpt-5.2`              |
-| Claude Opus 4.6   | `anthropic/claude-opus-4-6`   |
-| Claude Sonnet 4.6 | `anthropic/claude-sonnet-4-6` |
+Current profile effective 2026-06-12. `model_policy.py` is the executable source.
 
-The repo-local quality check uses `openai/gpt-5.2`. Platform-side difficulty evaluation is run by the platform after upload and is not part of this repo's approval gate.
+| Model | Agent flag | Quality-check flag |
+| --- | --- | --- |
+| GPT-5.5 | `@openai/gpt-5.5` | `openai/@openai/gpt-5.5` |
+| Claude Opus 4.8 | `@anthropic/claude-opus-4-8` | `anthropic/@anthropic/claude-opus-4-8` |
+
+Platform-side difficulty evaluation is run after upload and is not part of the repo-local approval gate. Historical model artifacts remain readable but do not satisfy a current calibration claim.
 
 ### Local frontier-agent calibration (`agent_test`)
 
@@ -394,8 +453,8 @@ Requires `stb` on PATH and Portkey credentials:
 export OPENAI_API_KEY=<your-portkey-api-key>
 export OPENAI_BASE_URL=https://api.portkey.ai/v1
 
-# Run 5 trials per model (GPT-5.2 + Claude Opus 4.6), then print difficulty band
-./scripts/agent_test.sh run tasks/<task-name>
+# Run 5 trials per current model (GPT-5.5 + Claude Opus 4.8), then print difficulty band
+./scripts/agent_test.sh run "$TASK"
 
 # Summarize existing job directories only
 ./scripts/agent_test.sh report jobs/<timestamp> jobs/<timestamp>

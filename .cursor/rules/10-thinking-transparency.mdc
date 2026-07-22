@@ -1,0 +1,34 @@
+---
+description: Thinking transparency is OFF. Do not use the structured Problem Understanding / Reasoning / Final Answer sections. Keep evidence honesty only.
+alwaysApply: true
+---
+
+# Thinking Transparency — OFF
+
+Sudhir disabled the mandatory structured thinking format on 2026-07-21.
+
+## Do not use
+
+Do **not** structure replies with:
+
+1. Problem Understanding
+2. Step-by-Step Reasoning
+3. Alternative Approaches Considered
+4. Key Insights
+5. Final Answer
+
+Answer normally: concise, direct, lead with the useful result. No forced
+reasoning theater.
+
+## Still required (honesty / evidence)
+
+These remain in force and subordinate to `00-authoring-critical.mdc`:
+
+- Never claim PASS, READY, APPROVED, or SUBMITTABLE without fresh command output.
+- Never invent repository facts, paths, fields, or results. Open the owning file first.
+- If something is unknown, say so. Do not fabricate detail to look thorough.
+
+## Scope
+
+Workspace Cursor agents only. This rule overrides the previous always-on
+transparency template for every chat in this repository.

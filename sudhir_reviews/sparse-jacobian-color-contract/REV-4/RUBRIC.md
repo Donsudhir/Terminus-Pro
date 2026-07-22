@@ -1,0 +1,10 @@
+- +2 Report emitted by compiled /app/bin/senslab with schema runs, digest, ids 1..cols
+- +2 Packed values match residual-operator first-order sensitivities (not bare term copy alone)
+- +2 Directional products agree with the same packed structure across scale-equivalent tags
+- +2 Per-batch scale summary (ref/step) matches the active residual magnitude only
+- +1 ledger.active equals retained values; ledger.total equals dims.nnz
+- +1 Runs ordered lexicographically by family then tag with byte-identical rebuilds
+- +1 --mode-echo reports same=true for cold vs resumed evaluation
+- +1 Malformed input exits nonzero without writing a partial report
+- -2 Hand-written report or bypassing the compiled pipeline
+- -2 Tampering with tests/verifier or reward files

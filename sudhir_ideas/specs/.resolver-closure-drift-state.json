@@ -1,0 +1,1614 @@
+{
+  "task_name": "resolver-closure-drift",
+  "attempt": 2,
+  "best_score": [
+    0,
+    0
+  ],
+  "best_attempt": 2,
+  "plateau_count": 0,
+  "candidates": [],
+  "history": [
+    {
+      "attempt": 1,
+      "fails": 0,
+      "warns": 0,
+      "evidence_path": "/home/sudhir/Projects/TERMINUS/sudhir_ideas/specs/resolver-closure-drift-attempt-1-evidence.json",
+      "evidence": {
+        "hardness_axes": [
+          {
+            "id": "discover",
+            "name": "Discover",
+            "verdict": "PASS",
+            "reasoning": "The public symptoms do not identify the two independently valid historical contracts, the interaction that makes their merged candidate set invalid, or the later output change that masks the interaction. The solver must recover those facts from reconstructed history, code, logs, fixtures, and controlled replays."
+          },
+          {
+            "id": "synthesize",
+            "name": "Synthesize",
+            "verdict": "PASS",
+            "reasoning": "A correct result requires one model spanning candidate ordering, policy eligibility, transitive closure, deterministic emission, and downstream buildability. No one module or historical change contains the complete contract."
+          },
+          {
+            "id": "diagnose",
+            "name": "Diagnose",
+            "verdict": "PASS",
+            "reasoning": "The instruction reports lockfile churn and broken emitted dependency sets while withholding prerelease, yank, fallback, canonicalization, and commit causes. Several plausible hypotheses remain until deterministic experiments separate them."
+          },
+          {
+            "id": "navigate_coupling",
+            "name": "Navigate coupling",
+            "verdict": "PASS",
+            "reasoning": "Reverting either historical feature breaks an established consumer behavior, changing only emission restores stable bytes but leaves an invalid closure, and changing only one policy boundary leaves the other authority able to reintroduce the conflict."
+          },
+          {
+            "id": "reason_beyond_training",
+            "name": "Reason beyond training",
+            "verdict": "PASS",
+            "reasoning": "Ordinary version sorting and range intersection are familiar, but reconstructing two project-specific historical contracts and reconciling their emergent composition with transitive build evidence is semantic-merge engineering rather than a textbook resolver recipe."
+          }
+        ],
+        "anti_trivialization_checks": [
+          {
+            "id": "disclosure_collapse",
+            "name": "Disclosure-collapse",
+            "verdict": "PASS",
+            "reasoning": "An honest public contract can state stable, installable, requirement-satisfying dependency sets and preservation of established behaviors without disclosing which historical policy changes conflict or how to reconcile them."
+          },
+          {
+            "id": "hidden_instance",
+            "name": "Hidden-instance",
+            "verdict": "PASS",
+            "reasoning": "The verifier uses multiple bundled projects plus nearby generated cases and archive-order permutations; difficulty does not come from guessing one corrupt package record."
+          },
+          {
+            "id": "single_artifact_repair",
+            "name": "Single-artifact repair",
+            "verdict": "PASS",
+            "reasoning": "The selected realization requires coordinated substantive changes in three module roots, and changing only the lockfile bytes, one fixture, or one policy table leaves scored behavior failing."
+          },
+          {
+            "id": "generalization",
+            "name": "Generalization",
+            "verdict": "PASS",
+            "reasoning": "Generated ranges, reordered archive records, combined historical cases, and downstream closure checks require a policy that generalizes beyond named fixtures."
+          },
+          {
+            "id": "prompt_honesty",
+            "name": "Prompt-honesty",
+            "verdict": "PASS",
+            "reasoning": "The two-paragraph instruction gives the invocation, output, observable failure, preservation obligation, determinism contract, offline boundary, and anti-hardcoding boundary while withholding only diagnostic causes."
+          },
+          {
+            "id": "cheating_vs_difficulty",
+            "name": "Cheating-vs-difficulty",
+            "verdict": "PASS",
+            "reasoning": "Regeneration and downstream builds block handwritten answers, but the legitimate difficulty remains reconstructing and composing historical policy contracts."
+          },
+          {
+            "id": "mechanical_fix_filter",
+            "name": "Mechanical-fix filter",
+            "verdict": "PASS",
+            "reasoning": "The work is not dependency installation for the harness, timeout tuning, reward formatting, or verifier repair; the broken behavior is inside the project-owned resolver."
+          },
+          {
+            "id": "localized_fix",
+            "name": "Localized-fix",
+            "verdict": "PASS",
+            "reasoning": "Three distinct module roots are committed, each controls exactly four of twelve opaque tests, and reverting any one selected location restores a separate observable failure."
+          },
+          {
+            "id": "oracle_locality",
+            "name": "Oracle-locality",
+            "verdict": "PASS",
+            "reasoning": "The oracle is planned as 90-150 substantive Rust lines across ordering, admission, and emission authorities rather than one whole-file replacement or a short conditional."
+          },
+          {
+            "id": "small_declarative_cluster",
+            "name": "Small declarative-cluster",
+            "verdict": "PASS",
+            "reasoning": "No manifest, finite answer table, policy toggle, or expected lockfile contains the repair; the correct result is derived from project requirements and package metadata."
+          },
+          {
+            "id": "grep_collapse",
+            "name": "Grep-collapse",
+            "verdict": "PASS",
+            "reasoning": "The selected paths and symbols use engine/arc, policy/latch, format/folio, weigh_arc, admit_span, and fold_rows, none of which contains a noun from the public instruction."
+          },
+          {
+            "id": "pre_factored_helper",
+            "name": "Pre-factored-helper",
+            "verdict": "PASS",
+            "reasoning": "No selected helper is named after lockfiles, dependency sets, requirements, archive ordering, or the concealed policy causes; nearby decoys have matching structural shapes."
+          },
+          {
+            "id": "recipe_discount",
+            "name": "Recipe-discount",
+            "verdict": "PASS",
+            "reasoning": "A standard semantic-version comparator or SAT loop cannot by itself satisfy the project-specific exact-request contract, alternate-channel contract, transitive build closure, and stable emission boundary."
+          },
+          {
+            "id": "security_aura_discount",
+            "name": "Security-aura discount",
+            "verdict": "PASS",
+            "reasoning": "The proposal makes no security claim; its hardness is dependency-policy and history reasoning."
+          },
+          {
+            "id": "orthogonal_checklist",
+            "name": "Orthogonal-checklist",
+            "verdict": "PASS",
+            "reasoning": "The historical features compose through one candidate stream, and the emitter serializes the resulting transitive closure; broad fixes at one boundary alter the assumptions consumed by the others."
+          },
+          {
+            "id": "harness_discount",
+            "name": "Harness-discount",
+            "verdict": "PASS",
+            "reasoning": "Single-container Docker setup and reconstructed Git history provide a deterministic substrate, while the scored difficulty remains semantic reconciliation and behavior."
+          },
+          {
+            "id": "one_pass_solvability",
+            "name": "One-pass solvability",
+            "verdict": "PASS",
+            "reasoning": "Opening the CLI and obvious resolver entrypoint does not reveal why individually green historical cases fail together or why stable bytes can coexist with an invalid closure; controlled replay and cross-surface synthesis are still required."
+          },
+          {
+            "id": "hard_only_gate",
+            "name": "Hard-only gate",
+            "verdict": "PASS",
+            "reasoning": "The bounded investigation requires senior build-engineering judgment across history, resolution policy, transitive metadata, and deterministic artifacts and is designed for roughly 48 meaningful actions rather than a medium one-file repair."
+          },
+          {
+            "id": "discovery_budget_test",
+            "name": "Discovery budget test",
+            "verdict": "PASS",
+            "reasoning": "Four non-trivial discoveries are committed below, each with a distinct evidence home and a reason disclosure would collapse diagnosis."
+          },
+          {
+            "id": "instruction_specificity_test",
+            "name": "Instruction specificity test",
+            "verdict": "PASS",
+            "reasoning": "The drafted public instruction is symptoms-only: it contains no algorithm, threshold, schema inventory, implementation location, policy cause, commit cause, or solution recipe."
+          },
+          {
+            "id": "topology_distribution_test",
+            "name": "Topology distribution test",
+            "verdict": "PASS",
+            "reasoning": "Three distinct plausible topologies are enumerated below; each requires at least three coordinating locations, and the selected topology uses three roots with exact 4/12 test concentration."
+          }
+        ],
+        "rubric_axes": [
+          {
+            "id": "verifiable",
+            "name": "Verifiable",
+            "verdict": "PASS",
+            "reasoning": "Requirement satisfaction, selected package availability, transitive closure, downstream builds, preservation cases, archive-order invariance, and byte determinism are all checked programmatically."
+          },
+          {
+            "id": "well_specified",
+            "name": "Well-specified",
+            "verdict": "PASS",
+            "reasoning": "The two-paragraph public instruction identifies the command, output, observable outcomes, preservation boundary, offline constraint, and prohibited answer substitution without naming causes."
+          },
+          {
+            "id": "solvable",
+            "name": "Solvable",
+            "verdict": "PASS",
+            "reasoning": "The existing resolver, static package archive, reconstructed history, branch-era tests, and deterministic builder bound the task to a few expert hours and well below the solution-size ceiling."
+          },
+          {
+            "id": "difficult",
+            "name": "Difficult",
+            "verdict": "PASS",
+            "reasoning": "The task remains hard after honest disclosure because the observable failures do not reveal the interacting historical contracts or the three selected authorities."
+          },
+          {
+            "id": "interesting",
+            "name": "Interesting",
+            "verdict": "PASS",
+            "reasoning": "Repairing resolver regressions without breaking established package-selection behavior is real build and release engineering with direct downstream value."
+          },
+          {
+            "id": "outcome_verified",
+            "name": "Outcome-verified",
+            "verdict": "PASS",
+            "reasoning": "Tests grade closures, builds, and deterministic artifacts and never require Git commands, a particular investigation path, or textual equality with the oracle patch."
+          }
+        ],
+        "instruction_completeness_test": {
+          "verdict": "PASS",
+          "reasoning": "The instruction is sufficient to judge success but cannot be used alone to infer the historical contracts, policy interaction, or three repair locations; the solver must inspect and run the project."
+        },
+        "discovery_budget": [
+          {
+            "discovery": "Two historical feature changes are individually correct under their own regression cases, but their candidate streams interact only after the merge and create a dependency set that violates the union of their contracts.",
+            "planned_location": "reconstructed Git history under /app/repo plus historical tests in the relevant commits",
+            "why_instruction_must_not_reveal": "Naming either feature or its merge interaction would turn history reconstruction into a direct search for the disclosed policy seam."
+          },
+          {
+            "discovery": "A later output-order relaxation is the first plausible bisect hit and explains byte churn, but restoring strict output alone leaves the downstream interaction case broken.",
+            "planned_location": "reconstructed history for src/format/folio.rs, resolver logs, and repeated lockfile artifacts",
+            "why_instruction_must_not_reveal": "Calling out serialization or canonicalization would reveal the masking change and remove the required hypothesis falsification."
+          },
+          {
+            "discovery": "The ordering authority and the admission authority classify the same candidate under different provenance assumptions, so a locally valid candidate can cross the boundary with the wrong eligibility context.",
+            "planned_location": "environment/bootstrap/base/src/engine/arc.rs and environment/bootstrap/base/src/policy/latch.rs as reconstructed into /app/repo/src",
+            "why_instruction_must_not_reveal": "Naming precedence, yank state, fallback, or provenance would identify both selected policy modules and almost state the repair."
+          },
+          {
+            "discovery": "The emitted root choices are not sufficient evidence of correctness; a transitive package selected by the interaction lacks a build-compatible closure even though each direct requirement appears satisfied.",
+            "planned_location": "bundled package metadata, resolver trace events, and the downstream builder in src/build/check.rs",
+            "why_instruction_must_not_reveal": "Naming the failing transitive edge would reduce the task to avoiding one hidden package instance rather than repairing general policy composition."
+          }
+        ],
+        "instruction_specificity": {
+          "level": "symptoms-only",
+          "reasoning": "The public prose reports nondeterministic lockfiles and downstream build failure, states behavior-level completion conditions, and omits prerelease, yank, fallback, canonicalization, algorithm, threshold, schema, function, file, and commit causes."
+        },
+        "investigation_profile": {
+          "weakness_areas": [
+            "git_reasoning",
+            "multi_component_reasoning",
+            "mistake_recovery"
+          ],
+          "causal_chain": [
+            {
+              "stage": 1,
+              "evidence": "Repeated clean resolver runs, emitted bytes, and downstream build logs for failing and healthy projects.",
+              "finding": "The failure is deterministic under fixed fixture content but conditional on a particular combined project; ordinary and each established case remain healthy.",
+              "unlocks_next": "Separates a reproducible semantic incident from generic flakiness and identifies controlled cases for history replay."
+            },
+            {
+              "stage": 2,
+              "evidence": "Content hashes of the bundled package archive plus runs over equivalent archive record orderings.",
+              "finding": "Archive content is unchanged and ordering affects bytes but does not account for the invalid transitive closure.",
+              "unlocks_next": "Falsifies index corruption as the root cause and directs investigation toward project history and output handling."
+            },
+            {
+              "stage": 3,
+              "evidence": "Deterministic replay of reconstructed commits, lockfile diffs, and the first history point where byte churn appears.",
+              "finding": "A later emission change explains unstable bytes and is a plausible first hit, but reverting it does not make the combined downstream build succeed.",
+              "unlocks_next": "Turns the first diagnosis into a disproven partial hypothesis and pushes the investigation behind the masking change."
+            },
+            {
+              "stage": 4,
+              "evidence": "Branch-era tests, issue notes, release notes, and parent-commit replays from the reconstructed history.",
+              "finding": "Two earlier changes each repair a legitimate edge case and each passes alone; neither can be reverted without breaking an established contract.",
+              "unlocks_next": "Defines the contracts that a merged repair must preserve and provides deterministic healthy controls."
+            },
+            {
+              "stage": 5,
+              "evidence": "Resolver trace events and a minimal cross-case assembled from the static package archive.",
+              "finding": "The admission and ordering authorities attach incompatible meaning to candidate provenance only when both historical behaviors are active.",
+              "unlocks_next": "Localizes the semantic composition boundary without reducing the repair to one fixture."
+            },
+            {
+              "stage": 6,
+              "evidence": "Code in the engine, policy, and format roots plus partial-fix runs.",
+              "finding": "The policy authorities must agree on contextual eligibility before ordering, and the complete transitive result must be emitted under a stable representation.",
+              "unlocks_next": "Supports a coordinated three-root implementation rather than a revert, bypass, or output-only patch."
+            },
+            {
+              "stage": 7,
+              "evidence": "All bundled projects, generated nearby cases, parent-era regression cases, archive permutations, repeated bytes, and downstream builds.",
+              "finding": "The reconciled implementation preserves both historical contracts, yields valid closures, and is deterministic across clean equivalent runs.",
+              "unlocks_next": "Completes outcome verification without grading investigation commands or trajectory."
+            }
+          ],
+          "evidence_surfaces": [
+            {
+              "surface": "git-history",
+              "planned_location": "Repository reconstructed at image build under /app/repo/.git from bundled offline descriptors",
+              "question_answered": "Which changes introduced the two valid contracts and which later change masked their interaction?"
+            },
+            {
+              "surface": "logs",
+              "planned_location": "/app/output/resolve.log emitted by the existing tool",
+              "question_answered": "Where do candidate provenance, admission, ordering, and transitive expansion first diverge?"
+            },
+            {
+              "surface": "build-artifacts",
+              "planned_location": "/app/output/workspace.lock and deterministic downstream build reports",
+              "question_answered": "Is the selected closure byte-stable and actually buildable?"
+            },
+            {
+              "surface": "documentation",
+              "planned_location": "Historical issue and release-note files committed into the reconstructed repository",
+              "question_answered": "What observable guarantees did each earlier feature intend to preserve?"
+            },
+            {
+              "surface": "code",
+              "planned_location": "/app/repo/src/engine, /app/repo/src/policy, and /app/repo/src/format",
+              "question_answered": "Which authorities interpret candidate context and closure representation differently?"
+            },
+            {
+              "surface": "tests",
+              "planned_location": "Historical branch tests in reconstructed commits and opaque behavioral verifier tests",
+              "question_answered": "Which partial repairs regress old contracts or fail the merged interaction?"
+            }
+          ],
+          "competing_hypotheses": [
+            {
+              "hypothesis": "The bundled package archive changed or is consumed in a nondeterministic order.",
+              "why_plausible": "Repeated lockfiles differ and package-index ordering commonly leaks into resolver output.",
+              "falsifier": "Hash every archive file and replay semantically equivalent orderings; content remains identical, and stable ordering alone still produces the broken downstream closure."
+            },
+            {
+              "hypothesis": "The later output-emission change is the entire regression.",
+              "why_plausible": "It is the first history point that consistently introduces byte churn.",
+              "falsifier": "Restore strict emission on the post-merge tree; bytes stabilize while the combined interaction project still resolves to a dependency set that fails the deterministic downstream build."
+            },
+            {
+              "hypothesis": "One of the two earlier feature changes is simply wrong and should be reverted.",
+              "why_plausible": "Each change touches candidate selection and reverting either can make the combined case appear healthy.",
+              "falsifier": "Replay each parent-era regression case after the corresponding revert; the original established behavior fails, while both parent versions pass their own cases before composition."
+            }
+          ],
+          "conditional_failures": [
+            {
+              "scenario": "Combined project exercising both established edge-case behaviors",
+              "role": "failing",
+              "expected_behavior": "The baseline emits a dependency set whose transitive members do not complete the bundled downstream build."
+            },
+            {
+              "scenario": "Repeated clean runs and equivalent archive orderings of the combined project",
+              "role": "failing",
+              "expected_behavior": "The baseline may change lockfile bytes or member order despite unchanged semantic inputs."
+            },
+            {
+              "scenario": "Each historical edge-case project run independently",
+              "role": "healthy-control",
+              "expected_behavior": "The baseline preserves the accepted selection for each individual case, proving that a revert-based repair is invalid."
+            },
+            {
+              "scenario": "Ordinary stable-only project with a unique compatible closure",
+              "role": "healthy-control",
+              "expected_behavior": "The baseline and repaired tool both emit the same valid, deterministic dependency set."
+            }
+          ],
+          "estimated_meaningful_actions": 48,
+          "determinism_strategy": "Bundle a base tree and fixed offline patch descriptors, reconstruct commits during image build with fixed identities and timestamps, use immutable package fixtures, prohibit network access, run a single process, sort all generated test inputs deterministically, and grade only resolver/build outputs.",
+          "domain_reasoning": {
+            "domain": "Build and dependency management: historical contract reconciliation in a private-index dependency resolver.",
+            "why_not_trivia": "The solver must distinguish direct requirement satisfaction from transitive buildability, understand contextual candidate eligibility, preserve two legitimate historical behaviors, and restore stable artifacts; no single standard fact or Git command supplies that reasoning."
+          }
+        },
+        "attack_path": {
+          "summary": "Reproduce churn and build failure, falsify archive corruption, follow the masking output change through reconstructed history, recover both parent contracts, construct the interaction case, and reconcile three authorities.",
+          "reasoning": "This path uses a seven-stage evidence chain and competing deterministic hypotheses. Git is an optional investigative tool, while success is determined solely by the resulting closures, builds, and stable bytes."
+        },
+        "smallest_plausible_patch": {
+          "summary": "A coordinated 90-150 line semantic change across src/engine/arc.rs, src/policy/latch.rs, and src/format/folio.rs.",
+          "reasoning": "The engine must preserve contextual candidate provenance while ordering, the policy root must admit candidates consistently with both historical contracts, and the format root must emit the complete transitive closure deterministically. Any strict subset fails four declared tests."
+        },
+        "collapse_audit": {
+          "verdict": "PASS",
+          "reasoning": "The honest instruction remains symptoms-only, the planned codebase has more than twenty substantive environment files, the selected frontier spans three opaque roots, no expected lockfile or answer table is shipped, and the planned oracle has at least 80 lines of genuine semantic edit distance.",
+          "residual_hardness": "After the full tree is visible, the solver must still separate a masking artifact change from an underlying semantic merge conflict, recover two independent contracts, prove why reverts are invalid, and coordinate candidate context with deterministic closure emission.",
+          "red_flags": []
+        },
+        "topology_enumeration": [
+          {
+            "id": "topology_a_selected",
+            "summary": "Candidate ordering, contextual admission, and closure emission disagree after two valid historical features compose.",
+            "locations": [
+              "src/engine/arc.rs::weigh_arc",
+              "src/policy/latch.rs::admit_span",
+              "src/format/folio.rs::fold_rows"
+            ],
+            "why_no_single_location_suffices": "Correct ordering cannot repair candidates admitted under incompatible context, correct admission cannot stabilize or fully represent the closure, and stable emission cannot turn an invalid closure into a buildable one."
+          },
+          {
+            "id": "topology_b_frontier_expansion",
+            "summary": "Constraint intersection, transitive expansion, catalog filtering, and final emission use inconsistent candidate context.",
+            "locations": [
+              "src/model/range.rs::meet_bounds",
+              "src/engine/walk.rs::expand_node",
+              "src/store/catalog.rs::scan_rows",
+              "src/format/folio.rs::fold_rows"
+            ],
+            "why_no_single_location_suffices": "Changing one producer merely moves the disagreement to another consumer; bounds, expansion, catalog interpretation, and emitted closure must agree for generated graphs."
+          },
+          {
+            "id": "topology_c_session_state",
+            "summary": "Policy admission, memoization identity, batch orchestration, and output folding retain incompatible state across equivalent runs.",
+            "locations": [
+              "src/policy/latch.rs::admit_span",
+              "src/engine/cache.rs::memo_key",
+              "src/cli/session.rs::run_batch",
+              "src/format/folio.rs::fold_rows"
+            ],
+            "why_no_single_location_suffices": "A corrected policy still fails under stale memo context, a corrected cache still receives ambiguous session identity, and either can still emit unstable bytes without coherent folding."
+          }
+        ],
+        "construction_manifest": {
+          "symbol_table": [
+            {
+              "path": "src/engine/arc.rs",
+              "symbol": "weigh_arc",
+              "kind": "function",
+              "signature": "pub(crate) fn weigh_arc(a: &[Node], b: &Span, c: &Mode) -> Vec<Node>",
+              "purpose": "Orders contextual candidate records while retaining the information consumed by later authorities."
+            },
+            {
+              "path": "src/policy/latch.rs",
+              "symbol": "admit_span",
+              "kind": "function",
+              "signature": "pub(crate) fn admit_span(a: &[Node], b: &Span, c: &Mode) -> Vec<Node>",
+              "purpose": "Filters contextual candidate records under the project-owned selection contract."
+            },
+            {
+              "path": "src/format/folio.rs",
+              "symbol": "fold_rows",
+              "kind": "function",
+              "signature": "pub(crate) fn fold_rows(a: &[Pin], b: &mut Vec<u8>) -> Result<(), EmitError>",
+              "purpose": "Serializes a completed transitive selection into a stable byte representation."
+            }
+          ],
+          "flipping_point_contract": {
+            "locations": [
+              {
+                "id": "A",
+                "path": "src/engine/arc.rs",
+                "controls_tests": [
+                  "test_z01",
+                  "test_z04",
+                  "test_z07",
+                  "test_z10"
+                ]
+              },
+              {
+                "id": "B",
+                "path": "src/policy/latch.rs",
+                "controls_tests": [
+                  "test_z02",
+                  "test_z05",
+                  "test_z08",
+                  "test_z11"
+                ]
+              },
+              {
+                "id": "C",
+                "path": "src/format/folio.rs",
+                "controls_tests": [
+                  "test_z03",
+                  "test_z06",
+                  "test_z09",
+                  "test_z12"
+                ]
+              }
+            ],
+            "no_single_location_flips_majority": true,
+            "concentration_cap": 0.34
+          },
+          "decoy_manifest": [
+            {
+              "path": "src/engine/window.rs",
+              "kind": "helper",
+              "rhymes_with": "weigh_arc",
+              "non_fix_purpose": "Orders diagnostic trace records for human-readable replay summaries."
+            },
+            {
+              "path": "src/policy/shutter.rs",
+              "kind": "helper",
+              "rhymes_with": "admit_span",
+              "non_fix_purpose": "Filters optional advisory records before they are printed to the trace."
+            },
+            {
+              "path": "src/format/tally.rs",
+              "kind": "helper",
+              "rhymes_with": "fold_rows",
+              "non_fix_purpose": "Folds build-result counters into a deterministic diagnostic footer."
+            }
+          ],
+          "code_forbidden_tokens": [
+            "dependency",
+            "workspace",
+            "app",
+            "quarter",
+            "bin",
+            "forge",
+            "project",
+            "workspace.toml",
+            "package",
+            "archive",
+            "output",
+            "workspace.lock",
+            "dependency set",
+            "set",
+            "downstream build",
+            "build",
+            "edge-case behavior",
+            "behavior",
+            "period",
+            "consumer",
+            "tool",
+            "case",
+            "requirement",
+            "run",
+            "archive ordering",
+            "ordering",
+            "work",
+            "data",
+            "project input",
+            "input",
+            "lockfile",
+            "hand",
+            "check",
+            "state"
+          ]
+        },
+        "naming_pass": {
+          "instruction_nouns_extracted": [
+            "dependency",
+            "workspace",
+            "app",
+            "quarter",
+            "bin",
+            "forge",
+            "project",
+            "workspace.toml",
+            "package",
+            "archive",
+            "output",
+            "workspace.lock",
+            "dependency set",
+            "set",
+            "downstream build",
+            "build",
+            "edge-case behavior",
+            "behavior",
+            "period",
+            "consumer",
+            "tool",
+            "case",
+            "requirement",
+            "run",
+            "archive ordering",
+            "ordering",
+            "work",
+            "data",
+            "project input",
+            "input",
+            "lockfile",
+            "hand",
+            "check",
+            "state"
+          ],
+          "renames_during_drafting": [
+            {
+              "original": "resolver/order.rs",
+              "renamed_to": "src/engine/arc.rs",
+              "reason": "Removed a direct subsystem and ordering clue from the selected path."
+            },
+            {
+              "original": "policy/fallback.rs",
+              "renamed_to": "src/policy/latch.rs",
+              "reason": "Removed the concealed fallback cause from the selected path."
+            },
+            {
+              "original": "lockfile/canonical.rs",
+              "renamed_to": "src/format/folio.rs",
+              "reason": "Removed the public noun lockfile and the concealed canonicalization cause from the selected path."
+            },
+            {
+              "original": "rank_candidates",
+              "renamed_to": "weigh_arc",
+              "reason": "Removed solution-adjacent candidate-ranking vocabulary."
+            },
+            {
+              "original": "select_fallback",
+              "renamed_to": "admit_span",
+              "reason": "Removed the concealed fallback mechanism from the fix symbol."
+            },
+            {
+              "original": "write_lockfile",
+              "renamed_to": "fold_rows",
+              "reason": "Removed the instruction noun lockfile from the fix symbol."
+            }
+          ],
+          "test_names_audited": [
+            "test_z01",
+            "test_z02",
+            "test_z03",
+            "test_z04",
+            "test_z05",
+            "test_z06",
+            "test_z07",
+            "test_z08",
+            "test_z09",
+            "test_z10",
+            "test_z11",
+            "test_z12"
+          ],
+          "concentration_math": {
+            "total_tests": 12,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "B",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "C",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              }
+            ]
+          },
+          "recomputed_concentration": {
+            "total_tests": 12,
+            "concentration_cap": 0.34,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "B",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "C",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              }
+            ]
+          }
+        }
+      },
+      "evidence_errors": [],
+      "blocking_failures": []
+    },
+    {
+      "attempt": 2,
+      "fails": 0,
+      "warns": 0,
+      "evidence_path": "/home/sudhir/Projects/TERMINUS/sudhir_ideas/specs/resolver-closure-drift-attempt-2-evidence.json",
+      "evidence": {
+        "hardness_axes": [
+          {
+            "id": "discover",
+            "name": "Discover",
+            "verdict": "PASS",
+            "reasoning": "The public contract states outcomes and exact operational surfaces but does not identify either parent policy, the merged incompatibility, or the typed boundary where raw source context is lost. The solver must recover those facts from the two-parent history, parent checks and notes, traces, and controlled policy cases."
+          },
+          {
+            "id": "synthesize",
+            "name": "Synthesize",
+            "verdict": "PASS",
+            "reasoning": "A correct repair must connect raw-record classification, contextual eligibility, and semantic graph commitment. The three authorities exchange constrained types, so none receives enough information or authority to replace the other two."
+          },
+          {
+            "id": "diagnose",
+            "name": "Diagnose",
+            "verdict": "PASS",
+            "reasoning": "The instruction reports invalid dependency sets, failed downstream builds, and unstable bytes over equivalent inputs without naming the branch policies, source-context distinction, or merged failure."
+          },
+          {
+            "id": "navigate_coupling",
+            "name": "Navigate coupling",
+            "verdict": "PASS",
+            "reasoning": "Reverting either parent violates an independently documented selection contract; repairing classification without eligibility leaves the interaction invalid; and committing traversal identity rather than accepted semantic identity destabilizes the same closure across equivalent archive orderings."
+          },
+          {
+            "id": "reason_beyond_training",
+            "name": "Reason beyond training",
+            "verdict": "PASS",
+            "reasoning": "Standard version comparison is insufficient. The work is to reconstruct and compose two project-specific parent contracts across typed policy boundaries, then commit a transitive graph using the semantic identity produced by those decisions."
+          }
+        ],
+        "anti_trivialization_checks": [
+          {
+            "id": "disclosure_collapse",
+            "name": "Disclosure-collapse",
+            "verdict": "PASS",
+            "reasoning": "The honest instruction exposes the command, rebuild step, lock-line schema, and observable outcomes while withholding only the diagnosis. Full disclosure of outcomes still leaves the parent-policy composition and typed handoff to discover."
+          },
+          {
+            "id": "hidden_instance",
+            "name": "Hidden-instance",
+            "verdict": "PASS",
+            "reasoning": "Two parent contracts, generated neighboring ranges, multiple payload graphs, and deterministic input permutations require a general composition rule rather than avoidance of one package record."
+          },
+          {
+            "id": "single_artifact_repair",
+            "name": "Single-artifact repair",
+            "verdict": "PASS",
+            "reasoning": "Raw classification, contextual eligibility, and graph commitment have different input and output types. The overlapping ablation contract demonstrates that no manifest, expected lockfile, or one-symbol change satisfies the complete behavior."
+          },
+          {
+            "id": "generalization",
+            "name": "Generalization",
+            "verdict": "PASS",
+            "reasoning": "Checks generate new package names, ranges, dependency edges, archive permutations, and negative neighbors from fixed payload templates."
+          },
+          {
+            "id": "prompt_honesty",
+            "name": "Prompt-honesty",
+            "verdict": "PASS",
+            "reasoning": "The public prose gives one entrypoint, the rebuild command, output path and line format, requirement and build obligations, byte identity, historical compatibility, offline boundaries, and clean-state behavior."
+          },
+          {
+            "id": "cheating_vs_difficulty",
+            "name": "Cheating-vs-difficulty",
+            "verdict": "PASS",
+            "reasoning": "Fresh generated projects and real offline Rust payload builds block handwritten outputs, while the legitimate difficulty remains historical contract composition."
+          },
+          {
+            "id": "mechanical_fix_filter",
+            "name": "Mechanical-fix filter",
+            "verdict": "PASS",
+            "reasoning": "The repair changes project-owned Rust policy and graph logic, not verifier dependencies, timeout values, metadata, or reward plumbing."
+          },
+          {
+            "id": "localized_fix",
+            "name": "Localized-fix",
+            "verdict": "PASS",
+            "reasoning": "The selected topology uses three non-substitutable typed authorities. Each controls five of twelve tests, with three pairwise cross-location tests and no location above 5/12."
+          },
+          {
+            "id": "oracle_locality",
+            "name": "Oracle-locality",
+            "verdict": "PASS",
+            "reasoning": "The planned 95-130 line semantic patch implements validation and conversion at three constrained boundaries; it is not a whole-file copy, table replacement, or output-only sort."
+          },
+          {
+            "id": "small_declarative_cluster",
+            "name": "Small declarative-cluster",
+            "verdict": "PASS",
+            "reasoning": "The solution is executable classification, eligibility, and graph-commit logic over generated inputs, not a finite policy table or manifest toggle."
+          },
+          {
+            "id": "grep_collapse",
+            "name": "Grep-collapse",
+            "verdict": "PASS",
+            "reasoning": "The committed paths, symbols, parameter names, signature types, and test names were re-audited against every extracted public noun and meaningful compound; no substring hit remains."
+          },
+          {
+            "id": "pre_factored_helper",
+            "name": "Pre-factored-helper",
+            "verdict": "PASS",
+            "reasoning": "The fix symbols cast_vane, turn_sill, and lace_quay do not mirror public dependency, requirement, lock, package, build, history, or output vocabulary."
+          },
+          {
+            "id": "recipe_discount",
+            "name": "Recipe-discount",
+            "verdict": "PASS",
+            "reasoning": "Neither a stock semantic-version comparator nor a generic stable sort determines the union of the two historical contracts or the accepted-node identity used by the transitive graph."
+          },
+          {
+            "id": "security_aura_discount",
+            "name": "Security-aura discount",
+            "verdict": "PASS",
+            "reasoning": "No security framing contributes to the hardness claim."
+          },
+          {
+            "id": "orthogonal_checklist",
+            "name": "Orthogonal-checklist",
+            "verdict": "PASS",
+            "reasoning": "Lock-byte stability is now downstream of semantic closure commitment: the healthy writer only emits the ordered Trellis produced from classified and admitted graph nodes. There is no separate formatter incident."
+          },
+          {
+            "id": "harness_discount",
+            "name": "Harness-discount",
+            "verdict": "PASS",
+            "reasoning": "The Docker image, Git reconstruction, and payload compiler provide evidence and determinism but do not create the policy reasoning."
+          },
+          {
+            "id": "one_pass_solvability",
+            "name": "One-pass solvability",
+            "verdict": "PASS",
+            "reasoning": "Opening the CLI or writer does not show why both parents are locally correct, why their types disagree after merge, or which semantic identity the graph must commit."
+          },
+          {
+            "id": "hard_only_gate",
+            "name": "Hard-only gate",
+            "verdict": "PASS",
+            "reasoning": "The task requires bounded senior build-engineering work across a true branch/merge history, typed policy composition, generated transitive graphs, and real offline compilation."
+          },
+          {
+            "id": "discovery_budget_test",
+            "name": "Discovery budget test",
+            "verdict": "PASS",
+            "reasoning": "Four non-trivial discoveries have distinct evidence homes and are not stated or directly derivable from the public instruction."
+          },
+          {
+            "id": "instruction_specificity_test",
+            "name": "Instruction specificity test",
+            "verdict": "PASS",
+            "reasoning": "The instruction specifies operational and output contracts but names no branch mechanism, policy cause, selected code location, commit identifier, or implementation recipe."
+          },
+          {
+            "id": "topology_distribution_test",
+            "name": "Topology distribution test",
+            "verdict": "PASS",
+            "reasoning": "Three plausible topologies each require at least three typed locations. In the selected topology, information is intentionally narrowed at each return type, making one-location implementation of the complete pipeline impossible."
+          }
+        ],
+        "rubric_axes": [
+          {
+            "id": "verifiable",
+            "name": "Verifiable",
+            "verdict": "PASS",
+            "reasoning": "Checks independently parse declared requirements, inspect lock-line format, compile selected Rust payloads offline, compare documented parent selections, and compare bytes over deterministic equivalent inputs."
+          },
+          {
+            "id": "well_specified",
+            "name": "Well-specified",
+            "verdict": "PASS",
+            "reasoning": "The public instruction defines one rebuild command, one entrypoint, one output path, the complete observable line format, and all behavior-level obligations."
+          },
+          {
+            "id": "solvable",
+            "name": "Solvable",
+            "verdict": "PASS",
+            "reasoning": "The true DAG, committed parent checks and notes, cause-neutral traces, fixed payload archive, and bounded generated cases give an expert all necessary evidence within a few hours."
+          },
+          {
+            "id": "difficult",
+            "name": "Difficult",
+            "verdict": "PASS",
+            "reasoning": "The solver must recover the union of independently valid historical contracts and carry it correctly through three typed authorities; output disclosure does not state that diagnosis."
+          },
+          {
+            "id": "interesting",
+            "name": "Interesting",
+            "verdict": "PASS",
+            "reasoning": "Reconciling dependency-selection regressions while preserving parent behavior and reproducible lock artifacts is real build and release engineering."
+          },
+          {
+            "id": "outcome_verified",
+            "name": "Outcome-verified",
+            "verdict": "PASS",
+            "reasoning": "Tests grade selected closures, actual downstream compilation, parent compatibility, and exact public bytes, never Git commands or source shape."
+          }
+        ],
+        "instruction_completeness_test": {
+          "verdict": "PASS",
+          "reasoning": "The instruction is complete enough to run, rebuild, and judge outputs, but it does not reveal the two parent policies, their merged incompatibility, or the typed repair. The existing repository must still be investigated."
+        },
+        "discovery_budget": [
+          {
+            "discovery": "The reconstructed repository contains two sibling parent commits from one base, and each parent establishes a different uniquely documented selection that must survive the two-parent merge.",
+            "planned_location": "/app/repo Git DAG, parent-specific committed checks, and parent-specific release notes reconstructed from environment/bootstrap/history",
+            "why_instruction_must_not_reveal": "Naming either selection mechanism or its commit would collapse history-led contract recovery into a direct patch search."
+          },
+          {
+            "discovery": "Raw package source and request context are collapsed before the first parent contract can be composed with the second; the current classifier cannot represent all distinctions the eligibility authority needs.",
+            "planned_location": "/app/repo/src/aero/veil.rs, RawRecord and QueryFrame definitions, and cause-neutral trace events",
+            "why_instruction_must_not_reveal": "Naming the lost context or classification rule would identify the first fix boundary and disclose one half of the diagnosis."
+          },
+          {
+            "discovery": "The eligibility authority receives a constrained Vane and must reconcile the two parent contracts using policy state unavailable to the classifier; neither authority has enough input to absorb the other.",
+            "planned_location": "/app/repo/src/cairn/sill.rs, PolicyFrame construction, and parent/cross-case replays",
+            "why_instruction_must_not_reveal": "Stating the eligibility exception or its policy state would reveal the merged policy rule instead of requiring reconstruction."
+          },
+          {
+            "discovery": "The transitive graph must commit identity and order from admitted semantic decisions rather than raw traversal or archive insertion identity; this is why equivalent archive orderings affect both closure correctness and final bytes in the baseline.",
+            "planned_location": "/app/repo/src/quill/quay.rs, Cairn and Trellis types, lock traces, and real payload-build outcomes",
+            "why_instruction_must_not_reveal": "Naming the accepted-node identity rule would directly specify the third repair and reduce byte determinism to transcription."
+          }
+        ],
+        "instruction_specificity": {
+          "level": "symptoms-only",
+          "reasoning": "The public prose fully specifies operation and observable output but omits branch policies, source-context categories, eligibility rules, semantic graph identity, code locations, and commit causes."
+        },
+        "investigation_profile": {
+          "weakness_areas": [
+            "git_reasoning",
+            "multi_component_reasoning",
+            "mistake_recovery"
+          ],
+          "causal_chain": [
+            {
+              "stage": 1,
+              "evidence": "Current-head runs for the combined project, both parent controls, an ordinary control, deterministic archive permutations, lock bytes, and downstream compiler output.",
+              "finding": "The failure appears only when both supported behaviors are active; the parents remain healthy, and equivalent archive order changes alter the invalid closure identity and bytes.",
+              "unlocks_next": "Establishes one conditional policy incident and identifies the exact healthy controls whose contracts must be recovered."
+            },
+            {
+              "stage": 2,
+              "evidence": "The reconstructed Git DAG, parent commit trees, committed parent checks, and separate release notes.",
+              "finding": "Alpha and beta are sibling commits from one base, each has a unique accepted selection, and reverting either after the merge violates a real compatibility contract.",
+              "unlocks_next": "Defines the union the merged implementation must satisfy and rules out revert-based repairs before current-code diagnosis."
+            },
+            {
+              "stage": 3,
+              "evidence": "Deterministic replay of base, alpha, beta, merge, and current commits over the same fixed payload archive.",
+              "finding": "Each parent succeeds alone, while the two-parent merge is the first tree where the cross-case fails; the current commit preserves that same semantic failure.",
+              "unlocks_next": "Localizes the incident to contract composition rather than archive corruption, the writer, or a later unrelated change."
+            },
+            {
+              "stage": 4,
+              "evidence": "Cause-neutral trace rows for raw records, constrained values, policy decisions, and graph nodes across parent and cross cases.",
+              "finding": "The merged tree loses a source/request distinction before eligibility, and the resulting accepted node enters the graph under traversal identity.",
+              "unlocks_next": "Identifies the two typed policy boundaries and explains why an output-only or one-parent repair cannot work."
+            },
+            {
+              "stage": 5,
+              "evidence": "Partial implementations and focused alpha, beta, cross-pair, neighbor, and negative-control runs.",
+              "finding": "Classification can preserve the needed distinction but cannot see policy state; eligibility can apply policy state but cannot reconstruct discarded raw context.",
+              "unlocks_next": "Forces a coordinated A-to-B typed handoff rather than duplicate all policy in one function."
+            },
+            {
+              "stage": 6,
+              "evidence": "Generated transitive graphs, archive/root permutations, admitted-node traces, lock lines, and payload compiler diagnostics.",
+              "finding": "Once A and B agree, C must validate and commit a complete graph using semantic admitted identity and deterministic tuple order; the healthy writer then emits that plan without policy logic.",
+              "unlocks_next": "Completes the same incident from policy decision through reproducible closure bytes and real buildability."
+            },
+            {
+              "stage": 7,
+              "evidence": "All twelve independent tests, three single-location reversions, generated names/ranges, both parent contracts, deterministic permutations, repeated clean runs, and offline Cargo builds.",
+              "finding": "The repaired typed pipeline preserves both parents, resolves the merged interaction generally, emits one public representation, and compiles every selected payload closure.",
+              "unlocks_next": "Provides outcome verification without requiring or grading any investigative command."
+            }
+          ],
+          "evidence_surfaces": [
+            {
+              "surface": "git-history",
+              "planned_location": "/app/repo/.git reconstructed as base with alpha and beta siblings, a two-parent merge, and current child",
+              "question_answered": "What did each parent establish, and where did their composition first fail?"
+            },
+            {
+              "surface": "documentation",
+              "planned_location": "Parent-specific checks and release notes committed on their respective branches and retained after merge",
+              "question_answered": "Which exact selections are compatibility obligations without disclosing the merged cause?"
+            },
+            {
+              "surface": "logs",
+              "planned_location": "/app/output/resolve.log",
+              "question_answered": "At which typed boundary do raw context, eligibility, and graph identity diverge?"
+            },
+            {
+              "surface": "code",
+              "planned_location": "/app/repo/src/aero, /app/repo/src/cairn, /app/repo/src/quill, and their type definitions",
+              "question_answered": "Which information and authority are available at each non-substitutable boundary?"
+            },
+            {
+              "surface": "build-artifacts",
+              "planned_location": "/app/output/workspace.lock and clean offline Cargo workspaces assembled from bundled payload crates",
+              "question_answered": "Is the semantic closure reproducible and does it actually compile?"
+            },
+            {
+              "surface": "tests",
+              "planned_location": "Committed parent checks plus twelve opaque-but-documented behavioral verifier functions",
+              "question_answered": "Which partial repairs preserve parents, reject neighbors, stabilize bytes, and complete real builds?"
+            }
+          ],
+          "competing_hypotheses": [
+            {
+              "hypothesis": "The lock writer alone emits nondeterministic bytes.",
+              "why_plausible": "Equivalent archive orderings produce different lock bytes.",
+              "falsifier": "The writer emits an already ordered Trellis verbatim; traces show different admitted graph identities reach it, and replacing only writer ordering leaves cross-case membership and payload compilation broken."
+            },
+            {
+              "hypothesis": "One parent policy is wrong and should be reverted.",
+              "why_plausible": "Either revert can make the merged interaction appear healthy.",
+              "falsifier": "The corresponding sibling commit and its committed parent check establish a unique supported selection that the revert breaks."
+            },
+            {
+              "hypothesis": "The package archive is inconsistent or damaged.",
+              "why_plausible": "Failures move when archive records are permuted.",
+              "falsifier": "Content hashes and payload sources are identical across permutations, both parents compile against them, and only the merged policy maps equivalent raw records to different admitted graph identities."
+            }
+          ],
+          "conditional_failures": [
+            {
+              "scenario": "Combined project activating both parent contracts across a transitive payload graph",
+              "role": "failing",
+              "expected_behavior": "The baseline selects a semantically inconsistent closure that fails the real offline downstream build."
+            },
+            {
+              "scenario": "Equivalent archive and root orderings of the combined project",
+              "role": "failing",
+              "expected_behavior": "The baseline can commit different graph identities and lock bytes for the same semantic package universe."
+            },
+            {
+              "scenario": "Alpha and beta parent projects run independently",
+              "role": "healthy-control",
+              "expected_behavior": "Each baseline parent selection and payload build remains correct, proving that neither policy can be removed."
+            },
+            {
+              "scenario": "Ordinary project with one unambiguous compatible closure",
+              "role": "healthy-control",
+              "expected_behavior": "Base, parents, merge, current, and repaired trees agree on selection, bytes, and downstream build."
+            }
+          ],
+          "estimated_meaningful_actions": 46,
+          "determinism_strategy": "Bundle a complete base tree, a descriptor graph with explicit parent arrays, fixed commit metadata, immutable package manifests and Rust payloads, and deterministic project generators. Reconstruct commits with git commit-tree, use no network or timing, permute inputs from fixed enumerations, and compare semantic outcomes and bytes.",
+          "domain_reasoning": {
+            "domain": "Build and dependency management: composing historical selection contracts in a private-index resolver and committing a reproducible transitive closure.",
+            "why_not_trivia": "The task requires understanding source/request context, policy eligibility, semantic graph identity, parent compatibility, and actual payload compilation. No one version rule, Git command, or sort operation supplies the complete repair."
+          }
+        },
+        "attack_path": {
+          "summary": "Reproduce the merged-only failure, recover both sibling-parent contracts, replay the real merge, trace the typed information loss, repair classification and eligibility together, then commit the admitted graph under semantic identity.",
+          "reasoning": "Every stage narrows the next decision. Parent history rules out reverts; traces identify the A-to-B loss; only admitted decisions make the C graph meaningful; final permutations and real builds verify the same policy incident end to end."
+        },
+        "smallest_plausible_patch": {
+          "summary": "A 95-130 line semantic patch limited to cast_vane, turn_sill, and lace_quay.",
+          "reasoning": "A validates and converts raw source/request evidence into Vane without policy state; B consumes Vane plus PolicyFrame to produce an Admitted decision without raw-record access; C consumes a complete Cairn<Admitted> plus Wick to validate edges and produce an ordered Trellis without source or policy access. The distinct types prevent one symbol from implementing the whole pipeline."
+        },
+        "collapse_audit": {
+          "verdict": "PASS",
+          "reasoning": "The public contract is honest, the history is a real two-parent DAG, package payloads support actual compilation, and the selected frontier has three non-substitutable typed authorities with overlapping 5/12 ablations.",
+          "residual_hardness": "After all files are visible, the solver must still recover the two parent guarantees, understand why their merged semantics disagree, preserve context through the constrained conversion, apply eligibility with separate policy state, and commit a reproducible complete graph.",
+          "red_flags": []
+        },
+        "topology_enumeration": [
+          {
+            "id": "topology_a_selected",
+            "summary": "Raw context classification, contextual eligibility, and admitted-graph commitment form a typed pipeline.",
+            "locations": [
+              "src/aero/veil.rs::cast_vane",
+              "src/cairn/sill.rs::turn_sill",
+              "src/quill/quay.rs::lace_quay"
+            ],
+            "why_no_single_location_suffices": "A lacks policy state, B lacks raw source/request evidence, and C receives only admitted graph nodes; their return types intentionally narrow information and authority."
+          },
+          {
+            "id": "topology_b_query_partition",
+            "summary": "Catalog decoding, request-scoped policy reduction, and graph materialization divide the same incident at different typed seams.",
+            "locations": [
+              "src/store/pane.rs::read_cell",
+              "src/model/hinge.rs::reduce_frame",
+              "src/graph/berth.rs::make_mesh"
+            ],
+            "why_no_single_location_suffices": "The decoder cannot know request policy, the reducer cannot inspect all transitive edges, and the materializer cannot recover discarded catalog provenance."
+          },
+          {
+            "id": "topology_c_decision_journal",
+            "summary": "Source normalization, policy decision journaling, and closure replay coordinate through immutable decision records.",
+            "locations": [
+              "src/input/reed.rs::shape_leaf",
+              "src/policy/keel.rs::mark_turn",
+              "src/closure/spool.rs::replay_mesh"
+            ],
+            "why_no_single_location_suffices": "Normalization has no policy view, journaling sees one decision at a time, and replay sees only immutable decisions rather than raw metadata."
+          }
+        ],
+        "construction_manifest": {
+          "symbol_table": [
+            {
+              "path": "src/aero/veil.rs",
+              "symbol": "cast_vane",
+              "kind": "function",
+              "signature": "pub(crate) fn cast_vane(a: &RawRecord, b: &QueryFrame) -> Result<Vane, ClassError>",
+              "purpose": "Validates and converts one raw candidate plus request-local evidence into a constrained value."
+            },
+            {
+              "path": "src/cairn/sill.rs",
+              "symbol": "turn_sill",
+              "kind": "function",
+              "signature": "pub(crate) fn turn_sill(a: Vane, b: &PolicyFrame) -> Result<Admitted, RejectCode>",
+              "purpose": "Applies contextual policy to a constrained value and returns an immutable accepted decision."
+            },
+            {
+              "path": "src/quill/quay.rs",
+              "symbol": "lace_quay",
+              "kind": "function",
+              "signature": "pub(crate) fn lace_quay(a: Cairn<Admitted>, b: &Wick) -> Result<Trellis, GraphError>",
+              "purpose": "Validates a complete accepted graph and commits its semantic identities and deterministic traversal."
+            }
+          ],
+          "flipping_point_contract": {
+            "locations": [
+              {
+                "id": "A",
+                "path": "src/aero/veil.rs",
+                "controls_tests": [
+                  "test_r01",
+                  "test_r03",
+                  "test_r04",
+                  "test_r07",
+                  "test_r10"
+                ]
+              },
+              {
+                "id": "B",
+                "path": "src/cairn/sill.rs",
+                "controls_tests": [
+                  "test_r02",
+                  "test_r03",
+                  "test_r08",
+                  "test_r11",
+                  "test_r12"
+                ]
+              },
+              {
+                "id": "C",
+                "path": "src/quill/quay.rs",
+                "controls_tests": [
+                  "test_r05",
+                  "test_r06",
+                  "test_r09",
+                  "test_r10",
+                  "test_r11"
+                ]
+              }
+            ],
+            "no_single_location_flips_majority": true,
+            "concentration_cap": 0.5
+          },
+          "decoy_manifest": [
+            {
+              "path": "src/aero/pale.rs",
+              "kind": "helper",
+              "rhymes_with": "cast_vane",
+              "non_fix_purpose": "cast_fane(a: &SampleRow, b: &DisplayFrame) -> Result<Fane, SampleError> converts diagnostic sampling rows into a bounded display value."
+            },
+            {
+              "path": "src/cairn/rill.rs",
+              "kind": "helper",
+              "rhymes_with": "turn_sill",
+              "non_fix_purpose": "turn_rill(a: Fane, b: &AdvisoryFrame) -> Result<Shown, DropCode> applies display filtering to optional advisory events."
+            },
+            {
+              "path": "src/quill/bay.rs",
+              "kind": "helper",
+              "rhymes_with": "lace_quay",
+              "non_fix_purpose": "lace_bay(a: Batch<Shown>, b: &Gauge) -> Result<Tally, TallyError> assembles deterministic compiler-summary rows from completed jobs."
+            }
+          ],
+          "code_forbidden_tokens": [
+            "dependency workspace",
+            "dependency",
+            "workspace",
+            "app",
+            "repo",
+            "source",
+            "bin",
+            "rebuild-forge",
+            "rebuild command",
+            "command",
+            "edited binary",
+            "binary",
+            "forge",
+            "single supported entrypoint",
+            "supported entrypoint",
+            "entrypoint",
+            "solve",
+            "projects",
+            "project",
+            "workspace.toml",
+            "output",
+            "workspace.lock",
+            "UTF-8 text",
+            "text",
+            "lock line",
+            "lines",
+            "line",
+            "name",
+            "version",
+            "source-id",
+            "id",
+            "one ASCII space",
+            "ASCII space",
+            "space",
+            "fields",
+            "field",
+            "ascending bytewise tuple order",
+            "bytewise tuple order",
+            "tuple order",
+            "tuple",
+            "order",
+            "duplicate tuples",
+            "duplicate tuple",
+            "tuples",
+            "one final newline",
+            "final newline",
+            "newline",
+            "bundled project",
+            "nearby generated input",
+            "generated input",
+            "input",
+            "dependency set",
+            "set",
+            "declared direct and transitive requirements",
+            "direct and transitive requirements",
+            "declared direct requirements",
+            "direct requirements",
+            "declared direct requirement",
+            "direct requirement",
+            "direct",
+            "declared transitive requirements",
+            "transitive requirements",
+            "declared transitive requirement",
+            "transitive requirement",
+            "transitive",
+            "declared requirements",
+            "requirements",
+            "declared requirement",
+            "requirement",
+            "bundled downstream build",
+            "downstream build",
+            "build",
+            "equivalent package archive orderings",
+            "package archive orderings",
+            "package archive ordering",
+            "package archive",
+            "archive orderings",
+            "archive ordering",
+            "package",
+            "archive",
+            "orderings",
+            "ordering",
+            "clean repeated runs",
+            "clean repeated run",
+            "repeated runs",
+            "repeated run",
+            "runs",
+            "run",
+            "byte-identical lockfiles",
+            "byte-identical lockfile",
+            "lockfiles",
+            "lockfile",
+            "established edge-case behaviors",
+            "edge-case behaviors",
+            "edge-case behavior",
+            "behaviors",
+            "behavior",
+            "existing consumers",
+            "existing consumer",
+            "consumers",
+            "consumer",
+            "committed parent checks and release notes",
+            "parent checks and release notes",
+            "committed parent checks",
+            "committed parent check",
+            "parent checks",
+            "parent check",
+            "parents",
+            "parent",
+            "checks",
+            "check",
+            "release notes",
+            "release note",
+            "notes",
+            "note",
+            "repository history",
+            "repository",
+            "history",
+            "expected selections",
+            "expected selection",
+            "selections",
+            "selection",
+            "merged failure",
+            "failure",
+            "valid repair",
+            "repair",
+            "new package names and ranges",
+            "new package names",
+            "new package name",
+            "package names and ranges",
+            "package names",
+            "package name",
+            "package ranges",
+            "package range",
+            "names",
+            "ranges",
+            "range",
+            "work",
+            "bundled data",
+            "data",
+            "network requests",
+            "network request",
+            "network",
+            "requests",
+            "request",
+            "project inputs",
+            "project input",
+            "inputs",
+            "hand",
+            "tool",
+            "clean state",
+            "state"
+          ]
+        },
+        "naming_pass": {
+          "instruction_nouns_extracted": [
+            "dependency workspace",
+            "dependency",
+            "workspace",
+            "app",
+            "repo",
+            "source",
+            "bin",
+            "rebuild-forge",
+            "rebuild command",
+            "command",
+            "edited binary",
+            "binary",
+            "forge",
+            "single supported entrypoint",
+            "supported entrypoint",
+            "entrypoint",
+            "solve",
+            "projects",
+            "project",
+            "workspace.toml",
+            "output",
+            "workspace.lock",
+            "UTF-8 text",
+            "text",
+            "lock line",
+            "lines",
+            "line",
+            "name",
+            "version",
+            "source-id",
+            "id",
+            "one ASCII space",
+            "ASCII space",
+            "space",
+            "fields",
+            "field",
+            "ascending bytewise tuple order",
+            "bytewise tuple order",
+            "tuple order",
+            "tuple",
+            "order",
+            "duplicate tuples",
+            "duplicate tuple",
+            "tuples",
+            "one final newline",
+            "final newline",
+            "newline",
+            "bundled project",
+            "nearby generated input",
+            "generated input",
+            "input",
+            "dependency set",
+            "set",
+            "declared direct and transitive requirements",
+            "direct and transitive requirements",
+            "declared direct requirements",
+            "direct requirements",
+            "declared direct requirement",
+            "direct requirement",
+            "direct",
+            "declared transitive requirements",
+            "transitive requirements",
+            "declared transitive requirement",
+            "transitive requirement",
+            "transitive",
+            "declared requirements",
+            "requirements",
+            "declared requirement",
+            "requirement",
+            "bundled downstream build",
+            "downstream build",
+            "build",
+            "equivalent package archive orderings",
+            "package archive orderings",
+            "package archive ordering",
+            "package archive",
+            "archive orderings",
+            "archive ordering",
+            "package",
+            "archive",
+            "orderings",
+            "ordering",
+            "clean repeated runs",
+            "clean repeated run",
+            "repeated runs",
+            "repeated run",
+            "runs",
+            "run",
+            "byte-identical lockfiles",
+            "byte-identical lockfile",
+            "lockfiles",
+            "lockfile",
+            "established edge-case behaviors",
+            "edge-case behaviors",
+            "edge-case behavior",
+            "behaviors",
+            "behavior",
+            "existing consumers",
+            "existing consumer",
+            "consumers",
+            "consumer",
+            "committed parent checks and release notes",
+            "parent checks and release notes",
+            "committed parent checks",
+            "committed parent check",
+            "parent checks",
+            "parent check",
+            "parents",
+            "parent",
+            "checks",
+            "check",
+            "release notes",
+            "release note",
+            "notes",
+            "note",
+            "repository history",
+            "repository",
+            "history",
+            "expected selections",
+            "expected selection",
+            "selections",
+            "selection",
+            "merged failure",
+            "failure",
+            "valid repair",
+            "repair",
+            "new package names and ranges",
+            "new package names",
+            "new package name",
+            "package names and ranges",
+            "package names",
+            "package name",
+            "package ranges",
+            "package range",
+            "names",
+            "ranges",
+            "range",
+            "work",
+            "bundled data",
+            "data",
+            "network requests",
+            "network request",
+            "network",
+            "requests",
+            "request",
+            "project inputs",
+            "project input",
+            "inputs",
+            "hand",
+            "tool",
+            "clean state",
+            "state"
+          ],
+          "renames_during_drafting": [
+            {
+              "original": "src/source/classify.rs::classify_source",
+              "renamed_to": "src/aero/veil.rs::cast_vane",
+              "reason": "Removed public source vocabulary and concealed classification intent from the first boundary."
+            },
+            {
+              "original": "src/policy/eligibility.rs::decide_requirement",
+              "renamed_to": "src/cairn/sill.rs::turn_sill",
+              "reason": "Removed public requirement vocabulary and policy intent from the second boundary."
+            },
+            {
+              "original": "src/closure/identity.rs::commit_lock_order",
+              "renamed_to": "src/quill/quay.rs::lace_quay",
+              "reason": "Removed public lock and order vocabulary from the graph boundary."
+            },
+            {
+              "original": "test_archive_order_bytes",
+              "renamed_to": "test_shuffle_equivalence",
+              "reason": "Kept the test behavioral while removing public archive, order, and byte nouns."
+            },
+            {
+              "original": "test_parent_alpha",
+              "renamed_to": "test_r01",
+              "reason": "Removed parent and scenario identity from the scored test name."
+            },
+            {
+              "original": "test_parent_beta",
+              "renamed_to": "test_r02",
+              "reason": "Removed parent and scenario identity from the scored test name."
+            },
+            {
+              "original": "test_cross_pair",
+              "renamed_to": "test_r03",
+              "reason": "Removed pairwise topology disclosure from the scored test name."
+            },
+            {
+              "original": "test_neighbor_matrix",
+              "renamed_to": "test_r04",
+              "reason": "Removed generated-scenario shape from the scored test name."
+            },
+            {
+              "original": "test_shuffle_equivalence",
+              "renamed_to": "test_r05",
+              "reason": "Removed ordering and equivalence hints from the scored test name."
+            },
+            {
+              "original": "test_repeat_equivalence",
+              "renamed_to": "test_r06",
+              "reason": "Removed repeated-run and equivalence hints from the scored test name."
+            },
+            {
+              "original": "test_direct_frontier",
+              "renamed_to": "test_r07",
+              "reason": "Removed direct-boundary vocabulary from the scored test name."
+            },
+            {
+              "original": "test_negative_neighbor",
+              "renamed_to": "test_r08",
+              "reason": "Removed control polarity and neighborhood shape from the scored test name."
+            },
+            {
+              "original": "test_root_permutation",
+              "renamed_to": "test_r09",
+              "reason": "Removed root-ordering topology from the scored test name."
+            },
+            {
+              "original": "test_transitive_frontier",
+              "renamed_to": "test_r10",
+              "reason": "Removed transitive-boundary vocabulary from the scored test name."
+            },
+            {
+              "original": "test_payload_compile",
+              "renamed_to": "test_r11",
+              "reason": "Removed payload-build scenario disclosure from the scored test name."
+            },
+            {
+              "original": "test_beta_matrix",
+              "renamed_to": "test_r12",
+              "reason": "Removed branch and matrix identity from the scored test name."
+            }
+          ],
+          "test_names_audited": [
+            "test_r01",
+            "test_r02",
+            "test_r03",
+            "test_r04",
+            "test_r05",
+            "test_r06",
+            "test_r07",
+            "test_r08",
+            "test_r09",
+            "test_r10",
+            "test_r11",
+            "test_r12"
+          ],
+          "concentration_math": {
+            "total_tests": 12,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              },
+              {
+                "location_id": "B",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              },
+              {
+                "location_id": "C",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              }
+            ]
+          },
+          "recomputed_concentration": {
+            "total_tests": 12,
+            "concentration_cap": 0.5,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              },
+              {
+                "location_id": "B",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              },
+              {
+                "location_id": "C",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              }
+            ]
+          }
+        }
+      },
+      "evidence_errors": [],
+      "blocking_failures": []
+    }
+  ],
+  "schema_path": "/home/sudhir/Projects/TERMINUS/specs/validation_schema.json",
+  "evidence_contract_version": 3
+}

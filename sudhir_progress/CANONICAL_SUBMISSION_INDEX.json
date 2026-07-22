@@ -1,0 +1,79 @@
+{
+  "archive_count": 6,
+  "archives": {
+    "envelope-rotation-shear.zip": {
+      "bytes": 32245,
+      "instruction_sha256": {
+        "instruction.md": "923e56c06d44a25a0d8b111bf703101814504d39443aea1592910afcf559429e"
+      },
+      "layout": "standard",
+      "member_count": 55,
+      "milestones": [],
+      "sha256": "95066f6b07081538af232c7d2eb382606105ef6006142b0101b53b45a07dbec1",
+      "task_toml_sha256": "69316aecd0e026e165dd07a70e863e0a0b0a51c8a64ff893deeebd7af6d49abb",
+      "validator_valid": true
+    },
+    "musl-sysroot-splice.zip": {
+      "bytes": 21082,
+      "instruction_sha256": {
+        "instruction.md": "fba2c6089ca46c73b3a20a97af4543b8ac67abd801ba67438934f4c99275f0af"
+      },
+      "layout": "standard",
+      "member_count": 46,
+      "milestones": [],
+      "sha256": "5739b009e19f822817ceb48fa98f7142b9f41928a0b14d68016a02450ecc9ee6",
+      "task_toml_sha256": "47b764a0a95e33df7fc7f0aea852b1be6f908b557275dfa0bbfbcec62e81cc15",
+      "validator_valid": true
+    },
+    "resolver-closure-drift.zip": {
+      "bytes": 39589,
+      "instruction_sha256": {
+        "instruction.md": "f99e5e62731803b38bdec3cb2948c8c72ac803979bf67bfaa742101acf861927"
+      },
+      "layout": "standard",
+      "member_count": 77,
+      "milestones": [],
+      "sha256": "6d1f0ec9db7d97a6cdff940332133775a298bb9d6ada24d074d6e427abcac48f",
+      "task_toml_sha256": "19756d6ecd885134054157f6a0687365322d55046ed0b37b7e94cfcefa6f1b51",
+      "validator_valid": true
+    },
+    "robust-predicate-scale-parity.zip": {
+      "bytes": 30807,
+      "instruction_sha256": {
+        "instruction.md": "678e91a9a14dd335e53d9c6e2605a4482a679024c82054da9539bb2c889763de"
+      },
+      "layout": "standard",
+      "member_count": 42,
+      "milestones": [],
+      "sha256": "60a22f1ef62971a2bc48cfddc8129433e6c81128b742430ab1d6634c725d1e66",
+      "task_toml_sha256": "9c2c75c535c5259cf2a08b2b9edca31c2d9b4b8549a2f89a9f5fda26f173ea27",
+      "validator_valid": true
+    },
+    "rowgroup-prune-mirage.zip": {
+      "bytes": 26109,
+      "instruction_sha256": {
+        "instruction.md": "c7a2a9cff74b9151ada3d135c3086fccac7163d325f43645e3b4fe4dde549033"
+      },
+      "layout": "standard",
+      "member_count": 48,
+      "milestones": [],
+      "sha256": "decd9555517e295ee363f306c35f2e453ee8b8e66f379ff16d6dc6f4c1c63132",
+      "task_toml_sha256": "2d34ce0e676e2807fd0437e7a0d10d63c8b18149ae0c35d5f81775e2d792a31b",
+      "validator_valid": true
+    },
+    "sparse-jacobian-color-contract.zip": {
+      "bytes": 32640,
+      "instruction_sha256": {
+        "instruction.md": "f2004d7a1abfca10331814acad2c86043dd2fb152de9a89892c19b825c512be6"
+      },
+      "layout": "standard",
+      "member_count": 43,
+      "milestones": [],
+      "sha256": "50ba04249f0a0a8b8ec798ce1159f67ee39015683a7df6d25d78d6f24b1a65d5",
+      "task_toml_sha256": "9236ed5697830cb4130be553f744249b3c8a135b088c1e7bb11b2e3c76842c55",
+      "validator_valid": true
+    }
+  },
+  "schema_version": 1,
+  "submission_directory": "sudhir_tasks_ready_to_submit"
+}

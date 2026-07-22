@@ -1,0 +1,3 @@
+# DIFFICULTY — musl-sysroot-splice REV-2
+
+This task is hard because the build still succeeds while the binary is wrong under qemu-user. I found that easy to miss if you only watch the compile exit code. One thing that made this tricky is that more than one vendor root looks usable, and picking the wrong mix leaves a dynamic interpreter or broken thread-local and errno behavior. At first I thought a fully static flag alone would fix it, but the staged headers, CRT objects, and library search order all have to agree. The ledger also has to reflect real probe output, so a pretty JSON file that wasnt produced from a good run still fails.

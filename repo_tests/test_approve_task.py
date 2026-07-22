@@ -13,8 +13,7 @@ from unittest import mock
 import approve_task
 import run_static_checks
 import task_integrity
-from repo_tests.cases import FIXTURE_TASKS_DIR
-
+from repo_tests.current_cases import CLEAN_FIXTURE_NAME, FIXTURE_TASKS_DIR
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -77,11 +76,14 @@ def write_verifier_health_report(
 class ApproveTaskRegressionTest(unittest.TestCase):
     def test_mechanical_fail_blocks_approval(self) -> None:
         """A fixture that collapse_check flags should fail the gate on mechanical grounds alone."""
-        fixture = FIXTURE_TASKS_DIR / "lsm-snapshot-recovery"
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_root = Path(tmpdir)
             task_dir = tmp_root / fixture.name
             shutil.copytree(fixture, task_dir)
+            (task_dir / "tests" / "reference_answer.json").write_text(
+                '{"answer": "solver-visible"}\n', encoding="utf-8"
+            )
             zip_path = tmp_root / f"{fixture.name}.zip"
             write_zip_from_source(task_dir, zip_path)
             verifier_health_path = tmp_root / "verifier-health.json"
@@ -99,7 +101,7 @@ class ApproveTaskRegressionTest(unittest.TestCase):
         )
 
     def test_clean_fixture_passes_gate(self) -> None:
-        fixture = FIXTURE_TASKS_DIR / "implicit-step-restart"
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_root = Path(tmpdir)
             task_dir = tmp_root / fixture.name
@@ -123,9 +125,13 @@ class ApproveTaskRegressionTest(unittest.TestCase):
 
         self.assertTrue(payload["approved"], payload["blocking_failures"])
         self.assertEqual(payload["mechanical_status"], "PASS")
+        self.assertEqual(
+            payload["delegated_official_checks"],
+            ["typos", "check_task_sizes"],
+        )
 
     def test_zip_source_mismatch_blocks_approval(self) -> None:
-        fixture = FIXTURE_TASKS_DIR / "implicit-step-restart"
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_root = Path(tmpdir)
             task_dir = tmp_root / fixture.name
@@ -159,7 +165,7 @@ class ApproveTaskRegressionTest(unittest.TestCase):
 
     def test_missing_verifier_health_report_warns_but_does_not_block(self) -> None:
         """Opt-in diagnostic: omitting --verifier-health yields WARN, not FAIL."""
-        fixture = FIXTURE_TASKS_DIR / "implicit-step-restart"
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_root = Path(tmpdir)
             task_dir = tmp_root / fixture.name
@@ -188,7 +194,7 @@ class ApproveTaskRegressionTest(unittest.TestCase):
 
     def test_skip_verifier_health_suppresses_warning(self) -> None:
         """--skip-verifier-health passes silently with no warning and no block."""
-        fixture = FIXTURE_TASKS_DIR / "implicit-step-restart"
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_root = Path(tmpdir)
             task_dir = tmp_root / fixture.name
@@ -215,7 +221,7 @@ class ApproveTaskRegressionTest(unittest.TestCase):
 
     def test_verifier_health_and_skip_are_mutually_exclusive(self) -> None:
         """CLI errors when both --verifier-health and --skip-verifier-health are passed."""
-        fixture = FIXTURE_TASKS_DIR / "implicit-step-restart"
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_root = Path(tmpdir)
             task_dir = tmp_root / fixture.name
@@ -244,7 +250,7 @@ class ApproveTaskRegressionTest(unittest.TestCase):
         self.assertIn("mutually exclusive", stderr.getvalue())
 
     def test_verifier_health_failure_blocks_approval(self) -> None:
-        fixture = FIXTURE_TASKS_DIR / "implicit-step-restart"
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_root = Path(tmpdir)
             task_dir = tmp_root / fixture.name
@@ -277,11 +283,14 @@ class ApproveTaskRegressionTest(unittest.TestCase):
         )
 
     def test_cli_json_reports_failures(self) -> None:
-        fixture = FIXTURE_TASKS_DIR / "lsm-snapshot-recovery"
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_root = Path(tmpdir)
             task_dir = tmp_root / fixture.name
             shutil.copytree(fixture, task_dir)
+            (task_dir / "tests" / "reference_answer.json").write_text(
+                '{"answer": "solver-visible"}\n', encoding="utf-8"
+            )
             zip_path = tmp_root / f"{fixture.name}.zip"
             write_zip_from_source(task_dir, zip_path)
             verifier_health_path = tmp_root / "verifier-health.json"

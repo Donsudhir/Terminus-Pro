@@ -1,0 +1,1 @@
+Checks rebuild the report through the compiled pipeline and assert permutation and scale equivalence, resume parity, ledger/digest/ids contracts, absolute per-batch scale summaries, operator-consistent packed values and directional products (including a denser conflict family), deterministic lex ordering, and fail-closed malformed input. NOP stays red; oracle stays green.

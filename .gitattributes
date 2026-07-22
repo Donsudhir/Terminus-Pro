@@ -1,0 +1,9 @@
+# Normalize repository text to LF when content is staged or checked out.
+*.py text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+*.sh text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+*.md text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+*.mdc text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+*.toml text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+*.json text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+*.txt text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+.gitignore text eol=lf whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

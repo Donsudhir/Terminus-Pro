@@ -1,0 +1,15 @@
+[
+  {
+    "item": {
+      "service": "other-cell",
+      "secret": "db-key"
+    },
+    "axis": "other-cell",
+    "epoch": 2,
+    "nonce": "NQGMQ0LuKmPKMFuIPC0Xeg",
+    "body": "LDBff8Xr9sITHQ",
+    "wrapped": "vnaXkCTDOTtJ1j9ar3zKBgZuoG3Q6pGahHLFiJ3xiy8",
+    "tag": "RcrXqzBc+594F2355ZOmSXW7Unk20j37UdBuZ4oPszg",
+    "seq": 2200
+  }
+]

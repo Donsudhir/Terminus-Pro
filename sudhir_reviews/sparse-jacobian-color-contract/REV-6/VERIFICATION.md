@@ -1,0 +1,3 @@
+# VERIFICATION — sparse-jacobian-color-contract REV-6
+
+Checks rebuild the report through the compiled /app/bin/senslab pipeline and assert permutation and scale equivalence, resume parity, exact ledger.groups against conflict coloring, Euclidean per-batch scale summaries with the literal residual-derived step (including a three-family sequential span case), operator-tinted packed values, directional products using the disclosed bundled companion directions for width 4 and width 5 (including a denser conflict family), deterministic lex ordering, and fail-closed malformed input. NOP stays red; oracle stays green across ten Harbor trials.

@@ -5,7 +5,11 @@ All prompts for the Terminal-Bench 3 task creation pipeline, in order.
 ## Overview
 
 ```
-Step 1:           ChatGPT  → Find the idea (creative, iterative)
+Inspiration:      ChatGPT  → Consult the source ladder and internally screen candidates
+Proposal gate:    ChatGPT  → Output the 4 Task Idea Proposal fields, then STOP
+Platform check:   Sudhir   → Paste fields and run Check feedback
+                             [capture PASS/FAIL + evidence; only PASS proceeds]
+Step 1:           Cursor   → Eligibility + six-scope uniqueness research
 Step 2a:          Cursor   → Validate idea + produce authoring spec + reviewer appendix (automated loop)
                              [you review specs/<task-name>.md and specs/<task-name>-reviewer.md]
                              [agent runs `validate_loop.py finalize <task>` as the strict v2 gate]
@@ -18,7 +22,7 @@ Step 2b:          Cursor   → Draft files + mechanical gates + ORACLE 1X SANITY
                              Any check that fires forces re-entry at the cheapest unchecked point,
                              so expensive oracle time is never wasted on a collapse-failing task.
                              Do NOT run oracle 10x here — that's Step 4's job.
-Step 3a (opt-in): Cursor   → Diagnostics for REVISIONS only — GPT-5.2 quality check (3a-Q)
+Step 3a (opt-in): Cursor   → Diagnostics for REVISIONS only — GPT-5.5 quality check (3a-Q)
                              and/or verifier_health.py (3a-V). Completely optional for new tasks.
 Step 3b:          Cursor   → LLM-LEVEL REVIEW ONLY (paper, no oracle runs). Three sub-steps:
                                1. Structural review against @review-and-submit.mdc
@@ -117,9 +121,25 @@ tasks/<task-name> -a nop`. Failure → return to drafting; the
 
 ---
 
-## Step 1: ChatGPT — Build the Step-2a Seed Bank
+## Inspiration and Task Idea Proposal gate
 
-Use **exactly two prompts** for the default Step 1 flow.
+Read `web/idea-inspiration-sources.md` every time. Source hunting and optional
+seed-bank generation happen before the formal lifecycle, but the first output
+for the single candidate selected to proceed is always the four-field proposal:
+
+1. Task Idea Summary — 2–5 sentences;
+2. Idea Category — one exact platform label;
+3. Associated Skills — 5–10 values;
+4. Task Tags — 3–6 values.
+
+Then stop. Sudhir pastes the fields into Snorkel and runs **Check feedback**.
+Do not start uniqueness, Step 2a, or task files until the result is captured as
+PASSED. A proposal pass is not uniqueness PASS or Step 2a GO.
+
+### Optional: build a reusable Step-2a seed bank
+
+Use these two prompts only when intentionally building a reusable idea bank;
+they are not required before every single proposal.
 
 The default Step 1 output is **not** a tiny shortlist. It is a **goal-sized Step-2a-ready seed bank** you can take into Cursor. Unless you specify otherwise, the default target is **150 Step-2a-ready seeds** after Option A.
 
@@ -130,7 +150,7 @@ Attach the entire `web/` folder and say:
 ```text
 Run Option B from `web/bulk-idea-generation.md` in goal-sized opus-weak mode.
 The final target after Option A is 150 Step-2a-ready seeds.
-Use the four Opus-weak categories, keep the bank category-balanced, keep Topology distinct within category, and return one downloadable `.md` seed-bank file.
+Use the three default allowed categories plus justified domain-rich investigations, keep the bank category-balanced, keep Topology distinct within category, require the compact long-horizon investigation profile on every seed, and return one downloadable `.md` seed-bank file.
 ```
 
 ### Prompt 2 — Option A: consolidate the final bank
@@ -141,7 +161,7 @@ Attach the `.md` file produced by Prompt 1 and say:
 Run Option A from `web/option-a-seed-refinement.md` in step2a-bank mode against the attached bulk-ideas file.
 The final target is 150 Step-2a-ready seeds.
 Repair or replace weak seeds instead of collapsing to a tiny shortlist.
-Keep the four Opus-weak categories balanced, keep Topology distinct within category, and return one downloadable `.md` file.
+Keep the three default allowed categories balanced, route investigation-shaped seeds to the allowed category matching their real core, keep Topology distinct within category, preserve the long-horizon investigation profile, and return one downloadable `.md` file.
 ```
 
 ### Optional strict reduction pass
@@ -155,7 +175,9 @@ Only if you later want a tiny shortlist for immediate drafting, run Option A aga
 - Keep Step 1 ideas in hard-only territory: no blank-canvas implementations, no obvious mediums, no fake hardness from giant scope or busywork.
 - Option A is allowed to **refine or replace** weak seeds to keep the final bank full. That is the intended behavior.
 
-Once you have the Step-2a-ready bank file, move to Step 2a in Cursor and validate whichever seed you want to pursue first.
+Once you have the bank, select one seed, generate its four Task Idea Proposal
+fields, and run Check feedback. Move to uniqueness and Step 2a only after the
+proposal result is captured as PASSED.
 
 ---
 
@@ -190,6 +212,15 @@ Read the ACTION line from the output.
 5. Run the collapse audit from @difficulty-calibration.mdc Part A (full template).
 6. If this is attempt 2+: for each check that was WARN or FAIL in a previous attempt and is now PASS, explicitly state what design change caused the improvement. Do not just rephrase the reasoning — name the structural change.
 7. If you changed anything from the original idea beyond fixing the flagged issues (language, scope, domain, architecture, number of modules, etc.), state each change and why it was necessary.
+7a. Build the long-horizon `investigation_profile` required by evidence contract v3:
+  - choose 2-4 reinforcing weakness areas for one incident
+  - enumerate a 4-8 stage causal chain where each finding unlocks the next stage
+  - name 3+ distinct evidence-surface types
+  - name 2+ plausible hypotheses and deterministic falsifiers
+  - include at least one failing scenario and one healthy control
+  - estimate 20-100 meaningful terminal actions without counting volume or repetition
+  - state the deterministic offline reproduction strategy and why the domain work is not trivia
+  Do not grade these process expectations in task tests. Planning order, tool choice, and recovery remain trajectory diagnostics only.
 8. Naming pass and token-provenance audit (run BEFORE building the
    evidence JSON):
    a. Draft the symptoms-only instruction prose. Extract every
@@ -223,6 +254,7 @@ Read the ACTION line from the output.
    - `anti_trivialization_checks` (21 entries — includes `topology_distribution_test`)
    - `discovery_budget`
    - `instruction_specificity`
+  - `investigation_profile` (BLOCKING for newly initialized loops): the complete profile from step 7a
    - `attack_path`
    - `smallest_plausible_patch`
    - `topology_enumeration` (BLOCKING): at least 3 distinct fix topologies, each naming ≥3 code locations that must coordinate, and for each a one-sentence explanation of why no single location is sufficient. If you cannot articulate 3 such topologies, the idea has a one-function-exploit locus — reject.
@@ -351,10 +383,12 @@ Create the files required by the brief and by `@task-creation.mdc`. The exact fi
 - `steps/milestone_N/solution/solveN.sh` — oracle for milestone N only, called by a tiny `steps/milestone_N/solution/solve.sh` wrapper.
 - `task.toml` — `version = "2.0"`, `[metadata].number_of_milestones` equal to the number of `[[steps]]` blocks, each `[[steps]].name = "milestone_N"`, per-step `[steps.agent]` / `[steps.verifier]` timeouts, no top-level `[agent]` / `[verifier]`, no Harbor-only fields (`schema_version`, `[task]`, `min_reward`, `[steps.healthcheck]`, `[steps.verifier.env]`, `artifacts`, `multi_step_reward_strategy`, `workdir/setup.sh`).
 
-**UI tasks (subcategories includes ui_building):** New UI building tasks are no longer accepted. In-progress instances may finish; do not start new ones. Below is the existing template for legacy/in-progress UI tasks only.
-- `tests/test_outputs.py` — unit tests. (Same RC3/RC4/Part B as standard.)
-- `tests/` e2e test files — Playwright/Vitest as specified in `@task-creation.mdc`. (§4 UI-task verifier rules.)
-- `tests/test.sh` — copy the UI platform template from `@task-creation.mdc` (different from standard).
+**UI tasks (`subcategories` includes `ui_building`):** New UI work is
+house-blocked before Step 2a GO, and there is no UI scaffold. An
+evidence-backed in-flight revision must use `tests/test_outputs.py`, the
+standard pytest `tests/test.sh`, and Playwright's Python bindings. JavaScript or
+TypeScript Playwright/Vitest verifier files are obsolete and fail compatibility
+checks.
 
 **All task types:**
 - `instruction.md` — write human-style per humanization rules in `@task-creation.mdc`. (RC6 symptoms-only, §1 Instruction checklist, absolute paths, no emojis, no synthetic Deliverables/Artifacts/Acceptance-Criteria sections, no algorithm/CLI/schema/threshold/file-location leakage, no bold-markers on solution-adjacent values.)
@@ -478,7 +512,7 @@ Both `harbor tasks check` (quality check) and `verifier_health.py` are **complet
 - Platform agent trials reported 0/10 while Step 2b's oracle + NOP look healthy → 3a-V (verifier_health).
 - A specific test looks chain-dependent, order-sensitive, or potentially flaky → 3a-V.
 - A reviewer asked for partial-oracle ablation evidence → 3a-V.
-- A reviewer asked for a GPT-5.2 rubric audit, or post-upload feedback points at instruction/test wording → 3a-Q.
+- A reviewer asked for a GPT-5.5 rubric audit, or post-upload feedback points at instruction/test wording → 3a-Q.
 - Step 4's 10x oracle stress showed intermittent failures → 3a-V with `--include-repeat-oracle`.
 
 3a-Q and 3a-V are independent. Run 3a-Q alone, 3a-V alone, or both. Skip both entirely for routine new tasks.
@@ -490,7 +524,7 @@ Both `harbor tasks check` (quality check) and `verifier_health.py` are **complet
 
 **After running a Step 3a sub-step:** rerun Step 2b's mechanical gates on any files that changed (static → collapse → 1x oracle + NOP — not 10x), then go to Step 3b (review) and Step 4 (10x + package + approve). Attach the artifact(s) to `approve_task.py` in Step 4 — see the Step 4 flag table.
 
-### 3a-Q. Quality check (GPT-5.2 rubric audit) — OPT-IN, REVISIONS
+### 3a-Q. Quality check (GPT-5.5 rubric audit) — OPT-IN, REVISIONS
 
 Run when a reviewer requested it or you want to pressure-test the instruction/test wording against an LLM judge.
 
@@ -783,7 +817,10 @@ If any of those is not true, STOP and return to the appropriate earlier step. Do
 
 This is the only place the 10x oracle stress test runs in the whole workflow. Earlier steps used `harbor run -p ... -a oracle` (one trial, no -k) as a cheap sanity check, because any structural edit downstream would have wasted the 10x investment. By now every mechanical and LLM-level edit is settled, so 10 parallel trials actually mean something.
 
-  harbor run -p "tasks/<task-name>" -a oracle -k 10 -n 10
+  source scripts/sudhir-env.sh
+  TASK="$TB3_TASKS_DIR/<task-name>"
+  ZIP="$TB3_SUBMISSIONS_DIR/<task-name>.zip"
+  harbor run -p "$TASK" -a oracle -k 10 -n 10
 
 All 10 trials must score 1.0. If any trial scores below 1.0, the oracle is flaky (non-deterministic solve.sh, environment race, timing dependency, filesystem ordering, network retry, etc.):
 - Do NOT just rerun and hope. Identify the source of non-determinism.
@@ -796,18 +833,13 @@ Report: oracle score (X/10). If not 10/10, stop and follow the fix-and-restart l
 
 ## 2. Generate the submission zip
 
-The zip must NOT contain any file listed under `validate_submission_zip.FORBIDDEN_ROOT_FILES` (`output_contract.toml`, `quality_check_adjudication.json`, `rubric.txt`, `rubrics.txt`). These files live at the task root for repo tooling but are forbidden in the shipped archive — exclude them explicitly with `-x`:
+The canonical package command owns exclusions, ZIP validation, approval, and
+current-submission index refresh:
 
-  cd tasks/<task-name>
-  rm -f ../../Task_Ready_To_Submit/<task-name>.zip
-  zip -rq ../../Task_Ready_To_Submit/<task-name>.zip . \
-      -x '*/__pycache__/*' '*.pyc' '.*' \
-      -x 'output_contract.toml' \
-      -x 'quality_check_adjudication.json' \
-      -x 'rubric.txt' \
-      -x 'rubrics.txt'
-  python3 ../../validate_submission_zip.py ../../Task_Ready_To_Submit/<task-name>.zip
-  cd ../..
+  python3 sudhir_task.py package <task-name>
+  python3 validate_submission_zip.py "$ZIP"
+
+Never write a new archive into historical `Task_Ready_To_Submit/`.
 
 If `validate_submission_zip.py` reports `forbidden archive-root file(s) present`, the most common cause is that the `-x` exclusion list above was incomplete — add the missing filename and re-zip. Do NOT continue to the gate with a non-PASS zip validation.
 
@@ -816,24 +848,24 @@ If `validate_submission_zip.py` reports `forbidden archive-root file(s) present`
 `approve_task.py` re-runs `run_static_checks.py` + `collapse_check.py` (RC1-RC7) + `validate_submission_zip.py` + manifest verification + zip/source parity, and — when attached — strictly validates the verifier-health and quality-check artifacts. (These already passed in Step 2b; the gate re-runs them as the authoritative check against the actual shipped zip.) Pick the one command that matches which Step 3a sub-steps (if any) you actually ran:
 
   # Routine path — no Step 3a-V, no Step 3a-Q:
-  python3 approve_task.py --task-dir tasks/<task-name> \
-      --zip Task_Ready_To_Submit/<task-name>.zip \
+    python3 approve_task.py --task-dir "$TASK" \
+      --zip "$ZIP" \
       --skip-verifier-health
 
   # Step 3a-V was run (no 3a-Q):
-  python3 approve_task.py --task-dir tasks/<task-name> \
-      --zip Task_Ready_To_Submit/<task-name>.zip \
+    python3 approve_task.py --task-dir "$TASK" \
+      --zip "$ZIP" \
       --verifier-health /tmp/<task-name>-verifier-health.json
 
   # Step 3a-Q was run (no 3a-V):
-  python3 approve_task.py --task-dir tasks/<task-name> \
-      --zip Task_Ready_To_Submit/<task-name>.zip \
+    python3 approve_task.py --task-dir "$TASK" \
+      --zip "$ZIP" \
       --skip-verifier-health \
       --quality-check-adjudication /tmp/<task-name>-quality-check-adjudication.json
 
   # Both 3a-Q and 3a-V were run:
-  python3 approve_task.py --task-dir tasks/<task-name> \
-      --zip Task_Ready_To_Submit/<task-name>.zip \
+    python3 approve_task.py --task-dir "$TASK" \
+      --zip "$ZIP" \
       --verifier-health /tmp/<task-name>-verifier-health.json \
       --quality-check-adjudication /tmp/<task-name>-quality-check-adjudication.json
 
@@ -925,7 +957,10 @@ Task path: tasks/<task-name>
 
 ## Submitting to the Platform
 
-Run this after Step 4's `approve_task.py` exited 0 with a verdict of ACCEPT or ACCEPT WITH NOTES. The validated zip is already at `Task_Ready_To_Submit/<task-name>.zip`.
+Run this after Step 4's `approve_task.py` exited 0 with a verdict of ACCEPT or
+ACCEPT WITH NOTES. The validated zip is already at
+`$TB3_SUBMISSIONS_DIR/<task-name>.zip`; historical `Task_Ready_To_Submit/` is
+read-only.
 
 Verify the archive root contains exactly: `instruction.md`, `task.toml`, `environment/`, `solution/`, `tests/`. The archive root must NOT contain `output_contract.toml`, `quality_check_adjudication.json`, `rubric.txt`, or `rubrics.txt` — these live at the task root for repo tooling but are forbidden in the shipped archive (see `validate_submission_zip.FORBIDDEN_ROOT_FILES`). If any forbidden file is present, go back to Step 4 sub-step 1 and check the zip command's `-x` exclusion list.
 

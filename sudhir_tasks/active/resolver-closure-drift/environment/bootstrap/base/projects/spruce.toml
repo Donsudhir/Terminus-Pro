@@ -1,0 +1,6 @@
+title = "spruce"
+profile = "plain"
+catalog = "/app/archive/catalog.json"
+roots = ["cedar:300:320:stable:300", "alder:100:130:stable:120"]
+apis = ["cedar:cedar_api", "alder:alder_api", "birch:birch_api", "elm:elm_api"]
+seed = "0"

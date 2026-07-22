@@ -1,0 +1,31 @@
+[project]
+name = "terminus-harness"
+version = "0.1.0"
+description = "Local hard-task authoring, review, and packaging harness for Terminal-Bench"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "jsonschema==4.26.0",
+  "PyYAML==6.0.3",
+]
+
+[dependency-groups]
+dev = [
+  "pytest==8.4.1",
+  "pytest-json-ctrf==0.3.5",
+  "ruff==0.15.12",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [
+  "repo_tests/fixtures",
+  "tasks",
+  "specs",
+  "jobs",
+  "Sudhir_tasks",
+  "sudhir_tasks",
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

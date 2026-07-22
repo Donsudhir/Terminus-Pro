@@ -17,7 +17,7 @@ The output of this file is a single markdown document you save as a downloadable
 
 Use this flow unless you have a strong reason to do something narrower.
 
-- **Prompt 1 — Option B**: generate a **goal-sized** seed bank in the four Opus-weak categories.
+- **Prompt 1 — Option B**: generate a **goal-sized** seed bank across the three default allowed categories, plus justified ideas in other allowed categories.
 - **Prompt 2 — Option A**: turn that seed bank into the **final Step-2a-ready bank** at the requested size.
 
 The two-prompt default is optimized for **bank yield**, not for producing a tiny finalist list.
@@ -26,17 +26,20 @@ The two-prompt default is optimized for **bank yield**, not for producing a tiny
 
 ## Default invocation
 
-Attach this bundle (`chatgpt-task-authoring-playbook.md`, `implementation-collapse-audit.md`, `terminal-bench-task-creation.md`, `TASK_PROPOSAL_RUBRIC.md`, and this file) to the chat.
+Attach this bundle (`chatgpt-task-authoring-playbook.md`,
+`idea-inspiration-sources.md`, `implementation-collapse-audit.md`,
+`terminal-bench-task-creation.md`, `TASK_PROPOSAL_RUBRIC.md`, and this file) to
+the chat. Consult the source ladder for every generated family.
 
 Then say:
 
-> Run **Option B** from `bulk-idea-generation.md` in **goal-sized opus-weak mode**. The final target after Option A is **150 Step-2a-ready seeds**. Use the four Opus-weak categories, keep the bank category-balanced, keep topology families distinct within category, and return one downloadable `.md` seed-bank file.
+> Run **Option B** from `bulk-idea-generation.md` in **goal-sized opus-weak mode**. The final target after Option A is **150 Step-2a-ready seeds**. Use the three default allowed categories plus justified domain-rich investigations, keep the bank category-balanced, keep topology families distinct within category, and return one downloadable `.md` seed-bank file.
 
 If you want a different final bank size, replace `150` with your target.
 
 ---
 
-## Why the default is the four Opus-weak categories
+## Why the default uses three allowed Opus-weak categories
 
 Current frontier chat models are usually not limited by broad domain familiarity. They fail more often on:
 
@@ -48,12 +51,19 @@ Current frontier chat models are usually not limited by broad domain familiarity
 - **hidden-state / low-observability debugging**
 - **edge-case inputs the obvious test misses**
 
-That makes these four categories the default bank generator surface:
+That makes these three allowed categories the default bank generator surface:
 
 1. `system-administration`
 2. `security`
-3. `debugging` (**systems substrate only**)
-4. `scientific-computing`
+3. `scientific-computing`
+
+Long-horizon debugging remains a preferred **investigation shape**, but
+`data-processing`, `debugging`, and `software-engineering` are blocked primary categories. Route
+each such seed to the allowed category matching its real intellectual core.
+Domain-rich investigations in `build-and-dependency-management`, `games`, or
+`machine-learning` are welcome when the
+seed names the execution, coherence, or verification weakness that keeps it
+hard.
 
 Only use the full nine-category sweep when you can name the **specific execution/coherence/verification failure mode** that keeps an Opus-strong category hard.
 
@@ -79,9 +89,10 @@ Prefer ideas built around:
 - binary or protocol predicates recovered from behavior rather than named standards
 - verifier-bypass bait where the local checker validates the wrong invariant
 
-### `debugging`
+### Cross-category investigation lens
 
-Only use debugging ideas with a real systems substrate:
+Only use investigation-shaped ideas with a real systems substrate, then assign
+an allowed category from the actual core:
 - ABI / layout / binary / loader / rebuild coupling
 - asynchronous processes and wait discipline
 - replay / rollback / restore / catchup workflows
@@ -116,6 +127,25 @@ Ideas in this bank should preferentially realize the following levers:
 
 The strongest seeds usually combine one primary lever with one or two reinforcing levers.
 
+## Long-horizon investigation profile
+
+Every surfaced seed must remain compact but pre-commit enough structure for
+Step 2a evidence contract v3:
+
+- select **2-4 reinforcing weakness areas** for one incident;
+- outline a **4-8 stage causal chain** where each finding unlocks the next;
+- name **3+ heterogeneous evidence surfaces**;
+- name **2+ plausible hypotheses** and the deterministic experiment that can
+   falsify each;
+- include at least one failing scenario and one nearby healthy control;
+- estimate **20-100 meaningful terminal actions** without counting repetition
+   or volume as work;
+- state how reproduction stays deterministic, offline, and single-container;
+- state why the domain work is engineering rather than obscure trivia.
+
+Do not force all weakness areas into one seed. A bank should cover the wider
+portfolio over time; an individual task should stay coherent.
+
 ---
 
 ## Goal-sized mode semantics
@@ -125,14 +155,14 @@ In **goal-sized opus-weak mode**:
 - Do **not** use a fixed quota like 25-per-category.
 - Size the bank to the **requested final output after Option A**.
 - Default to **150 final Step-2a-ready seeds** if the user does not specify a target.
-- Generate a **category-balanced** bank across the four Opus-weak categories.
+- Generate a **category-balanced** bank across the three default allowed categories, with justified use of other allowed categories.
 - Prefer **narrower subsystem framings** over filler if a category starts repeating itself.
 - Keep **Topology** distinct within each category.
 - Surface mostly **bank-ready** seeds, with a limited minority of **repairable** seeds.
 
 ### Category balance rule
 
-Aim for broad balance across the four default categories. Do not let one category dominate unless you explicitly note that another category saturated and had to be backfilled.
+Aim for broad balance across the three default categories. Do not let one category dominate unless you explicitly note that another category saturated and had to be backfilled.
 
 ### Status rule
 
@@ -182,6 +212,11 @@ Every surfaced seed must already satisfy all of the following:
 
 7. **Honest hardness estimate stays in the hard band**
    - if the strongest concrete draft still looks like a medium or a local patch, reject or strengthen before surfacing
+
+8. **Long-horizon profile is coherent**
+   - 2-4 weakness areas reinforce one incident
+   - 4+ causal stages depend on prior findings rather than forming an unrelated bug bundle
+   - 3+ evidence surfaces, 2+ falsifiable hypotheses, failure/control scenarios, deterministic reproduction, and a 20-100 meaningful-action estimate are concrete
 
 ---
 
@@ -239,9 +274,18 @@ Generator metadata:
 
 ### 1. `<short title>`
 - **Status**: `<bank-ready | repairable>`
+- **Inspiration lead**: `<source tier/type/reference or original>`
+- **Reuse boundary**: `<what inspired this seed; what is deliberately not copied>`
 - **Topology**: `<3-6 word phrase>`
 - **Symptom framing**: `<one sentence, symptoms-only>`
 - **Evidence basis**: `trajectory=<Execution|Coherence|Verification>; command_level=<none|not-waiting|terminal-crash|edge-cases>; cluster=<Complex-System-Builds|Long-Horizon-Coherence|Robust-Verification|Adversarial-Creative-Reasoning>`
+- **Weakness areas**: `<2-4 values; primary first>`
+- **Causal chain**: `<stage 1> -> <stage 2> -> <stage 3> -> <stage 4 or later>`
+- **Evidence surfaces**: `<3+ distinct surface types>`
+- **Competing hypotheses**: `<hypothesis -> falsifier; hypothesis -> falsifier>`
+- **Failure matrix**: `<failing scenario; nearby healthy control>`
+- **Action horizon**: `<20-100 meaningful actions and why>`
+- **Determinism / domain**: `<reproduction strategy; why not trivia>`
 - **Discoveries**:
   - `<discovery 1>`
   - `<discovery 2>`
@@ -284,7 +328,7 @@ Generator metadata:
 
 Use this exact wording as a safe default:
 
-> Run **Option B** from `bulk-idea-generation.md` in **goal-sized opus-weak mode**. The final target after Option A is **150 Step-2a-ready seeds**. Use the four Opus-weak categories, keep the bank balanced, keep Topology distinct within category, keep most seeds `bank-ready`, and return one downloadable `.md` seed-bank file.
+> Run **Option B** from `bulk-idea-generation.md` in **goal-sized opus-weak mode**. The final target after Option A is **150 Step-2a-ready seeds**. Use the three default allowed categories plus justified domain-rich investigations, keep the bank balanced, keep Topology distinct within category, keep most seeds `bank-ready`, and return one downloadable `.md` seed-bank file.
 
 ---
 
@@ -293,6 +337,8 @@ Use this exact wording as a safe default:
 1. Save the Option B output as a `.md` file.
 2. Attach that file together with the bundle.
 3. Run **Option A** from `option-a-seed-refinement.md` in **step2a-bank mode**.
-4. Use the resulting Step-2a-ready bank inside Cursor to start idea validation and drafting.
+4. Select one candidate and generate its four Task Idea Proposal fields.
+5. Run platform Check feedback and capture PASSED evidence.
+6. Only then start Cursor uniqueness and Step 2a validation.
 
 Do not stop at Option B unless the user explicitly wants raw seeds only.

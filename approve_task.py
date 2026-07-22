@@ -14,21 +14,21 @@ Two opt-in diagnostics are also consumed when attached:
 
 If the always-blocking stack passes and any attached diagnostic passes its
 own strict checks, the task is approved. `verifier_health.py` is opt-in
-because Step 2b's 10x oracle + NOP preflight already covers routine
-correctness; run it only for suspect tasks (0/10 on platform, order-
-sensitive tests, partial-oracle ablation evidence). Use
+because Step 2b's oracle 1x + NOP sanity checks and Step 4's 10x oracle
+stress cover routine correctness; run it only for suspect tasks (0/10 on
+platform, order-sensitive tests, partial-oracle ablation evidence). Use
 `--skip-verifier-health` on the routine path to suppress the default WARN.
 `--verifier-health` and `--skip-verifier-health` are mutually exclusive.
 
 Usage:
     # Routine path (no Step 3a-V):
-    python3 approve_task.py --task-dir tasks/<task-name> \
-        --zip Task_Ready_To_Submit/<task-name>.zip \
+    python3 approve_task.py --task-dir "$TB3_TASKS_DIR/<task-name>" \
+        --zip "$TB3_SUBMISSIONS_DIR/<task-name>.zip" \
         --skip-verifier-health
 
     # Escalated path (Step 3a-V was run):
-    python3 approve_task.py --task-dir tasks/<task-name> \
-        --zip Task_Ready_To_Submit/<task-name>.zip \
+    python3 approve_task.py --task-dir "$TB3_TASKS_DIR/<task-name>" \
+        --zip "$TB3_SUBMISSIONS_DIR/<task-name>.zip" \
         --verifier-health /tmp/<task-name>-verifier-health.json \
         --quality-check-adjudication /tmp/<task-name>-quality-check-adjudication.json
 
@@ -46,15 +46,20 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 import collapse_check
+import dockerfile_check
 import metrics_collector
 import quality_check_adjudicate
+import root_adapter
 import run_static_checks
 import task_integrity
 import validate_submission_zip
 import validation_log
 
-
 REPO_ROOT = Path(__file__).resolve().parent
+
+
+def configured_specs_dir() -> Path:
+    return root_adapter.load_roots(repo_root=REPO_ROOT).specs
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -613,6 +618,7 @@ def build_report(
     if task_dir.is_dir():
         static_reporter = run_static_checks.run_checks(task_dir)
         static_report = static_reporter.as_dict()
+        docker_report = dockerfile_check.build_report(task_dir)
         collapse_report = collapse_check.build_report(task_dir)
         collapse_status = (
             "FAIL" if collapse_report["fails"] else "WARN" if collapse_report["warns"] else "PASS"
@@ -622,6 +628,11 @@ def build_report(
             "passes": [],
             "warnings": [],
             "failures": [f"task directory does not exist: {task_dir}"],
+        }
+        docker_report = {
+            "fails": 1,
+            "warns": 0,
+            "results": [],
         }
         collapse_report = {
             "oracle_targets": [],
@@ -662,6 +673,15 @@ def build_report(
     if static_report["failures"]:
         blocking_failures.extend(
             f"static check failed: {message}" for message in static_report["failures"]
+        )
+
+    if docker_report["warns"]:
+        warnings.append(
+            f"dockerfile_check.py returned WARN with {docker_report['warns']} signal(s)"
+        )
+    if docker_report["fails"]:
+        blocking_failures.append(
+            f"dockerfile_check.py returned FAIL with {docker_report['fails']} blocking signal(s)"
         )
 
     if collapse_report["warns"]:
@@ -747,6 +767,7 @@ def build_report(
         "warnings": warnings,
         "step2b_checksum": {"ok": checksum_ok, "message": checksum_msg},
         "static_checks": static_report,
+        "dockerfile_check": docker_report,
         "collapse_check": {
             "status": collapse_status,
             "report": collapse_report,
@@ -756,6 +777,7 @@ def build_report(
         "source_zip_verification": source_zip_report,
         "verifier_health": verifier_health_report,
         "quality_check_adjudication": quality_check_adjudication_report,
+        "delegated_official_checks": ["typos", "check_task_sizes"],
     }
 
     # Successful-approval emission: aggregate counters, render the
@@ -766,7 +788,7 @@ def build_report(
         try:
             target_spec = spec_path
             if target_spec is None:
-                target_spec = REPO_ROOT / "specs" / f"{task_dir.name}.md"
+                target_spec = configured_specs_dir() / f"{task_dir.name}.md"
             aggregated = metrics_collector.aggregate(task_dir)
             block_text = render_metrics_block(
                 aggregated, now_ns=time.time_ns()
@@ -857,6 +879,14 @@ def format_text_report(payload: dict[str, Any]) -> str:
         "  - .step2b-checksum: " + ("PASS" if payload["step2b_checksum"]["ok"] else "FAIL"),
         "  - static checks: "
         + ("FAIL" if payload["static_checks"]["failures"] else "WARN" if payload["static_checks"]["warnings"] else "PASS"),
+        "  - dockerfile_check.py: "
+        + (
+            "FAIL"
+            if payload["dockerfile_check"]["fails"]
+            else "WARN"
+            if payload["dockerfile_check"]["warns"]
+            else "PASS"
+        ),
         f"  - collapse_check.py: {payload['collapse_check']['status']}",
         "  - validate_submission_zip.py: " + ("PASS" if payload["zip_validation"]["valid"] else "FAIL"),
         "  - manifest verification: " + ("PASS" if payload["manifest_verification"]["valid"] else "FAIL"),
@@ -864,6 +894,8 @@ def format_text_report(payload: dict[str, Any]) -> str:
         "  - verifier_health.py: " + _format_verifier_health_status(payload["verifier_health"]),
         "  - quality_check_adjudicate.py: "
         + (payload["quality_check_adjudication"]["gate"]),
+        "  - delegated upstream before submission: "
+        + ", ".join(payload["delegated_official_checks"]),
     ]
 
     if payload["warnings"]:

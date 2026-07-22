@@ -127,5 +127,5 @@ Then say verbatim:
 > `specs/<task-name>-validation-log.md`.
 
 Direct the user to ship the zip per the team's submission process
-(see `workflow-prompts.md` § "Submitting to the Platform"). Do not
+(see `workflow.md` § "Submitting to the Platform"). Do not
 upload from the agent.

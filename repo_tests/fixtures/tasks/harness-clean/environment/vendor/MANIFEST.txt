@@ -1,0 +1,3 @@
+alpha: include tree plus overlay headers; lib/ holds seeded startup objects.
+bravo: include and lib trees seeded from the musl package layout.
+charlie: alternate include and lib tree seeded alongside the others.

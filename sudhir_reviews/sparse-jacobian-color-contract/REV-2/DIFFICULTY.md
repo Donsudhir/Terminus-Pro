@@ -1,0 +1,3 @@
+# DIFFICULTY — sparse-jacobian-color-contract REV-2
+
+This task is hard because the failures only show up when you compare batches that should be the same after a permute, a resume, or a scale change. Ordinary runs look fine so you can waste a lot of time staring at the happy path. I found the real mess is that a few separate authorities disagree with each other and each one can make the next check fail even if you fixed the last one. At first I thought one better probe grouping would clear it. It didnt. You still have to chase resume seed leakage and stale magnitude context and a unpack mismatch that scrambles good probes.

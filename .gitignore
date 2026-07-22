@@ -2,18 +2,27 @@
 .env
 .env.*
 
-tasks/
-specs/
-summary/
-jobs/
+/tasks/
+/specs/*
+!/specs/validation_schema.json
+!/specs/README.md
+/summary/
+/jobs/
 
 # Validation working state
 specs/.*.json
 tasks/*/.step2b-checksum
 tasks/*/.step2b-metrics.jsonl
+sudhir_tasks/active/*/.step2b-checksum
+sudhir_tasks/active/*/.step2b-metrics.jsonl
+/sudhir_logs/jobs/
 
 # STB revision backups (local only)
 Task_Backups/
+
+# Snorkel platform exports are large; keep the folder + docs, not the blobs.
+sudhir_snorkel/inbox/*.json
+sudhir_snorkel/archive/*.json
 
 # Python
 __pycache__/

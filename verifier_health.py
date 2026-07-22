@@ -61,9 +61,8 @@ from typing import Any, Callable
 
 import analyze_trials
 
-
 REPO_ROOT = Path(__file__).resolve().parent
-DEFAULT_JOBS_DIR = REPO_ROOT / "jobs"
+DEFAULT_JOBS_DIR = Path(os.environ.get("TB3_JOBS_DIR", str(REPO_ROOT / "jobs"))).expanduser()
 DEFAULT_REPEAT_ORACLE_RUNS = 5
 DEFAULT_RANDOM_SEEDS = (101, 202, 303)
 PRESERVED_SUFFIX_COMMANDS = 2

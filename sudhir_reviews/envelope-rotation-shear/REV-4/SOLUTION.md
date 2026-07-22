@@ -1,0 +1,3 @@
+# SOLUTION — envelope-rotation-shear REV-4
+
+The repair makes frame creation and namespace context use one complete public-service identity. Authenticated reads then accept the matching context for records sealed under that same public service name, so valid newly introduced namespaces remain readable and cross-namespace substitutions stay rejected. Historical selection matches the full item and service identity before choosing one predecessor for recovery. Maintenance keeps that public-service binding, skips rewriting active matching-service records, and the public recovery workflow restores affected records while remaining byte-stable on the second maintenance run.

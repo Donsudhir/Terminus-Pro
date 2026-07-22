@@ -1,0 +1,27 @@
+--- a/projects/cypress.toml
++++ b/projects/cypress.toml
+@@ -1,5 +1,5 @@
+ title = "cypress"
+-profile = "plain"
++profile = "beta"
+ catalog = "/app/archive/catalog.json"
+ roots = ["birch:200:220:stable:210"]
+ apis = ["birch:beta_api", "elm:elm_api"]
+--- /dev/null
++++ b/tests/parent_beta.rs
+@@ -0,0 +1,6 @@
++#[test]
++fn exact_retained_contract() {
++    // Exact code-210 requests under beta must keep the retained Birch line.
++    let exact_code = 210u32;
++    assert!(exact_code >= 200 && exact_code < 220);
++}
+--- /dev/null
++++ b/docs/releases/beta.md
+@@ -0,0 +1,6 @@
++# Exact retained compatibility
++
++An exact code-210 request in the beta profile keeps the previously retained
++Birch line, even though ordinary new selections avoid that retained release.
++
++This behavior keeps pinned consumers on the API they already compiled against.

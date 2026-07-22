@@ -7,7 +7,8 @@ author_name = "anonymous"
 author_email = "anonymous"
 difficulty = "unknown"
 category = "software-engineering"
-# Options for subcategories are: "long_context", "tool_specific", "api_integration", "db_interaction", "ui_building"
+# Recognized subcategories include "ui_building", but net-new UI starts are house-blocked.
+# New tasks may use: "long_context", "tool_specific", "api_integration", "db_interaction"
 subcategories = []
 # Total milestone count — must match the number of [[steps]] blocks below
 number_of_milestones = 2

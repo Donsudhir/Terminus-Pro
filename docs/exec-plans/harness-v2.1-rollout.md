@@ -132,7 +132,7 @@ commands.md                            Replace the existing Packaging block's
                                        for Step 4. Document
                                        `python3 task_integrity.py {write|verify}`.
 
-workflow-prompts.md                    Add "Ralph discipline within the Step
+workflow.md                            Add "Ralph discipline within the Step
                                        model" subsection (v2.1 §11).
 
 CNI.md                                 Add demotion policy (v2.1 §10) and
@@ -290,7 +290,7 @@ Phase 1 is large enough that rollback procedure matters. The procedure is split 
 - Remove `docs/ARCHITECTURE.md`. No code depends on it.
 - Remove `.cursor/rules/00-authoring-critical.mdc`. No always-on rule references it (it's agent-requested), so removing it is silent.
 - Remove `lint_spec.py` and revert `validate_loop.py`'s wiring. Existing specs are unaffected (none have `version: 2` yet at rollback time).
-- Revert the new section in `REPO_CONVENTIONS.md` and the new pointers in `commands.md` / `workflow-prompts.md`.
+- Revert the new section in `REPO_CONVENTIONS.md` and the new pointers in `commands.md` / `workflow.md`.
 - Remove the new test files. They don't pin anything in the existing test surface.
 
 **Coordinated rollback (requires telling in-flight contributors to stop):**

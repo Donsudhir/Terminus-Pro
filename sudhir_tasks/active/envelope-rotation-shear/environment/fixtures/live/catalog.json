@@ -1,0 +1,26 @@
+[
+  {
+    "item": {
+      "service": "north-cell",
+      "secret": "api-token"
+    },
+    "file": "slice-01.bin",
+    "slot": 0
+  },
+  {
+    "item": {
+      "service": "archive-cell",
+      "secret": "db-key"
+    },
+    "file": "slice-02.bin",
+    "slot": 0
+  },
+  {
+    "item": {
+      "service": "steady-cell",
+      "secret": "signing-pin"
+    },
+    "file": "slice-03.bin",
+    "slot": 0
+  }
+]

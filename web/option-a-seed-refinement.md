@@ -36,11 +36,14 @@ In finalist mode, Option A can narrow to a small set of strongest seeds.
 
 ## Default invocation
 
-Attach this bundle (`chatgpt-task-authoring-playbook.md`, `implementation-collapse-audit.md`, `terminal-bench-task-creation.md`, `TASK_PROPOSAL_RUBRIC.md`, and this file) together with the `.md` seed-bank file from Option B.
+Attach this bundle (`chatgpt-task-authoring-playbook.md`,
+`idea-inspiration-sources.md`, `implementation-collapse-audit.md`,
+`terminal-bench-task-creation.md`, `TASK_PROPOSAL_RUBRIC.md`, and this file)
+together with the `.md` seed-bank file from Option B.
 
 Then say:
 
-> Run **Option A** from `option-a-seed-refinement.md` in **step2a-bank mode** against the attached bulk-ideas file. The final target is **150 Step-2a-ready seeds**. Repair or replace weak seeds instead of collapsing to a tiny shortlist. Keep the four Opus-weak categories balanced, keep Topology distinct within category, and return one downloadable `.md` file.
+> Run **Option A** from `option-a-seed-refinement.md` in **step2a-bank mode** against the attached bulk-ideas file. The final target is **150 Step-2a-ready seeds**. Repair or replace weak seeds instead of collapsing to a tiny shortlist. Keep the three default allowed categories balanced, route investigation-shaped seeds to the allowed category matching their real core, keep Topology distinct within category, and return one downloadable `.md` file.
 
 If you want a different final bank size, replace `150` with your target.
 
@@ -109,6 +112,13 @@ For each input seed, apply these filters:
 10. **evidence-basis consistency**
    - Evidence basis must match the actual exploit structure and scenario
 
+11. **long-horizon investigation profile**
+   - select 2-4 reinforcing weakness areas, not an eighteen-part checklist
+   - require a 4-8 stage causal chain where findings unlock later work
+   - require 3+ heterogeneous evidence surfaces and 2+ falsifiable hypotheses
+   - require a failing scenario, a nearby healthy control, deterministic reproduction, and a credible 20-100 meaningful-action estimate
+   - reject parallel bug bundles, volume-based action estimates, timing-luck races, and domain trivia
+
 ### B. After screening, classify each candidate
 
 Each seed ends in one of three buckets:
@@ -133,7 +143,7 @@ Each seed ends in one of three buckets:
 
 ### D. Category-balance rule
 
-Keep the final bank broadly balanced across the four Opus-weak categories unless the user asked for a different domain profile.
+Keep the final bank broadly balanced across the three default allowed categories unless the user asked for a different domain profile. `data-processing`, `debugging`, and `software-engineering` remain blocked primary categories; route the investigation shape through the allowed category matching the real work. Do not introduce net-new milestone ideas.
 
 If one category saturates early, replenish from a narrower subsystem inside that category before backfilling from another category. If backfill is still necessary, say so in the summary.
 
@@ -162,6 +172,11 @@ That means each final seed must have:
 - exactly 3 concrete discoveries
 - evidence basis
 - exploit integration
+- 2-4 weakness areas and a 4+ stage causal chain
+- 3+ evidence surfaces and 2+ hypothesis/falsifier pairs
+- failing and healthy-control scenarios
+- a 20-100 meaningful-action estimate plus deterministic reproduction
+- domain reasoning that is not obscure trivia
 - one sentence on why it is hard
 - one sentence on the main collapse risk
 
@@ -200,10 +215,19 @@ Screened against: `implementation-collapse-audit.md`, `chatgpt-task-authoring-pl
 #### 1. `<title>`
 - **Status**: `<ready | refined | replacement>`
 - **Source**: `<original seed reference or replacement note>`
+- **Inspiration lead**: `<source tier/type/reference or original>`
+- **Reuse boundary**: `<what inspired the seed; what is deliberately not copied>`
 - **Topology**: `<3-6 word phrase>`
 - **Symptom**: `<one sentence, symptoms-only>`
 - **Discoveries**: `<discovery 1>; <discovery 2>; <discovery 3>`
 - **Evidence**: `trajectory=<...>; command_level=<...>; cluster=<...>`
+- **Weakness areas**: `<2-4 values; primary first>`
+- **Causal chain**: `<stage 1> -> <stage 2> -> <stage 3> -> <stage 4 or later>`
+- **Evidence surfaces**: `<3+ distinct types>`
+- **Hypotheses / falsifiers**: `<pair 1; pair 2>`
+- **Failure matrix**: `<failing scenario; healthy control>`
+- **Action horizon**: `<20-100 meaningful actions and why>`
+- **Determinism / domain**: `<strategy; why not trivia>`
 - **Exploits**: `Exploit <N>: <scenario-specific realization>; Exploit <N>: <scenario-specific realization>`
 - **Why hard**: `<one sentence>`
 - **Main collapse risk**: `<one sentence>`
@@ -215,7 +239,7 @@ Screened against: `implementation-collapse-audit.md`, `chatgpt-task-authoring-pl
 ### Category: `security`
 ...
 
-### Category: `debugging`
+### Category: `<another allowed category when justified>`
 ...
 
 ### Category: `scientific-computing`
@@ -234,6 +258,8 @@ If the user explicitly asks for `finalist mode`, use this instead:
 - no repairable bank padding
 - surface only the strongest **3-12** seeds total
 - grouped by category if that makes sense
+- include a four-field **Task Idea Proposal preview** for every surfaced
+   finalist: 2–5 sentence summary, exact category label, 5–10 skills, 3–6 tags
 
 If the user does **not** say `finalist mode`, stay in `step2a-bank` mode.
 
@@ -254,7 +280,7 @@ If the user does **not** say `finalist mode`, stay in `step2a-bank` mode.
 
 Use this exact wording as a safe default:
 
-> Run **Option A** from `option-a-seed-refinement.md` in **step2a-bank mode** against the attached bulk-ideas file. The final target is **150 Step-2a-ready seeds**. Repair or replace weak seeds instead of collapsing to a tiny shortlist. Keep the four Opus-weak categories balanced, keep Topology distinct within category, and return one downloadable `.md` file.
+> Run **Option A** from `option-a-seed-refinement.md` in **step2a-bank mode** against the attached bulk-ideas file. The final target is **150 Step-2a-ready seeds**. Repair or replace weak seeds instead of collapsing to a tiny shortlist. Keep the three default allowed categories balanced, route investigation-shaped seeds to the allowed category matching their real core, keep Topology distinct within category, and return one downloadable `.md` file.
 
 ---
 
@@ -262,7 +288,9 @@ Use this exact wording as a safe default:
 
 1. Save the Option A output as a `.md` file.
 2. Bring that file into Cursor.
-3. Pick any seed from the bank and start Step 2a validation.
-4. If you later want only the strongest few, run Option A again in `finalist mode`.
+3. Pick a seed and generate its four Task Idea Proposal fields.
+4. Run platform Check feedback and capture PASSED evidence.
+5. Only then start uniqueness and Step 2a validation.
+6. If you later want only the strongest few, run Option A again in `finalist mode`.
 
 The default path is **large Step-2a-ready bank first, strict finalist reduction later if needed**.

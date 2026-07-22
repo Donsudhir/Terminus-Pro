@@ -1,0 +1,29 @@
+--- a/projects/beech.toml
++++ b/projects/beech.toml
+@@ -1,5 +1,5 @@
+ title = "beech"
+-profile = "plain"
++profile = "alpha"
+ catalog = "/app/archive/catalog.json"
+ roots = ["alder:100:130:preview:110"]
+ apis = ["alder:alpha_api", "birch:birch_api", "elm:elm_api"]
+--- /dev/null
++++ b/tests/parent_alpha.rs
+@@ -0,0 +1,6 @@
++#[test]
++fn explicit_preview_contract() {
++    // Preview channel with code 110 must remain selectable under alpha.
++    let preview_code = 110u32;
++    assert!(preview_code >= 100 && preview_code < 130);
++}
+--- /dev/null
++++ b/docs/releases/alpha.md
+@@ -0,0 +1,8 @@
++# Explicit preview compatibility
++
++When an explicit preview request includes code 110, the retained observable
++choice prefers the preview-channel Alder release that carries that code.
++Stable releases remain preferred for requests that do not opt into the
++preview channel.
++
++This behavior supports consumers testing the next Alder API before promotion.

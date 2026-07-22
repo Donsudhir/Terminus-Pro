@@ -3,14 +3,14 @@
 # requires-python = ">=3.10"
 # dependencies = ["anthropic"]
 # ///
-from __future__ import annotations
-
 """Advisory task proposal rubric review with opt-in task-structure context.
 
 Evaluates task proposals against a rubric defined in TASK_PROPOSAL_RUBRIC.md.
 The rubric is sent as the system prompt; by default the user message includes
 instruction prose only, with task-structure summary available as an opt-in.
 """
+
+from __future__ import annotations
 
 import argparse
 import ast
@@ -20,9 +20,13 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+import model_policy
+
 # CUSTOMIZE VALIDATION PIPELINE — change the default rubric file or model
 DEFAULT_RUBRIC_FILE = Path(__file__).parent.parent / "web" / "TASK_PROPOSAL_RUBRIC.md"
-DEFAULT_MODEL = "claude-opus-4-6"
+DEFAULT_MODEL = model_policy.RUBRIC_REVIEW_MODEL
 VISIBLE_FILE_SUMMARY_LIMIT = 40
 TEST_NAME_SUMMARY_LIMIT = 30
 METADATA_SUMMARY_KEYS = (

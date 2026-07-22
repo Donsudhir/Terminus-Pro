@@ -8,9 +8,16 @@ import unittest
 from pathlib import Path
 
 import run_static_checks
-from repo_tests.cases import COMMON_STATIC_PASS_MESSAGES, FIXTURE_TASKS_DIR, STATIC_CHECK_EXPECTATIONS
+from repo_tests.current_cases import (
+    CLEAN_FIXTURE_NAME,
+    COMMON_STATIC_PASS_MESSAGES,
+    FIXTURE_TASKS_DIR,
+    STATIC_CHECK_EXPECTATIONS,
+)
 
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "run_static_checks"
+ORACLE_CONTRACT_FIXTURE = FIXTURES_DIR / "oracle-contract"
+TEST_SH_FIXTURES = FIXTURES_DIR / "test_sh"
 
 
 class RunStaticChecksRegressionTest(unittest.TestCase):
@@ -20,6 +27,42 @@ class RunStaticChecksRegressionTest(unittest.TestCase):
         fixture_dir = FIXTURES_DIR / fixture_name
         task_dir = Path(tmpdir) / fixture_name
         shutil.copytree(fixture_dir, task_dir)
+        return task_dir
+
+    def copy_python_ui_fixture(self, tmpdir: str) -> Path:
+        task_dir = Path(tmpdir) / "python-ui"
+        shutil.copytree(FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME, task_dir)
+
+        task_toml = task_dir / "task.toml"
+        task_toml.write_text(
+            task_toml.read_text(encoding="utf-8").replace(
+                'subcategories = ["tool_specific"]',
+                'subcategories = ["ui_building"]',
+            ),
+            encoding="utf-8",
+        )
+
+        verifier = task_dir / "tests" / "test_outputs.py"
+        verifier_text = verifier.read_text(encoding="utf-8").replace(
+            "import pytest\n",
+            "import pytest\nfrom playwright.sync_api import Page\n",
+        )
+        verifier.write_text(
+            verifier_text
+            + "\n\ndef test_ui_browser_contract(page: Page) -> None:\n"
+            + '    """The browser renders a live DOM through Playwright Python."""\n'
+            + '    page.set_content("<main>ready</main>")\n'
+            + '    assert page.locator("main").inner_text() == "ready"\n',
+            encoding="utf-8",
+        )
+
+        dockerfile = task_dir / "environment" / "Dockerfile"
+        dockerfile.write_text(
+            dockerfile.read_text(encoding="utf-8")
+            + "\nRUN pip install playwright==1.54.0 pytest-playwright==0.7.0\n"
+            + "RUN python -m playwright install chromium\n",
+            encoding="utf-8",
+        )
         return task_dir
 
     def test_fixture_tasks_keep_pinned_static_check_results(self) -> None:
@@ -42,8 +85,28 @@ class RunStaticChecksRegressionTest(unittest.TestCase):
                 self.assertEqual(exit_code, 0)
                 self.assertIn("PASS", stdout.getvalue())
 
+    def test_official_python_playwright_ui_fixture_passes_static_checks(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = self.copy_python_ui_fixture(tmpdir)
+            reporter = run_static_checks.run_checks(task_dir)
+        self.assertEqual(reporter.failures, [])
+
+    def test_obsolete_javascript_ui_verifier_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = self.copy_python_ui_fixture(tmpdir)
+            tests_dir = task_dir / "tests"
+            (tests_dir / "package.json").write_text("{}\n", encoding="utf-8")
+            (tests_dir / "vitest.config.ts").write_text(
+                "export default {};\n", encoding="utf-8"
+            )
+            reporter = run_static_checks.run_checks(task_dir, {"task_structure"})
+        self.assertTrue(
+            any("JavaScript/TypeScript Playwright and Vitest" in failure for failure in reporter.failures),
+            reporter.failures,
+        )
+
     def test_reward_json_footer_is_rejected(self) -> None:
-        fixture = FIXTURE_TASKS_DIR / "implicit-step-restart"
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         with tempfile.TemporaryDirectory() as tmpdir:
             task_dir = Path(tmpdir) / fixture.name
             shutil.copytree(fixture, task_dir)
@@ -59,6 +122,135 @@ class RunStaticChecksRegressionTest(unittest.TestCase):
 
         self.assertIn(
             "tests/test.sh must emit /logs/verifier/reward.txt; reward.json is not supported by the Edition 2 template",
+            reporter.failures,
+        )
+
+    def test_semantic_reward_footer_accepts_current_official_forms(self) -> None:
+        for name in ("official-rc.sh", "official-inline.sh", "official-safe-capture.sh"):
+            with self.subTest(fixture=name):
+                lines = (TEST_SH_FIXTURES / name).read_text(encoding="utf-8").splitlines()
+                self.assertEqual(run_static_checks.reward_txt_footer_errors(lines), [])
+
+    def test_semantic_reward_footer_rejects_trailing_exit(self) -> None:
+        lines = (TEST_SH_FIXTURES / "forbidden-trailing-exit.sh").read_text(
+            encoding="utf-8"
+        ).splitlines()
+        errors = run_static_checks.reward_txt_footer_errors(lines)
+        self.assertTrue(any("trailing command" in error for error in errors), errors)
+        self.assertFalse(run_static_checks.reward_txt_tail_matches_template(lines))
+
+    def test_semantic_reward_footer_rejects_intervening_command(self) -> None:
+        lines = (TEST_SH_FIXTURES / "forbidden-intervening-command.sh").read_text(
+            encoding="utf-8"
+        ).splitlines()
+        errors = run_static_checks.reward_txt_footer_errors(lines)
+        self.assertTrue(any("captured immediately" in error for error in errors), errors)
+
+    def test_semantic_reward_footer_rejects_reversed_rewards(self) -> None:
+        lines = (TEST_SH_FIXTURES / "forbidden-reversed-rewards.sh").read_text(
+            encoding="utf-8"
+        ).splitlines()
+        errors = run_static_checks.reward_txt_footer_errors(lines)
+        self.assertTrue(any("reward 1" in error for error in errors), errors)
+        self.assertTrue(any("reward 0" in error for error in errors), errors)
+
+    def test_current_official_workdir_exit_zero_is_allowed_before_pytest(self) -> None:
+        content = (TEST_SH_FIXTURES / "official-rc.sh").read_text(encoding="utf-8")
+        substantive = run_static_checks.substantive_shell_lines(content)
+        self.assertEqual(
+            run_static_checks.non_ui_test_sh_prefix_mismatches(
+                substantive,
+                content=content,
+            ),
+            [],
+        )
+
+    def test_full_test_sh_check_accepts_safe_status_capture(self) -> None:
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir) / fixture.name
+            shutil.copytree(fixture, task_dir)
+            (task_dir / "tests" / "test.sh").write_text(
+                (TEST_SH_FIXTURES / "official-safe-capture.sh").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            reporter = run_static_checks.run_checks(task_dir, {"test_sh"})
+        self.assertEqual(reporter.failures, [])
+
+    def test_full_test_sh_check_rejects_trailing_exit(self) -> None:
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir) / fixture.name
+            shutil.copytree(fixture, task_dir)
+            test_sh = task_dir / "tests" / "test.sh"
+            test_sh.write_text(
+                test_sh.read_text(encoding="utf-8") + '\nexit "$?"\n',
+                encoding="utf-8",
+            )
+            reporter = run_static_checks.run_checks(task_dir, {"test_sh"})
+        self.assertTrue(
+            any("trailing command" in failure for failure in reporter.failures),
+            reporter.failures,
+        )
+
+    def test_test_sh_rejects_git_clone_runtime_setup(self) -> None:
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir) / fixture.name
+            shutil.copytree(fixture, task_dir)
+            test_sh = task_dir / "tests" / "test.sh"
+            test_sh.write_text(
+                test_sh.read_text(encoding="utf-8").replace(
+                    "cd /tests &&",
+                    "git clone https://example.invalid/verifier.git /tmp/verifier\n\ncd /tests &&",
+                ),
+                encoding="utf-8",
+            )
+            reporter = run_static_checks.run_checks(task_dir, {"test_sh"})
+        self.assertTrue(
+            any("git clone" in failure for failure in reporter.failures),
+            reporter.failures,
+        )
+
+    def test_test_sh_allows_pinned_local_wheel_install(self) -> None:
+        fixture = FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir) / fixture.name
+            shutil.copytree(fixture, task_dir)
+            test_sh = task_dir / "tests" / "test.sh"
+            test_sh.write_text(
+                test_sh.read_text(encoding="utf-8").replace(
+                    "cd /tests &&",
+                    "pip install --no-index -f /opt/wheels pytest==8.4.1\n\ncd /tests &&",
+                ),
+                encoding="utf-8",
+            )
+            reporter = run_static_checks.run_checks(task_dir, {"test_sh"})
+        self.assertEqual(reporter.failures, [])
+
+    def test_package_hygiene_allows_source_build_module_and_script_bin(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir)
+            source_build = task_dir / "environment" / "src" / "build"
+            source_build.mkdir(parents=True)
+            (source_build / "mod.rs").write_text("pub fn compile() {}\n", encoding="utf-8")
+            script_bin = task_dir / "environment" / "bin"
+            script_bin.mkdir()
+            (script_bin / "rebuild").write_text(
+                "#!/usr/bin/env bash\nset -e\n",
+                encoding="utf-8",
+            )
+
+            reporter = run_static_checks.run_checks(task_dir, {"package_hygiene"})
+            self.assertEqual(reporter.failures, [])
+
+            artifact_dir = task_dir / "environment" / "build"
+            artifact_dir.mkdir()
+            (artifact_dir / "result.o").write_bytes(b"artifact")
+            reporter = run_static_checks.run_checks(task_dir, {"package_hygiene"})
+
+        self.assertTrue(
+            any("environment/build" in failure for failure in reporter.failures),
             reporter.failures,
         )
 
@@ -192,13 +384,13 @@ class RunStaticChecksRegressionTest(unittest.TestCase):
         """A knob referenced by solve.sh but absent from instruction.md
         AND absent from every comment/doc under environment/ must warn.
 
-        Reproduces the rollback-replay-divergence failure mode: the oracle
+        Reproduces the invisible bespoke-knob failure mode: the oracle
         flips two CMake cache variables the agent cannot discover, so agents
         rewrite the source and lose the conditional-compilation ladder the
         grader depends on."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            source = FIXTURE_TASKS_DIR / "rollback-replay-divergence"
-            task_dir = Path(tmpdir) / "rollback-replay-divergence"
+            source = ORACLE_CONTRACT_FIXTURE
+            task_dir = Path(tmpdir) / "oracle-contract"
             shutil.copytree(source, task_dir)
 
             instruction = task_dir / "instruction.md"
@@ -231,7 +423,7 @@ class RunStaticChecksRegressionTest(unittest.TestCase):
         """Mentioning the knob in instruction.md alone clears the check even if
         the environment/ sources have no comment for it."""
         reporter = run_static_checks.run_checks(
-            FIXTURE_TASKS_DIR / "rollback-replay-divergence",
+            ORACLE_CONTRACT_FIXTURE,
             {"oracle_knob_discoverability"},
         )
         self.assertEqual(reporter.failures, [])
@@ -245,22 +437,32 @@ class RunStaticChecksRegressionTest(unittest.TestCase):
         must never trigger the check, even if they never appear in
         instruction.md. Tasks that only use standard knobs report a clean
         'no bespoke build knobs required' pass."""
-        reporter = run_static_checks.run_checks(
-            FIXTURE_TASKS_DIR / "byzantine-storage-rebalance",
-            {"oracle_knob_discoverability"},
-        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task_dir = Path(tmpdir)
+            (task_dir / "instruction.md").write_text(
+                "Build the local tool.\n", encoding="utf-8"
+            )
+            (task_dir / "solution").mkdir()
+            (task_dir / "solution" / "solve.sh").write_text(
+                "cmake -S /app -B /app/build "
+                "-D CMAKE_BUILD_TYPE=Release -D CMAKE_C_COMPILER=gcc\n",
+                encoding="utf-8",
+            )
+            reporter = run_static_checks.run_checks(
+                task_dir, {"oracle_knob_discoverability"}
+            )
         self.assertEqual(reporter.failures, [])
         self.assertEqual([], [w for w in reporter.warnings if "build knobs" in w])
 
     def test_oracle_path_discoverability_warns_when_install_path_is_invisible(self) -> None:
-        """Reproduces the rollback-replay-divergence v4 failure mode: agents
+        """Reproduces the invisible install-path failure mode: agents
         built the binary, ran it, produced the correct SIGNOFF digests, and
         still failed every test because nothing told them to install the
         binary at /app/bin/netplay_matrix. The check must catch this by
         warning that the test-required path is undocumented."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            source = FIXTURE_TASKS_DIR / "rollback-replay-divergence"
-            task_dir = Path(tmpdir) / "rollback-replay-divergence"
+            source = ORACLE_CONTRACT_FIXTURE
+            task_dir = Path(tmpdir) / "oracle-contract"
             shutil.copytree(source, task_dir)
 
             instruction = task_dir / "instruction.md"
@@ -284,7 +486,7 @@ class RunStaticChecksRegressionTest(unittest.TestCase):
         tests resolve is either in the shipped tree, under a standard build-
         output prefix, or named in instruction.md / environment/."""
         reporter = run_static_checks.run_checks(
-            FIXTURE_TASKS_DIR / "rollback-replay-divergence",
+            ORACLE_CONTRACT_FIXTURE,
             {"oracle_path_discoverability"},
         )
         self.assertEqual(reporter.failures, [])
@@ -300,11 +502,11 @@ class RunStaticChecksRegressionTest(unittest.TestCase):
         the agent can grep for them. This distinguishes paths from build
         knobs, where bare-code references don't count.
 
-        Specifically: byzantine-storage-rebalance documents
-        /app/config/sim_defaults.yaml only via a Go string-literal
+        The focused oracle-contract fixture documents
+        /app/config/sim_defaults.yaml only via a C string-literal
         constant; the check must not warn on it."""
         reporter = run_static_checks.run_checks(
-            FIXTURE_TASKS_DIR / "byzantine-storage-rebalance",
+            ORACLE_CONTRACT_FIXTURE,
             {"oracle_path_discoverability"},
         )
         self.assertEqual(reporter.failures, [])
@@ -316,7 +518,7 @@ class RunStaticChecksRegressionTest(unittest.TestCase):
         the agent's toolchain and don't need to be documented in
         instruction.md."""
         reporter = run_static_checks.run_checks(
-            FIXTURE_TASKS_DIR / "release-provenance-drift",
+            ORACLE_CONTRACT_FIXTURE,
             {"oracle_path_discoverability"},
         )
         self.assertEqual(reporter.failures, [])

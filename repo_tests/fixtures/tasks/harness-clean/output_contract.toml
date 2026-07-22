@@ -1,0 +1,22 @@
+user_visible_outputs = [
+  "/app/output/payload",
+  "/app/output/probe_report.json",
+  "/app/tools/build_payload.sh",
+]
+
+internal_harness_files = [
+  "/app/tools/run_probes.sh",
+]
+
+[structured_outputs.probe_report]
+target = "/app/output/probe_report.json"
+format = "json"
+instruction_checks = [
+  "schema_version",
+  "payload_digest",
+  "rows",
+  "name",
+  "ok",
+  "detail",
+  "settlement",
+]

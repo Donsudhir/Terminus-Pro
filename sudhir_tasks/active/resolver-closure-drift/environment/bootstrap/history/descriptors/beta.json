@@ -1,0 +1,9 @@
+{
+  "id": "beta",
+  "parents": ["base"],
+  "patch": "beta.patch",
+  "author_name": "Ivo Hart",
+  "author_email": "ivo@example.invalid",
+  "timestamp": "2025-02-19T11:45:00+0000",
+  "message": "extend beta profile handling"
+}

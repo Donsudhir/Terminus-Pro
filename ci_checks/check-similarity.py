@@ -22,10 +22,14 @@ import sys
 import tempfile
 from pathlib import Path
 
+from rubric_review import build_similarity_document
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from rubric_review import build_similarity_document
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+
+import root_adapter  # noqa: E402
 
 SIMILARITY_ALERT_THRESHOLD = 0.80
 # CUSTOMIZE — add reference repos to compare against for duplicate detection.
@@ -200,15 +204,21 @@ def main() -> int:
     reference_documents: dict[str, str] = {}
 
     task_name = task_path.name
-    local_tasks_dir = Path("tasks")
-    if local_tasks_dir.exists():
+    for label, local_tasks_dir in (
+        ("current", root_adapter.ROOTS.tasks),
+        ("historical", root_adapter.ROOTS.historical_tasks),
+    ):
+        if not local_tasks_dir.exists():
+            continue
         local = load_task_documents(
             local_tasks_dir,
             exclude_task=task_name,
             include_structure_signals=args.include_structure,
         )
         for tid, text in local.items():
-            reference_documents[f"local/{tid}"] = text
+            key = f"local/{label}/{tid}"
+            if key not in reference_documents:
+                reference_documents[key] = text
 
     repos = [parse_repo_entry(r) for r in REFERENCE_REPOS]
     with tempfile.TemporaryDirectory() as tmp:

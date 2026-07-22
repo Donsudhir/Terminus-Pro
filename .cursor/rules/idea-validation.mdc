@@ -8,12 +8,37 @@ alwaysApply: false
 Reference this file when validating a task idea and producing a spec. It is NOT auto-applied — use `@idea-validation.mdc` explicitly.
 The default Edition 2 acceptance profile in this repo is hard-only. If the best honest label is medium, the idea does not advance.
 
+## Entry prerequisite: Task Idea Proposal PASS
+
+Do not initialize or record Step 2a until the four Snorkel proposal fields have
+been generated, Check feedback has run, and `idea proposal <slug> passed`
+contains evidence. The proposal check is only an early platform signal; all
+eligibility, uniqueness, hardness, topology, and collapse checks below still
+apply.
+
+## Long-horizon investigation profile (new loops)
+
+New validation loops use evidence contract v3 and must follow
+`sudhir_knowledge/LONG_HORIZON_TASK_PHILOSOPHY.md`. Select 2-4 reinforcing
+weakness areas for one coherent incident, not all available dimensions. Commit
+to a 4-8 stage causal chain, 3+ heterogeneous evidence surfaces, 2+ plausible
+hypotheses with deterministic falsifiers, a failing scenario plus a nearby
+healthy control, a deterministic reproduction strategy, and an estimated
+20-100 meaningful terminal actions. The action estimate is authoring evidence,
+never a command-count requirement or task reward.
+
+Keep `data-processing`, `debugging`, and `software-engineering` blocked as primary categories. An
+investigation-shaped task must use the allowed category matching its real
+intellectual core; do not relabel generic repair work to evade the block.
+
 ## Task types we no longer accept
 
 Reject ideas that would land as either of the following before drafting any spec:
 
 - **Multi-container** tasks (anything that would set `is_multi_container = true` or ship `environment/docker-compose.yaml` with multiple services).
 - **UI building** tasks (anything that would slot under subcategory `ui_building` or rely on a UI test harness).
+- **Python-primary agent tasks** (ADR-0014 / CM-011): solvable core under Python in `environment/`, or a concept whose natural fix path is “write/fix a Python script/service”). Prefer niche stacks (C/C++/Rust/Fortran/Zig/Ada/Haskell/OCaml, etc.). Verifier-only pytest is not grounds for rejection.
+- **Milestone tasks** for net-new work. Current milestone guidance is compatibility support for evidence-backed in-flight revisions, not permission to start one.
 
 In-progress tasks of these types may be completed and submitted; new starts are disallowed. If a candidate idea would naturally land here, REJECT with a redesign note rather than producing a GO spec.
 
@@ -107,7 +132,7 @@ Reject these patterns actively:
 
 The validation loop is managed by `validate_loop.py`, not by the LLM. The script tracks attempts, decides when to stop (early stopping on plateau), and manages spec files.
 
-**Your job per attempt:** run the 5 hardness axes, 20 anti-trivialization checks, 6 rubric axes, instruction completeness test, and collapse audit. Output two clean docs (authoring spec + reviewer appendix) plus a structured evidence JSON that matches `specs/validation_schema.json`. The script handles scoring, state transitions, and gating.
+**Your job per attempt:** run the 5 hardness axes, 21 anti-trivialization checks, 6 rubric axes, instruction completeness test, long-horizon investigation profile, and collapse audit. Output two clean docs (authoring spec + reviewer appendix) plus a structured evidence JSON that matches `specs/validation_schema.json`. The script handles scoring, state transitions, and gating.
 
 **Naming-pass requirement:** before building the evidence JSON,
 draft the symptoms-only instruction prose and extract its nouns.
@@ -137,6 +162,7 @@ Required top-level fields:
 - `instruction_completeness_test`
 - `discovery_budget`
 - `instruction_specificity`
+- `investigation_profile` (required for evidence-contract-v3 loops)
 - `attack_path`
 - `smallest_plausible_patch`
 - `collapse_audit`
@@ -146,6 +172,11 @@ Default-workflow blocking rules:
 - `discovery_budget` must list at least 3 non-trivial solver discoveries the finished task will force from the codebase/runtime
 - each `discovery_budget` item must name the discovery, where it should live after Step 2b, and why instruction.md must not reveal it
 - `instruction_specificity.level` must be `symptoms-only` for any GO outcome
+- `investigation_profile` must select 2-4 weakness areas, number a 4-8 stage
+  causal chain consecutively, use 3+ distinct evidence-surface types, include
+  2+ falsifiable hypotheses, contain both failing and healthy-control
+  scenarios, estimate 20-100 meaningful actions, and explain deterministic
+  reproduction plus domain reasoning
 - GO is forbidden if required evidence is missing, malformed, or contradicts those blocking checks
 - `naming_pass.instruction_nouns_extracted` must equal
   `construction_manifest.code_forbidden_tokens` as sets
@@ -169,7 +200,7 @@ The loop stores this evidence with each attempt. Integer FAIL/WARN counts are se
 
 The authoring spec is the only drafting input for Step 2b. The reviewer appendix is human-review-only during authoring and should stay out of drafting until the post-build discovery confirmation step.
 
-See `workflow-prompts.md` Step 2a for the automated loop prompt.
+See `workflow.md` Step 2a for the automated loop prompt.
 
 ## Spec Output Format
 
@@ -201,6 +232,13 @@ When the winning variant is GO, produce two physical files using these exact str
 
 ### Failure topology
 [1-2 paragraphs describing the symptom clusters, invariant boundaries, interacting subsystems, and why the task is hard without naming the fix path or solution steps]
+
+### Investigation architecture
+[Required for new evidence-contract-v3 ideas. Summarize the selected 2-4
+weakness areas, the 4-8 stage causal progression, heterogeneous evidence
+surfaces, conditional failure/control shape, deterministic reproduction, and
+20-100 meaningful-action estimate. Preserve the investigation structure but do
+not turn this into an instruction or a list of exact fixes.]
 
 ### Environment shape
 [component-level map only. Name the major directories/subsystems/data domains that must exist and what role they play. Do NOT provide an exact file-by-file scaffold or call out likely fix files.]
@@ -331,6 +369,14 @@ code_forbidden_tokens: [<noun1>, <noun2>, ...]
 - Subcategories: [same array or []]
 - Tags: [same 3-6 values]
 - Milestones: [same 0 or count]
+
+### Investigation profile
+[Required for new evidence-contract-v3 ideas. Mirror the structured profile:
+2-4 weakness areas; each causal stage and what it unlocks; 3+ evidence
+surfaces; 2+ plausible hypotheses and deterministic falsifiers; failing and
+healthy-control scenarios; meaningful-action estimate; determinism strategy;
+domain and why the task is not trivia. This is reviewer-only detail and must
+not be copied into instruction.md.]
 
 ### Discovery budget
 [At least 3 entries. For each entry:]

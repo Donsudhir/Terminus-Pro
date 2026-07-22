@@ -1,0 +1,3 @@
+# DIFFICULTY — resolver-closure-drift REV-3
+
+This task is medium-hard because a correct lock is produced only after a typed multi-stage dependency pipeline merges two independently valid parent histories. The solver must recover classify, admit, and trellis rules from repository branches, Cargo payloads, and failing versus healthy controls, then keep direct/transitive closure, edge-case parent selections, sorted duplicate-free lock bytes, and byte-identical rebuilds true together. Patching one stage (for example profile admission alone), reading answer triples from docs, or writing the lockfile by hand does not satisfy the checks. Platform evidence: opus 5/5, gpt5 3/5, oracle 3/3, nop 0/1.

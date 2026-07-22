@@ -1,0 +1,15 @@
+.git
+.gitignore
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/node_modules/
+**/target/
+**/dist/
+**/build/
+!bootstrap/base/src/build/
+!bootstrap/base/src/build/**
+.env
+*.log
+solution/
+tests/

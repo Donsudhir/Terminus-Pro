@@ -102,14 +102,33 @@ The `code_forbidden_tokens` field in the authoring spec's construction manifest 
 
 The four modes are detailed in `difficulty-calibration.mdc` section A24 with worked examples. The mechanical gate (GX9, GX10) closes the easily-gameable holes on direction 1 and the contradiction sub-mode of direction 2. The remaining sub-modes of direction 2 are reviewer responsibility — a task that passes all 23 mechanical checks can still violate the honest-instruction principle on the value-over-spec or metaphor-jargon axis, and the reviewer must catch those before submission.
 
+### Preserve the long-horizon investigation profile
+
+For evidence-contract-v3 tasks, read the authoring spec's Investigation
+architecture before drafting. The built environment must preserve its causal
+stage order, heterogeneous evidence surfaces, competing hypotheses, failing
+scenario and healthy control, and deterministic reproduction strategy. Do not
+pad files, logs, commands, or test cases to make the 20-100 action estimate look
+true; the estimate should emerge from genuine uncertainty reduction. Tests
+still grade final behavior only and must never inspect command history,
+planning text, tool choice, or whether the solver made a wrong edit.
+
+Misleading documentation may describe a stale subsystem assumption, but it
+must be plausibly historical and experimentally falsifiable. It must not carry
+the operational contract that Instruction honesty requires in `instruction.md`.
+Race scenarios use barriers, seeded schedules, or explicit hooks, never sleeps
+or timing luck. Logical multi-repository tasks use separate roots in the one
+offline container; do not introduce Docker Compose or package excluded `.git`
+metadata merely for realism.
+
 ## Before Writing Any Code
 
 Ask for ALL missing required fields BEFORE writing code:
 
 1. **Task Idea**: What problem should the agent solve?
-2. **Programming Language**: What language(s)? (Avoid Python unless justified — Python tasks must be hard.)
+2. **Programming Language**: What language(s)? (Sudhir ADR-0014: no Python-primary agent languages — prefer niche/low-prevalence stacks. Pytest verifier-only is OK.)
 3. **Difficulty Level**: hard only for the default Edition 2 path
-4. **Category**: system-administration | build-and-dependency-management | data-processing | games | software-engineering | machine-learning | debugging | security | scientific-computing
+4. **Category**: system-administration | build-and-dependency-management | games | machine-learning | security | scientific-computing. `data-processing`, `software-engineering`, and `debugging` are blocked for net-new tasks.
 5. **Task Name**: kebab-case (e.g., `distributed-trace-analysis`)
 
 Optional: `subcategories`, `number_of_milestones`.
@@ -120,14 +139,15 @@ Fixed values: `author_name = "anonymous"`, `author_email = "anonymous"`, `versio
 
 - `minimal` codebase size: blocked on platform and treated as a blocking authoring failure in this repo. Count files under `environment/` EXCLUDING Dockerfile/docker-compose — must be 20+ for `small`. Treat this as a minimum realism floor, not as evidence of hardness. If you are below it, add genuine supporting modules, data, configs, or headers that the task actually needs; do not hover at exactly 20 or pad with empty files.
 - `easy` and `medium` difficulty: blocked on the default Edition 2 path. Use `hard`.
-- Python tasks: accepted only when empirical difficulty is `hard`.
+- Python-primary agent tasks: blocked for new Sudhir starts (ADR-0014 / CM-011). Do not put the solvable core in `environment/**/*.py`. Niche languages preferred; pytest under `tests/` remains allowed.
 - Avoid FastAPI.
 
 ## Task types we no longer accept
 
 - We are NO LONGER accepting new **multi-container** tasks.
 - We are NO LONGER accepting new **UI building** tasks (i.e., tasks whose `subcategories` includes `ui_building` or which use the UI test template).
-- Do not start new tasks in either category.
+- We are NO LONGER accepting net-new **milestone** tasks. Milestone structure below is for evidence-backed in-flight revisions only.
+- Do not start new tasks in any blocked type.
 
 This applies to construction (Step 2b) and to idea validation (Step 2a) — when validating an idea that would naturally land as multi-container or UI building, the right move is to redesign or reject rather than carry it forward.
 
@@ -241,7 +261,7 @@ Keep the existing canary string convention in `solveN.sh` files (Terminal-Bench 
 
 The old shape — root-level `instruction.md` plus `milestone_1.md ... milestone_N.md`, root-level `tests/` with `test_m1.py ... test_mN.py`, root-level `solution/` chaining `solve1.sh ... solveN.sh` — is deprecated. New submissions and in-progress submissions must migrate to the `steps/milestone_N/` layout above. The migration steps are listed under "Migration checklist for existing milestone tasks" below.
 
-### UI task
+### UI task (evidence-backed in-flight revisions only)
 
 ```
 <task-folder>/
@@ -254,11 +274,14 @@ The old shape — root-level `instruction.md` plus `milestone_1.md ... milestone
 │   └── solve.sh
 ├── tests/
 │   ├── test.sh
-│   ├── README.md, package.json, .gitignore
-│   ├── playwright.config.ts, vitest.config.ts
-│   ├── unit/, e2e/
+│   └── test_outputs.py  # pytest + Playwright Python
 └── index.html
 ```
+
+New UI starts are house-blocked. This shape exists only to document the
+official compatibility contract for a source-backed in-flight revision. Do not
+add verifier-side `package.json`, `playwright.config.*`, `vitest.config.*`, or
+JS/TS test specs.
 
 Do NOT include `rubrics.txt` — rubrics are edited in the submission UI.
 
@@ -538,7 +561,9 @@ Rules:
 - Do NOT create reserved paths (`/tests`, `/solution`, `/oracle`)
 - Install **verifier-only** dependencies here (pytest, pytest-json-ctrf, Playwright, extra Python/npm packages the verifier needs). With `allow_internet = false`, `tests/test.sh` cannot download or install anything at runtime.
 - Solution/agent dependencies MUST also be in the Dockerfile
-- See `skeleton/Default_Task_Skeleton/`, `skeleton/milestone_template/`, and `skeleton/UI_Task_Skeleton/` for offline-ready examples; the project site also documents Dockerfile/image best practices.
+- See `skeleton/Default_Task_Skeleton/` and `skeleton/milestone_template/` for
+  offline-ready examples. There is intentionally no UI scaffold; use the
+  compatibility contract above only for an evidenced in-flight revision.
 - No privileged mode, SYS_ADMIN, or docker.sock mounts
 - Build context must not escape `environment/`
 - Data files: put in `environment/data/`, use `COPY data /root/data`
@@ -708,9 +733,11 @@ Start from `skeleton/Default_Task_Skeleton/tests/test.sh` (standard tasks) or `s
 # Add task-specific verifier-only Python packages there, not here.
 
 mkdir -p /logs/verifier
+echo 0 > /logs/verifier/reward.txt
 
 if [ "$PWD" = "/" ]; then
     echo "Error: No working directory set. Please set a WORKDIR in your Dockerfile before running this script."
+    echo 0 > /logs/verifier/reward.txt
     exit 1
 fi
 
@@ -729,54 +756,32 @@ fi
 1. The pytest target path — `/tests/test_outputs.py` for standard tasks; `/tests/test_m1.py`, `/tests/test_m2.py`, … for milestone `steps/milestone_N/tests/test.sh` runners
 2. Extra pytest flags/plugins already installed in the image (e.g. `-p randomly` when `pytest-randomly` is in the Dockerfile)
 3. Use `python3 -m pytest` instead of `python -m pytest` when the image only provides `python3`
+4. CM-007 hardening on the pytest invocation (`cd /tests && PYTHONSAFEPATH=1 … --confcutdir=/tests`) when WORKDIR is agent-writable
 
 **What you MUST NOT change:**
 
 - Do not add runtime package installation (`apt-get`, `pip`, `curl`, `uv`/`uvx`, `npm install`, …)
 - Do not add `set -euo pipefail` or `set -e` on standard (non-milestone-step) tasks — `set -e` breaks `$?` in the reward footer
 - Milestone per-step runners in `skeleton/milestone_template/` may use `set -euo pipefail` with `set +e` around pytest; copy that pattern verbatim for milestone tasks
+- Do not remove the initial `echo 0 > /logs/verifier/reward.txt` immediately after `mkdir -p /logs/verifier` (CM-016: interrupted pytest must still leave a reward file)
 - Do not restructure the reward block: the file must end with the five-line `if [ $? -eq 0 ]; then` … `fi` block only (no `RC=$?`, no `exit` after `fi`) — upstream CodeBuild rejects any other tail
 - Do not emit `reward.json`
 
 Edition 2 templates always emit `/logs/verifier/reward.txt`. `run_static_checks.py` rejects network installs in any `tests/test.sh` or `steps/milestone_N/tests/test.sh`, requires the WORKDIR guard, requires `python -m pytest`, and validates the platform reward footer.
 
-### UI task template
+### UI compatibility policy
 
-**NOTE:** New UI building tasks are no longer accepted. In-progress UI tasks must follow the offline pattern in `skeleton/UI_Task_Skeleton/`: npm packages and Playwright install in `environment/Dockerfile` (`verifier-package.json` + `npm install` + `playwright install` at build time), not in `test.sh`.
+New UI building tasks are blocked by the repository's house eligibility rule,
+and no UI scaffold is shipped. Do not copy or recreate the retired
+JavaScript/Vitest verifier stack.
 
-```bash
-#!/bin/bash
-set -e
-
-# Verifier dependencies and the Playwright browser are installed in
-# environment/Dockerfile. Do not install npm packages or Playwright here.
-
-mkdir -p /logs/verifier
-
-if [ "$PWD" = "/" ]; then
-  echo "Error: No working directory set. Please set a WORKDIR in your Dockerfile before running this script."
-  exit 1
-fi
-
-rm -rf /tmp/ui-task-tests
-cp -R /tests /tmp/ui-task-tests
-cd /tmp/ui-task-tests
-ln -s /opt/ui-task-tests/node_modules node_modules
-export PATH="/opt/ui-task-tests/node_modules/.bin:$PATH"
-
-UNIT_EXIT=0
-E2E_EXIT=0
-npm run test || UNIT_EXIT=$?
-npm run test:e2e || E2E_EXIT=$?
-
-if [ "$UNIT_EXIT" -eq 0 ] && [ "$E2E_EXIT" -eq 0 ]; then
-  echo 1 > /logs/verifier/reward.txt
-else
-  echo 0 > /logs/verifier/reward.txt
-fi
-
-[ "$UNIT_EXIT" -eq 0 ] && [ "$E2E_EXIT" -eq 0 ]
-```
+An evidence-backed task that was already in platform review or revision may
+continue only after its `ui_building` exemption is captured. Its verifier uses
+the standard `tests/test.sh` pytest template above, `tests/test_outputs.py`, and
+Playwright's **Python** bindings from pytest. Pin `playwright` or
+`pytest-playwright` in the image, install the browser at image-build time with
+`python -m playwright install`, and keep runtime installation forbidden. The
+focused UI compatibility checks must pass before local approval.
 
 ## tests/test_outputs.py
 
@@ -843,19 +848,15 @@ Forbidden (must NOT be in the zip, even though some live at the task root for re
 - `rubric.txt`, `rubrics.txt` — rubrics are authored in the submission UI.
 - Anything under `__pycache__/`, `.*`, `*.pyc`.
 
-These four forbidden filenames are the canonical `validate_submission_zip.FORBIDDEN_ROOT_FILES` list. Step 4's zip command excludes them explicitly:
+These forbidden filenames are enforced by the canonical package transaction:
 
 ```bash
-cd tasks/<task-name>
-rm -f ../../Task_Ready_To_Submit/<task-name>.zip
-zip -rq ../../Task_Ready_To_Submit/<task-name>.zip . \
-    -x '*/__pycache__/*' '*.pyc' '.*' \
-    -x 'output_contract.toml' \
-    -x 'quality_check_adjudication.json' \
-    -x 'rubric.txt' \
-    -x 'rubrics.txt'
-python3 ../../validate_submission_zip.py ../../Task_Ready_To_Submit/<task-name>.zip
+source scripts/sudhir-env.sh
+python3 sudhir_task.py package <task-name>
+python3 validate_submission_zip.py "$TB3_SUBMISSIONS_DIR/<task-name>.zip"
 ```
+
+Never write a new archive into historical `Task_Ready_To_Submit/`.
 
 `validate_submission_zip.py` returning PASS is the gate, not the goal — Step 4 then runs `approve_task.py` as the authoritative repo-local approval, which bundles `run_static_checks.py` + `collapse_check.py` + zip validation + manifest verification + zip/source parity.
 

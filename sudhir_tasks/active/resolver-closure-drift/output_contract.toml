@@ -1,0 +1,27 @@
+user_visible_outputs = [
+  "/app/output/workspace.lock",
+  "/app/output/build-report.json",
+]
+
+internal_harness_files = [
+  "/app/output/resolve.log",
+]
+
+[structured_outputs.lock]
+target = "/app/output/workspace.lock"
+format = "utf8-line-records"
+instruction_checks = [
+  "<name> <version> <source-id>",
+  "ASCII space",
+  "ascending bytewise",
+  "no duplicate tuples",
+  "one final newline",
+]
+
+[structured_outputs.build_report]
+target = "/app/output/build-report.json"
+format = "json"
+instruction_checks = [
+  "success",
+  "members",
+]

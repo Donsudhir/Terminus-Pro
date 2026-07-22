@@ -1,0 +1,4 @@
+lock_path = "/app/output/workspace.lock"
+build_report = "/app/output/build-report.json"
+resolve_log = "/app/output/resolve.log"
+turn_limit = 256

@@ -1,0 +1,9 @@
+{
+  "id": "current",
+  "parents": ["merge"],
+  "patch": "current.patch",
+  "author_name": "Rowan Vale",
+  "author_email": "rowan@example.invalid",
+  "timestamp": "2025-04-02T08:55:00+0000",
+  "message": "add mixed fixture and compact traces"
+}

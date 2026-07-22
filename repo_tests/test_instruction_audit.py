@@ -12,8 +12,7 @@ import unittest
 from pathlib import Path
 
 import instruction_audit
-
-from repo_tests.cases import FIXTURE_TASKS_DIR
+from repo_tests.current_cases import CLEAN_FIXTURE_NAME, FIXTURE_TASKS_DIR
 
 
 class InstructionAuditRegressionTest(unittest.TestCase):
@@ -84,24 +83,22 @@ class InstructionAuditRegressionTest(unittest.TestCase):
         # identifier like md5sum_helper.
         self.assertEqual(report["signals"]["algorithm_mentions"], {})
 
-    def test_fixture_tuf_style_specificity_is_pinned(self) -> None:
-        """Pin the signal shape for the spec-complete fixture we shipped."""
-        # implicit-step-restart contains FNV, schedule enum, tolerance phrases,
-        # ALL_CAPS reason tokens — a classic spec-complete profile.
+    def test_clean_fixture_specificity_is_pinned(self) -> None:
+        """Pin the symptoms-only profile of the immutable clean fixture."""
         report = instruction_audit.audit_instruction(
-            FIXTURE_TASKS_DIR / "implicit-step-restart"
+            FIXTURE_TASKS_DIR / CLEAN_FIXTURE_NAME
         )
-        self.assertEqual(report["classification"]["level"], "spec-complete")
-        self.assertEqual(report["classification"]["severity"], "FAIL")
-        # FNV + FNV-1a + Runge-Kutta were all detected at audit design time.
-        mentions = report["signals"]["algorithm_mentions"]
-        self.assertIn("fnv", mentions)
+        self.assertEqual(report["classification"]["level"], "symptoms-only")
+        self.assertEqual(report["classification"]["severity"], "PASS")
+        self.assertEqual(report["classification"]["trigger_count"], 0)
 
-    def test_release_provenance_drift_classifies_cause_revealing(self) -> None:
+    def test_single_algorithm_signal_classifies_cause_revealing(self) -> None:
         """An in-between task — some signals but not dominating — should WARN."""
-        report = instruction_audit.audit_instruction(
-            FIXTURE_TASKS_DIR / "release-provenance-drift"
+        task_dir = self._make_task_with_instruction(
+            "Restore the local fingerprint behavior. The legacy output was "
+            "derived with FNV-1a, while the surrounding report should remain stable.\n"
         )
+        report = instruction_audit.audit_instruction(task_dir)
         self.assertEqual(report["classification"]["level"], "cause-revealing")
         self.assertEqual(report["classification"]["severity"], "WARN")
 

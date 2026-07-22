@@ -1,0 +1,8 @@
+#!/bin/bash
+set -euo pipefail
+
+rm -rf /app/data
+mkdir -p /app/data
+cp -R /opt/loam-seed/. /app/data/
+rm -rf /app/output
+mkdir -p /app/output

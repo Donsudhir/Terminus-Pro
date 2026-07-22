@@ -1,0 +1,9 @@
+{
+  "id": "base",
+  "parents": [],
+  "patch": null,
+  "author_name": "Rowan Vale",
+  "author_email": "rowan@example.invalid",
+  "timestamp": "2025-01-06T09:00:00+0000",
+  "message": "seed resolver core"
+}

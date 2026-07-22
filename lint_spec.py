@@ -37,7 +37,6 @@ import re
 import sys
 from pathlib import Path
 
-
 # `version: N` matches as a bare line OR a bulleted list item under any
 # heading (typically `### Metadata`). Indentation, leading dashes, and
 # leading asterisks are tolerated; case-sensitive on the keyword "version"

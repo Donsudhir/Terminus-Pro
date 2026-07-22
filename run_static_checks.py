@@ -13,6 +13,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import task_layout
+
 try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover
@@ -116,25 +118,6 @@ TOOL_SPECIFIC_HINTS = {
     "wandb",
 }
 
-# Must match upstream harbor run_static_checks.py (CodeBuild upload gate).
-PLATFORM_REWARD_BLOCK = [
-    "if [ $? -eq 0 ]; then",
-    "    echo 1 > /logs/verifier/reward.txt",
-    "else",
-    "    echo 0 > /logs/verifier/reward.txt",
-    "fi",
-]
-
-# Platform harness expects pytest failures to propagate as the verifier exit code.
-PLATFORM_REWARD_BLOCK_WITH_EXIT = [
-    "if [ \"$RC\" -eq 0 ]; then",
-    "    echo 1 > /logs/verifier/reward.txt",
-    "else",
-    "    echo 0 > /logs/verifier/reward.txt",
-    "fi",
-    "exit \"$RC\"",
-]
-
 OFFLINE_PYTEST_PATTERN = re.compile(r"\bpython3?\s+-m\s+pytest\b")
 ALLOWED_OFFLINE_PRE_PYTEST_PATTERNS = (
     re.compile(r"^mkdir\s+-p\s+/logs/verifier$"),
@@ -143,8 +126,11 @@ ALLOWED_OFFLINE_PRE_PYTEST_PATTERNS = (
         r'^echo\s+"Error:\s+No\s+working\s+directory\s+set\.\s+Please\s+set\s+a\s+WORKDIR\s+in\s+your\s+Dockerfile(?:\s+before\s+running\s+this\s+script)?\."$'
     ),
     re.compile(r"^echo 0 > /logs/verifier/reward\.txt$"),
-    re.compile(r"^exit\s+1$"),
+    re.compile(r"^exit\s+[01]$"),
     re.compile(r"^fi$"),
+    re.compile(
+        r"^pip(?:3)?\s+install\s+--no-index\s+(?:-f|--find-links)(?:=|\s+)/\S+\s+\S+==\S+$"
+    ),
 )
 
 STRUCTURED_SECTION_PATTERN = re.compile(
@@ -254,9 +240,24 @@ WORKDIR_GUARD_PATTERN = re.compile(
     re.MULTILINE,
 )
 NETWORK_INSTALL_PATTERN = re.compile(
-    r"\b(?:apt(?:-get)?\s+install|curl\b|wget\b|uvx\b|uv\s+pip\b|pip(?:3)?\s+install\b|npm\s+(?:install|ci)\b|pnpm\s+install\b|yarn\s+install\b)",
+    r"\b(?:apt(?:-get)?\s+install|curl\b|wget\b|git\s+clone\b|uvx\b|uv\s+pip\b|pip(?:3)?\s+install\b|npm\s+(?:install|ci)\b|pnpm\s+install\b|yarn\s+install\b|cargo\s+fetch\b|mvn\s+dependency:get\b|gradle\b[^\n]*\bdependencies\b)",
     re.IGNORECASE,
 )
+
+
+def runtime_network_setup_lines(content: str) -> list[str]:
+    hits: list[str] = []
+    for line in content.splitlines():
+        if not NETWORK_INSTALL_PATTERN.search(line):
+            continue
+        if re.search(r"\bpip(?:3)?\s+install\b", line, re.I):
+            local_only = "--no-index" in line and bool(
+                re.search(r"(?:-f|--find-links)(?:=|\s+)(?:/|file:)", line)
+            )
+            if local_only and not re.search(r"https?://", line):
+                continue
+        hits.append(line.strip())
+    return hits
 UV_PYTEST_PATTERN = re.compile(r"\buvx\b", re.IGNORECASE)
 PYTEST_DIRECT_PATTERN = re.compile(r"\bpytest\b")
 FORBIDDEN_DIRECT_PYTHON_TEST_PATTERN = re.compile(
@@ -782,12 +783,13 @@ def find_relative_instruction_references(instruction: str) -> list[str]:
 def get_task_characteristics(task_dir: Path, task_data: dict) -> dict[str, object]:
     languages = [item.lower() for item in normalize_string_list(get_task_field(task_data, "languages"))]
     subcategories = normalize_string_list(get_task_field(task_data, "subcategories"))
-    milestone_count = get_task_field(task_data, "number_of_milestones")
+    layout = task_layout.classify_task_dir(task_dir, task_data)
     compose_path = task_dir / "environment" / "docker-compose.yaml"
     return {
         "languages": languages,
         "subcategories": subcategories,
-        "milestone_count": milestone_count if isinstance(milestone_count, int) else 0,
+        "milestone_count": layout.milestone_count,
+        "layout": layout,
         "is_ui": "ui_building" in subcategories,
         "compose_path": compose_path,
         "has_compose": compose_path.exists(),
@@ -882,7 +884,6 @@ def first_verifier_command_index(substantive_lines: list[str]) -> int | None:
         if (
             re.search(r"^uvx\b", line)
             or OFFLINE_PYTEST_PATTERN.search(line)
-            or "pytest" in line
             or "npm run test" in line
             or "npm run test:e2e" in line
         ):
@@ -891,14 +892,8 @@ def first_verifier_command_index(substantive_lines: list[str]) -> int | None:
 
 
 def iter_task_test_sh_files(task_dir: Path) -> list[Path]:
-    paths: list[Path] = []
-    root_test_sh = task_dir / "tests" / "test.sh"
-    if root_test_sh.exists():
-        paths.append(root_test_sh)
-    steps_dir = task_dir / "steps"
-    if steps_dir.is_dir():
-        paths.extend(sorted(steps_dir.glob("milestone_*/tests/test.sh")))
-    return paths
+    layout = task_layout.classify_task_dir(task_dir)
+    return [path for path in task_layout.test_sh_paths(task_dir, layout) if path.exists()]
 
 
 def offline_pre_pytest_line_allowed(line: str) -> bool:
@@ -907,7 +902,7 @@ def offline_pre_pytest_line_allowed(line: str) -> bool:
 
 def non_ui_test_sh_prefix_mismatches(substantive_lines: list[str], *, content: str = "") -> list[str]:
     mismatches: list[str] = []
-    if content and NETWORK_INSTALL_PATTERN.search(content):
+    if content and runtime_network_setup_lines(content):
         mismatches.append(
             "tests/test.sh must not install verifier dependencies at runtime "
             "(apt-get install, pip install, curl, uv/uvx, npm install, etc.). "
@@ -931,14 +926,106 @@ def non_ui_test_sh_prefix_mismatches(substantive_lines: list[str], *, content: s
     return mismatches
 
 
+def _shell_status_operand(value: str) -> str | None:
+    """Return ``?`` or a variable name from a shell status operand."""
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+        value = value[1:-1].strip()
+    if value == "$?":
+        return "?"
+    match = re.fullmatch(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}", value)
+    if match:
+        return match.group(1)
+    match = re.fullmatch(r"\$([A-Za-z_][A-Za-z0-9_]*)", value)
+    return match.group(1) if match else None
+
+
+def _captured_status_variable(line: str) -> str | None:
+    match = re.fullmatch(r"([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)", line.strip())
+    if not match or _shell_status_operand(match.group(2)) != "?":
+        return None
+    return match.group(1)
+
+
+def _status_condition_operand(line: str) -> str | None:
+    match = re.fullmatch(
+        r"if\s+\[\s*(.+?)\s+-eq\s+0\s*\]\s*;\s*then",
+        line.strip(),
+    )
+    return _shell_status_operand(match.group(1)) if match else None
+
+
+def _reward_write_matches(line: str, reward: int) -> bool:
+    return bool(
+        re.fullmatch(
+            rf"echo\s+['\"]?{reward}['\"]?\s*>\s*/logs/verifier/reward\.txt",
+            line.strip(),
+        )
+    )
+
+
+def reward_txt_footer_errors(lines: list[str]) -> list[str]:
+    """Validate the current verifier reward footer by shell semantics.
+
+    The verifier status must be consumed immediately, either by an inline
+    ``$?`` condition or by a variable assignment followed by that condition.
+    The success/failure branches must write binary rewards and the closing
+    ``fi`` must be the final substantive command. This intentionally ignores
+    indentation, quote style, and status-variable casing.
+    """
+    substantive = substantive_shell_lines("\n".join(lines))
+    verifier_index = first_verifier_command_index(substantive)
+    if verifier_index is None:
+        return ["missing verifier command before reward footer"]
+
+    verifier_line = substantive[verifier_index]
+    inline_capture = re.search(
+        r"&&\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*0\s*\|\|\s*\1\s*=\s*['\"]?\$\?['\"]?\s*$",
+        verifier_line,
+    )
+    status_name = inline_capture.group(1) if inline_capture else "?"
+    condition_index = verifier_index + 1
+
+    if not inline_capture and condition_index < len(substantive):
+        captured_name = _captured_status_variable(substantive[condition_index])
+        if captured_name is not None:
+            status_name = captured_name
+            condition_index += 1
+
+    if condition_index >= len(substantive):
+        return ["missing reward condition after verifier status"]
+
+    condition_operand = _status_condition_operand(substantive[condition_index])
+    if condition_operand != status_name:
+        return [
+            "verifier status must be tested immediately via `$?` or a variable "
+            "captured immediately after pytest"
+        ]
+
+    footer = substantive[condition_index:]
+    if len(footer) < 5:
+        return ["incomplete binary reward footer"]
+
+    errors: list[str] = []
+    if not _reward_write_matches(footer[1], 1):
+        errors.append("successful verifier branch must write reward 1")
+    if footer[2] != "else":
+        errors.append("binary reward footer is missing its else branch")
+    if not _reward_write_matches(footer[3], 0):
+        errors.append("failed verifier branch must write reward 0")
+    if footer[4] != "fi":
+        errors.append("binary reward footer is missing its closing fi")
+    if len(footer) > 5:
+        errors.append(
+            "reward footer must be the final substantive block; trailing command(s): "
+            + " | ".join(footer[5:])
+        )
+    return errors
+
+
 def reward_txt_tail_matches_template(lines: list[str]) -> bool:
-    trimmed_lines = [line for line in lines if line.strip()]
-    for block in (PLATFORM_REWARD_BLOCK, PLATFORM_REWARD_BLOCK_WITH_EXIT):
-        if len(trimmed_lines) < len(block):
-            continue
-        if trimmed_lines[-len(block) :] == block:
-            return True
-    return False
+    """Compatibility wrapper around the semantic footer validator."""
+    return not reward_txt_footer_errors(lines)
 
 
 def dockerfile_prebuilds_app_build(task_dir: Path) -> bool:
@@ -968,13 +1055,29 @@ def python_verifier_rebuilds_from_source(task_dir: Path, characteristics: dict[s
 
 
 def collect_python_verifier_files(task_dir: Path, characteristics: dict[str, object]) -> list[Path]:
-    tests_dir = task_dir / "tests"
-    milestone_count = characteristics["milestone_count"]
-    if isinstance(milestone_count, int) and milestone_count > 0:
-        return [tests_dir / f"test_m{index}.py" for index in range(1, milestone_count + 1)]
+    layout = characteristics.get("layout")
+    if not isinstance(layout, task_layout.LayoutReport):
+        layout = task_layout.classify_task_dir(task_dir)
+    return [path for path in task_layout.verifier_paths(task_dir, layout) if path.exists()]
 
-    test_outputs = tests_dir / "test_outputs.py"
-    return [test_outputs] if test_outputs.exists() else []
+
+def layout_instruction_text(task_dir: Path, task_data: dict | None = None) -> str:
+    layout = task_layout.classify_task_dir(task_dir, task_data)
+    return "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in task_layout.instruction_paths(task_dir, layout)
+        if path.exists()
+    )
+
+
+def layout_test_dirs(task_dir: Path, task_data: dict | None = None) -> list[Path]:
+    layout = task_layout.classify_task_dir(task_dir, task_data)
+    return [path for path in task_layout.test_dirs(task_dir, layout) if path.exists()]
+
+
+def layout_solution_entrypoints(task_dir: Path, task_data: dict | None = None) -> list[Path]:
+    layout = task_layout.classify_task_dir(task_dir, task_data)
+    return [path for path in task_layout.solution_entrypoints(task_dir, layout) if path.exists()]
 
 
 def list_extra_milestone_files(task_dir: Path) -> dict[str, list[Path]]:
@@ -1012,18 +1115,30 @@ def has_main_guard(tree: ast.AST) -> bool:
     return False
 
 
-def check_required_files(task_dir: Path, reporter: Reporter) -> None:
-    required_paths = [
-        task_dir / "instruction.md",
-        task_dir / "task.toml",
-        task_dir / "output_contract.toml",
-        task_dir / "environment",
-        task_dir / "environment" / "Dockerfile",
-        task_dir / "solution",
-        task_dir / "solution" / "solve.sh",
-        task_dir / "tests",
-        task_dir / "tests" / "test.sh",
-    ]
+def check_required_files(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
+    layout = task_layout.classify_task_dir(task_dir, task_data)
+    if layout.errors:
+        for error in layout.errors:
+            reporter.fail(f"task layout: {error}")
+        return
+
+    required_paths = [task_dir / "task.toml", task_dir / "environment" / "Dockerfile"]
+    if layout.kind == task_layout.MILESTONE:
+        required_paths.extend(task_layout.instruction_paths(task_dir, layout))
+        required_paths.extend(task_layout.test_sh_paths(task_dir, layout))
+        required_paths.extend(task_layout.verifier_paths(task_dir, layout))
+        required_paths.extend(task_layout.solution_entrypoints(task_dir, layout))
+        required_paths.extend(task_layout.solution_implementations(task_dir, layout))
+    else:
+        required_paths.extend(
+            [
+                task_dir / "instruction.md",
+                task_dir / "output_contract.toml",
+                task_dir / "solution" / "solve.sh",
+                task_dir / "tests" / "test.sh",
+                task_dir / "tests" / "test_outputs.py",
+            ]
+        )
     missing = [path.relative_to(task_dir).as_posix() for path in required_paths if not path.exists()]
     if missing:
         reporter.fail(f"Missing required task files/directories: {', '.join(missing)}")
@@ -1032,6 +1147,7 @@ def check_required_files(task_dir: Path, reporter: Reporter) -> None:
 
 
 def check_task_toml(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
+    layout = task_layout.classify_task_dir(task_dir, task_data)
     if (task_dir / "task.yaml").exists():
         reporter.fail("task.yaml is obsolete; task.toml is the only supported manifest in Edition 2")
 
@@ -1154,46 +1270,40 @@ def check_task_toml(task_dir: Path, task_data: dict, reporter: Reporter) -> None
     if not isinstance(junior_time, int) or junior_time < 1:
         reporter.fail("junior_time_estimate_min must be a positive integer")
 
-    verifier = task_data.get("verifier")
-    if not isinstance(verifier, dict):
-        reporter.fail("task.toml must define a [verifier] table with timeout_sec")
+    timeout_tables: list[tuple[str, object, int]] = []
+    if layout.kind == task_layout.MILESTONE:
+        for step in task_data.get("steps") or []:
+            if not isinstance(step, dict):
+                continue
+            name = step.get("name", "?")
+            timeout_tables.extend(
+                [
+                    (f"[[steps]] {name!r} [verifier]", step.get("verifier"), 120),
+                    (f"[[steps]] {name!r} [agent]", step.get("agent"), 1),
+                ]
+            )
     else:
-        timeout_sec = verifier.get("timeout_sec")
-        if not isinstance(timeout_sec, int) or timeout_sec < 120:
-            reporter.fail(
-                f"task.toml [verifier].timeout_sec must be an integer >= 120, found {timeout_sec!r}"
-            )
-        elif timeout_sec > PLATFORM_MAX_TIMEOUT_SEC:
-            # The upstream harbor `run_static_checks.py` enforces an absolute
-            # ceiling of 1800s on both verifier and agent timeouts. Asking
-            # for more is a hard reject at CI — no reviewer recommendation
-            # can override the platform cap. If the verifier legitimately
-            # needs more time, the fix is to reduce verifier work (cache
-            # builds, parallelize, split scenarios) — not to raise the
-            # budget.
-            reporter.fail(
-                f"task.toml [verifier].timeout_sec = {timeout_sec} exceeds the "
-                f"platform cap of {PLATFORM_MAX_TIMEOUT_SEC}s. The upstream "
-                "harbor CI rejects any value above this cap. If the verifier "
-                "genuinely needs more time, reduce verifier-side work (cache "
-                "the build between scenarios, parallelize tests, split the "
-                "matrix into independent runs) — do not raise the budget."
-            )
+        timeout_tables.extend(
+            [
+                ("task.toml [verifier]", task_data.get("verifier"), 120),
+                ("task.toml [agent]", task_data.get("agent"), 1),
+            ]
+        )
 
-    agent = task_data.get("agent")
-    if not isinstance(agent, dict):
-        reporter.fail("task.toml must define an [agent] table with timeout_sec")
-    else:
-        timeout_sec = agent.get("timeout_sec")
-        if not isinstance(timeout_sec, int) or timeout_sec < 1:
+    for label, table, minimum in timeout_tables:
+        if not isinstance(table, dict):
+            reporter.fail(f"{label} must define a timeout_sec table value")
+            continue
+        timeout_sec = table.get("timeout_sec")
+        if not isinstance(timeout_sec, int) or timeout_sec < minimum:
             reporter.fail(
-                f"task.toml [agent].timeout_sec must be a positive integer, found {timeout_sec!r}"
+                f"{label}.timeout_sec must be an integer >= {minimum}, found {timeout_sec!r}"
             )
         elif timeout_sec > PLATFORM_MAX_TIMEOUT_SEC:
             reporter.fail(
-                f"task.toml [agent].timeout_sec = {timeout_sec} exceeds the "
-                f"platform cap of {PLATFORM_MAX_TIMEOUT_SEC}s. The upstream "
-                "harbor CI rejects any value above this cap."
+                f"{label}.timeout_sec = {timeout_sec} exceeds the platform cap of "
+                f"{PLATFORM_MAX_TIMEOUT_SEC}s. Reduce verifier-side work rather than "
+                "raising the platform budget."
             )
 
     environment = task_data.get("environment")
@@ -1263,7 +1373,11 @@ def check_task_toml(task_dir: Path, task_data: dict, reporter: Reporter) -> None
 
     if isinstance(subcategories, list) and "tool_specific" not in subcategories:
         tags_text = " ".join(normalize_string_list(tags))
-        instruction_text = (task_dir / "instruction.md").read_text(encoding="utf-8")
+        instruction_text = "\n".join(
+            path.read_text(encoding="utf-8")
+            for path in task_layout.instruction_paths(task_dir, layout)
+            if path.exists()
+        )
         combined_text = f"{tags_text}\n{instruction_text}".lower()
         matched_hints = sorted(hint for hint in TOOL_SPECIFIC_HINTS if hint in combined_text)
         if matched_hints:
@@ -1272,18 +1386,23 @@ def check_task_toml(task_dir: Path, task_data: dict, reporter: Reporter) -> None
                 f"{matched_hints}. Consider adding tool_specific to subcategories."
             )
 
-    if isinstance(verifier, dict):
-        timeout_sec = verifier.get("timeout_sec")
-        test_sh = task_dir / "tests" / "test.sh"
+    for label, table, _minimum in timeout_tables:
+        if "verifier" not in label or not isinstance(table, dict):
+            continue
+        timeout_sec = table.get("timeout_sec")
+        test_sh_paths = task_layout.test_sh_paths(task_dir, layout)
         if (
             isinstance(timeout_sec, int)
             and timeout_sec < 300
-            and test_sh.exists()
-            and NETWORK_INSTALL_PATTERN.search(test_sh.read_text(encoding="utf-8"))
+            and any(
+                path.exists()
+                and runtime_network_setup_lines(path.read_text(encoding="utf-8"))
+                for path in test_sh_paths
+            )
         ):
             reporter.warn(
-                "tests/test.sh appears to install verifier tooling from the network; "
-                "prefer [verifier].timeout_sec >= 300"
+                "A verifier test.sh appears to install tooling from the network; "
+                f"prefer {label}.timeout_sec >= 300"
             )
 
     if not reporter.has_failures():
@@ -1292,6 +1411,8 @@ def check_task_toml(task_dir: Path, task_data: dict, reporter: Reporter) -> None
 
 def check_task_structure(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
     characteristics = get_task_characteristics(task_dir, task_data)
+    layout = characteristics["layout"]
+    assert isinstance(layout, task_layout.LayoutReport)
     milestone_count = characteristics["milestone_count"]
     is_ui = bool(characteristics["is_ui"])
 
@@ -1306,79 +1427,66 @@ def check_task_structure(task_dir: Path, task_data: dict, reporter: Reporter) ->
                 "and keep root artifacts minimal"
             )
 
-    extras = list_extra_milestone_files(task_dir)
     if milestone_count > 0:
-        for index in range(1, milestone_count + 1):
-            milestone_path = task_dir / f"milestone_{index}.md"
-            if not milestone_path.exists():
-                reporter.fail(f"Milestone task is missing {milestone_path.relative_to(task_dir).as_posix()}")
-
-            test_path = task_dir / "tests" / f"test_m{index}.py"
-            if not test_path.exists():
-                reporter.fail(f"Milestone task is missing {test_path.relative_to(task_dir).as_posix()}")
-
-            solve_path = task_dir / "solution" / f"solve{index}.sh"
-            if not solve_path.exists():
-                reporter.fail(f"Milestone task is missing {solve_path.relative_to(task_dir).as_posix()}")
-
-        solve_sh = (task_dir / "solution" / "solve.sh").read_text(encoding="utf-8")
-        for index in range(1, milestone_count + 1):
-            name = f"solve{index}.sh"
-            if name not in solve_sh:
-                reporter.fail(f"solution/solve.sh must chain {name} for milestone tasks")
-
-        if (task_dir / "tests" / "test_outputs.py").exists():
-            reporter.warn("Milestone tasks should use tests/test_m1.py ... tests/test_mN.py instead of test_outputs.py")
+        for error in layout.errors:
+            reporter.fail(f"task layout: {error}")
     else:
+        extras = list_extra_milestone_files(task_dir)
         if extras["milestones"] or extras["tests"] or extras["solutions"]:
             reporter.fail(
                 "Non-milestone tasks must not include milestone_*.md, tests/test_m*.py, or solution/solveN.sh artifacts"
             )
 
-    if not is_ui and milestone_count == 0 and not (task_dir / "tests" / "test_outputs.py").exists():
-        reporter.fail("Standard non-UI, non-milestone tasks must include tests/test_outputs.py")
+    if milestone_count == 0 and not (task_dir / "tests" / "test_outputs.py").exists():
+        reporter.fail("Standard non-milestone tasks must include tests/test_outputs.py")
 
     if is_ui:
-        required_ui_files = [
-            task_dir / "tests" / "README.md",
-            task_dir / "tests" / "package.json",
-            task_dir / "tests" / ".gitignore",
-            task_dir / "tests" / "playwright.config.ts",
-            task_dir / "tests" / "vitest.config.ts",
+        tests_dir = task_dir / "tests"
+        legacy_paths = [
+            path
+            for path in (
+                tests_dir / "package.json",
+                tests_dir / "playwright.config.ts",
+                tests_dir / "playwright.config.js",
+                tests_dir / "vitest.config.ts",
+                tests_dir / "vitest.config.js",
+            )
+            if path.exists()
         ]
-        missing_ui = [path.relative_to(task_dir).as_posix() for path in required_ui_files if not path.exists()]
-        if missing_ui:
-            reporter.fail("UI tasks are missing required verifier stack files: " + ", ".join(missing_ui))
+        legacy_paths.extend(
+            path
+            for pattern in ("*.spec.ts", "*.spec.js", "*.test.ts", "*.test.js")
+            for path in tests_dir.rglob(pattern)
+        )
+        if legacy_paths:
+            reporter.fail(
+                "UI verifier must use Python pytest with Playwright's Python bindings; "
+                "JavaScript/TypeScript Playwright and Vitest verifier files are obsolete: "
+                + ", ".join(
+                    sorted(
+                        path.relative_to(task_dir).as_posix()
+                        for path in set(legacy_paths)
+                    )
+                )
+            )
 
-        package_json = task_dir / "tests" / "package.json"
-        if package_json.exists():
-            try:
-                import json
-
-                package_data = json.loads(package_json.read_text(encoding="utf-8"))
-            except Exception as exc:  # pragma: no cover
-                reporter.fail(f"tests/package.json could not be parsed: {exc}")
-            else:
-                scripts = package_data.get("scripts")
-                if not isinstance(scripts, dict) or "test" not in scripts or "test:e2e" not in scripts:
-                    reporter.fail("tests/package.json must define both scripts.test and scripts['test:e2e']")
-
-        gitignore = task_dir / "tests" / ".gitignore"
-        if gitignore.exists() and "node_modules" not in gitignore.read_text(encoding="utf-8"):
-            reporter.fail("tests/.gitignore must ignore node_modules for UI tasks")
-
-        has_unit_specs = any((task_dir / "tests" / "unit").glob("*.spec.*"))
-        has_e2e_specs = any((task_dir / "tests" / "e2e").glob("*.spec.*"))
-        if not has_unit_specs:
-            reporter.fail("UI tasks must include at least one tests/unit/*.spec.* file")
-        if not has_e2e_specs:
-            reporter.fail("UI tasks must include at least one tests/e2e/*.spec.* file")
+        verifier_path = tests_dir / "test_outputs.py"
+        verifier_text = (
+            verifier_path.read_text(encoding="utf-8", errors="replace")
+            if verifier_path.exists()
+            else ""
+        )
+        if not re.search(r"^\s*(?:from\s+playwright\b|import\s+playwright\b)", verifier_text, re.MULTILINE):
+            reporter.fail(
+                "UI tests/test_outputs.py must use Playwright's Python bindings from pytest"
+            )
 
     if not reporter.has_failures():
         reporter.ok("task structure aligns with Edition 2 expectations")
 
 
 def check_test_sh(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
+    layout = task_layout.classify_task_dir(task_dir, task_data)
     test_sh_paths = iter_task_test_sh_files(task_dir)
     if not test_sh_paths:
         reporter.fail("task is missing tests/test.sh (or steps/milestone_N/tests/test.sh for milestone tasks)")
@@ -1387,12 +1495,65 @@ def check_test_sh(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
     for path in test_sh_paths:
         relative = path.relative_to(task_dir).as_posix()
         content = path.read_text(encoding="utf-8")
-        if NETWORK_INSTALL_PATTERN.search(content):
+        runtime_network_hits = runtime_network_setup_lines(content)
+        if runtime_network_hits:
             reporter.fail(
                 f"{relative} must not install verifier dependencies at runtime "
                 "(apt-get install, pip install, curl, uv/uvx, npm install, etc.). "
-                "Pin verifier packages in environment/Dockerfile instead."
+                "Pin verifier packages in environment/Dockerfile instead.\n"
+                + "\n".join(runtime_network_hits)
             )
+
+    if layout.kind == task_layout.MILESTONE:
+        for index, path in enumerate(test_sh_paths, start=1):
+            relative = path.relative_to(task_dir).as_posix()
+            content = path.read_text(encoding="utf-8")
+            lines = content.splitlines()
+            substantive_lines = substantive_shell_lines(content)
+
+            if FORBIDDEN_NON_UI_SET_PATTERN.search(content):
+                reporter.fail(
+                    f"{relative} must not enable or toggle errexit; the reward footer must run"
+                )
+            if "/logs/verifier/reward.json" in content or "/logs/verifier/reward.txt" not in content:
+                reporter.fail(f"{relative} must emit /logs/verifier/reward.txt, not reward.json")
+            footer_errors = reward_txt_footer_errors(lines)
+            if footer_errors:
+                reporter.fail(
+                    f"{relative} must use the Edition 2 binary reward footer:\n"
+                    + "\n".join(f"- {error}" for error in footer_errors)
+                )
+            if not WORKDIR_GUARD_PATTERN.search(content):
+                reporter.fail(f'{relative} must guard against running with "$PWD" = "/"')
+            prefix_mismatches = non_ui_test_sh_prefix_mismatches(
+                substantive_lines, content=content
+            )
+            if prefix_mismatches:
+                reporter.fail(
+                    f"{relative} must preserve the offline verifier template:\n"
+                    + "\n".join(prefix_mismatches)
+                )
+            verifier_ref = f"/tests/test_m{index}.py"
+            if not PYTEST_DIRECT_PATTERN.search(content) or verifier_ref not in content:
+                reporter.fail(f"{relative} must run {verifier_ref} through python -m pytest")
+            if not OFFLINE_PYTEST_PATTERN.search(content):
+                reporter.fail(f"{relative} must invoke pytest through the offline template")
+            has_safepath = bool(
+                re.search(r"\bPYTHONSAFEPATH\s*=\s*1\b", content)
+                or re.search(r"\bpython3?\s+-[PI]\b", content)
+            )
+            has_confcut = "--confcutdir=/tests" in content or "--confcutdir /tests" in content
+            has_cd_tests = bool(re.search(r"\bcd\s+/tests\b", content))
+            if not (has_safepath and has_confcut and has_cd_tests):
+                reporter.fail(
+                    f"{relative} CM-007: run from /tests with PYTHONSAFEPATH=1 and "
+                    "--confcutdir=/tests"
+                )
+            if not CTRF_PATTERN.search(content):
+                reporter.warn(f"{relative} does not appear to emit /logs/verifier/ctrf.json")
+        if not reporter.has_failures():
+            reporter.ok("milestone verifier scripts match Edition 2 expectations")
+        return
 
     test_sh = test_sh_paths[0]
     content = test_sh.read_text(encoding="utf-8")
@@ -1405,9 +1566,9 @@ def check_test_sh(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
     # NOTE: The official platform template does NOT use set -euo pipefail in test.sh.
     # set -e breaks $? capture in the reward footer. Do not require it.
 
-    if not is_ui and FORBIDDEN_NON_UI_SET_PATTERN.search(content):
+    if FORBIDDEN_NON_UI_SET_PATTERN.search(content):
         reporter.fail(
-            "tests/test.sh must not enable or toggle errexit for non-UI tasks; "
+            "tests/test.sh must not enable or toggle errexit; "
             "do not add set -e, set -euo pipefail, set -o errexit, or set +e"
         )
 
@@ -1424,38 +1585,36 @@ def check_test_sh(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
         # before exit 1 so RewardNotFoundError cannot fire on misconfigured WORKDIR.
         # The reward footer always runs on the normal path because there is no set -e.
 
-        # UI tasks use a different template (set -e + exit code variables + final assertion)
-        # so the strict tail check only applies to non-UI Python/pytest tasks.
-        if not is_ui:
-            if not reward_txt_tail_matches_template(lines):
-                trimmed_lines = list(lines)
-                while trimmed_lines and not trimmed_lines[-1].strip():
-                    trimmed_lines.pop()
-                pretty_tail = "\n".join(trimmed_lines[-8:]) if trimmed_lines else "<empty file>"
-                reporter.fail(
-                    "tests/test.sh must end with the platform reward.txt block (no RC=$?, no exit after fi):\n"
-                    + "\n".join(PLATFORM_REWARD_BLOCK)
-                    + f"\nObserved tail:\n{pretty_tail}"
-                )
-            else:
-                reporter.ok("tests/test.sh reward.txt block matches Edition 2 expectation")
+        footer_errors = reward_txt_footer_errors(lines)
+        if footer_errors:
+            trimmed_lines = list(lines)
+            while trimmed_lines and not trimmed_lines[-1].strip():
+                trimmed_lines.pop()
+            pretty_tail = "\n".join(trimmed_lines[-8:]) if trimmed_lines else "<empty file>"
+            reporter.fail(
+                "tests/test.sh must consume pytest status immediately, write binary "
+                "reward.txt branches, and end at the closing fi:\n"
+                + "\n".join(f"- {error}" for error in footer_errors)
+                + f"\nObserved tail:\n{pretty_tail}"
+            )
+        else:
+            reporter.ok("tests/test.sh reward.txt block matches Edition 2 expectation")
 
     if not WORKDIR_GUARD_PATTERN.search(content):
         reporter.fail(
             'tests/test.sh must guard against running with "$PWD" = "/" to catch missing WORKDIR'
         )
 
-    if not is_ui:
-        prefix_mismatches = non_ui_test_sh_prefix_mismatches(substantive_lines, content=content)
-        if prefix_mismatches:
-            reporter.fail(
-                "tests/test.sh must use the offline verifier template: verifier dependencies belong in "
-                "environment/Dockerfile, and the script may only mkdir /logs/verifier, guard WORKDIR, "
-                "then run python -m pytest.\n"
-                + "\n".join(prefix_mismatches)
-            )
-        else:
-            reporter.ok("tests/test.sh pre-pytest block preserves the standard non-UI semantics")
+    prefix_mismatches = non_ui_test_sh_prefix_mismatches(substantive_lines, content=content)
+    if prefix_mismatches:
+        reporter.fail(
+            "tests/test.sh must use the offline pytest verifier template: dependencies belong in "
+            "environment/Dockerfile, and the script may only mkdir /logs/verifier, guard WORKDIR, "
+            "then run python -m pytest.\n"
+            + "\n".join(prefix_mismatches)
+        )
+    else:
+        reporter.ok("tests/test.sh pre-pytest block preserves the standard non-UI semantics")
 
     if FORBIDDEN_DIRECT_PYTHON_TEST_PATTERN.search(content):
         reporter.fail(
@@ -1471,6 +1630,23 @@ def check_test_sh(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
                 "tests/test.sh must invoke pytest via python -m pytest (offline template). "
                 "Do not download uv or install packages at verifier runtime."
             )
+        # CM-007: block cwd/sys.path pytest shadow (`/app/pytest.py`, `/conftest.py`).
+        if OFFLINE_PYTEST_PATTERN.search(content) or UV_PYTEST_PATTERN.search(content):
+            has_safepath = bool(
+                re.search(r"\bPYTHONSAFEPATH\s*=\s*1\b", content)
+                or re.search(r"\bpython3?\s+-[PI]\b", content)
+                or re.search(r"\bpython3?\s+-[^\s]*[PI]", content)
+            )
+            has_confcut = "--confcutdir=/tests" in content or "--confcutdir /tests" in content
+            has_cd_tests = bool(re.search(r"\bcd\s+/tests\b", content))
+            if not (has_safepath and has_confcut and has_cd_tests):
+                reporter.fail(
+                    "tests/test.sh CM-007: pytest must run as "
+                    "`cd /tests && PYTHONSAFEPATH=1 python -m pytest … --confcutdir=/tests` "
+                    "(or python -P/-I) so agents cannot plant /app/pytest.py or /conftest.py"
+                )
+            else:
+                reporter.ok("tests/test.sh CM-007 pytest cwd-shadow hardening present")
 
     if isinstance(milestone_count, int) and milestone_count > 0:
         milestone_paths = [f"/tests/test_m{index}.py" for index in range(1, milestone_count + 1)]
@@ -1487,17 +1663,18 @@ def check_test_sh(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
                 "Milestone Python verifier tasks must invoke pytest via python -m pytest "
                 "(verifier dependencies must be in environment/Dockerfile)"
             )
-
-    if is_ui:
-        if not re.search(r"\bnpm\s+run\s+test\b", content):
-            reporter.fail("UI tasks must require npm run test in tests/test.sh")
-        if not re.search(r"\bnpm\s+run\s+test:e2e\b", content):
-            reporter.fail("UI tasks must require npm run test:e2e in tests/test.sh")
-        if re.search(r"\bnpm\s+(?:install|ci)\b", content):
-            reporter.fail(
-                "UI tests/test.sh must not run npm install at verifier runtime; "
-                "install verifier npm packages and Playwright in environment/Dockerfile"
+        if not is_ui and (OFFLINE_PYTEST_PATTERN.search(content) or "pytest" in content):
+            has_safepath = bool(
+                re.search(r"\bPYTHONSAFEPATH\s*=\s*1\b", content)
+                or re.search(r"\bpython3?\s+-[PI]\b", content)
             )
+            has_confcut = "--confcutdir=/tests" in content or "--confcutdir /tests" in content
+            has_cd_tests = bool(re.search(r"\bcd\s+/tests\b", content))
+            if not (has_safepath and has_confcut and has_cd_tests):
+                reporter.fail(
+                    "Milestone tests/test.sh CM-007: pytest must run as "
+                    "`cd /tests && PYTHONSAFEPATH=1 python -m pytest … --confcutdir=/tests`"
+                )
 
     if not CTRF_PATTERN.search(content):
         reporter.warn("tests/test.sh does not appear to emit /logs/verifier/ctrf.json")
@@ -1632,7 +1809,7 @@ def check_dockerfile(task_dir: Path, task_data: dict, reporter: Reporter) -> Non
             f"Unpinned packages: {sorted(set(unpinned_pip_packages))}"
         )
 
-    if not is_ui and PYTEST_DIRECT_PATTERN.search(
+    if PYTEST_DIRECT_PATTERN.search(
         "\n".join(
             path.read_text(encoding="utf-8", errors="replace")
             for path in iter_task_test_sh_files(task_dir)
@@ -1646,10 +1823,27 @@ def check_dockerfile(task_dir: Path, task_data: dict, reporter: Reporter) -> Non
                 "because tests/test.sh runs offline without network access"
             )
 
-    if is_ui and "playwright" not in content.lower():
-        reporter.fail(
-            "UI task environment/Dockerfile must install Playwright and verifier npm packages at image build time"
+    if is_ui:
+        dependency_corpus = content + "\n" + "\n".join(
+            path.read_text(encoding="utf-8", errors="replace")
+            for pattern in ("*requirements*.txt", "*requirements*.in")
+            for path in (task_dir / "environment").glob(pattern)
         )
+        if not re.search(
+            r"(?im)^\s*(?:pytest-playwright|playwright)\s*==\s*[^\s#]+",
+            dependency_corpus,
+        ) and not re.search(
+            r"\bpip(?:3)?\b[^\n]*\binstall\b[^\n]*(?:pytest-playwright|playwright)==[^\s\\]+",
+            content,
+        ):
+            reporter.fail(
+                "UI task environment must pin the Playwright Python package at image-build time"
+            )
+        if not re.search(r"\bpython3?\s+-m\s+playwright\s+install\b", content):
+            reporter.fail(
+                "UI task environment/Dockerfile must install a browser through "
+                "`python -m playwright install` at image-build time"
+            )
 
     if not is_ui and not ({"javascript", "typescript"} & languages):
         suspicious_node_hits = re.findall(
@@ -1695,29 +1889,29 @@ def check_compose(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
         )
 
     reserved_volume_hits = re.findall(
-        r"^\s*-\s*[^#\n]+:(/logs/artifacts/|/logs/verifier/|/tests/|/solution/|/logs/artifacts|/logs/verifier|/tests|/solution)\b.*$",
+        r"^\s*-\s*[^#\n]+:(/logs/artifacts/|/logs/verifier/|/tests/|/solution/|/oracle/|/logs/artifacts|/logs/verifier|/tests|/solution|/oracle)\b.*$",
         content,
         flags=re.MULTILINE,
     )
     reserved_target_hits = re.findall(
-        r"^\s*target:\s*(/logs/artifacts/|/logs/verifier/|/tests/|/solution/|/logs/artifacts|/logs/verifier|/tests|/solution)\b.*$",
+        r"^\s*target:\s*(/logs/artifacts/|/logs/verifier/|/tests/|/solution/|/oracle/|/logs/artifacts|/logs/verifier|/tests|/solution|/oracle)\b.*$",
         content,
         flags=re.MULTILINE,
     )
     if reserved_volume_hits or reserved_target_hits:
         reporter.fail(
             "environment/docker-compose.yaml must not override Harbor-reserved mounts "
-            "(/logs/artifacts, /logs/verifier, /tests, /solution)"
+            "(/logs/artifacts, /logs/verifier, /tests, /solution, /oracle)"
         )
 
     privileged_hits = re.findall(
-        r"^\s*.*(?:privileged:\s*true|SYS_ADMIN|docker\.sock).*$",
+        r"^\s*.*(?:privileged:\s*true|cap_add:|SYS_ADMIN|NET_ADMIN|SYS_MODULE|SYS_PTRACE|DAC_READ_SEARCH|DAC_OVERRIDE|MKNOD|docker\.sock).*$",
         content,
         flags=re.IGNORECASE | re.MULTILINE,
     )
     if privileged_hits:
         reporter.fail(
-            "environment/docker-compose.yaml must not request privileged mode, SYS_ADMIN, or docker.sock access.\n"
+            "environment/docker-compose.yaml must not request privileged mode, unsafe capabilities, or docker.sock access.\n"
             + "\n".join(sorted(set(privileged_hits)))
         )
 
@@ -1745,47 +1939,59 @@ def check_canary(task_dir: Path, reporter: Reporter) -> None:
 
 
 def check_instruction(task_dir: Path, task_data: dict | None, reporter: Reporter) -> None:
-    instruction_path = task_dir / "instruction.md"
-    instruction = instruction_path.read_text(encoding="utf-8")
-    if not instruction.strip():
-        reporter.fail("instruction.md must not be empty")
-        return
+    layout = task_layout.classify_task_dir(task_dir, task_data)
+    for instruction_path in task_layout.instruction_paths(task_dir, layout):
+        relative = instruction_path.relative_to(task_dir).as_posix()
+        instruction = instruction_path.read_text(encoding="utf-8")
+        if not instruction.strip():
+            reporter.fail(f"{relative} must not be empty")
+            continue
 
-    if STRUCTURED_SECTION_PATTERN.search(instruction):
-        reporter.warn(
-            "instruction.md uses scaffold-like headings such as Deliverables/Artifacts/"
-            "Acceptance Criteria; prefer a natural user request unless the task truly needs them"
+        if STRUCTURED_SECTION_PATTERN.search(instruction):
+            reporter.warn(
+                f"{relative} uses scaffold-like headings such as Deliverables/Artifacts/"
+                "Acceptance Criteria; prefer a natural user request unless the task truly needs them"
+            )
+
+        if task_dir.name.lower() in instruction.lower():
+            reporter.fail(f"{relative} must not include the task name")
+
+        milestone_count = max(
+            layout.milestone_count,
+            task_layout.number_of_milestones(task_data),
         )
+        if milestone_count > 0 and not instruction_has_signal_completion_directive(
+            instruction
+        ):
+            reporter.fail(
+                "Milestone tasks must tell the agent to signal completion before advancing "
+                "to the next milestone"
+            )
 
-    if task_dir.name.lower() in instruction.lower():
-        reporter.fail("instruction.md must not include the task name")
+        milestone_language_hits = MILESTONE_LANGUAGE_PATTERN.findall(instruction)
+        if milestone_language_hits:
+            reporter.warn(
+                f"{relative} contains the word 'milestone' "
+                f"({len(milestone_language_hits)} occurrence(s)); the upstream instruction-eval "
+                "flags milestone-related language in agent-facing instructions. This is "
+                "non-blocking; use neutral step/stage language."
+            )
 
-    milestone_count = 0
-    if isinstance(task_data, dict):
-        milestone_count = int(get_task_characteristics(task_dir, task_data)["milestone_count"])
-    if milestone_count > 0 and not instruction_has_signal_completion_directive(instruction):
-        reporter.fail(
-            "Milestone tasks must tell the agent to signal completion before advancing to the next milestone"
-        )
-
-    milestone_language_hits = MILESTONE_LANGUAGE_PATTERN.findall(instruction)
-    if milestone_language_hits:
-        reporter.warn(
-            f"instruction.md contains the word 'milestone' ({len(milestone_language_hits)} occurrence(s)); "
-            "the upstream instruction-eval flags milestone-related language in agent-facing instructions. "
-            "This is non-blocking, but rephrase using neutral wording (e.g. 'step', 'stage', 'each part') so "
-            "the eval does not surface the warning at submit time"
-        )
-
-    paragraphs = [part.strip() for part in re.split(r"\n\s*\n", instruction.strip()) if part.strip()]
-    if len(paragraphs) > 3:
-        reporter.warn("instruction.md is longer than the preferred 1 sentence to 3 paragraphs guidance")
+        paragraphs = [
+            part.strip() for part in re.split(r"\n\s*\n", instruction.strip()) if part.strip()
+        ]
+        if len(paragraphs) > 3:
+            reporter.warn(
+                f"{relative} is longer than the preferred 1 sentence to 3 paragraphs guidance"
+            )
 
 
 def check_absolute_paths(task_dir: Path, reporter: Reporter) -> None:
-    instruction = (task_dir / "instruction.md").read_text(encoding="utf-8")
+    layout = task_layout.classify_task_dir(task_dir)
     working_dir = dockerfile_workdir(task_dir)
-    references = find_relative_instruction_references(instruction)
+    references: list[str] = []
+    for path in task_layout.instruction_paths(task_dir, layout):
+        references.extend(find_relative_instruction_references(path.read_text(encoding="utf-8")))
     if references:
         reporter.fail(
             "instruction.md must use absolute in-container path references instead of relative ones. "
@@ -1801,6 +2007,10 @@ def check_absolute_paths(task_dir: Path, reporter: Reporter) -> None:
 
 
 def check_output_contract(task_dir: Path, reporter: Reporter) -> None:
+    layout = task_layout.classify_task_dir(task_dir)
+    if layout.kind == task_layout.MILESTONE:
+        reporter.ok("milestone layout uses step-local instruction contracts")
+        return
     failures_before = len(reporter.failures)
     contract_path = task_dir / "output_contract.toml"
     contract, errors = load_output_contract(contract_path)
@@ -2146,6 +2356,28 @@ _ARTIFACT_DIR_NAMES = {
     "coverage", ".coverage",
 }
 
+_SOURCE_MODULE_SUFFIXES = {
+    ".c", ".cc", ".cpp", ".cxx", ".go", ".h", ".hpp", ".java", ".kt",
+    ".md", ".py", ".rs", ".swift", ".toml",
+}
+
+
+def _is_source_artifact_named_dir(path: Path, env: Path) -> bool:
+    """Distinguish source modules/scripts from generated artifact directories."""
+    files = [candidate for candidate in path.rglob("*") if candidate.is_file()]
+    if not files:
+        return False
+    if path.name == "build" and path.parent.name == "src":
+        return all(
+            candidate.suffix.lower() in _SOURCE_MODULE_SUFFIXES for candidate in files
+        )
+    if path.name == "bin" and path.parent == env:
+        try:
+            return all(candidate.read_bytes().startswith(b"#!") for candidate in files)
+        except OSError:
+            return False
+    return False
+
 
 def check_package_hygiene(task_dir: Path, reporter: Reporter) -> None:
     """No build artifacts or reference outputs inside the environment/ tree.
@@ -2175,7 +2407,11 @@ def check_package_hygiene(task_dir: Path, reporter: Reporter) -> None:
 
     artifact_hits: list[str] = []
     for path in env.rglob("*"):
-        if path.is_dir() and path.name in _ARTIFACT_DIR_NAMES:
+        if (
+            path.is_dir()
+            and path.name in _ARTIFACT_DIR_NAMES
+            and not _is_source_artifact_named_dir(path, env)
+        ):
             artifact_hits.append(path.relative_to(task_dir).as_posix())
 
     # Deduplicate nested hits: if environment/build/CMakeFiles is flagged,
@@ -2338,8 +2574,8 @@ def _script_references_build(task_dir: Path, script_ref: str, _depth: int = 0, _
     candidates = [
         task_dir / "environment" / rel,
         task_dir / rel,
-        task_dir / "tests" / rel,
     ]
+    candidates.extend(tests_dir / rel for tests_dir in layout_test_dirs(task_dir))
     # If the reference is a bare filename (no path separator), glob.
     if "/" not in rel:
         candidates.extend(task_dir.rglob(rel))
@@ -2372,7 +2608,9 @@ def _script_references_build(task_dir: Path, script_ref: str, _depth: int = 0, _
     return False
 
 
-def _tests_do_heavy_build(task_dir: Path) -> tuple[bool, list[str], int]:
+def _tests_do_heavy_build(
+    task_dir: Path, tests_dirs: list[Path] | None = None
+) -> tuple[bool, list[str], int]:
     """Return (has_build, matched_evidence_strings, build_site_count).
 
     build_site_count is a coarse count of distinct invocations that each
@@ -2385,8 +2623,8 @@ def _tests_do_heavy_build(task_dir: Path) -> tuple[bool, list[str], int]:
     catch the transitive case (test runs `bash build_and_load.sh` which
     itself does `cargo build` + `cmake --build`).
     """
-    tests = task_dir / "tests"
-    if not tests.exists():
+    tests_dirs = tests_dirs if tests_dirs is not None else layout_test_dirs(task_dir)
+    if not tests_dirs:
         return False, [], 0
     evidence: list[str] = []
     total_sites = 0
@@ -2394,7 +2632,8 @@ def _tests_do_heavy_build(task_dir: Path) -> tuple[bool, list[str], int]:
     # per call site. A helper called from N test functions counts as N
     # sites because the verifier pays N builds of wall time.
     seen_script_refs: dict[str, bool] = {}
-    for path in tests.rglob("*"):
+    test_paths = (path for tests_dir in tests_dirs for path in tests_dir.rglob("*"))
+    for path in test_paths:
         if not path.is_file():
             continue
         if path.suffix.lower() not in {".sh", ".py", ".toml", ".yaml", ".yml"}:
@@ -2433,7 +2672,9 @@ def _tests_do_heavy_build(task_dir: Path) -> tuple[bool, list[str], int]:
     return bool(evidence), evidence, total_sites
 
 
-def _sum_explicit_subprocess_timeouts(task_dir: Path) -> tuple[int, list[tuple[str, int, int]]]:
+def _sum_explicit_subprocess_timeouts(
+    task_dir: Path, tests_dirs: list[Path] | None = None
+) -> tuple[int, list[tuple[str, int, int]]]:
     """AST-walk every Python file in tests/ and sum the literal-int values
     of ``timeout=N`` keyword arguments to function calls.
 
@@ -2466,14 +2707,15 @@ def _sum_explicit_subprocess_timeouts(task_dir: Path) -> tuple[int, list[tuple[s
     from N tests is paid N times but we only see the literal once. The
     sum is therefore a useful WARN signal, not a hard FAIL signal.
     """
-    tests = task_dir / "tests"
-    if not tests.exists():
+    tests_dirs = tests_dirs if tests_dirs is not None else layout_test_dirs(task_dir)
+    if not tests_dirs:
         return 0, []
 
     total = 0
     evidence: list[tuple[str, int, int]] = []
 
-    for path in sorted(tests.rglob("*.py")):
+    paths = sorted(path for tests_dir in tests_dirs for path in tests_dir.rglob("*.py"))
+    for path in paths:
         try:
             text = path.read_text(encoding="utf-8")
         except OSError:
@@ -2509,7 +2751,12 @@ def _sum_explicit_subprocess_timeouts(task_dir: Path) -> tuple[int, list[tuple[s
     return total, evidence
 
 
-def check_timeout_coherence(task_dir: Path, task_data: dict, reporter: Reporter) -> None:
+def check_timeout_coherence(
+    task_dir: Path,
+    task_data: dict,
+    reporter: Reporter,
+    tests_dirs_override: list[Path] | None = None,
+) -> None:
     """Verifier and agent timeouts must match the task's actual workload.
 
     Root cause this catches: authors size Docker build budgets correctly
@@ -2532,6 +2779,25 @@ def check_timeout_coherence(task_dir: Path, task_data: dict, reporter: Reporter)
     on the agent side, which otherwise pushed authors toward unrealistic
     agent budgets.
     """
+    layout = task_layout.classify_task_dir(task_dir, task_data)
+    if layout.kind == task_layout.MILESTONE and tests_dirs_override is None:
+        test_dirs = task_layout.test_dirs(task_dir, layout)
+        for step, tests_dir in zip(task_data.get("steps") or [], test_dirs, strict=True):
+            if not isinstance(step, dict):
+                continue
+            step_data = {
+                "agent": step.get("agent"),
+                "verifier": step.get("verifier"),
+                "environment": task_data.get("environment"),
+            }
+            check_timeout_coherence(
+                task_dir,
+                step_data,
+                reporter,
+                tests_dirs_override=[tests_dir],
+            )
+        return
+
     verifier_t = None
     agent_t = None
     build_t = None
@@ -2548,7 +2814,7 @@ def check_timeout_coherence(task_dir: Path, task_data: dict, reporter: Reporter)
     except (TypeError, ValueError):
         pass
 
-    has_build, evidence, build_sites = _tests_do_heavy_build(task_dir)
+    has_build, evidence, build_sites = _tests_do_heavy_build(task_dir, tests_dirs_override)
 
     if has_build and verifier_t is not None and build_t is not None:
         # Determine the required verifier floor from the build workload.
@@ -2612,7 +2878,9 @@ def check_timeout_coherence(task_dir: Path, task_data: dict, reporter: Reporter)
     # may kill the verifier mid-fixture and the trial reports as a
     # missing reward file rather than a meaningful failure.
     if verifier_t is not None:
-        timeout_sum, timeout_evidence = _sum_explicit_subprocess_timeouts(task_dir)
+        timeout_sum, timeout_evidence = _sum_explicit_subprocess_timeouts(
+            task_dir, tests_dirs_override
+        )
         if timeout_sum > verifier_t:
             rendered = "\n".join(
                 f"  {p}:{ln}  timeout={t}s"
@@ -2836,14 +3104,13 @@ def check_instruction_test_vocabulary(task_dir: Path, task_data: dict | None, re
     instruction-named fields. Tests that assert on internal probes,
     negative filters, or structural type checks don't fire the warning.
     """
-    tests_dir = task_dir / "tests"
-    if not tests_dir.exists():
+    tests_dirs = layout_test_dirs(task_dir, task_data)
+    if not tests_dirs:
         return
-    instruction_path = task_dir / "instruction.md"
-    if not instruction_path.exists():
+    instruction_text = layout_instruction_text(task_dir, task_data)
+    if not instruction_text:
         return
 
-    instruction_text = instruction_path.read_text(encoding="utf-8")
     named_fields = _instruction_named_fields(instruction_text)
     if not named_fields:
         reporter.ok("no backticked field names in instruction.md; vocabulary check skipped")
@@ -2851,15 +3118,18 @@ def check_instruction_test_vocabulary(task_dir: Path, task_data: dict | None, re
 
     lowered_instruction = instruction_text.lower()
     undocumented: list[tuple[str, int, str, str]] = []
-    for test_file in sorted(tests_dir.rglob("test_*.py")):
-        for lineno, field, literal in _literal_assertions_on_named_fields(test_file, named_fields):
-            if literal in instruction_text:
-                continue
-            if literal.lower() in lowered_instruction:
-                continue
-            undocumented.append(
-                (test_file.relative_to(task_dir).as_posix(), lineno, field, literal)
-            )
+    for tests_dir in tests_dirs:
+        for test_file in sorted(tests_dir.rglob("test_*.py")):
+            for lineno, field, literal in _literal_assertions_on_named_fields(
+                test_file, named_fields
+            ):
+                if literal in instruction_text:
+                    continue
+                if literal.lower() in lowered_instruction:
+                    continue
+                undocumented.append(
+                    (test_file.relative_to(task_dir).as_posix(), lineno, field, literal)
+                )
 
     if undocumented:
         sample = undocumented[:10]
@@ -3212,29 +3482,21 @@ def check_oracle_knob_discoverability(task_dir: Path, reporter: Reporter) -> Non
     ``environment/`` (as a comment, a default, a doc file, whatever the
     agent can grep for). Otherwise flag it.
     """
-    instruction_path = task_dir / "instruction.md"
-    if not instruction_path.exists():
+    instruction_text = layout_instruction_text(task_dir)
+    if not instruction_text:
         return
-
-    try:
-        instruction_text = instruction_path.read_text(encoding="utf-8")
-    except OSError:
-        return
-
-    solve_path = task_dir / "solution" / "solve.sh"
-    tests_dir = task_dir / "tests"
 
     oracle_knobs: set[str] = set()
-    if solve_path.exists():
+    for solve_path in layout_solution_entrypoints(task_dir):
         try:
-            oracle_knobs = _extract_build_knobs_from_shell(
+            oracle_knobs |= _extract_build_knobs_from_shell(
                 solve_path.read_text(encoding="utf-8")
             )
         except OSError:
-            oracle_knobs = set()
+            continue
 
     test_knobs: set[str] = set()
-    if tests_dir.exists():
+    for tests_dir in layout_test_dirs(task_dir):
         for test_file in sorted(tests_dir.rglob("*")):
             if not test_file.is_file():
                 continue
@@ -3469,26 +3731,20 @@ def check_oracle_path_discoverability(task_dir: Path, reporter: Reporter) -> Non
     encounter them while exploring the codebase. Paths under harness-owned
     roots (``/logs/``, ``/tmp/``) are never required to be documented.
     """
-    instruction_path = task_dir / "instruction.md"
-    if not instruction_path.exists():
-        return
-    tests_dir = task_dir / "tests"
-    if not tests_dir.exists():
-        return
-
-    try:
-        instruction_text = instruction_path.read_text(encoding="utf-8")
-    except OSError:
+    instruction_text = layout_instruction_text(task_dir)
+    tests_dirs = layout_test_dirs(task_dir)
+    if not instruction_text or not tests_dirs:
         return
 
     test_paths: set[str] = set()
-    for test_file in sorted(tests_dir.rglob("*.py")):
-        try:
-            text = test_file.read_text(encoding="utf-8")
-        except OSError:
-            continue
-        for value in _resolve_path_constants(text).values():
-            test_paths.add(value)
+    for tests_dir in tests_dirs:
+        for test_file in sorted(tests_dir.rglob("*.py")):
+            try:
+                text = test_file.read_text(encoding="utf-8")
+            except OSError:
+                continue
+            for value in _resolve_path_constants(text).values():
+                test_paths.add(value)
 
     if not test_paths:
         reporter.ok("no agent-target paths declared in tests/")
@@ -3557,21 +3813,31 @@ def run_checks(task_dir: Path, selected_checks: set[str] | None = None) -> Repor
     reporter = Reporter()
     selected_checks = selected_checks or set(SUPPORTED_CHECKS)
 
-    if "required_files" in selected_checks:
-        check_required_files(task_dir, reporter)
-        if reporter.has_failures():
-            return reporter
-
     task_data: dict | None = None
     needs_task_data = bool(
         selected_checks
-        & {"task_toml", "task_structure", "test_sh", "dockerfile", "compose", "instruction", "test_layout", "timeout_coherence"}
+        & {
+            "required_files",
+            "task_toml",
+            "task_structure",
+            "test_sh",
+            "dockerfile",
+            "compose",
+            "instruction",
+            "test_layout",
+            "timeout_coherence",
+        }
     )
     if needs_task_data:
         try:
             task_data = load_toml_file(task_dir / "task.toml")
         except Exception as exc:  # pragma: no cover
             reporter.fail(f"task.toml could not be parsed: {exc}")
+            return reporter
+
+    if "required_files" in selected_checks and task_data is not None:
+        check_required_files(task_dir, task_data, reporter)
+        if reporter.has_failures():
             return reporter
 
     if "canary" in selected_checks:

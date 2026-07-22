@@ -1,0 +1,10 @@
+[
+{"name":"alder","version":"1.0.0","code":100,"source":"alder-main-100","preview":false,"withdrawn":false,"needs":"birch:200:220:stable:200","payload":"alder/1.0.0","api":"alder_api"},
+{"name":"alder","version":"1.1.0-alpha.1","code":110,"source":"alder-preview-110a","preview":true,"withdrawn":false,"needs":"birch:200:220:stable:-","payload":"alder/1.1.0-alpha.1","api":"alpha_api"},
+{"name":"alder","version":"1.1.0","code":120,"source":"alder-main-110","preview":false,"withdrawn":false,"needs":"birch:200:220:stable:200","payload":"alder/1.1.0","api":"alder_api"},
+{"name":"birch","version":"2.0.0","code":200,"source":"birch-main-200","preview":false,"withdrawn":false,"needs":"elm:400:410:stable:400","payload":"birch/2.0.0","api":"birch_api"},
+{"name":"birch","version":"2.1.0","code":210,"source":"birch-retained-210","preview":false,"withdrawn":true,"needs":"elm:400:410:stable:400","payload":"birch/2.1.0","api":"beta_api"},
+{"name":"cedar","version":"3.0.0","code":300,"source":"cedar-main-300","preview":false,"withdrawn":false,"needs":"","payload":"cedar/3.0.0","api":"cedar_api"},
+{"name":"cedar","version":"3.1.0","code":310,"source":"cedar-main-310","preview":false,"withdrawn":false,"needs":"birch:200:220:stable:210;elm:400:410:stable:400","payload":"cedar/3.1.0","api":"cedar_next_api"},
+{"name":"elm","version":"4.0.0","code":400,"source":"elm-main-400","preview":false,"withdrawn":false,"needs":"","payload":"elm/4.0.0","api":"elm_api"}
+]

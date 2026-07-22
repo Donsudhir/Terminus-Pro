@@ -1,3 +1,3 @@
-Overall task description goes here. Milestone 1's instruction should include any context the agent needs to get oriented for the whole task — subsequent milestones can be shorter.
+Overall task description goes here. The first step should include any context needed to get oriented for the whole task; subsequent steps can be shorter.
 
-Milestone 1: Create a file called /app/hello.txt and write "Hello, world!" to it.
+Create a file called /app/hello.txt and write "Hello, world!" to it. When finished, signal completion before advancing to the next step.

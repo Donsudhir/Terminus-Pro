@@ -25,7 +25,9 @@ Output format (last lines, machine-readable):
 from __future__ import annotations
 
 import argparse
+import copy
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -38,12 +40,19 @@ except ModuleNotFoundError:
     jsonschema_validators = None
 
 import lint_spec
+import root_adapter
 
-SPECS_DIR = Path("specs")
-SCHEMA_PATH = SPECS_DIR / "validation_schema.json"
+SPECS_DIR = root_adapter.ROOTS.specs
+SCHEMA_PATH = Path(
+    os.environ.get(
+        "TB3_VALIDATION_SCHEMA",
+        str(root_adapter.ROOTS.validation_schema),
+    )
+).expanduser()
 MAX_ATTEMPTS = 5
 PLATEAU_THRESHOLD = 2
 MIN_DISCOVERY_BUDGET_ITEMS = 3
+EVIDENCE_CONTRACT_VERSION = 3
 VALID_VERDICTS = {"PASS", "WARN", "FAIL"}
 VALID_SPECIFICITY_LEVELS = {
     "spec-complete",
@@ -126,7 +135,9 @@ def load_state(task_name: str) -> dict[str, Any]:
 
 
 def save_state(task_name: str, state: dict[str, Any]) -> None:
-    state_path(task_name).write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+    path = state_path(task_name)
+    root_adapter.ROOTS.assert_writable(path)
+    path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
 
 
 def _is_non_empty_string(value: Any) -> bool:
@@ -258,6 +269,65 @@ def _validate_instruction_specificity(
             "instruction_specificity.level must be 'symptoms-only' for the default hard-only Step 2a workflow."
         )
     return normalized
+
+
+def _validate_investigation_profile(
+    evidence: dict[str, Any],
+    errors: list[str],
+) -> dict[str, Any]:
+    """Validate cross-field invariants for the long-horizon profile.
+
+    JSON Schema owns field shape and cardinality. This function enforces the
+    small set of semantic constraints the schema cannot express: causal stages
+    are numbered in order, evidence surfaces are heterogeneous, and the
+    conditional matrix contains both a failing case and a healthy control.
+    """
+    value = evidence.get("investigation_profile")
+    if not isinstance(value, dict):
+        errors.append("investigation_profile must be an object for evidence contract v3.")
+        return {}
+
+    causal_chain = value.get("causal_chain") or []
+    stage_numbers = [
+        item.get("stage")
+        for item in causal_chain
+        if isinstance(item, dict)
+    ]
+    expected_stage_numbers = list(range(1, len(causal_chain) + 1))
+    if stage_numbers != expected_stage_numbers:
+        errors.append(
+            "investigation_profile.causal_chain stages must be numbered "
+            f"consecutively from 1; found {stage_numbers}."
+        )
+
+    evidence_surfaces = value.get("evidence_surfaces") or []
+    surface_types = [
+        item.get("surface")
+        for item in evidence_surfaces
+        if isinstance(item, dict)
+    ]
+    if len(set(surface_types)) != len(surface_types):
+        errors.append(
+            "investigation_profile.evidence_surfaces must use distinct surface "
+            "types; repeated files or logs do not create heterogeneous evidence."
+        )
+
+    conditional_failures = value.get("conditional_failures") or []
+    scenario_roles = {
+        item.get("role")
+        for item in conditional_failures
+        if isinstance(item, dict)
+    }
+    missing_roles = {"failing", "healthy-control"} - scenario_roles
+    if missing_roles:
+        errors.append(
+            "investigation_profile.conditional_failures must include at least "
+            "one failing scenario and one healthy-control scenario; missing "
+            + ", ".join(sorted(missing_roles))
+            + "."
+        )
+
+    return copy.deepcopy(value)
 
 
 def _validate_analysis_block(
@@ -662,7 +732,11 @@ def _draft7_compatible_schema(value: Any) -> Any:
     return value
 
 
-def validate_evidence(raw_evidence: Any) -> dict[str, Any]:
+def validate_evidence(
+    raw_evidence: Any,
+    *,
+    require_investigation_profile: bool = False,
+) -> dict[str, Any]:
     schema_errors = _validate_schema(raw_evidence)
     if schema_errors:
         return {
@@ -695,11 +769,26 @@ def validate_evidence(raw_evidence: Any) -> dict[str, Any]:
     normalized["instruction_specificity"] = _validate_instruction_specificity(
         raw_evidence, errors, hard_fail_reasons
     )
+    if "investigation_profile" in raw_evidence:
+        normalized["investigation_profile"] = _validate_investigation_profile(
+            raw_evidence, errors
+        )
+    elif require_investigation_profile:
+        hard_fail_reasons.append(
+            "investigation_profile is required for newly initialized Step 2a "
+            "loops (evidence contract v3)."
+        )
     normalized["attack_path"] = _validate_analysis_block(raw_evidence, "attack_path", errors)
     normalized["smallest_plausible_patch"] = _validate_analysis_block(
         raw_evidence, "smallest_plausible_patch", errors
     )
     normalized["collapse_audit"] = _validate_collapse_audit(raw_evidence, errors, counts)
+    normalized["topology_enumeration"] = copy.deepcopy(
+        raw_evidence["topology_enumeration"]
+    )
+    normalized["construction_manifest"] = copy.deepcopy(
+        raw_evidence["construction_manifest"]
+    )
     normalized["naming_pass"] = _validate_naming_pass(
         raw_evidence, errors, hard_fail_reasons, counts
     )
@@ -737,7 +826,7 @@ def validate_evidence(raw_evidence: Any) -> dict[str, Any]:
 
 def cmd_init(args: argparse.Namespace) -> None:
     task_name = args.task_name
-    SPECS_DIR.mkdir(exist_ok=True)
+    SPECS_DIR.mkdir(parents=True, exist_ok=True)
 
     sp = state_path(task_name)
     if sp.exists():
@@ -753,14 +842,17 @@ def cmd_init(args: argparse.Namespace) -> None:
         "candidates": [],
         "history": [],
         "schema_path": SCHEMA_PATH.as_posix(),
+        "evidence_contract_version": EVIDENCE_CONTRACT_VERSION,
     }
     save_state(task_name, state)
 
     log = SPECS_DIR / f"{task_name}-validation-log.md"
+    root_adapter.ROOTS.assert_writable(log)
     log.write_text(f"# Validation Log: {task_name}\n\n", encoding="utf-8")
 
     print(f"Initialized loop for '{task_name}'.")
     print(f"Evidence schema: {SCHEMA_PATH.as_posix()}")
+    print(f"Evidence contract: v{EVIDENCE_CONTRACT_VERSION} (investigation profile required)")
     print("ACTION: CONTINUE")
     print(f"SAVE_TO: {authoring_spec_path(task_name).as_posix()}")
     print(f"REVIEWER_SAVE_TO: {reviewer_spec_path(task_name).as_posix()}")
@@ -789,7 +881,12 @@ def cmd_record(args: argparse.Namespace) -> None:
         sys.exit(1)
 
     attempt = state["attempt"] + 1
-    validation = validate_evidence(raw_evidence)
+    validation = validate_evidence(
+        raw_evidence,
+        require_investigation_profile=(
+            state.get("evidence_contract_version", 2) >= EVIDENCE_CONTRACT_VERSION
+        ),
+    )
     fails, warns = validation["score"]
     provided_score = None
     provided_score_mismatch = None
@@ -802,6 +899,7 @@ def cmd_record(args: argparse.Namespace) -> None:
             )
 
     stored_evidence_path = attempt_evidence_path(task_name, attempt)
+    root_adapter.ROOTS.assert_writable(stored_evidence_path)
     stored_evidence_path.write_text(
         json.dumps(validation["normalized"], indent=2) + "\n",
         encoding="utf-8",
@@ -974,6 +1072,7 @@ def _cleanup_candidate_files(task_name: str, state: dict[str, Any]) -> None:
             reviewer_spec_path(task_name, candidate["candidate_n"]),
         ):
             if path.exists():
+                root_adapter.ROOTS.assert_writable(path)
                 path.unlink()
 
 
@@ -1108,10 +1207,12 @@ def cmd_select(args: argparse.Namespace) -> None:
             sys.exit(1)
         _enforce_lint_spec_or_exit(winner_authoring)
 
+        root_adapter.ROOTS.assert_writable(canonical_authoring)
         canonical_authoring.write_text(
             winner_authoring.read_text(encoding="utf-8"),
             encoding="utf-8",
         )
+        root_adapter.ROOTS.assert_writable(canonical_reviewer)
         canonical_reviewer.write_text(
             winner_reviewer.read_text(encoding="utf-8"),
             encoding="utf-8",
@@ -1144,8 +1245,10 @@ def cmd_status(args: argparse.Namespace) -> None:
 def cmd_reset(args: argparse.Namespace) -> None:
     task_name = args.task_name
     for path in SPECS_DIR.glob(f"{task_name}*"):
+        root_adapter.ROOTS.assert_writable(path)
         path.unlink()
     for path in SPECS_DIR.glob(f".{task_name}*"):
+        root_adapter.ROOTS.assert_writable(path)
         path.unlink()
     print(f"Reset '{task_name}'.")
 

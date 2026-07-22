@@ -18,6 +18,7 @@ This bundle follows the repo's default **hard-only** Edition 2 profile and is in
 Attach all files in this folder:
 
 - `chatgpt-task-authoring-playbook.md` (this file)
+- `idea-inspiration-sources.md` (mandatory source ladder + conversion rules)
 - `bulk-idea-generation.md` (Option B — goal-sized seed bank generator)
 - `option-a-seed-refinement.md` (Option A — Step-2a bank consolidator / finalist screener)
 - `implementation-collapse-audit.md`
@@ -41,27 +42,35 @@ Optional extra attachments:
 
 ## Intent Routing
 
-0. Goal-sized seed-bank generation sized to the requested final Step-1 output → `bulk-idea-generation.md` (**Option B**)
-0a. Consolidate a seed pool into a Step-2a-ready bank (default) or a strict finalist list (optional) → `option-a-seed-refinement.md` (**Option A**)
-1. Idea generation, screening, proposal shaping → this file
-2. Allowed metadata values (category, subcategory, languages) → `terminal-bench-task-creation.md`
-3. Go/no-go on whether an idea should be pursued → `TASK_PROPOSAL_RUBRIC.md`
-4. Whether a task got trivialized during planning → `implementation-collapse-audit.md`
+0. Selected candidate entering the lifecycle → generate the four Task Idea
+   Proposal fields, then stop for platform Check feedback
+1. Goal-sized seed-bank generation → `bulk-idea-generation.md` (**Option B**)
+2. Consolidate a seed pool into a bank/finalist list → `option-a-seed-refinement.md` (**Option A**)
+3. Idea generation and screening → this file
+4. Allowed metadata values → `terminal-bench-task-creation.md`
+5. Local concept quality → `TASK_PROPOSAL_RUBRIC.md`
+6. Implementation collapse → `implementation-collapse-audit.md`
 
 Option A and Option B are the two entry points most users should reach for:
 - No seed idea yet? Run **Option B** to produce a goal-sized self-screened seed bank, save it as `.md`, then run **Option A** on that file.
 - Have a screenshot, typed idea, or a saved Option B `.md` file? Skip straight to **Option A**.
 
 Option A is the modern, explicit form of the "Phase -1: Seed Challenge Mode" described later in this file. If you're following Option A, you are already running Phase -1.
+After selecting a finalist, still run the platform Task Idea Proposal check
+before Cursor uniqueness or Step 2a.
 
 ## Mandatory Stage Gates
 
 ChatGPT enforces the first two gates. Cursor enforces the rest.
 
-1. **Idea search** — do not let the first plausible idea bypass ideation.
-2. **Proposal / concept gate** — the idea must look hard under an honest prompt and survive the rubric.
-3. **Implementation-plan collapse gate** — handled by Cursor.
-4. **Draft and benchmark gate** — handled by Cursor.
+1. **Source-ladder search** — consult `idea-inspiration-sources.md`; do not let
+   the first plausible idea bypass ideation.
+2. **Platform Task Idea Proposal check** — output the four fields and stop;
+   capture Check feedback before uniqueness or Step 2a.
+3. **Proposal / concept gate** — after platform PASS, the idea must look hard
+   under an honest prompt and survive the local rubric.
+4. **Implementation-plan collapse gate** — handled by Cursor.
+5. **Draft and benchmark gate** — handled by Cursor.
 
 If a task fails any later gate, do not rescue it by keeping the original idea-family label. Regenerate or stop.
 
@@ -89,11 +98,36 @@ If any of the four is present in a candidate, Option A rejects without rescue. A
 ## Best Website Workflow
 
 - use the strongest reasoning mode available
+- read `idea-inspiration-sources.md` every time and record provenance for the selected idea
 - keep the chat focused on ideation — do not jump to file creation
 - do the mandatory pre-Phase-0 search every time; do not let the first plausible idea bypass it
 - use regeneration internally and carry forward only the strongest surviving seeds or bank
 - screen ideas against the 5 hardness axes and 20 anti-trivialization checks before handing off to Cursor
 - do not claim a task is ready to submit or CI-clean — that determination happens in Cursor
+
+## Mandatory first output for a selected candidate
+
+When the user asks to create one new task, reason internally using the source
+ladder and hard-only filters, but output only this first:
+
+```text
+Task Idea Summary
+<2-5 sentences>
+
+Idea Category
+<one exact platform display label>
+
+Associated Skills
+<5-10 comma-separated skills>
+
+Task Tags
+<3-6 comma-separated tags>
+```
+
+Then stop and ask the user to run **Check feedback** in the Snorkel Task Idea
+Proposal form. Do not emit Step 2a evidence, authoring specs, task files, oracle
+design, or rubric content yet. After feedback returns, capture the proposal
+verdict/evidence; only PASSED proceeds to eligibility, uniqueness, and Step 2a.
 
 ## Bundle Defaults
 
@@ -103,7 +137,7 @@ Use these fixed values unless the user explicitly overrides them:
 - `author_email = "anonymous"`
 - `version = "2.0"`
 - standalone drafting default: `difficulty = "hard"`
-- default domain sweep: **four Opus-weak categories** (see below)
+- default domain sweep: **three allowed Opus-weak categories**, plus justified domain-rich investigations (see below)
 - default final Step 1 bank size after Option A: **150 Step-2a-ready seeds** unless the user asks for a different target
 
 Important:
@@ -112,21 +146,20 @@ Important:
 - the `hard` default is a bundle-level ideation preference, not proof that the finished task empirically qualifies as hard
 - avoid choosing Python as the default implementation language unless the idea clearly calls for it
 - avoid choosing FastAPI as the default framework unless there is a strong justification
-- prefer single-container unless the task clearly needs docker-compose or multiple services
+- require a single offline container; model multiple services or repositories as logical components inside it
 - default to a non-milestone task unless the screenshot or user explicitly calls for milestones
 
 ### Opus-weakness-aware domain preference
 
 Terminal-Bench 2.0 published results (April 2026) show frontier chat models (Claude Opus 4.6/4.7, GPT-5.x, Gemini 3.x) within ~4 points of each other at 74-78%. The TB paper's error analysis shows failures are ~50% execution-class (disobeying spec, wrong source of truth, destructive step repetition, wrong format/place), ~25% coherence-class (context loss over long workflows), ~25% verification-class (shallow self-checks). Domain knowledge is rarely the bottleneck; the bottleneck is execution discipline over long horizons.
 
-This bundle therefore defaults to generating ideas in the **four categories most likely to exploit those failure modes**:
+This bundle therefore defaults to generating ideas in the **three allowed categories most likely to exploit those failure modes**:
 
 1. `system-administration` — kernel interfaces, namespaces, cgroups, systemd, live-system state, multiple plausible sources of truth
 2. `security` — authority splits, revocation lag, capability confusion, enclave/TEE state (RC6 discipline required when protocol surface is named)
-3. `debugging` — with a systems substrate only (ABI ordering, concurrency, binary-level evidence, distributed state reconciliation)
-4. `scientific-computing` — numerical pipelines with silent intermediate state, checkpoint/resume, parallel reduction ordering, solver coupling
+3. `scientific-computing` — numerical pipelines with silent intermediate state, checkpoint/resume, parallel reduction ordering, solver coupling
 
-The five remaining accepted categories (`software-engineering`, `data-processing`, `machine-learning`, `games`, `build-and-dependency-management`) are **not removed** — they remain valid Terminal-Bench 3.0 categories and a genuinely hard task in them is still acceptable. But they play to Opus's native strengths (SWE-Bench Verified ~80%, schema reasoning, algorithms with named pedigree, well-known ecosystems) and tasks drafted there usually collapse into training-distribution solves. If a candidate in an Opus-strong category is to be generated, it must carry an explicit per-idea `Opus-strong justification` naming which execution-class failure mode it exploits. If the justification reduces to "this is a hard topic" or "this uses a complex tool," reject.
+`data-processing`, `debugging`, and `software-engineering` remain blocked primary categories. Long-horizon debugging is an investigation shape, not a label: route each seed through the allowed category matching its actual intellectual core. The other allowed categories (`machine-learning`, `games`, and `build-and-dependency-management`) remain available when a candidate carries an explicit justification naming which execution, coherence, or verification failure mode keeps it hard. Net-new milestone ideas are also blocked. If the justification reduces to "this is a hard topic" or "this uses a complex tool," reject.
 
 Use `bulk-idea-generation.md`'s default **Opus-weak sweep mode** unless the user explicitly asks for extended nine-sweep mode.
 
@@ -135,6 +168,9 @@ Use `bulk-idea-generation.md`'s default **Opus-weak sweep mode** unless the user
 This step is required for every task family.
 
 Do not let a screenshot, typed seed, or first decent-looking idea skip this phase.
+Read `idea-inspiration-sources.md` before searching. The source ladder is the
+default inspiration pool, but current category blocks and originality rules
+override source popularity.
 
 ### Search modes
 
@@ -161,7 +197,7 @@ For every candidate considered in Phase -1:
 - **reject build-from-scratch on blank canvas** — without an existing codebase to understand, debug, and navigate, the agent works in its ideal mode. Hard tasks need existing systems with real coupling.
 - **reject in-distribution recipes** — HMAC verification, JSON schema validation, Monte Carlo CI, sliding windows, policy checkers, Merkle trees — these have thousands of implementations in training data.
 - **verify all 5 hardness axes:** the task must require the agent to (1) discover info not in the instruction, (2) synthesize across interacting systems, (3) diagnose from symptoms not causes, (4) navigate coupling, (5) reason beyond training distribution. If any axis fails, the idea is not hard.
-- **prefer the four Opus-weak categories** (`system-administration`, `security`, `debugging` with systems substrate, `scientific-computing`) per Bundle Defaults above. If the seed naturally lives in an Opus-strong category, keep it only if you can identify which execution-class failure mode it exploits.
+- **prefer the three allowed Opus-weak categories** (`system-administration`, `security`, `scientific-computing`) per Bundle Defaults above. Treat debugging as a cross-category investigation shape. If the seed naturally lives in another allowed category, keep it only if you can identify which execution-class failure mode it exploits.
 - **prefer candidates that exploit execution-class failure modes**: wrong source of truth, destructive step repetition, long-horizon coherence, wrong format-or-place, verifier-bypass bait, multi-phase state threading, not-waiting for long-running processes, terminal-state corruption, edge-case inputs the obvious test misses. These are the TB 2.0 paper's evidenced failure modes. Map each surfaced candidate against the trajectory-level taxonomy (Execution ~50% / Coherence ~25% / Verification ~25%) and the four named-hard domain clusters (Complex System Builds, Long-Horizon Coherence, Robust Verification, Adversarial & Creative Reasoning). See `bulk-idea-generation.md`'s "Empirical evidence basis" section for the full taxonomy, per-category attack surface, and the 16-20% hard-band resolution-rate calibration target.
 - in default bank mode, return the requested Step-2a-ready bank size; only narrow to a tiny shortlist if the user explicitly asks for finalist mode
 - surface for each survivor:
@@ -247,7 +283,8 @@ Subtype guardrails:
 
 - use `long_context` only when the source idea clearly implies at least 50k tokens of reading, roughly 50-150 pages, and semantic reasoning rather than simple parsing or keyword search
 - use `api_integration` only when the API is local and mockable inside Docker with no external web access
-- use `ui_building` only when the task is genuinely UI-facing and intended for the UI verifier stack or Playwright-style testing path
+- reject or redesign `ui_building` seeds; the repository house-blocks net-new
+   UI work even though the platform still recognizes the value
 - do not default to Python as the implementation language if another language fits the task naturally
 - do not default to FastAPI just because the task mentions an API
 
@@ -360,6 +397,18 @@ Run these before allowing the idea to proceed.
     - **Cause-revealing** (usually medium): the broken component is named but the full fix is not specified.
     - **Symptoms-only** (can be hard): observable misbehavior is described without indicating where or why.
     A hard task's instruction must be at the symptoms-only level. If any requirement bullet reads like a spec line (exact value, exact schema, exact formula), ask whether that specificity is genuinely needed for the verifier contract or whether it hands the agent the answer.
+
+### Long-horizon investigation profile (blocking for new seeds)
+
+Before carrying a seed into Step 2a, select 2-4 reinforcing weakness areas and
+outline one 4-8 stage causal investigation. Name at least three heterogeneous
+evidence surfaces, two plausible hypotheses with deterministic falsifiers, one
+failing scenario and one nearby healthy control, a deterministic offline
+reproduction strategy, and a credible estimate of 20-100 meaningful terminal
+actions. Reject a seed when the stages are independent bugs, the action count
+comes from volume or repetition, the race depends on timing luck, or the domain
+work reduces to one obscure fact. Planning order, tool choice, and recovery may
+be diagnosed from trajectories later, but task tests must grade outcomes only.
 
 ### What does not count as hard
 

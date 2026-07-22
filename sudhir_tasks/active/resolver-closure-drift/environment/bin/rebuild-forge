@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cargo build --release --offline --locked --manifest-path /app/repo/Cargo.toml
+mkdir -p /app/bin
+install -m 0755 /app/repo/target/release/forge /app/bin/forge.next
+mv -f /app/bin/forge.next /app/bin/forge

@@ -1,0 +1,48 @@
+# TASK-RPSP-001 Step 4 Log
+
+## 2026-07-18 - Final validation and approval
+
+- Phase: Step 4 oracle stress, fresh NOP, package, parity, approval
+- Starting state: revision 4, Step 3b CLEAN, cheap gates PASS, checksum current, no package
+- Docker preparation:
+  - no stale RPSP containers;
+  - unused networks pruned from 29 to 17 before stress.
+- Oracle stress:
+  - command shape: Harbor oracle `-k 10 -n 10`;
+  - job: `jobs/2026-07-18__23-30-19/result.json`;
+  - completed: 10/10;
+  - mean reward: 1.0;
+  - errors/exceptions/retries: 0;
+  - all pass-at-k values through 10: 1.0.
+- Post-stress NOP:
+  - job: `jobs/2026-07-18__23-31-33/result.json`;
+  - completed: 1/1;
+  - mean reward: 0.0;
+  - errors: 0.
+- Infrastructure:
+  - Snap Docker daemon again denied compose teardown after completed trials;
+  - internal process-tree cleanup removed all RPSP containers;
+  - ten unused RPSP networks were pruned after stress.
+- Package:
+  - path: `sudhir_tasks_ready_to_submit/robust-predicate-scale-parity.zip`;
+  - SHA-256: `17a0eb184ef35e43a0d6474da4ca7367a931de0e456b378534e1d9310bd6797d`;
+  - size: 29,677 bytes;
+  - members: 42;
+  - required `environment/.dockerignore`: present;
+  - authoring-only and AI-scaffolding files: absent.
+- Approval:
+  - zip validation PASS;
+  - checksum PASS;
+  - static PASS;
+  - collapse PASS;
+  - manifest PASS;
+  - source/zip parity PASS, 42/42;
+  - verifier-health explicitly skipped on the clean routine path;
+  - quality adjudication not required;
+  - final decision PASS, approved true, zero warnings, zero blocking failures.
+- Harness repair:
+  - pipeline subprocesses now receive every canonical Sudhir root;
+  - validation metrics were emitted to the canonical spec log;
+  - focused regression added and passed.
+- Final repository certification: Ruff PASS, pytest 241 passed and 26 skipped, task checksum PASS, 157-archive legacy index current, no stale RPSP containers, whitespace PASS.
+- Next action: upload the zip, run `sudhir_task.py phase robust-predicate-scale-parity submitted`, then ingest the platform export.

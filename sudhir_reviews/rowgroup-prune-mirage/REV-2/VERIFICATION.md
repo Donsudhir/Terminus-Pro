@@ -1,0 +1,3 @@
+# VERIFICATION — rowgroup-prune-mirage REV-2
+
+The tests checks both answer correctness and whether the optimized paths still perform meaningful work. Generated CSV inputs are ingested and their persisted markers are parsed independently, while archived stores are queried under selective/full and row/batch combinations. Exact aggregates cover missing entries, legitimate values that resemble old placeholders, range predicates, and mixed-generation interactions. Healthy controls require fewer pages under selective reads and keep the batch path active, so disabling an optimization cannot earn reward. Single-location reversions fail the committed five-test subsets, and repeated runs confirm byte-stable artifacts and reports.

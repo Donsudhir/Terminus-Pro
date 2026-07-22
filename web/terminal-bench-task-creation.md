@@ -9,6 +9,21 @@ Use this file as the canonical authoring reference inside the standalone `web` b
 
 ## Intake Rules
 
+### Task Idea Proposal gate (first)
+
+Before the inputs below enter formal idea validation, generate and paste:
+
+- Task Idea Summary — 2–5 sentences;
+- Idea Category — one exact platform display label;
+- Associated Skills — 5–10 values;
+- Task Tags — 3–6 values.
+
+Run Snorkel **Check feedback** and capture the result. Only a PASSED proposal
+continues to eligibility, uniqueness, and Step 2a. Use
+`idea-inspiration-sources.md` for every proposal, while treating external
+issues, benchmarks, books, and community posts as inspiration rather than
+content to copy.
+
 ### Required inputs
 
 1. **Task idea**
@@ -24,13 +39,14 @@ Use this file as the canonical authoring reference inside the standalone `web` b
    Allowed values:
    - `system-administration`
    - `build-and-dependency-management`
-   - `data-processing`
    - `games`
-   - `software-engineering`
    - `machine-learning`
-   - `debugging`
    - `security`
    - `scientific-computing`
+
+   `data-processing`, `software-engineering`, and `debugging` are currently blocked for net-new tasks. New milestone tasks are also blocked; their template is compatibility support for in-flight revisions only.
+   Long-horizon debugging is a cross-category investigation shape; select the
+   allowed category matching the task's real intellectual core.
 
 5. **Task name**
    A short kebab-case directory name such as `distributed-trace-analysis`.
@@ -65,7 +81,7 @@ Apply these gates while shaping the task:
 - `easy` and `medium` are blocked for this bundle; accepted tasks should end up `hard`
 - Python tasks are accepted only when the empirical difficulty is `hard`
 - during ideation, avoid Python unless there is a compelling reason to choose it
-- prefer single-container tasks; multi-container should be rare and justified
+- new tasks must be single-container; redesign multi-service ideas as logical components inside one offline container
 - avoid FastAPI during ideation unless there is a compelling reason to choose it
 - `api_integration` tasks must mock the API locally in Docker with no external web dependency
 - `long_context` tasks must require at least 50k tokens of reading, roughly 50-150 pages, and semantic reasoning; do not fake this with simple parsing or keyword search
@@ -86,6 +102,19 @@ This bundle explicitly rejects tasks that collapse into:
 
 Real systems, real daemons, security flavor, and complex output (many JSON fields, many tests, multi-stage pipelines) do not rescue those patterns. Complex output that fans out from a few simple fixes is not hardness.
 
+## Long-Horizon Investigation Profile
+
+Every new seed should combine only 2-4 reinforcing agent-weakness areas around
+one coherent incident. Pre-commit a 4-8 stage causal chain, 3+ heterogeneous
+evidence surfaces, 2+ plausible hypotheses with deterministic falsifiers, a
+failing scenario plus a nearby healthy control, a deterministic offline
+reproduction strategy, and an estimated 20-100 meaningful terminal actions.
+
+The action estimate is not a verifier rule. Do not manufacture it with file
+count, log size, repeated commands, setup friction, or unrelated bugs. Tests
+grade final system behavior, not planning prose, tool choice, command count, or
+whether the solver tried a particular wrong change.
+
 ## Concrete Drafting Rule
 
 When shaping the idea, ask:
@@ -97,6 +126,8 @@ When shaping the idea, ask:
 - would a strong model likely solve the task in one pass without much verifier-guided search?
 - **what specific facts must the agent discover from the codebase that are NOT in the instruction?** List at least 3. If you cannot, the task is easy.
 - **would the instruction need to give exact values, schemas, or formulas for the verifier to work?** If yes, the agent will just diff the spec against the code — that is always easy.
+- **does each investigation stage unlock the next, or are these independent bugs bundled together?** Independent bug bundles fail the profile.
+- **can every claimed race, partial failure, or stale-documentation contradiction be reproduced and falsified deterministically?** If no, redesign.
 
 If the answers point toward an easy concrete instance, regenerate or stop before drafting.
 
@@ -111,7 +142,9 @@ If the answers point toward an easy concrete instance, regenerate or stop before
 
 - `long_context` is only appropriate when the task truly depends on at least 50k tokens of reading, roughly 50-150 pages, and semantic reasoning. If simple parsing, filtering, or keyword search is enough, do not label it `long_context`.
 - `api_integration` is only appropriate when the API is mocked locally in Docker with no external web access. If the task depends on a live remote API, do not label it `api_integration`.
-- `ui_building` is only appropriate for genuine UI tasks that use the UI verifier stack rather than ordinary pytest-only backend validation.
+- `ui_building` remains a recognized platform value, but new UI tasks are
+   blocked by repository house policy. Evidence-backed in-flight revisions use
+   Python pytest + Playwright Python, never the retired JS/Vitest verifier stack.
 
 ## Difficulty Evaluation
 

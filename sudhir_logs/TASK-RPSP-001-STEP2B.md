@@ -1,0 +1,42 @@
+# TASK-RPSP-001 Step 2b Log
+
+## 2026-07-18 - Construction opened
+
+- Phase: Step 2b construction
+- Goal: create the approved task, pass preflight, run oracle once, and run NOP
+- Branch/head: `main` at `3384fcb`
+- Starting worktree: 81 pre-existing changed or untracked entries
+- Task root at start: absent
+- Tool availability:
+  - Docker client 29.1.3, daemon 29.3.1
+  - Harbor available at `/home/sudhir/.local/bin/harbor`
+  - uv available at `/home/sudhir/.local/bin/uv`
+- Inputs loaded:
+  - canonical lifecycle and current status;
+  - approved v2 authoring spec and ADR-0006;
+  - task creation, Docker, difficulty, review, workflow, command, and taxonomy rules;
+  - current standard-task templates and a strong mixed-system reference task.
+- Approved topology: four locations across C, Rust, and Fortran with 12 opaque tests.
+- Planned divergence: omit source-tree `environment/output/` because current package-hygiene policy forbids it; create runtime output directory in Docker/Make instead.
+- Construction result:
+  - 47 task files, including 36 environment files excluding Dockerfile/compose;
+  - complete C, Rust, and Fortran pipeline;
+  - twelve opaque exact/property tests;
+  - substantive four-target oracle with 283 non-boilerplate lines and 186 real edit-distance lines.
+- Gate result:
+  - static PASS with no warning;
+  - Dockerfile PASS;
+  - collapse 0 FAIL, 0 WARN, 23 PASS;
+  - packaging preview PASS;
+  - checksum PASS for 44 tracked files.
+- Behavioral result:
+  - local oracle 12 passed, reward 1;
+  - local untouched baseline 12 failed, reward 0;
+  - each location ablation failed exactly its declared four tests;
+  - final Harbor oracle job `jobs/2026-07-18__22-42-37/result.json`: mean 1.0, zero errors;
+  - final Harbor NOP job `jobs/2026-07-18__22-43-34/result.json`: mean 0.0, zero errors.
+- Infrastructure note: Harbor completed both trials but the Snap Docker daemon denied compose teardown. Stale containers were terminated through their internal process trees; final check found none.
+- Registry: revision 2, phase `review`; stale premature package evidence and zip invalidated.
+- Final repository certification: Ruff PASS, pytest 240 passed and 26 skipped, task checksum PASS, 157-archive index current, no final zip, no stale task container, whitespace check PASS.
+- Evidence: `sudhir_reviews/robust-predicate-scale-parity/STEP2B.md` and `EDIT_LEDGER.md`.
+- Next action: Step 3b paper review.

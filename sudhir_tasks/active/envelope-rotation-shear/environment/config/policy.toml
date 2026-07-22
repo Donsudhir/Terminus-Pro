@@ -1,0 +1,15 @@
+[maintenance]
+active_epoch = 3
+max_bundle_records = 64
+rewrite_older_epochs = true
+stable_order = "item"
+
+[compaction]
+retain_generations = 3
+minimum_segment_frames = 1
+reject_duplicate_sequences = true
+
+[audit]
+check_live_catalog = true
+check_segment_headers = true
+require_unique_items = true

@@ -1,0 +1,755 @@
+{
+  "task_name": "rowgroup-prune-mirage",
+  "attempt": 1,
+  "best_score": [
+    0,
+    0
+  ],
+  "best_attempt": 1,
+  "plateau_count": 0,
+  "candidates": [],
+  "history": [
+    {
+      "attempt": 1,
+      "fails": 0,
+      "warns": 0,
+      "evidence_path": "/home/sudhir/Projects/TERMINUS/sudhir_ideas/specs/rowgroup-prune-mirage-attempt-1-evidence.json",
+      "evidence": {
+        "hardness_axes": [
+          {
+            "id": "discover",
+            "name": "Discover",
+            "verdict": "PASS",
+            "reasoning": "The public contract exposes plan-dependent business totals and the supported operational surfaces, but not the historical validity migration, the authority carried by persisted summaries, or the two different read-path failures. The solver must recover those facts from plan matrices, stored artifacts, runtime counters, and code."
+          },
+          {
+            "id": "synthesize",
+            "name": "Synthesize",
+            "verdict": "PASS",
+            "reasoning": "A correct repair must connect Rust-produced artifacts to C++ selective admission and C++ batch evaluation while preserving old stores and producing valid new ones. No component owns or observes the complete contract."
+          },
+          {
+            "id": "diagnose",
+            "name": "Diagnose",
+            "verdict": "PASS",
+            "reasoning": "The instruction reports only that equivalent execution modes disagree for historical data and that fast paths must remain healthy. It does not name validity maps, sentinel-shaped values, persisted bounds, page-local dictionaries, or any repair site."
+          },
+          {
+            "id": "navigate_coupling",
+            "name": "Navigate coupling",
+            "verdict": "PASS",
+            "reasoning": "Repairing new summaries does not alter immutable archives; relaxing selective admission cannot fix invalid lanes selected by the batch kernel; masking batch lanes cannot recover an already skipped page. Broad reader fallbacks fail the healthy selective-read controls."
+          },
+          {
+            "id": "reason_beyond_training",
+            "name": "Reason beyond training",
+            "verdict": "PASS",
+            "reasoning": "Generic advice to handle nulls, recompute min/max, or use a row fallback is insufficient. The solver must infer this store's mixed-generation authority handoff and preserve both correctness and selective work across two languages."
+          }
+        ],
+        "anti_trivialization_checks": [
+          {
+            "id": "disclosure_collapse",
+            "name": "Disclosure-collapse",
+            "verdict": "PASS",
+            "reasoning": "The honest instruction states commands, report fields, answer equivalence, fresh-ingest behavior, archive compatibility, and fast-path preservation. Those outcomes do not disclose which representation changed or where three consumers diverge."
+          },
+          {
+            "id": "hidden_instance",
+            "name": "Hidden-instance",
+            "verdict": "PASS",
+            "reasoning": "The verifier generates fresh numeric and dictionary cases and combines them with several archived generations. Success requires a general validity contract, not locating one named bad file."
+          },
+          {
+            "id": "single_artifact_repair",
+            "name": "Single-artifact repair",
+            "verdict": "PASS",
+            "reasoning": "Independent verifier parsing of fresh artifacts, immutable archive queries, and two execution paths prevent replacing one report, fixture, index, or binary output."
+          },
+          {
+            "id": "generalization",
+            "name": "Generalization",
+            "verdict": "PASS",
+            "reasoning": "Generated CSV values, row arrangements, predicates, and page boundaries exercise cases not present in the bundled incident."
+          },
+          {
+            "id": "prompt_honesty",
+            "name": "Prompt-honesty",
+            "verdict": "PASS",
+            "reasoning": "The instruction defines rebuild, audit, ingest, the concise JSON report schema, repeated-run stability, archive preservation, and fast-path obligations without synthetic jargon or hidden test-only requirements."
+          },
+          {
+            "id": "cheating_vs_difficulty",
+            "name": "Cheating-vs-difficulty",
+            "verdict": "PASS",
+            "reasoning": "Generated cases and verifier-owned artifact parsing block hardcoding, but the legitimate difficulty remains reconstructing and coordinating the producer/planner/executor contract."
+          },
+          {
+            "id": "mechanical_fix_filter",
+            "name": "Mechanical-fix filter",
+            "verdict": "PASS",
+            "reasoning": "The intended work is domain code in Rust and C++, not dependency installation, timeout tuning, report footer repair, or task metadata."
+          },
+          {
+            "id": "localized_fix",
+            "name": "Localized-fix",
+            "verdict": "PASS",
+            "reasoning": "Three typed authorities in three module roots control overlapping five-of-twelve test subsets. A single local edit cannot produce valid fresh summaries, read immutable archives selectively, and filter batch lanes correctly."
+          },
+          {
+            "id": "oracle_locality",
+            "name": "Oracle-locality",
+            "verdict": "PASS",
+            "reasoning": "The planned oracle adds approximately 100-150 substantive lines across one Rust and two C++ functions, including summary construction, generation-aware admission, and validity-first lane evaluation rather than replacing whole files."
+          },
+          {
+            "id": "small_declarative_cluster",
+            "name": "Small declarative-cluster",
+            "verdict": "PASS",
+            "reasoning": "No flag table, format-version switch, expected-answer map, or one policy constant contains the repair. Generated artifacts and archived compatibility require executable semantics."
+          },
+          {
+            "id": "grep_collapse",
+            "name": "Grep-collapse",
+            "verdict": "PASS",
+            "reasoning": "The selected paths, opaque symbols, one-letter parameters, and test names were audited against every noun and meaningful compound in the drafted instruction; no fix-path substring hit remains."
+          },
+          {
+            "id": "pre_factored_helper",
+            "name": "Pre-factored-helper",
+            "verdict": "PASS",
+            "reasoning": "The selected symbols tilt_a, turn_b, and sweep_c perform ordinary production work in realistic modules. Their names do not mirror the public plan, store, total, ingest, selective, batch, or report vocabulary."
+          },
+          {
+            "id": "recipe_discount",
+            "name": "Recipe-discount",
+            "verdict": "PASS",
+            "reasoning": "A textbook null bitmap, min/max index, or vector mask recipe cannot determine how this project's historical and current generations share value bytes, summaries, and page-local dictionaries."
+          },
+          {
+            "id": "security_aura_discount",
+            "name": "Security-aura discount",
+            "verdict": "PASS",
+            "reasoning": "No security framing contributes to the hardness claim."
+          },
+          {
+            "id": "orthogonal_checklist",
+            "name": "Orthogonal-checklist",
+            "verdict": "PASS",
+            "reasoning": "All symptoms descend from one half-migrated validity authority. Producer summaries, selective admission, and batch filtering are successive consumers of that same contract rather than unrelated correctness bullets."
+          },
+          {
+            "id": "harness_discount",
+            "name": "Harness-discount",
+            "verdict": "PASS",
+            "reasoning": "The container, generated data, and plan matrix make behavior reproducible. They do not reveal the historical representation or supply the repair."
+          },
+          {
+            "id": "one_pass_solvability",
+            "name": "One-pass solvability",
+            "verdict": "PASS",
+            "reasoning": "Opening the CLI and report code exposes only healthy orchestration. The first plausible workarounds, disabling selective reads or the batch path, are rejected by controls, while artifact evidence is needed to distinguish producer from consumer responsibility."
+          },
+          {
+            "id": "hard_only_gate",
+            "name": "Hard-only gate",
+            "verdict": "PASS",
+            "reasoning": "The bounded task requires senior storage/query-engine reasoning across a 48-72 action investigation, mixed-language artifact semantics, and three coordinated authorities while remaining solvable in expert hours."
+          },
+          {
+            "id": "discovery_budget_test",
+            "name": "Discovery budget test",
+            "verdict": "PASS",
+            "reasoning": "Four non-trivial discoveries are committed with distinct artifact, runtime, and code homes and explicit reasons they cannot appear in the public instruction."
+          },
+          {
+            "id": "instruction_specificity_test",
+            "name": "Instruction specificity test",
+            "verdict": "PASS",
+            "reasoning": "The instruction is symptoms-only. Its commands and JSON fields are operational contracts, not algorithms, numeric thresholds, causes, fix locations, or implementation steps."
+          },
+          {
+            "id": "topology_distribution_test",
+            "name": "Topology distribution test",
+            "verdict": "PASS",
+            "reasoning": "Three plausible topologies each require at least three locations. The selected producer/planner/executor topology uses non-substitutable inputs and overlapping ablations with no location above 5/12."
+          }
+        ],
+        "rubric_axes": [
+          {
+            "id": "verifiable",
+            "name": "Verifiable",
+            "verdict": "PASS",
+            "reasoning": "Verifier-owned expected aggregates, independent fresh-artifact parsing, explicit plan modes, stable work counters, and repeated runs are deterministic and programmatically checkable."
+          },
+          {
+            "id": "well_specified",
+            "name": "Well-specified",
+            "verdict": "PASS",
+            "reasoning": "The public contract defines how to rebuild, run the end-to-end audit, ingest fresh data, read the report, preserve archives, and retain selective/batch behavior without prescribing internals."
+          },
+          {
+            "id": "solvable",
+            "name": "Solvable",
+            "verdict": "PASS",
+            "reasoning": "All source, archived stores, fresh CSV inputs, plan reports, artifact inspection tools, and build dependencies are local and deterministic. An experienced database engineer can complete the bounded repair in hours."
+          },
+          {
+            "id": "difficult",
+            "name": "Difficult",
+            "verdict": "PASS",
+            "reasoning": "The solver must distinguish producer metadata from consumer interpretation, keep backward compatibility, coordinate Rust and C++, and reject broad fast-path shutdowns."
+          },
+          {
+            "id": "interesting",
+            "name": "Interesting",
+            "verdict": "PASS",
+            "reasoning": "Plan-dependent wrong answers after a storage-format migration are high-impact production database failures with direct financial and trust consequences."
+          },
+          {
+            "id": "outcome_verified",
+            "name": "Outcome-verified",
+            "verdict": "PASS",
+            "reasoning": "Tests grade query answers, generated artifact semantics, archive compatibility, plan selection, and pages read. They do not inspect source text, solver commands, or the oracle's implementation."
+          }
+        ],
+        "instruction_completeness_test": {
+          "verdict": "PASS",
+          "reasoning": "No. The instruction is complete enough to run and judge the system, but it does not identify the half-migrated validity representation, which summaries are untrustworthy, or why the selective and batch paths fail differently. Deep engagement with artifacts and code remains necessary."
+        },
+        "discovery_budget": [
+          {
+            "discovery": "Mixed-generation stores retain origin and validity evidence sufficient to distinguish historical placeholders from legitimate equal-valued rows, so the data payload is not corrupt.",
+            "planned_location": "environment/data/archive/, environment/docs/format-notes.md, structured artifact output from /app/bin/loam inspect, and C++ store decoding",
+            "why_instruction_must_not_reveal": "Naming the historical representation or preserved origin evidence would collapse the first artifact-forensics stage into a direct format patch."
+          },
+          {
+            "discovery": "Fresh persisted summaries are derived from value lanes before the authoritative validity lanes are applied.",
+            "planned_location": "environment/rust/src/ember/fold.rs, generated store metadata, and verifier-owned artifact parsing",
+            "why_instruction_must_not_reveal": "Naming summary construction or validity ordering would identify the Rust repair site and remove producer-versus-reader diagnosis."
+          },
+          {
+            "discovery": "Selective admission interprets archived bounds under a generation and dictionary domain that differs from the page that produced them.",
+            "planned_location": "environment/cpp/src/harbor/veil.cpp, persisted per-page metadata, and structured plan counters",
+            "why_instruction_must_not_reveal": "Naming bounds, generation, or dictionaries would turn plan forensics into a disclosed planner edit."
+          },
+          {
+            "discovery": "One batch kernel selects value lanes before applying explicit validity, while the row path applies validity first.",
+            "planned_location": "environment/cpp/src/lattice/rill.cpp, row/batch plan comparisons, and lane-level diagnostic traces",
+            "why_instruction_must_not_reveal": "Naming the ordering of lane selection and validity would disclose the execution repair and eliminate the second plan split."
+          }
+        ],
+        "instruction_specificity": {
+          "level": "symptoms-only",
+          "reasoning": "The drafted instruction reports plan-dependent archived totals, defines build/audit/ingest and the minimal JSON schema, and requires fast paths to remain active. It contains no null encoding, sentinel, bitmap, bound, dictionary, algorithm, threshold, fix path, symbol, or repair sequence."
+        },
+        "investigation_profile": {
+          "weakness_areas": [
+            "sql_investigation",
+            "multi_component_reasoning",
+            "partial_failures",
+            "mistake_recovery"
+          ],
+          "causal_chain": [
+            {
+              "stage": 1,
+              "evidence": "Run the bundled incident through the end-to-end audit and compare archived failing stores with current-format healthy controls.",
+              "finding": "Only mixed-generation stores produce conflicting totals, while repeated runs are stable.",
+              "unlocks_next": "The conditional shape rules out nondeterministic execution and justifies splitting behavior by supported plan mode."
+            },
+            {
+              "stage": 2,
+              "evidence": "Force selective/full and row/batch modes through the documented case pack and compare answers plus pages-read counters.",
+              "finding": "Some losses are selective-read dependent, some are batch dependent, and one interaction case survives either single fallback.",
+              "unlocks_next": "The two symptom classes identify artifact/planner and execution hypotheses without revealing their causes."
+            },
+            {
+              "stage": 3,
+              "evidence": "Inspect stable checksums, decoded value lanes, validity coverage, stored summaries, and page-local dictionaries for failing and healthy stores.",
+              "finding": "Payload bytes are intact, but summary and validity authority disagree only at the historical transition.",
+              "unlocks_next": "Random corruption is falsified and the producer artifact boundary becomes independently testable with fresh ingests."
+            },
+            {
+              "stage": 4,
+              "evidence": "Ingest generated CSV cases, parse produced artifacts independently, and rerun the matrix before and after the producer repair.",
+              "finding": "Fresh summaries can be made internally valid, yet immutable archived stores still fail selectively.",
+              "unlocks_next": "This proves producer correctness is necessary but not sufficient and focuses the next stage on backward-compatible selective admission."
+            },
+            {
+              "stage": 5,
+              "evidence": "Compare archived page-local metadata with selective-plan decisions and healthy forced-plan controls.",
+              "finding": "The planner consumes one domain across artifacts whose generation and page-local coding require different interpretation.",
+              "unlocks_next": "Once selective admission is aligned, any remaining row/batch disagreement can be attributed to execution rather than missing pages."
+            },
+            {
+              "stage": 6,
+              "evidence": "Run no-skip row and batch scans over the same decoded pages and inspect lane-level diagnostic counters.",
+              "finding": "The batch path applies validity after predicate selection for one kernel while the row path applies it before evaluation.",
+              "unlocks_next": "All three typed consumers of the validity contract are now identified and can be repaired coherently."
+            },
+            {
+              "stage": 7,
+              "evidence": "Sweep archived, generated, legitimate-equal-value, null-heavy, dictionary, and healthy controls under every supported plan and repeat the full run.",
+              "finding": "Answers agree, fresh summaries are valid, archives remain readable, selective reads still skip work, batch execution remains selected, and output bytes are stable.",
+              "unlocks_next": "The incident is closed with deterministic domain outcomes rather than source-shape evidence."
+            }
+          ],
+          "evidence_surfaces": [
+            {
+              "surface": "runtime-state",
+              "planned_location": "Structured audit and inspect output from /app/bin/loam",
+              "question_answered": "Which answers and work counters vary by plan, store generation, and case?"
+            },
+            {
+              "surface": "filesystem",
+              "planned_location": "environment/data/archive/ and generated store directories",
+              "question_answered": "Which value, validity, summary, and dictionary artifacts survive the format transition?"
+            },
+            {
+              "surface": "code",
+              "planned_location": "environment/rust/src/ember/, environment/cpp/src/harbor/, and environment/cpp/src/lattice/",
+              "question_answered": "How does each typed authority produce or consume the shared validity contract?"
+            },
+            {
+              "surface": "documentation",
+              "planned_location": "environment/docs/architecture.md and historically stale format-notes.md",
+              "question_answered": "Which public invariants are intended, and which old representation assumption is experimentally falsifiable?"
+            },
+            {
+              "surface": "build-artifacts",
+              "planned_location": "/app/bin/loam and generated persisted stores",
+              "question_answered": "Do the repaired mixed-language components interoperate and produce repeatable artifacts?"
+            },
+            {
+              "surface": "tests",
+              "planned_location": "Twelve opaque behavioral verifier cases",
+              "question_answered": "Do partial repairs, broad fallbacks, and fast-path shutdowns remain observably incomplete?"
+            }
+          ],
+          "competing_hypotheses": [
+            {
+              "hypothesis": "The archived store payloads are corrupt.",
+              "why_plausible": "Only historical stores return wrong totals and the problem appeared after a format migration.",
+              "falsifier": "Stable checksums pass and full row scans can recover correct values from the same payload bytes while selective/batch plans diverge."
+            },
+            {
+              "hypothesis": "The mechanism that forces execution modes is broken.",
+              "why_plausible": "Answers change when a mode is requested, so the request layer may be routing cases incorrectly.",
+              "falsifier": "Healthy controls select the requested modes, preserve identical answers, and expose the expected difference in pages-read counters."
+            },
+            {
+              "hypothesis": "The cost model is nondeterministic.",
+              "why_plausible": "Different plans normally arise from cost decisions and could explain report variance.",
+              "falsifier": "Repeated runs choose identical modes and counters; wrongness follows explicit store-generation and mode combinations."
+            }
+          ],
+          "conditional_failures": [
+            {
+              "scenario": "Archived stores produced across the historical validity transition",
+              "role": "failing",
+              "expected_behavior": "Equivalent selective/full and row/batch modes disagree in the baseline but must return the same correct aggregates after repair."
+            },
+            {
+              "scenario": "Fresh generated inputs with nulls and legitimate values equal to historical placeholders",
+              "role": "failing",
+              "expected_behavior": "The baseline persists invalid summaries or yields plan-dependent answers; repaired output must be internally valid and plan-independent."
+            },
+            {
+              "scenario": "Current-format sentinel-free and dictionary-simple stores",
+              "role": "healthy-control",
+              "expected_behavior": "All modes agree and selective/batch fast paths remain active before and after repair."
+            },
+            {
+              "scenario": "Current-format stores containing legitimate values that resemble old placeholders",
+              "role": "healthy-control",
+              "expected_behavior": "Legitimate values remain data, not nulls, under every mode."
+            }
+          ],
+          "estimated_meaningful_actions": 56,
+          "determinism_strategy": "Bundle fixed archived stores and deterministic CSV generators in one offline container. Use fixed page sizes, stable input order, a frozen cost policy, no threads or clocks, sorted traversal, verifier-owned expected aggregates, and repeated byte comparisons.",
+          "domain_reasoning": {
+            "domain": "Columnar data processing and query-engine correctness across storage-format evolution, selective planning, and batch execution.",
+            "why_not_trivia": "The task requires artifact forensics, plan comparison, backward compatibility, cross-language contract reasoning, and preservation of optimized paths. No isolated SQL fact or format-field lookup provides the repair."
+          }
+        },
+        "attack_path": {
+          "summary": "Reproduce the conditional disagreement, split it by plan, prove payload integrity, repair fresh artifact production, align archived selective admission, then align batch validity and sweep the complete matrix.",
+          "reasoning": "Each stage removes a live competing explanation and creates the controlled comparison needed by the next. The path spans runtime results, work counters, persisted artifacts, documentation, and two languages without grading the solver's process."
+        },
+        "smallest_plausible_patch": {
+          "summary": "A roughly 100-150 line semantic patch across rust/src/ember/fold.rs, cpp/src/harbor/veil.cpp, and cpp/src/lattice/rill.cpp.",
+          "reasoning": "Only the Rust boundary creates fresh persisted summaries, only the planner boundary decides whether an archived page is read, and only the batch boundary evaluates selected lanes. Their inputs and outputs differ, archived stores are immutable, and healthy controls reject central full-scan or row-only fallbacks."
+        },
+        "collapse_audit": {
+          "verdict": "PASS",
+          "reasoning": "The public contract is honest, the selected frontier is hidden among realistic readers, codecs, reports, and decoys, and generated cases prevent answer hardcoding. Producer artifacts, selective decisions, and batch answers are independently observable, so one broad workaround cannot satisfy the matrix.",
+          "residual_hardness": "After the tree is visible, the solver must still separate producer metadata from consumer interpretation, understand the historical validity transition, preserve archives, coordinate Rust and C++, and keep optimized paths genuinely active.",
+          "red_flags": []
+        },
+        "topology_enumeration": [
+          {
+            "id": "topology_a_selected_pipeline",
+            "summary": "Fresh summary production, generation-aware selective admission, and validity-first batch evaluation carry one authority through three typed boundaries.",
+            "locations": [
+              "rust/src/ember/fold.rs::tilt_a",
+              "cpp/src/harbor/veil.cpp::turn_b",
+              "cpp/src/lattice/rill.cpp::sweep_c"
+            ],
+            "why_no_single_location_suffices": "The producer cannot change immutable archives, the planner cannot alter newly persisted summaries or evaluate batch lanes, and the batch kernel cannot recover a page the planner skipped."
+          },
+          {
+            "id": "topology_b_normalized_descriptor",
+            "summary": "A versioned artifact decoder, a conservative candidate reducer, and a batch mask application could coordinate through a normalized descriptor.",
+            "locations": [
+              "rust/src/codec.rs::shape_d",
+              "cpp/src/store.cpp::read_e",
+              "cpp/src/exec.cpp::apply_f"
+            ],
+            "why_no_single_location_suffices": "The decoder lacks query context, the reducer lacks lane values, and execution lacks authority to rewrite producer metadata; all three handoffs remain necessary."
+          },
+          {
+            "id": "topology_c_dual_summary",
+            "summary": "Compaction provenance, page-local ordering metadata, and kernel-specific validity masks could preserve both historical and current domains explicitly.",
+            "locations": [
+              "rust/src/ember/reed.rs::carry_g",
+              "cpp/src/harbor/index.cpp::choose_h",
+              "cpp/src/lattice/mask.cpp::filter_i"
+            ],
+            "why_no_single_location_suffices": "Provenance alone cannot choose query pages, planning metadata cannot enforce lane validity, and a mask cannot repair stored summaries or skipped pages."
+          }
+        ],
+        "construction_manifest": {
+          "symbol_table": [
+            {
+              "path": "rust/src/ember/fold.rs",
+              "symbol": "tilt_a",
+              "kind": "function",
+              "signature": "pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr>",
+              "purpose": "Builds one persisted marker set from value, presence, and origin lanes."
+            },
+            {
+              "path": "cpp/src/harbor/veil.cpp",
+              "symbol": "turn_b",
+              "kind": "function",
+              "signature": "Gate turn_b(const Slab& a, const Probe& b)",
+              "purpose": "Decides whether one stored slab can contribute to one probe."
+            },
+            {
+              "path": "cpp/src/lattice/rill.cpp",
+              "symbol": "sweep_c",
+              "kind": "function",
+              "signature": "Tally sweep_c(const Slab& a, const Probe& b, const Gate& c)",
+              "purpose": "Evaluates selected lanes in one batch and accumulates its tally."
+            }
+          ],
+          "flipping_point_contract": {
+            "locations": [
+              {
+                "id": "A",
+                "path": "rust/src/ember/fold.rs",
+                "controls_tests": [
+                  "test_p01",
+                  "test_p03",
+                  "test_p05",
+                  "test_p07",
+                  "test_p10"
+                ]
+              },
+              {
+                "id": "B",
+                "path": "cpp/src/harbor/veil.cpp",
+                "controls_tests": [
+                  "test_p02",
+                  "test_p03",
+                  "test_p06",
+                  "test_p08",
+                  "test_p11"
+                ]
+              },
+              {
+                "id": "C",
+                "path": "cpp/src/lattice/rill.cpp",
+                "controls_tests": [
+                  "test_p04",
+                  "test_p05",
+                  "test_p06",
+                  "test_p09",
+                  "test_p12"
+                ]
+              }
+            ],
+            "no_single_location_flips_majority": true,
+            "concentration_cap": 0.5
+          },
+          "decoy_manifest": [
+            {
+              "path": "rust/src/ember/pale.rs",
+              "kind": "helper",
+              "rhymes_with": "tilt_a",
+              "non_fix_purpose": "tilt_d summarizes operator telemetry from completed artifact jobs without reading persisted value lanes."
+            },
+            {
+              "path": "cpp/src/harbor/pale.cpp",
+              "kind": "helper",
+              "rhymes_with": "turn_b",
+              "non_fix_purpose": "turn_d classifies display-only diagnostic rows for the human plan report."
+            },
+            {
+              "path": "cpp/src/lattice/bay.cpp",
+              "kind": "helper",
+              "rhymes_with": "sweep_c",
+              "non_fix_purpose": "sweep_e aggregates already-computed timing and work counters for status output."
+            }
+          ],
+          "code_forbidden_tokens": [
+            "finance",
+            "support",
+            "archived orders",
+            "orders",
+            "execution modes",
+            "execution mode",
+            "modes",
+            "mode",
+            "totals",
+            "system",
+            "app",
+            "equivalent modes",
+            "equivalent mode",
+            "same correct rows",
+            "correct rows",
+            "rows",
+            "same correct totals",
+            "correct totals",
+            "archived stores",
+            "archived store",
+            "stores",
+            "store",
+            "newly ingested stores",
+            "newly ingested store",
+            "selective reads",
+            "selective read",
+            "batch execution",
+            "fast paths",
+            "fast path",
+            "healthy cases",
+            "healthy case",
+            "tools",
+            "build-all",
+            "rebuild command",
+            "command",
+            "bin",
+            "loam",
+            "audit",
+            "case directory",
+            "report path",
+            "report",
+            "UTF-8 JSON",
+            "JSON",
+            "status",
+            "cases",
+            "case row",
+            "case",
+            "case_id",
+            "row_count",
+            "sum_amount",
+            "pages_total",
+            "pages_read",
+            "path",
+            "skipping",
+            "digest",
+            "repeated runs",
+            "repeated run",
+            "runs",
+            "run",
+            "fresh inputs",
+            "inputs",
+            "input",
+            "ingest",
+            "CSV",
+            "store directory",
+            "directory",
+            "same contract",
+            "archived mixed-generation stores",
+            "archived mixed-generation store",
+            "rewriting",
+            "work",
+            "offline",
+            "answers",
+            "answer",
+            "behavior"
+          ]
+        },
+        "naming_pass": {
+          "instruction_nouns_extracted": [
+            "finance",
+            "support",
+            "archived orders",
+            "orders",
+            "execution modes",
+            "execution mode",
+            "modes",
+            "mode",
+            "totals",
+            "system",
+            "app",
+            "equivalent modes",
+            "equivalent mode",
+            "same correct rows",
+            "correct rows",
+            "rows",
+            "same correct totals",
+            "correct totals",
+            "archived stores",
+            "archived store",
+            "stores",
+            "store",
+            "newly ingested stores",
+            "newly ingested store",
+            "selective reads",
+            "selective read",
+            "batch execution",
+            "fast paths",
+            "fast path",
+            "healthy cases",
+            "healthy case",
+            "tools",
+            "build-all",
+            "rebuild command",
+            "command",
+            "bin",
+            "loam",
+            "audit",
+            "case directory",
+            "report path",
+            "report",
+            "UTF-8 JSON",
+            "JSON",
+            "status",
+            "cases",
+            "case row",
+            "case",
+            "case_id",
+            "row_count",
+            "sum_amount",
+            "pages_total",
+            "pages_read",
+            "path",
+            "skipping",
+            "digest",
+            "repeated runs",
+            "repeated run",
+            "runs",
+            "run",
+            "fresh inputs",
+            "inputs",
+            "input",
+            "ingest",
+            "CSV",
+            "store directory",
+            "directory",
+            "same contract",
+            "archived mixed-generation stores",
+            "archived mixed-generation store",
+            "rewriting",
+            "work",
+            "offline",
+            "answers",
+            "answer",
+            "behavior"
+          ],
+          "renames_during_drafting": [
+            {
+              "original": "rust/src/pages/stats.rs::build_page_stats",
+              "renamed_to": "rust/src/ember/fold.rs::tilt_a",
+              "reason": "Removed public row/store-adjacent vocabulary and hid the producer repair boundary."
+            },
+            {
+              "original": "cpp/src/planner/prune.cpp::admit_page",
+              "renamed_to": "cpp/src/harbor/veil.cpp::turn_b",
+              "reason": "Removed execution and selective-read vocabulary from the planner boundary."
+            },
+            {
+              "original": "cpp/src/executor/vector_scan.cpp::scan_batch",
+              "renamed_to": "cpp/src/lattice/rill.cpp::sweep_c",
+              "reason": "Removed batch execution vocabulary from the kernel boundary."
+            },
+            {
+              "original": "test_fresh_stats",
+              "renamed_to": "test_p01",
+              "reason": "Removed artifact and producer clues from the scored test name."
+            },
+            {
+              "original": "test_pruned_archive",
+              "renamed_to": "test_p02",
+              "reason": "Removed selective-path and archive clues from the scored test name."
+            },
+            {
+              "original": "test_vector_nulls",
+              "renamed_to": "test_p04",
+              "reason": "Removed kernel and validity clues from the scored test name."
+            }
+          ],
+          "test_names_audited": [
+            "test_p01",
+            "test_p02",
+            "test_p03",
+            "test_p04",
+            "test_p05",
+            "test_p06",
+            "test_p07",
+            "test_p08",
+            "test_p09",
+            "test_p10",
+            "test_p11",
+            "test_p12"
+          ],
+          "concentration_math": {
+            "total_tests": 12,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              },
+              {
+                "location_id": "B",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              },
+              {
+                "location_id": "C",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              }
+            ]
+          },
+          "recomputed_concentration": {
+            "total_tests": 12,
+            "concentration_cap": 0.5,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              },
+              {
+                "location_id": "B",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              },
+              {
+                "location_id": "C",
+                "test_count": 5,
+                "ratio": 0.4166666666666667
+              }
+            ]
+          }
+        }
+      },
+      "evidence_errors": [],
+      "blocking_failures": []
+    }
+  ],
+  "schema_path": "/home/sudhir/Projects/TERMINUS/specs/validation_schema.json",
+  "evidence_contract_version": 3
+}

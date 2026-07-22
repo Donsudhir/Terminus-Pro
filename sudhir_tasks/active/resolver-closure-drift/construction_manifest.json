@@ -1,0 +1,102 @@
+{
+  "symbol_table": [
+    {
+      "path": "src/aero/veil.rs",
+      "symbol": "cast_vane",
+      "kind": "function",
+      "signature": "pub(crate) fn cast_vane(a: &RawRecord, b: &QueryFrame) -> Result<Vane, ClassError>",
+      "purpose": "Validates and converts one raw candidate plus request-local evidence into a constrained value."
+    },
+    {
+      "path": "src/cairn/sill.rs",
+      "symbol": "turn_sill",
+      "kind": "function",
+      "signature": "pub(crate) fn turn_sill(a: Vane, b: &PolicyFrame) -> Result<Admitted, RejectCode>",
+      "purpose": "Applies contextual policy to a constrained value and returns an immutable accepted decision."
+    },
+    {
+      "path": "src/quill/quay.rs",
+      "symbol": "lace_quay",
+      "kind": "function",
+      "signature": "pub(crate) fn lace_quay(a: Cairn<Admitted>, b: &Wick) -> Result<Trellis, GraphError>",
+      "purpose": "Validates a complete accepted graph and commits its semantic identities and deterministic traversal."
+    }
+  ],
+  "flipping_point_contract": {
+    "locations": [
+      {
+        "id": "A",
+        "path": "src/aero/veil.rs",
+        "controls_tests": ["test_r01", "test_r03", "test_r04", "test_r07", "test_r10"]
+      },
+      {
+        "id": "B",
+        "path": "src/cairn/sill.rs",
+        "controls_tests": ["test_r02", "test_r03", "test_r08", "test_r11", "test_r12"]
+      },
+      {
+        "id": "C",
+        "path": "src/quill/quay.rs",
+        "controls_tests": ["test_r05", "test_r06", "test_r09", "test_r10", "test_r11"]
+      }
+    ],
+    "no_single_location_flips_majority": true,
+    "concentration_cap": 0.5
+  },
+  "decoy_manifest": [
+    {
+      "path": "src/aero/pale.rs",
+      "kind": "helper",
+      "rhymes_with": "cast_vane",
+      "non_fix_purpose": "cast_fane(a: &SampleRow, b: &DisplayFrame) -> Result<Fane, SampleError> converts diagnostic sampling rows into a bounded display value."
+    },
+    {
+      "path": "src/cairn/rill.rs",
+      "kind": "helper",
+      "rhymes_with": "turn_sill",
+      "non_fix_purpose": "turn_rill(a: Fane, b: &AdvisoryFrame) -> Result<Shown, DropCode> applies display filtering to optional advisory events."
+    },
+    {
+      "path": "src/quill/bay.rs",
+      "kind": "helper",
+      "rhymes_with": "lace_quay",
+      "non_fix_purpose": "lace_bay(a: Batch<Shown>, b: &Gauge) -> Result<Tally, TallyError> assembles deterministic compiler-summary rows from completed jobs."
+    }
+  ],
+  "code_forbidden_tokens": [
+    "dependency workspace", "dependency", "workspace", "app", "repo", "source",
+    "bin", "rebuild-forge", "rebuild command", "command", "edited binary", "binary",
+    "forge", "single supported entrypoint", "supported entrypoint", "entrypoint",
+    "solve", "projects", "project", "workspace.toml", "output", "workspace.lock",
+    "UTF-8 text", "text", "lock line", "lines", "line", "name", "version",
+    "source-id", "id", "one ASCII space", "ASCII space", "space", "fields", "field",
+    "ascending bytewise tuple order", "bytewise tuple order", "tuple order", "tuple",
+    "order", "duplicate tuples", "duplicate tuple", "tuples", "one final newline",
+    "final newline", "newline", "bundled project", "nearby generated input",
+    "generated input", "input", "dependency set", "set",
+    "declared direct and transitive requirements", "direct and transitive requirements",
+    "declared direct requirements", "direct requirements", "declared direct requirement",
+    "direct requirement", "direct", "declared transitive requirements",
+    "transitive requirements", "declared transitive requirement", "transitive requirement",
+    "transitive", "declared requirements", "requirements", "declared requirement",
+    "requirement", "bundled downstream build", "downstream build", "build",
+    "equivalent package archive orderings", "package archive orderings",
+    "package archive ordering", "package archive", "archive orderings",
+    "archive ordering", "package", "archive", "orderings", "ordering",
+    "clean repeated runs", "clean repeated run", "repeated runs", "repeated run",
+    "runs", "run", "byte-identical lockfiles", "byte-identical lockfile",
+    "lockfiles", "lockfile", "established edge-case behaviors", "edge-case behaviors",
+    "edge-case behavior", "behaviors", "behavior", "existing consumers",
+    "existing consumer", "consumers", "consumer", "committed parent checks and release notes",
+    "parent checks and release notes", "committed parent checks", "committed parent check",
+    "parent checks", "parent check", "parents", "parent", "checks", "check",
+    "release notes", "release note", "notes", "note", "repository history",
+    "repository", "history", "expected selections", "expected selection",
+    "selections", "selection", "merged failure", "failure", "valid repair", "repair",
+    "new package names and ranges", "new package names", "new package name",
+    "package names and ranges", "package names", "package name", "package ranges",
+    "package range", "names", "ranges", "range", "work", "bundled data", "data",
+    "network requests", "network request", "network", "requests", "request",
+    "project inputs", "project input", "inputs", "hand", "tool", "clean state", "state"
+  ]
+}

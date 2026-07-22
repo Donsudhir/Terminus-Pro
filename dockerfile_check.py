@@ -19,8 +19,11 @@ import json
 import re
 import shlex
 import sys
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from pathlib import Path
+
+import ci_policy
 
 try:
     import tomllib
@@ -33,6 +36,20 @@ REQUIRED_ENVIRONMENT_KEYS = ("cpus", "memory_mb", "storage_mb", "build_timeout_s
 OCI_LABEL_PREFIX = "org.opencontainers.image."
 DOCKER_COMPOSE_NAMES = {"docker-compose.yaml", "docker-compose.yml"}
 ENV_FILE_EXCLUDE = {"dockerfile"} | {name.lower() for name in DOCKER_COMPOSE_NAMES}
+ARCHIVE_SUFFIXES = (".tar", ".tar.gz", ".tgz", ".zip")
+BUILD_TOOL_PACKAGES = {
+    "build-essential",
+    "gcc",
+    "g++",
+    "clang",
+    "cmake",
+    "make",
+    "cargo",
+    "rustc",
+    "golang-go",
+    "maven",
+    "gradle",
+}
 
 
 @dataclass
@@ -91,6 +108,30 @@ def normalize_dockerfile_lines(content: str) -> list[tuple[int, str]]:
     return logical
 
 
+def from_image(text: str) -> str | None:
+    try:
+        tokens = shlex.split(text)
+    except ValueError:
+        return None
+    if not tokens or tokens[0].upper() != "FROM":
+        return None
+    for token in tokens[1:]:
+        if token.startswith("--"):
+            continue
+        return token
+    return None
+
+
+def docker_stages(logical: list[tuple[int, str]]) -> list[list[tuple[int, str]]]:
+    stages: list[list[tuple[int, str]]] = []
+    for item in logical:
+        if re.match(r"^\s*FROM\b", item[1], re.I):
+            stages.append([])
+        if stages:
+            stages[-1].append(item)
+    return stages
+
+
 def env_file_count(task_dir: Path) -> int:
     env_dir = task_dir / "environment"
     if not env_dir.is_dir():
@@ -128,7 +169,8 @@ def check_pin_base_digest(content: str, logical: list[tuple[int, str]]) -> Check
         )
         return result
     for line_no, text in from_lines:
-        if "@sha256:" not in text:
+        image = from_image(text)
+        if image != "scratch" and "@sha256:" not in text:
             result.add(
                 Issue(
                     rule="pin_base_digest",
@@ -146,6 +188,73 @@ def check_pin_base_digest(content: str, logical: list[tuple[int, str]]) -> Check
                     line=line_no,
                 )
             )
+    return result
+
+
+def check_sanctioned_base_image(logical: list[tuple[int, str]]) -> CheckResult:
+    result = CheckResult(check="check_sanctioned_base_images", severity="PASS")
+    from_lines = [item for item in logical if re.match(r"^\s*FROM\b", item[1], re.I)]
+    if not from_lines:
+        return result
+    line_no, text = from_lines[-1]
+    image = from_image(text)
+    if image not in ci_policy.SANCTIONED_FINAL_IMAGES and image not in ci_policy.SANCTIONED_BASE_EXEMPTIONS:
+        result.add(
+            Issue(
+                rule="check_sanctioned_base_images",
+                severity="FAIL",
+                message=(
+                    "Final runtime stage must use an exact sanctioned image or an "
+                    f"ADR-approved image added to the reviewed policy list; found {image!r}"
+                ),
+                line=line_no,
+            )
+        )
+    return result
+
+
+def check_build_context_size(task_dir: Path) -> CheckResult:
+    result = CheckResult(check="check_build_context_size", severity="PASS")
+    environment = task_dir / "environment"
+    if not environment.is_dir():
+        return result
+    total = 0
+    for path in sorted(environment.rglob("*")):
+        if path.is_symlink():
+            resolved = path.resolve(strict=False)
+            if not resolved.is_relative_to(environment.resolve()):
+                result.add(
+                    Issue(
+                        rule="check_build_context_size",
+                        severity="FAIL",
+                        message=f"Build-context symlink escapes environment/: {path.relative_to(task_dir)}",
+                    )
+                )
+            continue
+        if not path.is_file():
+            continue
+        size = path.stat().st_size
+        total += size
+        if size > ci_policy.BUILD_CONTEXT_FILE_MAX_BYTES:
+            result.add(
+                Issue(
+                    rule="check_build_context_size",
+                    severity="FAIL",
+                    message=(
+                        f"Build-context file exceeds 50 MiB: {path.relative_to(task_dir)} "
+                        f"({size} bytes)"
+                    ),
+                )
+            )
+    if total > ci_policy.BUILD_CONTEXT_MAX_BYTES:
+        result.add(
+            Issue(
+                rule="check_build_context_size",
+                severity="FAIL",
+                message=f"environment/ exceeds 100 MiB build-context limit ({total} bytes)",
+            )
+        )
+    result.detail = f"environment build context: {total} bytes"
     return result
 
 
@@ -196,15 +305,42 @@ def check_reproducible_builds(logical: list[tuple[int, str]]) -> CheckResult:
                     line=line_no,
                 )
             )
+        if re.search(r"^\s*RUN\b[^\n]*\b(?:curl|wget)\b", text, re.I) and not re.search(
+            r"\b(?:sha256sum|shasum\s+-a\s+256)\b", text, re.I
+        ):
+            result.add(
+                Issue(
+                    rule="reproducible_builds",
+                    severity="FAIL",
+                    message="Direct curl/wget downloads must verify a SHA-256 checksum in the same RUN",
+                    line=line_no,
+                )
+            )
+        if re.search(r"^\s*RUN\b[^\n]*\bgit\s+clone\b", text, re.I) and not re.search(
+            r"\bgit\s+(?:-C\s+\S+\s+)?checkout\s+[0-9a-f]{40}\b", text, re.I
+        ):
+            result.add(
+                Issue(
+                    rule="reproducible_builds",
+                    severity="FAIL",
+                    message="git clone must check out an exact 40-character commit in the same RUN",
+                    line=line_no,
+                )
+            )
     return result
 
 
 def check_apt_hygiene(logical: list[tuple[int, str]]) -> CheckResult:
     result = CheckResult(check="apt_hygiene", severity="PASS")
-    update_count = 0
+    update_counts: list[int] = []
+    current_updates = 0
     for line_no, text in logical:
+        if re.match(r"^\s*FROM\b", text, re.I):
+            if update_counts or current_updates:
+                update_counts.append(current_updates)
+            current_updates = 0
         if re.search(r"\bapt(?:-get)?\s+update\b", text, re.I):
-            update_count += 1
+            current_updates += 1
         if re.search(r"\bapt(?:-get)?\s+install\b", text, re.I):
             if "rm -rf /var/lib/apt/lists" not in text:
                 result.add(
@@ -224,14 +360,19 @@ def check_apt_hygiene(logical: list[tuple[int, str]]) -> CheckResult:
                         line=line_no,
                     )
                 )
-    if update_count > 1:
-        result.add(
-            Issue(
-                rule="apt_hygiene",
-                severity="WARN",
-                message=f"Found {update_count} apt-get update calls; consolidate into one apt transaction per stage",
+    update_counts.append(current_updates)
+    for stage_number, update_count in enumerate(update_counts, start=1):
+        if update_count > 1:
+            result.add(
+                Issue(
+                    rule="apt_hygiene",
+                    severity="WARN",
+                    message=(
+                        f"Stage {stage_number} has {update_count} apt-get update calls; "
+                        "consolidate into one apt transaction per stage"
+                    ),
+                )
             )
-        )
     return result
 
 
@@ -247,6 +388,56 @@ def check_agent_session_tools(content: str) -> CheckResult:
                 message=(
                     "Agent runtime requires tmux and asciinema in the image; "
                     f"missing: {', '.join(missing)}"
+                ),
+            )
+        )
+    return result
+
+
+def check_python_interpreter_hygiene(content: str, logical: list[tuple[int, str]]) -> CheckResult:
+    """Fail when /usr/bin/python3 is repointed over Debian asciinema's interpreter.
+
+    CM-001: ln -sf …/python3.X /usr/bin/python3 after apt-installing asciinema
+    breaks `#!/usr/bin/python3` at runtime while earlier-layer version checks still pass.
+    """
+    result = CheckResult(check="python_interpreter_hygiene", severity="PASS")
+    lowered = content.lower()
+    installs_asciinema = bool(re.search(r"\basciinema\b", lowered))
+    if not installs_asciinema:
+        return result
+
+    symlink_re = re.compile(
+        r"ln\s+(-[a-zA-Z]+\s+)*\S*python3(?:\.\d+)?\s+/usr/bin/python3\b",
+        re.I,
+    )
+    for line_no, text in logical:
+        if symlink_re.search(text):
+            result.add(
+                Issue(
+                    rule="python_interpreter_hygiene",
+                    severity="FAIL",
+                    message=(
+                        "Do not symlink /usr/bin/python3 onto the image Python when "
+                        "asciinema is installed (CM-001). Debian asciinema uses "
+                        "#!/usr/bin/python3 and its modules live on the distro "
+                        "interpreter; repointing breaks agent session setup. Prefer "
+                        "PATH ordering and keep `asciinema --version` in the final RUN."
+                    ),
+                    line=line_no,
+                )
+            )
+
+    # Soft guard: if asciinema is installed, require a version check somewhere so
+    # runtime breakage is not hidden behind an earlier-layer probe alone.
+    if "asciinema --version" not in lowered and "asciinema -v" not in lowered:
+        result.add(
+            Issue(
+                rule="python_interpreter_hygiene",
+                severity="WARN",
+                message=(
+                    "asciinema is installed but no `asciinema --version` appears in "
+                    "the Dockerfile; add a final-layer check so interpreter breakage "
+                    "fails the image build (CM-001)."
                 ),
             )
         )
@@ -292,12 +483,63 @@ def check_silo_and_reserved(content: str, logical: list[tuple[int, str]]) -> Che
             )
 
     for line_no, text in logical:
-        if re.search(r"(?:--privileged|SYS_ADMIN|docker\.sock)", text, re.I):
+        unsafe_names = "|".join(re.escape(value) for value in ci_policy.UNSAFE_CAPABILITIES)
+        if re.search(
+            rf"(?:--privileged|--cap-add|{unsafe_names}|docker\.sock)",
+            text,
+            re.I,
+        ):
             result.add(
                 Issue(
                     rule="silo_and_reserved",
                     severity="FAIL",
-                    message="Do not use privileged mode, SYS_ADMIN, or docker.sock mounts",
+                    message="Do not use privileged mode, unsafe capabilities, or docker.sock mounts",
+                    line=line_no,
+                )
+            )
+    return result
+
+
+def check_compose_safety(task_dir: Path) -> CheckResult:
+    result = CheckResult(check="check_privileged_containers", severity="PASS")
+    compose = next(
+        (
+            task_dir / "environment" / name
+            for name in DOCKER_COMPOSE_NAMES
+            if (task_dir / "environment" / name).is_file()
+        ),
+        None,
+    )
+    if compose is None:
+        return result
+    content = compose.read_text(encoding="utf-8", errors="replace")
+    unsafe_names = "|".join(re.escape(value) for value in ci_policy.UNSAFE_CAPABILITIES)
+    for line_no, line in enumerate(content.splitlines(), start=1):
+        if re.search(
+            rf"(?:privileged:\s*true|cap_add:|{unsafe_names}|docker\.sock)",
+            line,
+            re.I,
+        ):
+            result.add(
+                Issue(
+                    rule="check_privileged_containers",
+                    severity="FAIL",
+                    message=f"Unsafe compose privilege/capability: {line.strip()}",
+                    line=line_no,
+                )
+            )
+        if re.search(
+            r":\s*(?:/logs/artifacts|/logs/verifier|/tests|/solution|/oracle)(?:/|\s|$)",
+            line,
+        ) or re.search(
+            r"target:\s*(?:/logs/artifacts|/logs/verifier|/tests|/solution|/oracle)(?:/|\s|$)",
+            line,
+        ):
+            result.add(
+                Issue(
+                    rule="check_privileged_containers",
+                    severity="FAIL",
+                    message=f"Compose overrides a Harbor-reserved mount: {line.strip()}",
                     line=line_no,
                 )
             )
@@ -407,6 +649,126 @@ def check_lazy_pull(logical: list[tuple[int, str]]) -> CheckResult:
     return result
 
 
+def check_file_extraction(logical: list[tuple[int, str]]) -> CheckResult:
+    result = CheckResult(check="check_file_extraction", severity="PASS")
+    for stage in docker_stages(logical):
+        stage_text = "\n".join(text for _line, text in stage)
+        for line_no, text in stage:
+            if not re.match(r"^\s*(?:COPY|ADD)\b", text, re.I):
+                continue
+            archive_tokens = [
+                token.strip('"\'')
+                for token in text.split()
+                if token.lower().endswith(ARCHIVE_SUFFIXES)
+            ]
+            for archive in archive_tokens:
+                basename = Path(archive).name
+                extracted = bool(
+                    re.search(rf"(?:tar\s+[^\n]*|unzip\s+[^\n]*){re.escape(basename)}", stage_text, re.I)
+                )
+                removed = bool(
+                    re.search(rf"\brm\b[^\n]*{re.escape(basename)}", stage_text, re.I)
+                )
+                if not (extracted and removed):
+                    result.add(
+                        Issue(
+                            rule="check_file_extraction",
+                            severity="WARN",
+                            message=(
+                                f"Archive {basename} must be extracted and removed in the same "
+                                "Docker stage"
+                            ),
+                            line=line_no,
+                        )
+                    )
+    return result
+
+
+def check_layer_volatility(logical: list[tuple[int, str]]) -> CheckResult:
+    result = CheckResult(check="check_layer_volatility", severity="PASS")
+    dependency_install = re.compile(
+        r"\b(?:pip(?:3)?\s+install|npm\s+(?:ci|install)|cargo\s+fetch|go\s+mod\s+download|mvn\b|gradle\b)",
+        re.I,
+    )
+    for stage in docker_stages(logical):
+        broad_copy_index: int | None = None
+        for index, (line_no, text) in enumerate(stage):
+            if re.search(r"^\s*(?:COPY|ADD)\s+(?:--\S+\s+)*\.\s+", text, re.I):
+                broad_copy_index = index
+                broad_copy_line = line_no
+                break
+        if broad_copy_index is None:
+            continue
+        if any(dependency_install.search(text) for _line, text in stage[broad_copy_index + 1 :]):
+            result.add(
+                Issue(
+                    rule="check_layer_volatility",
+                    severity="WARN",
+                    message=(
+                        "COPY/ADD . appears before dependency installation; copy manifests and "
+                        "install dependencies before volatile source"
+                    ),
+                    line=broad_copy_line,
+                )
+            )
+    return result
+
+
+def check_no_build_tools_in_runtime(
+    logical: list[tuple[int, str]], task_data: dict
+) -> CheckResult:
+    result = CheckResult(check="check_no_build_tools_in_runtime", severity="PASS")
+    stages = docker_stages(logical)
+    if not stages:
+        return result
+    metadata = task_data.get("metadata") or {}
+    languages = {
+        str(value).strip().lower()
+        for value in (metadata.get("languages") or [])
+        if isinstance(value, str)
+    }
+    compilation_expected = bool(
+        languages
+        & {
+            "c",
+            "c++",
+            "cpp",
+            "rust",
+            "go",
+            "golang",
+            "java",
+            "fortran",
+            "zig",
+            "ada",
+            "haskell",
+            "ocaml",
+        }
+    )
+    if compilation_expected:
+        return result
+    for line_no, text in stages[-1]:
+        if not re.search(r"\bapt(?:-get)?\s+install\b", text, re.I):
+            continue
+        installed = sorted(
+            package
+            for package in BUILD_TOOL_PACKAGES
+            if re.search(rf"(?<![\w-]){re.escape(package)}(?![\w-])", text)
+        )
+        if installed:
+            result.add(
+                Issue(
+                    rule="check_no_build_tools_in_runtime",
+                    severity="WARN",
+                    message=(
+                        "Final runtime installs build tools not justified by agent-facing "
+                        f"languages: {installed}"
+                    ),
+                    line=line_no,
+                )
+            )
+    return result
+
+
 def check_oci_labels(content: str) -> CheckResult:
     result = CheckResult(check="oci_labels", severity="PASS")
     if OCI_LABEL_PREFIX not in content:
@@ -423,7 +785,14 @@ def check_oci_labels(content: str) -> CheckResult:
     return result
 
 
-def check_dependency_pinning(logical: list[tuple[int, str]]) -> CheckResult:
+def _exact_version(value: str) -> bool:
+    cleaned = value.strip()
+    return bool(re.fullmatch(r"(?:v?\d+)(?:\.\d+)*(?:[-+][0-9A-Za-z.-]+)?", cleaned))
+
+
+def check_dependency_pinning(
+    task_dir: Path, logical: list[tuple[int, str]]
+) -> CheckResult:
     result = CheckResult(check="dependency_pinning", severity="PASS")
     unpinned_pip: list[str] = []
 
@@ -450,6 +819,59 @@ def check_dependency_pinning(logical: list[tuple[int, str]]) -> CheckResult:
                     continue
                 unpinned_pip.append(token)
 
+        if re.search(r"\bnpm\s+install\b", text, re.I) and not re.search(
+            r"\bnpm\s+install\s+(?:--\S+\s+)*(?:\.\s*)?$", text, re.I
+        ):
+            try:
+                tokens = shlex.split(text)
+            except ValueError:
+                tokens = []
+            try:
+                npm_install_index = tokens.index("install")
+            except ValueError:
+                npm_install_index = len(tokens)
+            for token in tokens[npm_install_index + 1 :]:
+                if token.startswith("-"):
+                    continue
+                if token.startswith(("&&", "||")):
+                    break
+                if token.startswith("@"):
+                    pinned = token.count("@") >= 2 and _exact_version(token.rsplit("@", 1)[1])
+                else:
+                    pinned = "@" in token and _exact_version(token.rsplit("@", 1)[1])
+                if not pinned:
+                    result.add(
+                        Issue(
+                            rule="dependency_pinning",
+                            severity="FAIL",
+                            message=f"Pin npm install package exactly: {token}",
+                            line=line_no,
+                        )
+                    )
+
+        if re.search(r"\bcargo\s+install\b", text) and not re.search(
+            r"\bcargo\s+install\b[^\n]*(?:--version\s+\S+|--locked\b)", text
+        ):
+            result.add(
+                Issue(
+                    rule="dependency_pinning",
+                    severity="FAIL",
+                    message="cargo install requires --version or --locked",
+                    line=line_no,
+                )
+            )
+        if re.search(r"\bgo\s+install\s+\S+", text) and not re.search(
+            r"\bgo\s+install\s+\S+@v?\d", text
+        ):
+            result.add(
+                Issue(
+                    rule="dependency_pinning",
+                    severity="FAIL",
+                    message="go install requires an explicit @version",
+                    line=line_no,
+                )
+            )
+
     if unpinned_pip:
         result.add(
             Issue(
@@ -458,6 +880,118 @@ def check_dependency_pinning(logical: list[tuple[int, str]]) -> CheckResult:
                 message=f"Pin pip packages when installed directly: {sorted(set(unpinned_pip))}",
             )
         )
+
+    environment = task_dir / "environment"
+    for package_json in environment.rglob("package.json"):
+        try:
+            data = json.loads(package_json.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            result.add(
+                Issue(
+                    rule="dependency_pinning",
+                    severity="FAIL",
+                    message=f"Invalid package.json {package_json.relative_to(task_dir)}: {exc}",
+                )
+            )
+            continue
+        dependencies = {
+            **(data.get("dependencies") or {}),
+            **(data.get("devDependencies") or {}),
+        }
+        lock_present = any(
+            (package_json.parent / name).is_file()
+            for name in ("package-lock.json", "pnpm-lock.yaml", "yarn.lock")
+        )
+        if dependencies and not lock_present:
+            unpinned = sorted(
+                name
+                for name, version in dependencies.items()
+                if not isinstance(version, str) or not _exact_version(version)
+            )
+            if unpinned:
+                result.add(
+                    Issue(
+                        rule="dependency_pinning",
+                        severity="FAIL",
+                        message=(
+                            f"Node dependencies need exact versions or a lockfile in "
+                            f"{package_json.parent.relative_to(task_dir)}: {unpinned}"
+                        ),
+                    )
+                )
+
+    for cargo_toml in environment.rglob("Cargo.toml"):
+        text = cargo_toml.read_text(encoding="utf-8", errors="replace")
+        if "[dependencies]" in text and not (cargo_toml.parent / "Cargo.lock").is_file():
+            non_exact = re.findall(
+                r"(?m)^\s*([A-Za-z0-9_-]+)\s*=\s*[\"'](?:\^|~|\*|>=|<=|>|<)",
+                text,
+            )
+            if non_exact:
+                result.add(
+                    Issue(
+                        rule="dependency_pinning",
+                        severity="FAIL",
+                        message=(
+                            f"Cargo dependencies need exact versions or Cargo.lock in "
+                            f"{cargo_toml.parent.relative_to(task_dir)}: {sorted(non_exact)}"
+                        ),
+                    )
+                )
+
+    for go_mod in environment.rglob("go.mod"):
+        text = go_mod.read_text(encoding="utf-8", errors="replace")
+        has_requirements = bool(re.search(r"(?m)^\s*require(?:\s|\()", text))
+        if has_requirements and not (go_mod.parent / "go.sum").is_file():
+            result.add(
+                Issue(
+                    rule="dependency_pinning",
+                    severity="FAIL",
+                    message=f"go.mod with requirements needs go.sum in {go_mod.parent.relative_to(task_dir)}",
+                )
+            )
+
+    for pom in environment.rglob("pom.xml"):
+        try:
+            tree = ET.fromstring(pom.read_text(encoding="utf-8"))
+        except ET.ParseError as exc:
+            result.add(
+                Issue(
+                    rule="dependency_pinning",
+                    severity="FAIL",
+                    message=f"Invalid pom.xml {pom.relative_to(task_dir)}: {exc}",
+                )
+            )
+            continue
+        dependencies = [node for node in tree.iter() if node.tag.endswith("dependency")]
+        missing_versions = [
+            next(
+                (child.text or "?" for child in node if child.tag.endswith("artifactId")),
+                "?",
+            )
+            for node in dependencies
+            if not any(child.tag.endswith("version") and (child.text or "").strip() for child in node)
+        ]
+        if missing_versions:
+            result.add(
+                Issue(
+                    rule="dependency_pinning",
+                    severity="FAIL",
+                    message=f"Maven dependencies need versions in {pom.relative_to(task_dir)}: {missing_versions}",
+                )
+            )
+
+    for gradle in [*environment.rglob("build.gradle"), *environment.rglob("build.gradle.kts")]:
+        text = gradle.read_text(encoding="utf-8", errors="replace")
+        dynamic = re.findall(r"[\"'][^\"']+:(?:\+|latest[^\"']*)[\"']", text, re.I)
+        if dynamic:
+            result.add(
+                Issue(
+                    rule="dependency_pinning",
+                    severity="FAIL",
+                    message=f"Gradle dependencies use dynamic versions in {gradle.relative_to(task_dir)}",
+                )
+            )
     return result
 
 
@@ -519,7 +1053,11 @@ def check_task_environment(task_dir: Path, task_data: dict) -> CheckResult:
 
 def run_checks(task_dir: Path) -> list[CheckResult]:
     task_data = load_task_toml(task_dir)
-    results: list[CheckResult] = [check_task_environment(task_dir, task_data)]
+    results: list[CheckResult] = [
+        check_task_environment(task_dir, task_data),
+        check_build_context_size(task_dir),
+        check_compose_safety(task_dir),
+    ]
 
     present = check_dockerfile_exists(task_dir)
     results.append(present)
@@ -532,17 +1070,21 @@ def run_checks(task_dir: Path) -> list[CheckResult]:
     results.extend(
         [
             check_pin_base_digest(content, logical),
+            check_sanctioned_base_image(logical),
             check_workdir(content),
             check_reproducible_builds(logical),
             check_apt_hygiene(logical),
             check_agent_session_tools(content),
+            check_python_interpreter_hygiene(content, logical),
             check_silo_and_reserved(content, logical),
             check_dockerignore_and_copy(task_dir, logical),
             check_source_as_files(logical),
             check_copy_metadata(logical),
-            check_lazy_pull(logical),
+            check_file_extraction(logical),
+            check_layer_volatility(logical),
+            check_no_build_tools_in_runtime(logical, task_data),
             check_oci_labels(content),
-            check_dependency_pinning(logical),
+            check_dependency_pinning(task_dir, logical),
         ]
     )
     return results

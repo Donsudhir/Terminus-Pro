@@ -1,0 +1,15 @@
+[
+  {
+    "item": {
+      "service": "steady-cell",
+      "secret": "signing-pin"
+    },
+    "axis": "steady-cell",
+    "epoch": 3,
+    "nonce": "2vMwuWeOjZy3436yazzJYw",
+    "body": "528FneSiXIZT0XxR90Ny",
+    "wrapped": "c6pEGlXaPQ0ooutIh/c+hp40DhprJWKRO2JmepMGDXE",
+    "tag": "yBklU6J3fTAHzuS59s7oTVSuijiR+oKr9eKBU2VETUc",
+    "seq": 3003
+  }
+]

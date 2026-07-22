@@ -1,0 +1,157 @@
+{
+  "symbol_table": [
+    {
+      "path": "conductor/arc.go",
+      "symbol": "trace_q",
+      "kind": "function",
+      "signature": "func trace_q(a model.ItemID, b model.AxisID, c keyring.Epoch, d model.Payload) (model.Frame, error)",
+      "purpose": "Builds the protected frame metadata for one transition."
+    },
+    {
+      "path": "tenant/spine.go",
+      "symbol": "settle_r",
+      "kind": "function",
+      "signature": "func settle_r(a model.AxisID, b keyring.Epoch) (crypto.Scope, error)",
+      "purpose": "Builds scoped bytes for one key operation."
+    },
+    {
+      "path": "aperture/sill.go",
+      "symbol": "route_s",
+      "kind": "function",
+      "signature": "func route_s(a model.Frame, b crypto.Scope, c *keyring.Ring) (model.Payload, error)",
+      "purpose": "Selects one candidate and performs an authenticated open."
+    },
+    {
+      "path": "ledger/reel.go",
+      "symbol": "replay_t",
+      "kind": "function",
+      "signature": "func replay_t(a *Journal, b model.ItemID, c model.AxisID, d keyring.Epoch) (*model.Frame, error)",
+      "purpose": "Locates and validates one prior protected frame."
+    }
+  ],
+  "flipping_point_contract": {
+    "locations": [
+      {
+        "id": "A",
+        "path": "conductor/arc.go",
+        "controls_tests": ["test_e01", "test_e05", "test_e09", "test_e12"]
+      },
+      {
+        "id": "B",
+        "path": "tenant/spine.go",
+        "controls_tests": ["test_e02", "test_e06", "test_e10", "test_e12"]
+      },
+      {
+        "id": "C",
+        "path": "aperture/sill.go",
+        "controls_tests": ["test_e03", "test_e07", "test_e09", "test_e11"]
+      },
+      {
+        "id": "D",
+        "path": "ledger/reel.go",
+        "controls_tests": ["test_e04", "test_e08", "test_e09", "test_e10"]
+      }
+    ],
+    "no_single_location_flips_majority": true,
+    "concentration_cap": 0.34
+  },
+  "decoy_manifest": [
+    {
+      "path": "conductor/dial.go",
+      "kind": "helper",
+      "rhymes_with": "trace_q",
+      "non_fix_purpose": "Produces dry-run timing and item-count telemetry for operator summaries."
+    },
+    {
+      "path": "tenant/relay.go",
+      "kind": "helper",
+      "rhymes_with": "settle_r",
+      "non_fix_purpose": "Normalizes display labels for diagnostics without participating in protected operations."
+    },
+    {
+      "path": "aperture/panel.go",
+      "kind": "helper",
+      "rhymes_with": "route_s",
+      "non_fix_purpose": "Routes health observations into human-readable status rows."
+    },
+    {
+      "path": "ledger/spool.go",
+      "kind": "helper",
+      "rhymes_with": "replay_t",
+      "non_fix_purpose": "Replays compaction counters into metrics without reading protected frame bodies."
+    }
+  ],
+  "code_forbidden_tokens": [
+    "maintenance",
+    "window",
+    "maintenance window",
+    "last maintenance window",
+    "services",
+    "app",
+    "secrets",
+    "records",
+    "same records",
+    "authentication",
+    "service",
+    "namespaces",
+    "service namespaces",
+    "namespace",
+    "namespace values",
+    "values",
+    "system",
+    "existing system",
+    "secret",
+    "affected secret",
+    "incident",
+    "pre-incident value",
+    "correct pre-incident value",
+    "value",
+    "bin",
+    "vaultctl",
+    "recover",
+    "command",
+    "output",
+    "recovery",
+    "recovery.json",
+    "JSON",
+    "object",
+    "JSON object",
+    "recovered",
+    "array",
+    "recovered array",
+    "items",
+    "array items",
+    "form",
+    "string",
+    "service/secret identity",
+    "affected service/secret identity",
+    "identity",
+    "healthy identity",
+    "healthy records",
+    "byte",
+    "byte-for-byte",
+    "get",
+    "bundled corpus",
+    "corpus",
+    "maintain",
+    "run",
+    "second run",
+    "state",
+    "on-disk state",
+    "complete on-disk state",
+    "audit",
+    "recovered values",
+    "tampered records",
+    "substituted records",
+    "behavior",
+    "same behavior",
+    "reset",
+    "corpus reset",
+    "clean corpus reset",
+    "generated namespaces",
+    "additional generated namespaces",
+    "cycles",
+    "maintenance cycles",
+    "later maintenance cycles"
+  ]
+}

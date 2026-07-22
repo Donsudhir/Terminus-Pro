@@ -1,0 +1,92 @@
+{
+  "symbol_table": [
+    {
+      "path": "native/lane.c",
+      "symbol": "mix_cols",
+      "kind": "function",
+      "signature": "int mix_cols(const int32_t *a, const int32_t *b, int32_t n, int32_t *c);",
+      "purpose": "Builds a partition of unknowns into probe groups from a nonzero pattern."
+    },
+    {
+      "path": "host/vault.rs",
+      "symbol": "bind_slot",
+      "kind": "function",
+      "signature": "pub(crate) fn bind_slot(a: i32, b: &mut Shelf) -> i8",
+      "purpose": "Binds a restored or fresh probe-group slot into the host shelf without leaking prior bits."
+    },
+    {
+      "path": "host/gauge.rs",
+      "symbol": "reset_span",
+      "kind": "function",
+      "signature": "pub(crate) fn reset_span(a: &mut Gauge, b: &[f64])",
+      "purpose": "Rebuilds per-run magnitude context used to choose finite-difference step sizes."
+    },
+    {
+      "path": "analysis/knit.f90",
+      "symbol": "merge_slots",
+      "kind": "function",
+      "signature": "integer(c_int) function merge_slots(a, b, c) bind(C)",
+      "purpose": "Unpacks compressed probe results into a stable sparse representation and updates support totals."
+    }
+  ],
+  "flipping_point_contract": {
+    "locations": [
+      {
+        "id": "A",
+        "path": "native/lane.c",
+        "controls_tests": ["test_k01", "test_k02", "test_k06", "test_k10"]
+      },
+      {
+        "id": "B",
+        "path": "host/vault.rs",
+        "controls_tests": ["test_k03", "test_k06", "test_k07", "test_k10"]
+      },
+      {
+        "id": "C",
+        "path": "host/gauge.rs",
+        "controls_tests": ["test_k04", "test_k05", "test_k11", "test_k12"]
+      },
+      {
+        "id": "D",
+        "path": "analysis/knit.f90",
+        "controls_tests": ["test_k07", "test_k08", "test_k09", "test_k12"]
+      }
+    ],
+    "no_single_location_flips_majority": true,
+    "concentration_cap": 0.34
+  },
+  "decoy_manifest": [
+    {
+      "path": "native/ledge.c",
+      "kind": "helper",
+      "rhymes_with": "mix_cols",
+      "non_fix_purpose": "Computes ordinary pattern statistics for diagnostic summaries."
+    },
+    {
+      "path": "host/locker.rs",
+      "kind": "helper",
+      "rhymes_with": "bind_slot",
+      "non_fix_purpose": "Maps display codes for status banners without affecting probe plans."
+    },
+    {
+      "path": "host/meter.rs",
+      "kind": "helper",
+      "rhymes_with": "reset_span",
+      "non_fix_purpose": "Clears reusable output slots after completed runs."
+    },
+    {
+      "path": "analysis/tally.f90",
+      "kind": "helper",
+      "rhymes_with": "merge_slots",
+      "non_fix_purpose": "Folds scalar diagnostic marks into aggregate counters."
+    }
+  ],
+  "code_forbidden_tokens": [
+    "residual", "lab", "app", "sensitivity", "report", "batch", "unknown", "probe",
+    "plan", "entry", "matrix-vector", "product", "scale", "support", "mismatch",
+    "disagreement", "matrix", "audit", "summary", "pipeline", "output", "bin",
+    "senslab", "variant", "identity", "nonzero", "layout", "directional",
+    "cardinality", "structure", "linearization", "contract", "reproducibility",
+    "digest", "input", "check", "packed", "json"
+  ]
+}

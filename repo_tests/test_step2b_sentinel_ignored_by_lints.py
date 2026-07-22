@@ -27,7 +27,11 @@ import collapse_check
 import run_static_checks
 import task_integrity
 import verifier_health
-from repo_tests.cases import COLLAPSE_CHECK_EXPECTATIONS, FIXTURE_TASKS_DIR
+from repo_tests.current_cases import (
+    CLEAN_FIXTURE_NAME,
+    COLLAPSE_CHECK_EXPECTATIONS,
+    FIXTURE_TASKS_DIR,
+)
 
 SENTINEL_NAME = task_integrity.CHECKSUM_FILE_NAME
 SENTINEL_BARE = SENTINEL_NAME.lstrip(".")
@@ -60,11 +64,11 @@ class Step2bSentinelIgnoredByLintsTest(unittest.TestCase):
         new warnings, no missing passes) and the sentinel name must not
         appear in any reporter line.
 
-        Uses `byzantine-storage-rebalance` because its baseline is
-        `failures: []` / `warnings: []` (per `STATIC_CHECK_EXPECTATIONS`),
+        Uses the clean fixture because its baseline is
+        `failures: []` / `warnings: []`,
         so any drift introduced by seeding the sentinel surfaces as a
         non-empty list rather than as a delta against a noisy baseline."""
-        fixture_name = "byzantine-storage-rebalance"
+        fixture_name = CLEAN_FIXTURE_NAME
         baseline = run_static_checks.run_checks(FIXTURE_TASKS_DIR / fixture_name)
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -92,11 +96,11 @@ class Step2bSentinelIgnoredByLintsTest(unittest.TestCase):
         the sentinel must never be classified as agent-visible (which
         would feed it into RC2 predictability and similar checks).
 
-        Uses `byzantine-storage-rebalance` because it has the most
-        comprehensive pinned expectation in `COLLAPSE_CHECK_EXPECTATIONS`
+        Uses the clean fixture because it has a complete pinned expectation
+        in `COLLAPSE_CHECK_EXPECTATIONS`
         (every RC and CR result severity pinned), so any drift from the
         sentinel surfaces as a severity diff."""
-        fixture_name = "byzantine-storage-rebalance"
+        fixture_name = CLEAN_FIXTURE_NAME
         expected = COLLAPSE_CHECK_EXPECTATIONS[fixture_name]
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -134,7 +138,7 @@ class Step2bSentinelIgnoredByLintsTest(unittest.TestCase):
         copy step that mirrors the task tree into per-trial workdirs and
         (b) the report aggregator that summarizes per-check results into
         an overall PASS/FAIL payload. Both must be sentinel-blind."""
-        fixture_name = "byzantine-storage-rebalance"
+        fixture_name = CLEAN_FIXTURE_NAME
 
         with tempfile.TemporaryDirectory() as tmpdir:
             seeded = Path(tmpdir) / fixture_name

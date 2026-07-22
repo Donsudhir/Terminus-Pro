@@ -1,5 +1,5 @@
 ---
-description: Critical-path policy for TB3 task work. Pull when editing task files, running gates (run_static_checks.py, collapse_check.py, oracle, NOP), preparing a submission, or running approve_task.py. Source of truth when it disagrees with deeper rules.
+description: Critical TB3 policy for task edits, gates, review, packaging, and approval. Source of truth over deeper rules.
 alwaysApply: false
 ---
 
@@ -11,13 +11,8 @@ If a deep rule contradicts this one, edit the deep rule.
 
 ## 0. No hallucinated repo facts
 
-Before naming a path, command, `task.toml` field, output path, or test file:
-open the file or check `commands.md`. Specifically:
-
-- `/app/...` paths come from `instruction.md` or `output_contract.toml`, not memory.
-- `task.toml` fields come from an existing task or the static-checks output.
-- Test file paths come from `tests/test.sh` or the verifier files themselves.
-- Command syntax comes from `commands.md`.
+Before naming a path, command, metadata field, output, or test file, open the
+owning file or `commands.md`. Never invent repository facts from memory.
 
 ## 1. Step 2a before Step 2b
 
@@ -73,21 +68,16 @@ Before claiming READY / APPROVED / SUBMIT:
 
 ## 6. Forbidden shortcuts
 
-- Runtime verifier installs in `tests/test.sh` or `steps/milestone_N/tests/test.sh` when `allow_internet = false` (use `environment/Dockerfile` instead).
-- Omitting `[environment].allow_internet = false` from `task.toml`.
-- Editing tests to fit a broken solution.
-- Hiding golden answers under `environment/`.
-- Putting answer-shaped values into `instruction.md`.
-- Hidden instructions to the agent in environment files (HINT:/STEP N: walkthroughs, "to solve this...", prescriptive TODOs aimed at the solver).
-- AI-specific filenames anywhere in the archive (`CLAUDE.md`, `skills.md`, `AGENTS.md`, `.cursor/`, `.aider/`, …).
-- Replacing anonymous author placeholders (`"your-name"` / `"your-email"` / `"anonymous"`) with real identifiers.
-- Decorative code or empty files to satisfy size requirements.
-- Padding `solve.sh` with cosmetic operations (sed substitutions on comment markers, AST or heredoc rewrites whose only effect is whitespace or comment shuffling) to push GX3 / A16 line counts above the threshold. A WARN-band GX3 means the oracle is genuinely small — expand the substantive fix logic or accept the WARN with documented Step 3b justification. See `difficulty-calibration.mdc` A16 WARN-band policy.
-- Starting a new multi-container or UI building task (both no longer accepted; in-progress instances may be completed).
-- Using the deprecated root-level milestone layout (top-level `instruction.md` / `tests/` / `solution/` / `milestones.md` / `milestone_X.md`). Use `steps/milestone_N/` per `task-creation.mdc`.
-- Using Harbor-framework-only `task.toml` fields we do not adopt (`schema_version`, `[task]`, `min_reward`, `[steps.healthcheck]`, `[steps.verifier.env]`, `artifacts`, `multi_step_reward_strategy`, `workdir/setup.sh`).
-- Claiming a command passed without its output.
-- Bypassing the dirty-flag by deleting `.step2b-checksum`.
+- Runtime dependency installs when internet is disabled; use the Dockerfile.
+- Missing `allow_internet = false`, real author IDs, or unsupported Harbor metadata.
+- Editing tests around a bad solution, hidden answers, answer-shaped instructions,
+  solver walkthroughs, or AI-scaffolding names on solver-visible surfaces.
+- Decorative files, dead code, no-op rewrites, or cosmetic oracle padding.
+- New UI or multi-container tasks, or deprecated root-level milestone layout.
+- Claims without command evidence, or checksum deletion/forgery.
+
+Detailed constructions and examples belong in `task-creation.mdc` and
+`difficulty-calibration.mdc`; keep this file limited to critical policy.
 
 ## 7. Failure escalation
 

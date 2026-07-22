@@ -1,0 +1,26 @@
+user_visible_outputs = [
+  "/app/output/sensitivity_report.json",
+]
+
+internal_harness_files = [
+  "/app/build/libnative.a",
+  "/app/build/libanalysis.a",
+  "/app/build/libridge.a",
+  "/app/tools/build_all.sh",
+]
+
+[structured_outputs.sensitivity_report]
+target = "/app/output/sensitivity_report.json"
+format = "json"
+instruction_checks = [
+  "runs",
+  "label",
+  "ids",
+  "values",
+  "indices",
+  "dims",
+  "products",
+  "ledger",
+  "digest",
+  "scale summary",
+]

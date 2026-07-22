@@ -1,0 +1,410 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://terminal-bench.local/specs/validation_schema.json",
+  "title": "TB3 Step 2a validation evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "hardness_axes",
+    "anti_trivialization_checks",
+    "rubric_axes",
+    "instruction_completeness_test",
+    "discovery_budget",
+    "instruction_specificity",
+    "attack_path",
+    "smallest_plausible_patch",
+    "collapse_audit",
+    "topology_enumeration",
+    "construction_manifest",
+    "naming_pass"
+  ],
+  "properties": {
+    "hardness_axes": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": { "$ref": "#/$defs/named_verdict" }
+    },
+    "anti_trivialization_checks": {
+      "type": "array",
+      "minItems": 21,
+      "maxItems": 21,
+      "items": { "$ref": "#/$defs/named_verdict" }
+    },
+    "rubric_axes": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": { "$ref": "#/$defs/named_verdict" }
+    },
+    "instruction_completeness_test": { "$ref": "#/$defs/verdict_block" },
+    "discovery_budget": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["discovery", "planned_location", "why_instruction_must_not_reveal"],
+        "properties": {
+          "discovery": { "type": "string", "minLength": 1 },
+          "planned_location": { "type": "string", "minLength": 1 },
+          "why_instruction_must_not_reveal": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "instruction_specificity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "reasoning"],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["spec-complete", "cause-revealing", "symptoms-only"]
+        },
+        "reasoning": { "type": "string", "minLength": 1 }
+      }
+    },
+    "investigation_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "weakness_areas",
+        "causal_chain",
+        "evidence_surfaces",
+        "competing_hypotheses",
+        "conditional_failures",
+        "estimated_meaningful_actions",
+        "determinism_strategy",
+        "domain_reasoning"
+      ],
+      "properties": {
+        "weakness_areas": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "long_horizon_debugging",
+              "misleading_documentation",
+              "multi_component_reasoning",
+              "partial_failures",
+              "hidden_terminal_state",
+              "log_interpretation",
+              "ambiguous_bug_report",
+              "race_conditions",
+              "performance_optimization",
+              "long_context_reasoning",
+              "tool_selection",
+              "git_reasoning",
+              "infrastructure_debugging",
+              "sql_investigation",
+              "security_reasoning",
+              "large_refactor",
+              "planning_before_coding",
+              "mistake_recovery"
+            ]
+          }
+        },
+        "causal_chain": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["stage", "evidence", "finding", "unlocks_next"],
+            "properties": {
+              "stage": { "type": "integer", "minimum": 1 },
+              "evidence": { "type": "string", "minLength": 1 },
+              "finding": { "type": "string", "minLength": 1 },
+              "unlocks_next": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "evidence_surfaces": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["surface", "planned_location", "question_answered"],
+            "properties": {
+              "surface": {
+                "type": "string",
+                "enum": [
+                  "code",
+                  "runtime-state",
+                  "logs",
+                  "configuration",
+                  "documentation",
+                  "database",
+                  "build-artifacts",
+                  "metrics",
+                  "git-history",
+                  "filesystem",
+                  "network-capture",
+                  "tests"
+                ]
+              },
+              "planned_location": { "type": "string", "minLength": 1 },
+              "question_answered": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "competing_hypotheses": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["hypothesis", "why_plausible", "falsifier"],
+            "properties": {
+              "hypothesis": { "type": "string", "minLength": 1 },
+              "why_plausible": { "type": "string", "minLength": 1 },
+              "falsifier": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "conditional_failures": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["scenario", "role", "expected_behavior"],
+            "properties": {
+              "scenario": { "type": "string", "minLength": 1 },
+              "role": {
+                "type": "string",
+                "enum": ["failing", "healthy-control"]
+              },
+              "expected_behavior": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "estimated_meaningful_actions": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 100
+        },
+        "determinism_strategy": { "type": "string", "minLength": 1 },
+        "domain_reasoning": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["domain", "why_not_trivia"],
+          "properties": {
+            "domain": { "type": "string", "minLength": 1 },
+            "why_not_trivia": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "attack_path": { "$ref": "#/$defs/analysis_block" },
+    "smallest_plausible_patch": { "$ref": "#/$defs/analysis_block" },
+    "collapse_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "reasoning", "residual_hardness", "red_flags"],
+      "properties": {
+        "verdict": { "type": "string", "enum": ["PASS", "WARN", "FAIL"] },
+        "reasoning": { "type": "string", "minLength": 1 },
+        "residual_hardness": { "type": "string", "minLength": 1 },
+        "red_flags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "topology_enumeration": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "summary", "locations", "why_no_single_location_suffices"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "summary": { "type": "string", "minLength": 1 },
+          "locations": {
+            "type": "array",
+            "minItems": 3,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "why_no_single_location_suffices": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "construction_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol_table",
+        "flipping_point_contract",
+        "decoy_manifest",
+        "code_forbidden_tokens"
+      ],
+      "properties": {
+        "symbol_table": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "symbol", "kind", "signature", "purpose"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "symbol": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "enum": ["function", "class", "constant"] },
+              "signature": { "type": "string", "minLength": 1 },
+              "purpose": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "flipping_point_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "locations",
+            "no_single_location_flips_majority",
+            "concentration_cap"
+          ],
+          "properties": {
+            "locations": {
+              "type": "array",
+              "minItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "path", "controls_tests"],
+                "properties": {
+                  "id": { "type": "string", "minLength": 1 },
+                  "path": { "type": "string", "minLength": 1 },
+                  "controls_tests": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": { "type": "string", "minLength": 1 }
+                  }
+                }
+              }
+            },
+            "no_single_location_flips_majority": { "type": "boolean" },
+            "concentration_cap": { "type": "number", "maximum": 0.5 }
+          }
+        },
+        "decoy_manifest": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "kind", "rhymes_with", "non_fix_purpose"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "kind": { "type": "string", "minLength": 1 },
+              "rhymes_with": { "type": "string", "minLength": 1 },
+              "non_fix_purpose": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "code_forbidden_tokens": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "naming_pass": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instruction_nouns_extracted",
+        "renames_during_drafting",
+        "test_names_audited",
+        "concentration_math"
+      ],
+      "properties": {
+        "instruction_nouns_extracted": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "renames_during_drafting": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["original", "renamed_to", "reason"],
+            "properties": {
+              "original": { "type": "string" },
+              "renamed_to": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          }
+        },
+        "test_names_audited": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "concentration_math": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["total_tests", "per_location"],
+          "properties": {
+            "total_tests": { "type": "integer", "minimum": 1 },
+            "per_location": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["location_id", "test_count", "ratio"],
+                "properties": {
+                  "location_id": { "type": "string", "minLength": 1 },
+                  "test_count": { "type": "integer", "minimum": 0 },
+                  "ratio": { "type": "number", "minimum": 0 }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "named_verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "verdict", "reasoning"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "verdict": { "type": "string", "enum": ["PASS", "WARN", "FAIL"] },
+        "reasoning": { "type": "string", "minLength": 1 }
+      }
+    },
+    "verdict_block": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "reasoning"],
+      "properties": {
+        "verdict": { "type": "string", "enum": ["PASS", "WARN", "FAIL"] },
+        "reasoning": { "type": "string", "minLength": 1 }
+      }
+    },
+    "analysis_block": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "reasoning"],
+      "properties": {
+        "summary": { "type": "string", "minLength": 1 },
+        "reasoning": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

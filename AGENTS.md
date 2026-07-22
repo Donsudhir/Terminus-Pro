@@ -1,29 +1,34 @@
 # AGENTS.md
 
-Terminal-Bench 3.0 Edition 2 task-authoring harness. Unit of work: a task
-under `tasks/<task-name>/`. New here? Read `docs/ARCHITECTURE.md` first.
+Edition 2. Read `docs/ARCHITECTURE.md` and `sudhir_knowledge/TASK_LIFECYCLE.md`.
 
-## Where to look
+## Pipeline (every chat)
 
-- Layout: `docs/ARCHITECTURE.md`.
-- Before any task edit: pull `.cursor/rules/00-authoring-critical.mdc`.
-- Authoring: `task-creation.mdc`. Idea validation: `idea-validation.mdc`.
-- Review: `review-and-submit.mdc`. Hardness: `difficulty-calibration.mdc`.
-- Commands: `commands.md`. Workflow: `workflow-prompts.md`. Conventions: `REPO_CONVENTIONS.md`.
+Run `sudhir_task.py board`, then `ingest`; registry JSON is truth. Before
+packaging read `COMMON_MISTAKES.md` and `WHAT_WORKED.md`. New work first outputs
+the 4 proposal fields and stops for Check feedback,
+then run `idea new` + `idea proposal`. Construction needs proposal PASS,
+uniqueness + Step 2a GO. `outcome` requires evidence;
+evaluation-passed is not acceptance. Inbox: `sudhir_snorkel/inbox/`.
 
-## Must-fire bullets (every interaction)
+## Routing
 
-1. Every `task.toml` must include `[environment] allow_internet = false`; verifier deps go in `environment/Dockerfile`, not runtime installs in `test.sh`.
-2. Never claim PASS / READY / APPROVED / SUBMIT without command output as evidence.
-3. Cheap gates first: `run_static_checks.py` → `collapse_check.py` → oracle 1x → NOP. No oracle 10x in Step 2b.
-4. Don't invent paths, `task.toml` fields, or commands from memory; open the file or `commands.md`.
-5. After any task-file edit, prior Step 2b evidence is stale. Rerun cheap gates. `approve_task.py` refuses to package on checksum mismatch.
-6. One-command preflight: `./scripts/check-task.sh tasks/<task-name>`. Preflight only — oracle 1x and NOP still required for Step 2b PASS.
-7. Milestone tasks use the canonical `steps/milestone_N/{instruction.md, tests/, solution/}` layout with `task.toml` `version = "2.0"` and matching `[[steps]]` blocks. The deprecated root-level `instruction.md` / `tests/` / `solution/` / `milestones.md` shape is rejected — see `task-creation.mdc`.
-8. New starts of multi-container or UI building tasks are no longer accepted; in-progress instances may finish.
-9. After creating or revising a task and writing the submission zip, run `./scripts/cleanup-task-docker.sh <task-name>` to stop Harbor containers and prune Docker build cache so local runs do not keep the laptop busy.
-10. Non-trivial tasks need `environment/.dockerignore` in the task folder and in the submission zip (hidden dotfile; see `task-creation.mdc`). A zip missing `environment/.dockerignore` is a packaging defect when the task dir has one.
+Commands/process: `commands.md`, `workflow.md`, `REPO_CONVENTIONS.md`. Author,
+review, and communication detail lives under `.cursor/rules/`.
 
-## Forbidden in submissions
+## Always
 
-`output_contract.toml`, `quality_check_adjudication.json`, `construction_manifest.json`, `rubric*.txt`, `.step2b-checksum`, and any AI-scaffolding filename (`CLAUDE.md`, `AGENTS.md`, `skills.md`, `.cursor/`, `.aider/`, `.continue/`, `.claude/`) at any archive depth. See `REPO_CONVENTIONS.md`.
+1. Read commands from files, not memory.
+2. Offline only; install dependencies in the Dockerfile.
+3. Step 2b: preflight + oracle 1x + NOP. Step 4 only: oracle 10x.
+4. Edits invalidate evidence; rerun gates. Never alter checksums.
+5. Claim no status without command output.
+6. Store every form paste in `REV-<n>/`.
+7. Require `.dockerignore`; clean Docker after packaging.
+8. Log new failures in `COMMON_MISTAKES.md` immediately.
+9. No Python-primary solvable core (ADR-0014); verifier-only pytest is fine.
+
+## Shipping
+
+Follow `validate_submission_zip.py` and `REPO_CONVENTIONS.md`; never ship
+authoring metadata, checksums, metrics, rubrics, or AI scaffolding.

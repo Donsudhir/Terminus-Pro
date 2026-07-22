@@ -1,0 +1,577 @@
+{
+  "task_name": "robust-predicate-scale-parity",
+  "attempt": 1,
+  "best_score": [
+    0,
+    0
+  ],
+  "best_attempt": 1,
+  "plateau_count": 0,
+  "candidates": [],
+  "history": [
+    {
+      "attempt": 1,
+      "fails": 0,
+      "warns": 0,
+      "evidence_path": "/home/sudhir/Projects/TERMINUS/sudhir_ideas/specs/robust-predicate-scale-parity-attempt-1-evidence.json",
+      "evidence": {
+        "hardness_axes": [
+          {
+            "id": "discover",
+            "name": "Discover",
+            "verdict": "PASS",
+            "reasoning": "The public symptoms do not identify the invalid numerical bound, the lost refinement status, the cross-batch scale lifetime, or the connectivity fold convention. The solver must recover those facts from C, Rust, Fortran, build behavior, and transformed runs."
+          },
+          {
+            "id": "synthesize",
+            "name": "Synthesize",
+            "verdict": "PASS",
+            "reasoning": "Correct affine-equivalent connectivity requires coordinated behavior across a C determinant path, two Rust state-boundary locations, and a Fortran incidence fold. No module contains the complete scientific invariant."
+          },
+          {
+            "id": "diagnose",
+            "name": "Diagnose",
+            "verdict": "PASS",
+            "reasoning": "The instruction reports changing connectivity, inverted cells, neighbor failures, and summary disagreement without naming predicates, contraction, status encoding, normalization, or ordering as causes."
+          },
+          {
+            "id": "navigate_coupling",
+            "name": "Navigate coupling",
+            "verdict": "PASS",
+            "reasoning": "A corrected numerical filter still fails if refinement is not propagated, correct status mapping still fails with stale batch scale, and valid cells still serialize differently when the downstream fold convention disagrees."
+          },
+          {
+            "id": "reason_beyond_training",
+            "name": "Reason beyond training",
+            "verdict": "PASS",
+            "reasoning": "Known robust-predicate code can address only the C kernel. The custom three-valued ABI, affine batch lifecycle, and legacy Fortran connectivity fold create a project-specific scientific coupling that cannot be solved by copying one reference implementation."
+          }
+        ],
+        "anti_trivialization_checks": [
+          {
+            "id": "disclosure_collapse",
+            "name": "Disclosure-collapse",
+            "verdict": "PASS",
+            "reasoning": "An honest statement of topology invariance and output correctness does not reveal which numerical, status, lifecycle, or folding authority is inconsistent."
+          },
+          {
+            "id": "hidden_instance",
+            "name": "Hidden-instance",
+            "verdict": "PASS",
+            "reasoning": "The task generalizes across generated near-flat, near-spherical, translated, rescaled, reordered, and sequential batches rather than hiding one corrupted case."
+          },
+          {
+            "id": "single_artifact_repair",
+            "name": "Single-artifact repair",
+            "verdict": "PASS",
+            "reasoning": "Four coordinated locations across three languages are required, and no manifest, fixture, or report replacement can satisfy regenerated invariant checks."
+          },
+          {
+            "id": "generalization",
+            "name": "Generalization",
+            "verdict": "PASS",
+            "reasoning": "The verifier derives transformed variants and exact properties from raw rational inputs, so fixes must generalize beyond named bundles."
+          },
+          {
+            "id": "prompt_honesty",
+            "name": "Prompt-honesty",
+            "verdict": "PASS",
+            "reasoning": "The instruction names observable geometry failures, invocation, output, and completion conditions while withholding only implementation causes and fix sites."
+          },
+          {
+            "id": "cheating_vs_difficulty",
+            "name": "Cheating-vs-difficulty",
+            "verdict": "PASS",
+            "reasoning": "Regeneration and exact test-side arithmetic prevent hardcoding, but the difficulty remains the cross-language scientific diagnosis rather than those anti-cheating mechanisms."
+          },
+          {
+            "id": "mechanical_fix_filter",
+            "name": "Mechanical-fix filter",
+            "verdict": "PASS",
+            "reasoning": "The core work is not dependency placement, timeouts, reward formatting, or metadata repair."
+          },
+          {
+            "id": "localized_fix",
+            "name": "Localized-fix",
+            "verdict": "PASS",
+            "reasoning": "The selected topology contains one C location, two Rust locations, and one Fortran location, each controlling only one third of the planned tests."
+          },
+          {
+            "id": "oracle_locality",
+            "name": "Oracle-locality",
+            "verdict": "PASS",
+            "reasoning": "The planned oracle performs substantive numerical-bound, status, lifecycle, and incidence-fold changes rather than replacing one short file or toggling one compiler option."
+          },
+          {
+            "id": "small_declarative_cluster",
+            "name": "Small declarative-cluster",
+            "verdict": "PASS",
+            "reasoning": "No finite table, threshold list, schema block, or configuration cluster contains the solution."
+          },
+          {
+            "id": "grep_collapse",
+            "name": "Grep-collapse",
+            "verdict": "PASS",
+            "reasoning": "Selected fix paths and symbols use opaque series, plate, frame, and pack vocabulary that does not contain any noun extracted from the public instruction."
+          },
+          {
+            "id": "pre_factored_helper",
+            "name": "Pre-factored-helper",
+            "verdict": "PASS",
+            "reasoning": "The selected functions do not mirror public terms such as connectivity, orientation, topology, batch, cell, or report."
+          },
+          {
+            "id": "recipe_discount",
+            "name": "Recipe-discount",
+            "verdict": "PASS",
+            "reasoning": "A known adaptive-predicate recipe cannot repair the custom status mapping, batch-scoped coordinate policy, or Fortran canonical fold."
+          },
+          {
+            "id": "security_aura_discount",
+            "name": "Security-aura discount",
+            "verdict": "PASS",
+            "reasoning": "This is a scientific-computing task and does not rely on security language or exploit framing for difficulty."
+          },
+          {
+            "id": "orthogonal_checklist",
+            "name": "Orthogonal-checklist",
+            "verdict": "PASS",
+            "reasoning": "Cross-location tests couple the C filter to Rust status propagation, Rust lifecycle locations to one another, and Rust batch state to the Fortran fold."
+          },
+          {
+            "id": "harness_discount",
+            "name": "Harness-discount",
+            "verdict": "PASS",
+            "reasoning": "Docker and mixed-language compilation provide realism, while residual hardness comes from mathematical decisions and state conventions."
+          },
+          {
+            "id": "one_pass_solvability",
+            "name": "One-pass solvability",
+            "verdict": "PASS",
+            "reasoning": "Opening the obvious entrypoint does not reveal the four locations, and copying public C code leaves three non-C invariant failures plus custom ABI adaptation."
+          },
+          {
+            "id": "hard_only_gate",
+            "name": "Hard-only gate",
+            "verdict": "PASS",
+            "reasoning": "The bounded task requires professional computational-geometry, floating-point, FFI, and scientific-pipeline reasoning across three languages within an expert-hours scope."
+          },
+          {
+            "id": "discovery_budget_test",
+            "name": "Discovery budget test",
+            "verdict": "PASS",
+            "reasoning": "Four non-trivial discoveries are committed below, each with a distinct planned location and a reason it must remain absent from the public instruction."
+          },
+          {
+            "id": "instruction_specificity_test",
+            "name": "Instruction specificity test",
+            "verdict": "PASS",
+            "reasoning": "The drafted instruction mechanically classifies symptoms-only with zero triggered specificity families and no named algorithm, threshold, schema enumeration, or cause."
+          },
+          {
+            "id": "topology_distribution_test",
+            "name": "Topology distribution test",
+            "verdict": "PASS",
+            "reasoning": "Three distinct candidate topologies are enumerated below, each requiring at least four coordinating locations; the selected topology distributes tests across four locations at 0.3333 each."
+          }
+        ],
+        "rubric_axes": [
+          {
+            "id": "verifiable",
+            "name": "Verifiable",
+            "verdict": "PASS",
+            "reasoning": "Exact determinant signs, cell handedness, local empty-sphere properties, adjacency reciprocity, affine-equivalent connectivity, topology counts, and byte determinism are all programmatic."
+          },
+          {
+            "id": "well_specified",
+            "name": "Well-specified",
+            "verdict": "PASS",
+            "reasoning": "The 163-word instruction clearly identifies invocation, output, preserved identities, invariant outcomes, and prohibited hardcoding without revealing implementation causes."
+          },
+          {
+            "id": "solvable",
+            "name": "Solvable",
+            "verdict": "PASS",
+            "reasoning": "The design bounds inputs and fixes to a small existing pipeline; an expert familiar with numerical geometry and FFI can complete the coordinated changes in roughly three to eight hours."
+          },
+          {
+            "id": "difficult",
+            "name": "Difficult",
+            "verdict": "PASS",
+            "reasoning": "The task stays hard after honest disclosure because the observable topology does not identify which numerical and cross-language conventions disagree."
+          },
+          {
+            "id": "interesting",
+            "name": "Interesting",
+            "verdict": "PASS",
+            "reasoning": "Reliable tetrahedral connectivity is paid production work in CAD, finite-element meshing, simulation, geoscience, and scientific visualization."
+          },
+          {
+            "id": "outcome_verified",
+            "name": "Outcome-verified",
+            "verdict": "PASS",
+            "reasoning": "The tests accept any implementation producing correct mathematical and topological outcomes and do not require the oracle's exact code shape."
+          }
+        ],
+        "instruction_completeness_test": {
+          "verdict": "PASS",
+          "reasoning": "The instruction is sufficient to judge the final geometry report but insufficient to locate or derive the four fixes without deeply reading and running the codebase."
+        },
+        "discovery_budget": [
+          {
+            "discovery": "The filtered determinant's accepted-error region no longer matches the arithmetic produced by the compiled C translation unit, allowing a near-zero determinant to be certified with the wrong sign.",
+            "planned_location": "environment/native/series.c plus the native build target",
+            "why_instruction_must_not_reveal": "Naming arithmetic contraction or the stale bound would collapse the C diagnosis into a compiler-option or formula lookup."
+          },
+          {
+            "discovery": "The C status contract has a refinement-required state that the Rust mapping collapses into an ordinary sign, bypassing the exact path without a crash.",
+            "planned_location": "environment/native/include/series.h and environment/host/src/plate.rs",
+            "why_instruction_must_not_reveal": "Naming a tri-valued status or refinement state would identify both the boundary and the required branch."
+          },
+          {
+            "discovery": "Coordinate scaling is retained across independent batches, so an affine-equivalent batch is evaluated using a magnitude policy derived from earlier input.",
+            "planned_location": "environment/host/src/frame.rs and its batch caller",
+            "why_instruction_must_not_reveal": "Stating that normalization must reset per batch would directly expose the lifecycle repair."
+          },
+          {
+            "discovery": "Canonical connectivity folding must use a vertex convention coherent with upstream signs; the legacy Fortran fold uses a different permutation convention on ambiguous rows.",
+            "planned_location": "environment/analysis/pack.f90",
+            "why_instruction_must_not_reveal": "Naming permutation, ordering, or sign convention would reduce the Fortran work to a disclosed tie-break recipe."
+          }
+        ],
+        "instruction_specificity": {
+          "level": "symptoms-only",
+          "reasoning": "Mechanical audit reports zero algorithm, schema-enumeration, API-enumeration, numeric-threshold, binding-phrase, and scope-closure signals."
+        },
+        "attack_path": {
+          "summary": "Reproduce transformed-batch divergence, isolate sign and refinement disagreements, trace batch-scoped magnitude state, then reconcile canonical connectivity across the legacy analysis boundary.",
+          "reasoning": "The path requires experiments and cross-language model building; no prompt noun, file name, or single failed assertion reveals all four locations."
+        },
+        "smallest_plausible_patch": {
+          "summary": "Coordinated substantive edits to one C numerical kernel, two Rust status/lifecycle locations, and one Fortran connectivity fold, together exceeding a trivial patch.",
+          "reasoning": "Any strict subset leaves at least one exact-sign, affine-batch, local-validity, canonical-connectivity, or deterministic-report property failing."
+        },
+        "collapse_audit": {
+          "verdict": "PASS",
+          "reasoning": "The editable frontier spans four non-obvious locations across three languages, the instruction remains symptoms-only, no declarative cluster or reference output exists, and the planned oracle adds substantive logic rather than deleting or toggling one feature.",
+          "residual_hardness": "After the complete file tree is visible, the solver must still identify why mathematically equivalent geometry crosses different numerical and representation authorities and then preserve one invariant through four locations.",
+          "red_flags": []
+        },
+        "topology_enumeration": [
+          {
+            "id": "topology_a_selected",
+            "summary": "Certification, status, batch scale, and connectivity fold disagree across the C, Rust, and Fortran pipeline.",
+            "locations": [
+              "native/series.c::eval_band",
+              "host/plate.rs::map_state",
+              "host/frame.rs::clear_frame",
+              "analysis/pack.f90::fold_rows"
+            ],
+            "why_no_single_location_suffices": "A correct C sign can still be discarded or evaluated under stale scale, and correct upstream cells can still serialize to a different canonical complex."
+          },
+          {
+            "id": "topology_b_numeric_certificate",
+            "summary": "The fast filter, exact refinement, certificate packing, and foreign status mapping form a four-stage numerical certificate chain.",
+            "locations": [
+              "native/series.c::eval_band",
+              "native/refine.c::seal_mark",
+              "native/capsule.c::pack_cert",
+              "host/plate.rs::map_state"
+            ],
+            "why_no_single_location_suffices": "The exact path is useless if not requested, a correct sign is useless if packed incorrectly, and a correct certificate is useless if the foreign mapper collapses its status."
+          },
+          {
+            "id": "topology_c_symmetry_convention",
+            "summary": "Canonical row folding, orientation auditing, face packing, and native orientation stamping use incompatible symmetry conventions.",
+            "locations": [
+              "analysis/pack.f90::fold_rows",
+              "analysis/pulse.f90::seal_axes",
+              "host/relay.rs::pack_faces",
+              "native/stamp.c::mark_side"
+            ],
+            "why_no_single_location_suffices": "Changing one convention only moves the disagreement to another boundary; all producers and consumers must represent the same oriented complex."
+          }
+        ],
+        "construction_manifest": {
+          "symbol_table": [
+            {
+              "path": "native/series.c",
+              "symbol": "eval_band",
+              "kind": "function",
+              "signature": "int eval_band(const double *a, const double *b, int32_t n, double *c);",
+              "purpose": "Evaluates a bounded numerical decision and returns a status plus working value."
+            },
+            {
+              "path": "host/plate.rs",
+              "symbol": "map_state",
+              "kind": "function",
+              "signature": "pub(crate) fn map_state(a: i32, b: &mut Frame) -> i8",
+              "purpose": "Maps a foreign status into the host pipeline while preserving escalation behavior."
+            },
+            {
+              "path": "host/frame.rs",
+              "symbol": "clear_frame",
+              "kind": "function",
+              "signature": "pub(crate) fn clear_frame(a: &mut Frame, b: &[f64])",
+              "purpose": "Initializes per-run magnitude context from the current input."
+            },
+            {
+              "path": "analysis/pack.f90",
+              "symbol": "fold_rows",
+              "kind": "function",
+              "signature": "integer(c_int) function fold_rows(a, b, c) bind(C)",
+              "purpose": "Folds emitted integer rows into a stable representation and updates incidence totals."
+            }
+          ],
+          "flipping_point_contract": {
+            "locations": [
+              {
+                "id": "A",
+                "path": "native/series.c",
+                "controls_tests": [
+                  "test_r01",
+                  "test_r02",
+                  "test_r06",
+                  "test_r10"
+                ]
+              },
+              {
+                "id": "B",
+                "path": "host/plate.rs",
+                "controls_tests": [
+                  "test_r03",
+                  "test_r06",
+                  "test_r07",
+                  "test_r10"
+                ]
+              },
+              {
+                "id": "C",
+                "path": "host/frame.rs",
+                "controls_tests": [
+                  "test_r04",
+                  "test_r05",
+                  "test_r11",
+                  "test_r12"
+                ]
+              },
+              {
+                "id": "D",
+                "path": "analysis/pack.f90",
+                "controls_tests": [
+                  "test_r07",
+                  "test_r08",
+                  "test_r09",
+                  "test_r12"
+                ]
+              }
+            ],
+            "no_single_location_flips_majority": true,
+            "concentration_cap": 0.34
+          },
+          "decoy_manifest": [
+            {
+              "path": "native/window.c",
+              "kind": "helper",
+              "rhymes_with": "eval_band",
+              "non_fix_purpose": "Computes viewport statistics for ordinary diagnostic summaries."
+            },
+            {
+              "path": "host/router.rs",
+              "kind": "helper",
+              "rhymes_with": "map_state",
+              "non_fix_purpose": "Maps report codes for display without affecting numerical decisions."
+            },
+            {
+              "path": "host/pool.rs",
+              "kind": "helper",
+              "rhymes_with": "clear_frame",
+              "non_fix_purpose": "Clears reusable output slots after completed runs."
+            },
+            {
+              "path": "analysis/stats.f90",
+              "kind": "helper",
+              "rhymes_with": "fold_rows",
+              "non_fix_purpose": "Folds scalar diagnostic marks into aggregate counters."
+            }
+          ],
+          "code_forbidden_tokens": [
+            "geometry",
+            "lab",
+            "app",
+            "connectivity",
+            "report",
+            "point",
+            "cloud",
+            "point-cloud",
+            "batch",
+            "space",
+            "cell",
+            "set",
+            "boundary",
+            "case",
+            "neighbor",
+            "relation",
+            "disagreement",
+            "audit",
+            "summary",
+            "pipeline",
+            "output",
+            "bin",
+            "geomlab",
+            "variant",
+            "identity",
+            "adjacency",
+            "orientation",
+            "validity",
+            "topology",
+            "count",
+            "reproducibility",
+            "digest",
+            "input",
+            "cardinality",
+            "handedness",
+            "structure",
+            "check"
+          ]
+        },
+        "naming_pass": {
+          "instruction_nouns_extracted": [
+            "geometry",
+            "lab",
+            "app",
+            "connectivity",
+            "report",
+            "point",
+            "cloud",
+            "point-cloud",
+            "batch",
+            "space",
+            "cell",
+            "set",
+            "boundary",
+            "case",
+            "neighbor",
+            "relation",
+            "disagreement",
+            "audit",
+            "summary",
+            "pipeline",
+            "output",
+            "bin",
+            "geomlab",
+            "variant",
+            "identity",
+            "adjacency",
+            "orientation",
+            "validity",
+            "topology",
+            "count",
+            "reproducibility",
+            "digest",
+            "input",
+            "cardinality",
+            "handedness",
+            "structure",
+            "check"
+          ],
+          "renames_during_drafting": [
+            {
+              "original": "host/bridge.rs",
+              "renamed_to": "host/plate.rs",
+              "reason": "Removed a semantic tell for the foreign-language boundary."
+            },
+            {
+              "original": "analysis/order.f90",
+              "renamed_to": "analysis/pack.f90",
+              "reason": "Removed a direct clue about the connectivity-ordering fault."
+            },
+            {
+              "original": "host/batch.rs",
+              "renamed_to": "host/frame.rs",
+              "reason": "Removed the public instruction noun batch from a selected fix path."
+            },
+            {
+              "original": "reset_frame",
+              "renamed_to": "clear_frame",
+              "reason": "Avoided the forbidden noun set appearing as a substring inside reset."
+            },
+            {
+              "original": "canonicalize_cells",
+              "renamed_to": "fold_rows",
+              "reason": "Removed direct public contract nouns from the Fortran fix symbol."
+            }
+          ],
+          "test_names_audited": [
+            "test_r01",
+            "test_r02",
+            "test_r03",
+            "test_r04",
+            "test_r05",
+            "test_r06",
+            "test_r07",
+            "test_r08",
+            "test_r09",
+            "test_r10",
+            "test_r11",
+            "test_r12"
+          ],
+          "concentration_math": {
+            "total_tests": 12,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "B",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "C",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "D",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              }
+            ]
+          },
+          "recomputed_concentration": {
+            "total_tests": 12,
+            "concentration_cap": 0.34,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "B",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "C",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "D",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              }
+            ]
+          }
+        }
+      },
+      "evidence_errors": [],
+      "blocking_failures": []
+    }
+  ],
+  "schema_path": "/home/sudhir/Projects/TERMINUS/specs/validation_schema.json"
+}

@@ -23,7 +23,6 @@ from pathlib import Path, PurePosixPath
 import approve_task
 import task_integrity
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 MODULE_PATH = REPO_ROOT / "task_integrity.py"
 

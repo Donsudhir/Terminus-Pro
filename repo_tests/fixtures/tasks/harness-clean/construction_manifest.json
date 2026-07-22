@@ -1,0 +1,101 @@
+{
+  "code_forbidden_tokens": [
+    "payload",
+    "probe",
+    "musl",
+    "interpreter",
+    "identity",
+    "settlement",
+    "assembly",
+    "qemu",
+    "matrix",
+    "report",
+    "binary",
+    "thread-local",
+    "contract",
+    "ledger",
+    "courier",
+    "schema_version",
+    "detail",
+    "entrypoint",
+    "linking",
+    "release",
+    "expectations",
+    "static"
+  ],
+  "decoy_manifest": [
+    {
+      "kind": "helper",
+      "non_fix_purpose": "Records staging telemetry for dry-run diagnostics; never consulted by the release build.",
+      "path": "mod_a/legacy_knit.c",
+      "rhymes_with": "op_knit"
+    },
+    {
+      "kind": "helper",
+      "non_fix_purpose": "Pretty-prints candidate -L orders for operators; output is unused by the linker.",
+      "path": "mod_b/lane_watch.c",
+      "rhymes_with": "step_lane"
+    },
+    {
+      "kind": "helper",
+      "non_fix_purpose": "Writes an alternate audit JSON under /tmp for humans; not the verifier ledger.",
+      "path": "mod_c/seal_audit.c",
+      "rhymes_with": "seal_phase"
+    }
+  ],
+  "flipping_point_contract": {
+    "concentration_cap": 0.5,
+    "locations": [
+      {
+        "controls_tests": [
+          "test_artifact_present",
+          "test_elf_has_no_interp",
+          "test_runtime_marker_match"
+        ],
+        "id": "A",
+        "path": "mod_a/op_knit.c"
+      },
+      {
+        "controls_tests": [
+          "test_runtime_thread_slot",
+          "test_runtime_errno_slot",
+          "test_digest_matches_artifact"
+        ],
+        "id": "B",
+        "path": "mod_b/step_lane.c"
+      },
+      {
+        "controls_tests": [
+          "test_summary_all_true",
+          "test_summary_count"
+        ],
+        "id": "C",
+        "path": "mod_c/seal_phase.c"
+      }
+    ],
+    "no_single_location_flips_majority": true
+  },
+  "symbol_table": [
+    {
+      "kind": "function",
+      "path": "mod_a/op_knit.c",
+      "purpose": "Stages include and CRT objects from selected vendor roots into out_dir.",
+      "signature": "int op_knit(const char *a, const char *b, const char *out_dir);",
+      "symbol": "op_knit"
+    },
+    {
+      "kind": "function",
+      "path": "mod_b/step_lane.c",
+      "purpose": "Writes library search-path ordering into a link response fragment.",
+      "signature": "int step_lane(const char *a, const char *b, const char *out_path);",
+      "symbol": "step_lane"
+    },
+    {
+      "kind": "function",
+      "path": "mod_c/seal_phase.c",
+      "purpose": "Emits final link flags and drives report settlement from live row outcomes.",
+      "signature": "int seal_phase(const char *a, const char *b, const char *out_path);",
+      "symbol": "seal_phase"
+    }
+  ]
+}

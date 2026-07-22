@@ -9,9 +9,10 @@ import unittest
 from pathlib import Path
 
 import collapse_check
-from repo_tests.cases import COLLAPSE_CHECK_EXPECTATIONS, FIXTURE_TASKS_DIR
+from repo_tests.current_cases import COLLAPSE_CHECK_EXPECTATIONS, FIXTURE_TASKS_DIR
 
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "collapse_check"
+SHADOW_MODEL_FIXTURE = FIXTURES_DIR / "shadow-model"
 
 
 class CollapseCheckRegressionTest(unittest.TestCase):
@@ -74,7 +75,9 @@ class CollapseCheckRegressionTest(unittest.TestCase):
                         expected["rc7_band"]["oracle_loc"],
                     )
 
-                self.assertEqual(collapse_check.exit_code(report), 1)
+                self.assertEqual(
+                    collapse_check.exit_code(report), expected["exit_code"]
+                )
 
     def test_json_cli_output_matches_programmatic_report(self) -> None:
         for task_name in COLLAPSE_CHECK_EXPECTATIONS:
@@ -84,7 +87,10 @@ class CollapseCheckRegressionTest(unittest.TestCase):
                     exit_code = collapse_check.main(
                         [str(FIXTURE_TASKS_DIR / task_name), "--json"]
                     )
-                self.assertEqual(exit_code, 1)
+                self.assertEqual(
+                    exit_code,
+                    COLLAPSE_CHECK_EXPECTATIONS[task_name]["exit_code"],
+                )
                 payload = json.loads(stdout.getvalue())
                 self.assertEqual(
                     payload["oracle_targets"],
@@ -117,6 +123,83 @@ class CollapseCheckRegressionTest(unittest.TestCase):
                     "tests/test_outputs.py",
                 },
             )
+
+    def test_symbol_extraction_supports_rust_scoped_visibility_and_fortran(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            rust_source = root / "plate.rs"
+            rust_source.write_text(
+                "pub(crate) fn map_state(a: i32) -> i32 { a }\n",
+                encoding="utf-8",
+            )
+            fortran_source = root / "pack.f90"
+            fortran_source.write_text(
+                textwrap.dedent(
+                    """\
+                    integer(c_int) function fold_rows(a) bind(C)
+                      use iso_c_binding
+                      integer(c_int), value :: a
+                      fold_rows = a
+                    end function fold_rows
+                    """
+                ),
+                encoding="utf-8",
+            )
+
+            self.assertIn("map_state", collapse_check.extract_symbols_from_file(rust_source))
+            self.assertIn("fold_rows", collapse_check.extract_symbols_from_file(fortran_source))
+
+    def test_short_infix_does_not_create_a_grep_collision(self) -> None:
+        self.assertEqual(
+            collapse_check._substring_matches({"lace"}, {"replace"}),
+            set(),
+        )
+        self.assertEqual(
+            collapse_check._substring_matches({"lace"}, {"lace"}),
+            {("lace", "lace")},
+        )
+        self.assertEqual(
+            collapse_check._substring_matches({"mapstate"}, {"state"}),
+            {("state", "mapstate")},
+        )
+
+    def test_reconstructed_frontier_uses_runtime_source_roots(self) -> None:
+        target = "bootstrap/base/src/aero/veil.rs"
+        self.assertEqual(
+            collapse_check.semantic_frontier_path(target),
+            "src/aero/veil.rs",
+        )
+        self.assertEqual(collapse_check.frontier_root(target), "src/aero")
+
+    def test_cr2_uses_distinct_subsystems_under_shared_src_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            task_dir = Path(tmp)
+            manifest = {
+                "flipping_point_contract": {
+                    "locations": [
+                        {"id": "A", "path": "src/aero/veil.rs", "controls_tests": ["test_a"]},
+                        {"id": "B", "path": "src/cairn/sill.rs", "controls_tests": ["test_b"]},
+                        {"id": "C", "path": "src/quill/quay.rs", "controls_tests": ["test_c"]},
+                    ],
+                    "concentration_cap": 0.5,
+                }
+            }
+            (task_dir / "construction_manifest.json").write_text(
+                json.dumps(manifest),
+                encoding="utf-8",
+            )
+            report = collapse_check.cr2_flipping_point_contract(task_dir)
+            self.assertEqual(report["severity"], "PASS")
+            self.assertEqual(report["distinct_roots"], ["aero", "cairn", "quill"])
+
+            for location in manifest["flipping_point_contract"]["locations"]:
+                location["path"] = f"src/aero/{location['id'].lower()}.rs"
+            (task_dir / "construction_manifest.json").write_text(
+                json.dumps(manifest),
+                encoding="utf-8",
+            )
+            report = collapse_check.cr2_flipping_point_contract(task_dir)
+            self.assertEqual(report["severity"], "FAIL")
 
     def test_analyze_oracle_handles_inplace_rewrite_patterns(self) -> None:
         task_dir = FIXTURES_DIR / "oracle-rewrite-patterns"
@@ -203,13 +286,13 @@ class CollapseCheckRegressionTest(unittest.TestCase):
             self.assertEqual(report["predictable"][0]["signals"], ["test_names", "visible_file_names"])
 
     def test_rc5_flags_hardcoded_digest_constants_in_repo_fixture(self) -> None:
-        report = collapse_check.rc5_reference_artifacts(FIXTURE_TASKS_DIR / "byzantine-storage-rebalance")
+        report = collapse_check.rc5_reference_artifacts(SHADOW_MODEL_FIXTURE)
         issue_types = {issue["type"] for issue in report["issues"]}
         self.assertIn("hardcoded_digest_constants", issue_types)
 
     def test_rc4_and_rc5_flag_shadow_models_in_repo_fixture(self) -> None:
-        rc4 = collapse_check.rc4_tamper_surface(FIXTURE_TASKS_DIR / "lsm-snapshot-recovery")
-        rc5 = collapse_check.rc5_reference_artifacts(FIXTURE_TASKS_DIR / "lsm-snapshot-recovery")
+        rc4 = collapse_check.rc4_tamper_surface(SHADOW_MODEL_FIXTURE)
+        rc5 = collapse_check.rc5_reference_artifacts(SHADOW_MODEL_FIXTURE)
 
         self.assertEqual(rc4["severity"], "FAIL")
         self.assertEqual(rc5["severity"], "FAIL")

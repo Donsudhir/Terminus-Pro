@@ -1,0 +1,5 @@
+[matrix]
+rows = ["marker", "thread", "errno"]
+
+[runner]
+qemu = "qemu-x86_64"

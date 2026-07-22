@@ -1,29 +1,39 @@
 #!/usr/bin/env python3
 """
-Validate one submission zip produced for Task_Ready_To_Submit.
+Validate one submission zip from the canonical current-submission root or an
+explicit historical/reference path.
 
 Usage:
-    python3 validate_submission_zip.py Task_Ready_To_Submit/<task-name>.zip
-    python3 validate_submission_zip.py Task_Ready_To_Submit/<task-name>.zip --json
+    python3 validate_submission_zip.py "$TB3_SUBMISSIONS_DIR/<task-name>.zip"
+    python3 validate_submission_zip.py "$TB3_SUBMISSIONS_DIR/<task-name>.zip" --json
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import tomllib
 import zipfile
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-REQUIRED_ROOT_FILES = (
+import task_layout
+
+STANDARD_REQUIRED_ROOT_FILES = (
     "instruction.md",
     "task.toml",
 )
-REQUIRED_ROOT_DIRS = (
+STANDARD_REQUIRED_ROOT_DIRS = (
     "environment",
     "solution",
     "tests",
 )
+MILESTONE_REQUIRED_ROOT_FILES = ("task.toml",)
+MILESTONE_REQUIRED_ROOT_DIRS = ("environment", "steps")
+
+# Backward-compatible names used in reports for archives that cannot be read.
+REQUIRED_ROOT_FILES = STANDARD_REQUIRED_ROOT_FILES
+REQUIRED_ROOT_DIRS = STANDARD_REQUIRED_ROOT_DIRS
 FORBIDDEN_ROOT_FILES = (
     "rubric.txt",
     "rubrics.txt",
@@ -84,7 +94,7 @@ FORBIDDEN_MEMBER_SUBSTRINGS = (
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Validate a Task_Ready_To_Submit zip archive for required archive-root files, "
+            "Validate a submission zip archive for required archive-root files, "
             "required root directories, wrapping folders, and forbidden archive-root files."
         )
     )
@@ -157,8 +167,16 @@ def detect_wrapping_folder(
         else:
             nested_root_dirs.add(parts[1])
 
-    recognized_nested_files = sorted(name for name in nested_root_files if name in REQUIRED_ROOT_FILES)
-    recognized_nested_dirs = sorted(name for name in nested_root_dirs if name in REQUIRED_ROOT_DIRS)
+    recognized_nested_files = sorted(
+        name
+        for name in nested_root_files
+        if name in set(STANDARD_REQUIRED_ROOT_FILES) | set(MILESTONE_REQUIRED_ROOT_FILES)
+    )
+    recognized_nested_dirs = sorted(
+        name
+        for name in nested_root_dirs
+        if name in set(STANDARD_REQUIRED_ROOT_DIRS) | set(MILESTONE_REQUIRED_ROOT_DIRS)
+    )
     if not recognized_nested_files and not recognized_nested_dirs:
         return None
 
@@ -195,6 +213,8 @@ def build_error_report(zip_path: Path, failure: str) -> dict[str, Any]:
     return {
         "zip_path": str(resolved_path),
         "valid": False,
+        "layout": "unknown",
+        "milestones": [],
         "member_count": 0,
         "required_root_files": list(REQUIRED_ROOT_FILES),
         "required_root_dirs": [f"{name}/" for name in REQUIRED_ROOT_DIRS],
@@ -224,9 +244,25 @@ def build_report(zip_path: Path) -> dict[str, Any]:
         return build_error_report(resolved_path, f"invalid zip archive: {resolved_path} ({exc})")
 
     root_files, root_dirs = collect_root_entries(members)
-    member_names = [str(member["name"]) for member in members]
-    missing_root_files = sorted(set(REQUIRED_ROOT_FILES) - root_files)
-    missing_root_dirs = sorted(set(REQUIRED_ROOT_DIRS) - root_dirs)
+    member_names = [str(member["name"]) for member in members if not member["is_dir"]]
+    try:
+        with zipfile.ZipFile(resolved_path) as archive:
+            task_data = tomllib.loads(archive.read("task.toml").decode("utf-8"))
+    except (KeyError, UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        task_data = {}
+        task_toml_error = f"task.toml could not be parsed: {exc}"
+    else:
+        task_toml_error = None
+    layout_report = task_layout.classify_inventory(member_names, task_data)
+    layout = layout_report.kind
+    if layout == "milestone":
+        required_root_files = MILESTONE_REQUIRED_ROOT_FILES
+        required_root_dirs = MILESTONE_REQUIRED_ROOT_DIRS
+    else:
+        required_root_files = STANDARD_REQUIRED_ROOT_FILES
+        required_root_dirs = STANDARD_REQUIRED_ROOT_DIRS
+    missing_root_files = sorted(set(required_root_files) - root_files)
+    missing_root_dirs = sorted(set(required_root_dirs) - root_dirs)
     forbidden_root_files = sorted(set(FORBIDDEN_ROOT_FILES) & root_files)
     forbidden_members = sorted(
         name
@@ -238,6 +274,11 @@ def build_report(zip_path: Path) -> dict[str, Any]:
 
     passes: list[str] = []
     failures: list[str] = []
+    milestones: list[str] = list(layout_report.milestone_names)
+
+    if task_toml_error:
+        failures.append(task_toml_error)
+    failures.extend(layout_report.errors)
 
     if missing_root_files:
         failures.append(f"missing required archive-root files: {', '.join(missing_root_files)}")
@@ -278,12 +319,24 @@ def build_report(zip_path: Path) -> dict[str, Any]:
             "task files must live at the archive root"
         )
 
+    if layout == "milestone" and wrapping_folder is None and not layout_report.errors:
+        passes.extend(
+            [
+                "no deprecated root-level milestone content present",
+                "task.toml steps match milestone directories",
+                "milestone count matches task.toml metadata",
+                "all milestone directories contain canonical files",
+            ]
+        )
+
     return {
         "zip_path": str(resolved_path),
         "valid": not failures,
+        "layout": layout,
+        "milestones": milestones,
         "member_count": len(members),
-        "required_root_files": list(REQUIRED_ROOT_FILES),
-        "required_root_dirs": [f"{name}/" for name in REQUIRED_ROOT_DIRS],
+        "required_root_files": list(required_root_files),
+        "required_root_dirs": [f"{name}/" for name in required_root_dirs],
         "root_files": sorted(root_files),
         "root_dirs": sorted(f"{name}/" for name in root_dirs),
         "root_entries": sorted(root_files) + sorted(f"{name}/" for name in root_dirs),

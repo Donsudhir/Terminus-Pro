@@ -14,6 +14,25 @@ For a one-page map of which file owns which layer of the harness, see
 
 ---
 
+## Canonical roots are writable; compatibility roots are read-only
+
+`root_adapter.py` resolves all production roots from `sudhir_config.toml` and
+`TB3_*` overrides. Current task/spec/submission writes belong under
+`sudhir_tasks/active/`, `sudhir_ideas/specs/`, and
+`sudhir_tasks_ready_to_submit/`. `tasks/`, `specs/`, and
+`Task_Ready_To_Submit/` are compatibility or historical read surfaces; a
+production write through them is a blocking `HistoricalRootWriteError`.
+
+Current and historical ZIP indexes are independent. Packaging/revision updates
+`sudhir_progress/CANONICAL_SUBMISSION_INDEX.json`; the 159-archive historical
+baseline remains `repo_tests/fixtures/submission_index.json`. Never merge or
+overwrite one with the other.
+
+BOARD, IDEA_INDEX, and STATUS are generated together from one registry snapshot
+and carry the same generation digest. Do not edit any of them by hand.
+
+---
+
 ## `output_contract.toml` is required, not non-standard
 
 **Reviewer feedback pattern:** "`output_contract.toml` lives at the task
@@ -208,7 +227,7 @@ push back. Apply one of the structural fixes instead.
 
 ## `harbor tasks check` false positives are adjudicated, not hand-fixed
 
-**Reviewer feedback pattern:** "Harbor `tasks check` (GPT-5.2) flagged
+**Reviewer feedback pattern:** "Harbor `tasks check` (current GPT-5.5) flagged
 `anti_cheating_measures` / `pinned_dependencies` / `typos` / … as `fail`;
 edit the task until the checker reports `pass`."
 
@@ -229,7 +248,7 @@ gate. It regularly produces three kinds of fail that are NOT task defects:
 3. **Quality-vs-difficulty collapse** — the remedy would push
    `instruction.md` toward spec-language, tripping RC6 (`spec-complete`)
    in `collapse_check.py`. Documented at length in the Step 3a-Q
-   quality-vs-difficulty block of `workflow-prompts.md`.
+  quality-vs-difficulty block of `workflow.md`.
 
 Because of (1) and (2), a literal-repair loop ("keep editing until the
 checker passes") is the wrong response and regularly regresses either
@@ -239,7 +258,7 @@ mechanical checks or RC6/difficulty.
 `quality_check_adjudicate.py` against a per-task
 `tasks/<task-name>/quality_check_adjudication.json` waiver. Classifications:
 
-- `task-defect` — real gap. Must be repaired (see Step 3a-Q in `workflow-prompts.md` — fix the task, rerun Step 2b's oracle + NOP preflight, then re-adjudicate).
+- `task-defect` — real gap. Must be repaired (see Step 3a-Q in `workflow.md` — fix the task, rerun Step 2b's oracle + NOP preflight, then re-adjudicate).
 - `convention-conflict` — evidence required: `enforcing_rule.file`
   and `enforcing_rule.line`. The script verifies the file exists and the
   line is in range.
@@ -477,9 +496,11 @@ end — is that path open?"
 - **UI building** tasks (anything filed under subcategory `ui_building`
   or relying on the UI test harness).
 
-In-progress instances of these types may finish and submit; they are
-not rejected solely for type. New starts must REJECT (in Step 2a) or
-redesign the idea away from these categories.
+In-progress instances may continue only with source-backed exemption evidence.
+For UI work, the old JavaScript/Vitest layout is not grandfathered: the
+revision must use Python pytest + Playwright Python and pass the focused local
+compatibility checks. New starts must REJECT (in Step 2a) or redesign the idea
+away from these categories.
 
 **Action:** when a candidate idea would naturally land here, reject it
 in idea validation with a redesign note. Do not begin Step 2b drafting.

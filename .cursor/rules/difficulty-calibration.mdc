@@ -375,7 +375,7 @@ If any test fails under random order, it depends on execution order or shared gl
 
 ### B3.5. Flaky test stress-test
 
-Step 2b's 10x oracle preflight (`harbor run -a oracle -k 10 -n 10`) is the routine flake guard. Escalate to `verifier_health.py --include-repeat-oracle` **only** if that preflight showed intermittent failures, or a specific test looks flaky by paper inspection (timers, retries, subprocess calls, randomness). Repeated oracle stress is expensive (~5 extra oracle trials) and adds near-zero signal when the 10x preflight was clean.
+Step 4's 10x oracle stress (`harbor run -a oracle -k 10 -n 10`) is the routine flake guard. Escalate to `verifier_health.py --include-repeat-oracle` **only** if that final stress showed intermittent failures, or a specific test looks flaky by paper inspection (timers, retries, subprocess calls, randomness). Repeated oracle stress is expensive (~5 extra oracle trials) and adds near-zero signal when Step 4's stress was clean.
 
 Flag any test that uses:
 - subprocess calls, service checks, or network connections (needs adequate timeouts)

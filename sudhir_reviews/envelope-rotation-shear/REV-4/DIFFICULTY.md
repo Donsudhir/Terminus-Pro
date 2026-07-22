@@ -1,0 +1,3 @@
+# DIFFICULTY — envelope-rotation-shear REV-4
+
+This task is hard because one public-service namespace binding has to stay consistent across maintenance writes, namespace context, authenticated reads, and historical recovery. Valid records sealed under a newly introduced service’s own public name must open directly, but an intact record copied from another namespace must fail without recovery. A permissive compatibility change breaks isolation, while an overly strict change breaks healthy generated reads. The solver also has to recover prior-history records and keep repeat maintenance byte-stable without rewriting already-matching active records.

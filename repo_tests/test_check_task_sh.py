@@ -18,45 +18,15 @@ external authoring discipline.
 from __future__ import annotations
 
 import os
-import re
 import shutil
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / "scripts" / "check-task.sh"
 COMMANDS_MD_PATH = REPO_ROOT / "commands.md"
-
-
-def _extract_zip_x_patterns(text: str) -> set[str]:
-    """Find every single-quoted pattern that follows a `-x` token.
-
-    Used on both `scripts/check-task.sh` and the Packaging block of
-    `commands.md`. The two sources must agree exactly so an author who
-    follows the Step 4 manual zip command in commands.md gets the same
-    exclusion behavior as scripts/check-task.sh's Phase B preview.
-    """
-    patterns: set[str] = set()
-    for line in text.splitlines():
-        if "-x" not in line:
-            continue
-        for chunk in line.split("-x")[1:]:
-            patterns.update(re.findall(r"'([^']+)'", chunk))
-    return patterns
-
-
-def _extract_packaging_block(commands_md_text: str) -> str:
-    match = re.search(
-        r"## Packaging\n(.*?)(?=\n## |\Z)", commands_md_text, re.DOTALL
-    )
-    if not match:
-        raise AssertionError(
-            "commands.md is missing a `## Packaging` section heading"
-        )
-    return match.group(1)
 
 
 def _seed_min_task(task_dir: Path) -> None:
@@ -65,10 +35,11 @@ def _seed_min_task(task_dir: Path) -> None:
     required root entries present."""
     files = {
         "instruction.md": "Test task body.\n",
-        "task.toml": 'version = "2.0"\n',
+        "task.toml": 'version = "2.0"\n[metadata]\nnumber_of_milestones = 0\n',
         "environment/Dockerfile": "FROM scratch\n",
         "solution/solve.sh": "#!/usr/bin/env bash\nexit 0\n",
         "tests/test.sh": "#!/usr/bin/env bash\n",
+        "tests/test_outputs.py": "def test_placeholder():\n    assert True\n",
     }
     for rel, content in files.items():
         target = task_dir / rel
@@ -92,7 +63,7 @@ class CheckTaskShRegressionTest(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.tmpdir, ignore_errors=True)
 
         # Phase A tools — stubbed (always exit 0). Tests can override.
-        for stub in ("run_static_checks.py", "collapse_check.py"):
+        for stub in ("run_static_checks.py", "collapse_check.py", "dockerfile_check.py"):
             (self.tmpdir / stub).write_text("import sys\nsys.exit(0)\n")
 
         # Phase B + Phase C tools — real modules from the repo.
@@ -105,6 +76,7 @@ class CheckTaskShRegressionTest(unittest.TestCase):
         # checksum-content assertions in the existing fixture tests.
         for real in (
             "validate_submission_zip.py",
+            "task_layout.py",
             "task_integrity.py",
             "metrics_collector.py",
         ):
@@ -185,32 +157,12 @@ class CheckTaskShRegressionTest(unittest.TestCase):
         self.assertIn("AI-scaffolding filename(s) present", combined)
         self.assertIn("copilot.md", combined)
 
-    def test_phase_b_exclusions_match_commands_md(self) -> None:
-        """Authors running the Step 4 manual zip command from commands.md
-        must get the same exclusion behavior as the Phase B preview in
-        scripts/check-task.sh. If the lists drift, an author can ship a
-        file the script's preview promised would be excluded."""
-        script_text = SCRIPT_PATH.read_text()
+    def test_commands_use_canonical_package_driver(self) -> None:
+        """Commands must not reintroduce a second manual ZIP writer."""
         commands_md_text = COMMANDS_MD_PATH.read_text()
-        packaging_block = _extract_packaging_block(commands_md_text)
-
-        script_patterns = _extract_zip_x_patterns(script_text)
-        commands_patterns = _extract_zip_x_patterns(packaging_block)
-
-        self.assertTrue(
-            script_patterns,
-            "scripts/check-task.sh contains no -x patterns",
-        )
-        self.assertEqual(
-            script_patterns,
-            commands_patterns,
-            msg=(
-                "-x lists drifted between scripts/check-task.sh and "
-                "commands.md Packaging block. "
-                f"only_in_script={sorted(script_patterns - commands_patterns)}, "
-                f"only_in_commands_md={sorted(commands_patterns - script_patterns)}"
-            ),
-        )
+        self.assertIn("python3 sudhir_task.py package <task-name>", commands_md_text)
+        self.assertIn('$TB3_SUBMISSIONS_DIR/<task-name>.zip', commands_md_text)
+        self.assertNotIn("zip -rq ../../Task_Ready_To_Submit", commands_md_text)
 
     def _metrics_records(self) -> list[dict]:
         """Return JSONL records from the synthetic task's metrics file.

@@ -87,7 +87,7 @@ verdict per item.
 
 Classify every finding:
 
-- **Hard FAIL** — blocks approval. Edit per `workflow-prompts.md`
+- **Hard FAIL** — blocks approval. Edit per `workflow.md`
   Step 3b preservation discipline (predict at-risk gates, smallest
   preservation-safe fix, label preservation-safe or justified
   regression). Any edit dirty-flags the task. Always Hard FAIL

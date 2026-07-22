@@ -12,7 +12,6 @@ from pathlib import Path
 
 import validate_loop
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_FIXTURE = REPO_ROOT / "specs" / "validation_schema.json"
 
@@ -61,6 +60,89 @@ def _named_entries(expected: dict[str, str]) -> list[dict[str, str]]:
     ]
 
 
+def _valid_investigation_profile() -> dict[str, object]:
+    return {
+        "weakness_areas": [
+            "long_horizon_debugging",
+            "misleading_documentation",
+            "partial_failures",
+        ],
+        "causal_chain": [
+            {
+                "stage": 1,
+                "evidence": "Service logs isolate a failure after restart.",
+                "finding": "Only resumed requests use stale routing state.",
+                "unlocks_next": "Compare runtime state with persisted configuration.",
+            },
+            {
+                "stage": 2,
+                "evidence": "Runtime and persisted state disagree after migration.",
+                "finding": "The migration updates one authority but not its cache key.",
+                "unlocks_next": "Trace which API clients retain the old key shape.",
+            },
+            {
+                "stage": 3,
+                "evidence": "Client compatibility probes split by API generation.",
+                "finding": "The fallback path serializes the pre-migration identifier.",
+                "unlocks_next": "Exercise cache invalidation across both generations.",
+            },
+            {
+                "stage": 4,
+                "evidence": "Healthy and failing cache scenarios identify the coupled boundary.",
+                "finding": "Migration, fallback serialization, and invalidation must agree.",
+                "unlocks_next": "Implement the coordinated repair and verify controls.",
+            },
+        ],
+        "evidence_surfaces": [
+            {
+                "surface": "logs",
+                "planned_location": "environment/var/log/service.log",
+                "question_answered": "Which lifecycle boundary first shows divergence?",
+            },
+            {
+                "surface": "runtime-state",
+                "planned_location": "environment/tools/dump_state.py",
+                "question_answered": "Which authority is stale after restart?",
+            },
+            {
+                "surface": "documentation",
+                "planned_location": "environment/README.md",
+                "question_answered": "Which operational assumption is outdated?",
+            },
+        ],
+        "competing_hypotheses": [
+            {
+                "hypothesis": "The database migration omitted rows.",
+                "why_plausible": "The first visible error follows migration startup.",
+                "falsifier": "A row-count and key audit shows complete migrated data.",
+            },
+            {
+                "hypothesis": "The cache serves identifiers from the old API generation.",
+                "why_plausible": "Only warm resumed requests fail.",
+                "falsifier": "A cold-cache compatibility probe reproduces or clears the split.",
+            },
+        ],
+        "conditional_failures": [
+            {
+                "scenario": "Warm cache after migrated service restart",
+                "role": "failing",
+                "expected_behavior": "Both API generations return the same canonical identity.",
+            },
+            {
+                "scenario": "Cold cache on a fresh database",
+                "role": "healthy-control",
+                "expected_behavior": "Canonical identity remains unchanged.",
+            },
+        ],
+        "estimated_meaningful_actions": 36,
+        "determinism_strategy": "Bundled state snapshots and seeded probes reproduce every branch offline.",
+        "domain_reasoning": {
+            "domain": "stateful service migration",
+            "why_not_trivia": "The repair requires reconciling lifecycle and compatibility behavior, not recalling one API fact.",
+        },
+    }
+
+
 def _valid_evidence() -> dict[str, object]:
     return {
         "hardness_axes": _named_entries(validate_loop.HARDNESS_AXES),
@@ -91,6 +173,7 @@ def _valid_evidence() -> dict[str, object]:
             "level": "symptoms-only",
             "reasoning": "The brief names the symptom but not the underlying cause.",
         },
+        "investigation_profile": _valid_investigation_profile(),
         "attack_path": {
             "summary": "A solver must connect the public symptom to multiple internal components.",
             "reasoning": "The winning fix requires tracing across the environment and tests.",
@@ -234,6 +317,12 @@ class ValidateLoopRegressionTest(unittest.TestCase):
         specs_dir = Path("specs")
         specs_dir.mkdir()
         shutil.copyfile(SCHEMA_FIXTURE, specs_dir / "validation_schema.json")
+        original_specs_dir = validate_loop.SPECS_DIR
+        original_schema_path = validate_loop.SCHEMA_PATH
+        self.addCleanup(setattr, validate_loop, "SPECS_DIR", original_specs_dir)
+        self.addCleanup(setattr, validate_loop, "SCHEMA_PATH", original_schema_path)
+        validate_loop.SPECS_DIR = specs_dir
+        validate_loop.SCHEMA_PATH = specs_dir / "validation_schema.json"
 
     def test_validate_evidence_rejects_extra_top_level_property(self) -> None:
         evidence = _valid_evidence()
@@ -269,6 +358,102 @@ class ValidateLoopRegressionTest(unittest.TestCase):
             "symptoms-only",
         )
         self.assertEqual(len(validation["normalized"]["discovery_budget"]), 3)
+        self.assertEqual(
+            validation["normalized"]["investigation_profile"]["estimated_meaningful_actions"],
+            36,
+        )
+
+    def test_legacy_payload_without_investigation_profile_remains_readable(self) -> None:
+        evidence = _valid_evidence()
+        evidence.pop("investigation_profile")
+
+        validation = validate_loop.validate_evidence(evidence)
+
+        self.assertEqual(validation["errors"], [])
+        self.assertEqual(validation["hard_fail_reasons"], [])
+        self.assertNotIn("investigation_profile", validation["normalized"])
+
+    def test_new_contract_rejects_missing_investigation_profile(self) -> None:
+        evidence = _valid_evidence()
+        evidence.pop("investigation_profile")
+
+        validation = validate_loop.validate_evidence(
+            evidence,
+            require_investigation_profile=True,
+        )
+
+        self.assertIn(
+            "investigation_profile is required for newly initialized Step 2a loops",
+            validation["hard_fail_reasons"][0],
+        )
+
+    def test_investigation_profile_requires_distinct_evidence_surfaces(self) -> None:
+        evidence = _valid_evidence()
+        profile = evidence["investigation_profile"]
+        assert isinstance(profile, dict)
+        surfaces = profile["evidence_surfaces"]
+        assert isinstance(surfaces, list)
+        surfaces[1]["surface"] = "logs"
+
+        validation = validate_loop.validate_evidence(evidence)
+
+        self.assertTrue(
+            any("distinct surface types" in issue for issue in validation["hard_fail_reasons"]),
+            validation,
+        )
+
+    def test_investigation_profile_requires_failure_and_control(self) -> None:
+        evidence = _valid_evidence()
+        profile = evidence["investigation_profile"]
+        assert isinstance(profile, dict)
+        scenarios = profile["conditional_failures"]
+        assert isinstance(scenarios, list)
+        scenarios[1]["role"] = "failing"
+
+        validation = validate_loop.validate_evidence(evidence)
+
+        self.assertTrue(
+            any("healthy-control" in issue for issue in validation["hard_fail_reasons"]),
+            validation,
+        )
+
+    def test_init_marks_new_loop_with_v3_evidence_contract(self) -> None:
+        task_name = "v3-task"
+        with contextlib.redirect_stdout(io.StringIO()):
+            validate_loop.cmd_init(argparse.Namespace(task_name=task_name))
+
+        state = validate_loop.load_state(task_name)
+
+        self.assertEqual(
+            state["evidence_contract_version"],
+            validate_loop.EVIDENCE_CONTRACT_VERSION,
+        )
+
+    def test_pre_v3_loop_state_can_record_legacy_evidence(self) -> None:
+        task_name = "legacy-loop"
+        with contextlib.redirect_stdout(io.StringIO()):
+            validate_loop.cmd_init(argparse.Namespace(task_name=task_name))
+        state = validate_loop.load_state(task_name)
+        state.pop("evidence_contract_version")
+        validate_loop.save_state(task_name, state)
+
+        evidence = _valid_evidence()
+        evidence.pop("investigation_profile")
+        evidence_path = Path("legacy-evidence.json")
+        evidence_path.write_text(json.dumps(evidence), encoding="utf-8")
+
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            validate_loop.cmd_record(
+                argparse.Namespace(
+                    task_name=task_name,
+                    evidence=str(evidence_path),
+                    fails=None,
+                    warns=None,
+                )
+            )
+
+        self.assertIn("ACTION: GO", stdout.getvalue())
 
     def test_record_outputs_paired_save_paths_for_go_attempt(self) -> None:
         task_name = "demo-task"

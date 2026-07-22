@@ -1,0 +1,49 @@
+family aurora
+dim 4
+eq 3
+term 1 1 1.0
+term 1 2 2.0
+term 2 1 1.0
+term 2 2 3.0
+term 2 3 1.0
+term 3 3 1.0
+term 3 4 4.0
+base 1.0 2.0 3.0 4.0
+tag base 1.0 0.0 0.0 0.0 0.0
+tag wide 2.0 0.0 0.0 0.0 0.0
+tag narrow 0.5 0.0 0.0 0.0 0.0
+perm swap 2 1 4 3
+end
+family meridian
+dim 5
+eq 4
+term 1 1 2.0
+term 1 2 1.0
+term 2 1 1.0
+term 2 2 2.0
+term 2 3 3.0
+term 3 2 1.0
+term 3 3 1.0
+term 3 4 2.0
+term 4 1 1.0
+term 4 5 1.0
+base 2.0 1.0 3.0 2.0 1.0
+tag base 1.0 0.0 0.0 0.0 0.0 0.0
+tag far 3.0 1.0 0.0 0.0 0.0 0.0
+tag near 0.25 0.0 0.0 0.0 0.0 0.0
+end
+family prism
+dim 4
+eq 3
+term 1 1 1.5
+term 1 2 0.5
+term 2 1 2.0
+term 2 2 1.0
+term 2 3 2.0
+term 3 3 1.0
+term 3 4 3.0
+base 0.5 1.5 2.5 1.0
+tag base 1.0 0.0 0.0 0.0 0.0
+tag raised 4.0 0.0 0.0 0.0 0.0
+tag reduced 0.2 0.0 0.0 0.0 0.0
+end

@@ -38,9 +38,7 @@ from pathlib import Path
 
 import lint_spec
 import validate_loop
-
 from repo_tests.test_validate_loop import _valid_evidence
-
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_FIXTURE = REPO_ROOT / "specs" / "validation_schema.json"
@@ -192,6 +190,12 @@ class FinalizeSubcommandTest(unittest.TestCase):
         os.chdir(self._tmpdir.name)
         Path("specs").mkdir()
         shutil.copyfile(SCHEMA_FIXTURE, Path("specs") / "validation_schema.json")
+        original_specs_dir = validate_loop.SPECS_DIR
+        original_schema_path = validate_loop.SCHEMA_PATH
+        self.addCleanup(setattr, validate_loop, "SPECS_DIR", original_specs_dir)
+        self.addCleanup(setattr, validate_loop, "SCHEMA_PATH", original_schema_path)
+        validate_loop.SPECS_DIR = Path("specs")
+        validate_loop.SCHEMA_PATH = Path("specs/validation_schema.json")
 
     def _run_finalize(self, task_name: str) -> tuple[int, str]:
         stdout = io.StringIO()
@@ -247,6 +251,12 @@ class CmdRecordGoBranchPrintsThenRunTest(unittest.TestCase):
         os.chdir(self._tmpdir.name)
         Path("specs").mkdir()
         shutil.copyfile(SCHEMA_FIXTURE, Path("specs") / "validation_schema.json")
+        original_specs_dir = validate_loop.SPECS_DIR
+        original_schema_path = validate_loop.SCHEMA_PATH
+        self.addCleanup(setattr, validate_loop, "SPECS_DIR", original_specs_dir)
+        self.addCleanup(setattr, validate_loop, "SCHEMA_PATH", original_schema_path)
+        validate_loop.SPECS_DIR = Path("specs")
+        validate_loop.SCHEMA_PATH = Path("specs/validation_schema.json")
 
     def test_go_branch_prints_then_run_finalize(self) -> None:
         task = "demo-task"

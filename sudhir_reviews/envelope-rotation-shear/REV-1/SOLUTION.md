@@ -1,0 +1,3 @@
+# SOLUTION — envelope-rotation-shear REV-1
+
+The fix restores one stable authority identity through maintenance frame binding, scoped key context, authenticated open, and validated predecessor selection. Recovery uses `/app/bin/vaultctl recover` to restore every affected identity into live state and write `/app/output/recovery.json` with the exact recovered service/secret inventory. Healthy records stay byte-identical, `maintain` is idempotent on a second run, `get` returns the correct values, and `audit` keeps namespace isolation while rejecting tamper and cross-namespace substitutions across resets and generated namespaces.

@@ -44,37 +44,52 @@ from functools import lru_cache
 from pathlib import Path, PurePosixPath
 
 import instruction_audit
+import root_adapter
+import task_layout
 
 
 def load_instruction(task_dir: Path) -> str:
-    p = task_dir / "instruction.md"
-    return p.read_text(encoding="utf-8") if p.exists() else ""
+    layout = task_layout.classify_task_dir(task_dir)
+    return "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in task_layout.instruction_paths(task_dir, layout)
+        if path.exists()
+    )
 
 def load_oracle(task_dir: Path) -> str:
-    p = task_dir / "solution" / "solve.sh"
-    return p.read_text(encoding="utf-8") if p.exists() else ""
+    layout = task_layout.classify_task_dir(task_dir)
+    return "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in task_layout.solution_entrypoints(task_dir, layout)
+        if path.exists()
+    )
 
 def load_tests(task_dir: Path) -> str:
-    """Load all test files recursively: Python, JS, TS under tests/."""
-    tests_dir = task_dir / "tests"
-    if not tests_dir.is_dir():
-        return ""
+    """Load all test files recursively from canonical verifier roots."""
     parts = []
-    # Python tests (recursive)
-    for f in sorted(tests_dir.rglob("*.py")):
-        if f.name.startswith("test") or f.name == "conftest.py":
-            parts.append(f.read_text(encoding="utf-8", errors="replace"))
-    # JS/TS tests (recursive — covers tests/unit/, tests/e2e/)
-    for pattern in ("**/*.test.js", "**/*.test.ts", "**/*.spec.js", "**/*.spec.ts",
-                     "**/*.test.jsx", "**/*.test.tsx", "**/*.spec.jsx", "**/*.spec.tsx"):
-        for f in sorted(tests_dir.glob(pattern)):
-            parts.append(f.read_text(encoding="utf-8", errors="replace"))
+    layout = task_layout.classify_task_dir(task_dir)
+    for tests_dir in task_layout.test_dirs(task_dir, layout):
+        if not tests_dir.is_dir():
+            continue
+        # Python tests (recursive)
+        for f in sorted(tests_dir.rglob("*.py")):
+            if f.name.startswith("test") or f.name == "conftest.py":
+                parts.append(f.read_text(encoding="utf-8", errors="replace"))
+        # JS/TS tests (recursive — covers tests/unit/, tests/e2e/)
+        for pattern in ("**/*.test.js", "**/*.test.ts", "**/*.spec.js", "**/*.spec.ts",
+                        "**/*.test.jsx", "**/*.test.tsx", "**/*.spec.jsx", "**/*.spec.tsx"):
+            for f in sorted(tests_dir.glob(pattern)):
+                parts.append(f.read_text(encoding="utf-8", errors="replace"))
     return "\n".join(parts)
 
 
 def load_test_sh(task_dir: Path) -> str:
-    p = task_dir / "tests" / "test.sh"
-    return p.read_text(encoding="utf-8", errors="replace") if p.exists() else ""
+    layout = task_layout.classify_task_dir(task_dir)
+    return "\n".join(
+        path.read_text(encoding="utf-8", errors="replace")
+        for path in task_layout.test_sh_paths(task_dir, layout)
+        if path.exists()
+    )
 
 
 def load_dockerfile(task_dir: Path) -> str:
@@ -83,25 +98,25 @@ def load_dockerfile(task_dir: Path) -> str:
 
 
 def test_files(task_dir: Path) -> list[Path]:
-    tests_dir = task_dir / "tests"
-    if not tests_dir.is_dir():
-        return []
-
     files: list[Path] = []
-    for f in sorted(tests_dir.rglob("*.py")):
-        if f.name.startswith("test") or f.name == "conftest.py":
-            files.append(f)
-    for pattern in (
-        "**/*.test.js",
-        "**/*.test.ts",
-        "**/*.spec.js",
-        "**/*.spec.ts",
-        "**/*.test.jsx",
-        "**/*.test.tsx",
-        "**/*.spec.jsx",
-        "**/*.spec.tsx",
-    ):
-        files.extend(sorted(tests_dir.glob(pattern)))
+    layout = task_layout.classify_task_dir(task_dir)
+    for tests_dir in task_layout.test_dirs(task_dir, layout):
+        if not tests_dir.is_dir():
+            continue
+        for f in sorted(tests_dir.rglob("*.py")):
+            if f.name.startswith("test") or f.name == "conftest.py":
+                files.append(f)
+        for pattern in (
+            "**/*.test.js",
+            "**/*.test.ts",
+            "**/*.spec.js",
+            "**/*.spec.ts",
+            "**/*.test.jsx",
+            "**/*.test.tsx",
+            "**/*.spec.jsx",
+            "**/*.spec.tsx",
+        ):
+            files.extend(sorted(tests_dir.glob(pattern)))
     return files
 
 
@@ -305,16 +320,19 @@ def agent_visible_files(task_dir: Path) -> list[Path]:
     `task.toml`, `output_contract.toml`, and everything under `solution/`.
     Runtime error output is reviewed manually and is not modeled here.
     """
-    files: list[Path] = []
-    for root_name in SOLVER_VISIBLE_ROOT_FILES:
-        root_file = task_dir / root_name
-        if root_file.is_file():
-            files.append(root_file)
-    for root_name in SOLVER_VISIBLE_DIRS:
-        root = task_dir / root_name
-        if not root.is_dir():
-            continue
-        files.extend(sorted(path for path in root.rglob("*") if path.is_file()))
+    layout = task_layout.classify_task_dir(task_dir)
+    files = [
+        path for path in task_layout.instruction_paths(task_dir, layout) if path.is_file()
+    ]
+    files.extend(
+        path
+        for tests_dir in task_layout.test_dirs(task_dir, layout)
+        for path in sorted(tests_dir.rglob("*"))
+        if path.is_file()
+    )
+    environment = task_dir / "environment"
+    if environment.is_dir():
+        files.extend(sorted(path for path in environment.rglob("*") if path.is_file()))
     return files
 
 
@@ -332,7 +350,7 @@ def is_non_source_visible_artifact(path: Path, task_dir: Path) -> bool:
         return False
     if not rel.parts:
         return False
-    if rel.parts[0] == "tests":
+    if "tests" in rel.parts:
         return True
     if rel.parts[0] != "environment":
         return False
@@ -516,7 +534,8 @@ def find_hardcoded_digest_issues(task_dir: Path) -> list[dict]:
     seen_paths: set[str] = set()
     for path in agent_visible_files(task_dir):
         rel = str(path.relative_to(task_dir))
-        if rel != "instruction.md" and not rel.startswith("tests/"):
+        rel_parts = path.relative_to(task_dir).parts
+        if path.name != "instruction.md" and "tests" not in rel_parts:
             continue
         content = read_text_if_possible(path)
         if not content:
@@ -653,8 +672,16 @@ def normalize_app_relative_path(path: str) -> str | None:
     return "/".join(parts) if parts else None
 
 
-def frontier_root(path: str) -> str:
+def semantic_frontier_path(path: str) -> str:
+    """Strip deterministic reconstruction scaffolding from runtime paths."""
     parts = PurePosixPath(path).parts
+    if parts[:2] == ("bootstrap", "base"):
+        parts = parts[2:]
+    return "/".join(parts)
+
+
+def frontier_root(path: str) -> str:
+    parts = PurePosixPath(semantic_frontier_path(path)).parts
     if not parts:
         return ""
     if len(parts) >= 2 and "." not in parts[1]:
@@ -1364,10 +1391,14 @@ def extract_called_script_token(line: str) -> str | None:
 @lru_cache(maxsize=None)
 def analyze_oracle(task_dir: Path) -> dict:
     task_dir = task_dir.resolve()
-    solution_dir = task_dir / "solution"
+    layout = task_layout.classify_task_dir(task_dir)
     env_dir = task_dir / "environment"
-    root_script = solution_dir / "solve.sh"
-    if not root_script.exists():
+    root_scripts = [
+        path
+        for path in task_layout.solution_entrypoints(task_dir, layout)
+        if path.exists()
+    ]
+    if not root_scripts:
         return {
             "oracle_targets": [],
             "oracle_loc_non_boilerplate": 0,
@@ -1409,7 +1440,12 @@ def analyze_oracle(task_dir: Path) -> dict:
             source,
         )
 
-    def walk_script(script_path: Path, app_cwd: str = "", inherited_shell_vars: dict[str, str] | None = None) -> None:
+    def walk_script(
+        script_path: Path,
+        solution_dir: Path,
+        app_cwd: str = "",
+        inherited_shell_vars: dict[str, str] | None = None,
+    ) -> None:
         script_path = script_path.resolve()
         if script_path in seen_scripts:
             return
@@ -1504,13 +1540,14 @@ def analyze_oracle(task_dir: Path) -> dict:
             if called_script_token:
                 called_script = resolve_solution_host_path(called_script_token, script_path, solution_dir, shell_vars)
                 if called_script and solution_dir in called_script.parents:
-                    walk_script(called_script, app_cwd, shell_vars)
+                    walk_script(called_script, solution_dir, app_cwd, shell_vars)
 
             i += 1
 
         record_source(script_path, "shell", loc)
 
-    walk_script(root_script)
+    for root_script in root_scripts:
+        walk_script(root_script, root_script.parent)
 
     comparable_writes: list[dict[str, object]] = []
     for op in operations:
@@ -1578,8 +1615,14 @@ _C_CPP_SYMBOL_PATTERN = re.compile(
     re.MULTILINE,
 )
 _RUST_SYMBOL_PATTERN = re.compile(
-    r'^\s*(?:pub\s+)?(?:extern\s+"C"\s+)?(?:fn|struct|enum|trait|impl)\s+([A-Za-z_][A-Za-z0-9_]*)',
+    r'^\s*(?:pub(?:\s*\([^\)]*\))?\s+)?(?:extern\s+"C"\s+)?(?:fn|struct|enum|trait|impl)\s+([A-Za-z_][A-Za-z0-9_]*)',
     re.MULTILINE,
+)
+_FORTRAN_SYMBOL_PATTERN = re.compile(
+    r'^\s*(?:(?:integer|real|logical|complex|character)(?:\s*\([^\)]*\))?\s+)?'
+    r'(?:(?:recursive|pure|elemental)\s+)?(?:function|subroutine)\s+'
+    r'([A-Za-z_][A-Za-z0-9_]*)',
+    re.MULTILINE | re.IGNORECASE,
 )
 _GO_SYMBOL_PATTERN = re.compile(r'^\s*func\s+(?:\([^\)]*\)\s*)?([A-Za-z_][A-Za-z0-9_]*)', re.MULTILINE)
 _JAVA_CLASS_PATTERN = re.compile(
@@ -1599,6 +1642,11 @@ _SYMBOL_PATTERN_BY_SUFFIX = {
     '.cpp': [_C_CPP_SYMBOL_PATTERN],
     '.hpp': [_C_CPP_SYMBOL_PATTERN],
     '.rs': [_RUST_SYMBOL_PATTERN],
+    '.f': [_FORTRAN_SYMBOL_PATTERN],
+    '.f90': [_FORTRAN_SYMBOL_PATTERN],
+    '.f95': [_FORTRAN_SYMBOL_PATTERN],
+    '.f03': [_FORTRAN_SYMBOL_PATTERN],
+    '.f08': [_FORTRAN_SYMBOL_PATTERN],
     '.go': [_GO_SYMBOL_PATTERN],
     '.java': [_JAVA_CLASS_PATTERN, _JAVA_METHOD_PATTERN],
 }
@@ -1656,9 +1704,9 @@ def _substring_matches(haystack_tokens: set[str], needle_tokens: set[str]) -> se
                 continue
             if needle_stem == cand_stem:
                 matches.add((needle, candidate))
-            elif needle_stem in cand_stem and len(needle_stem) >= 4:
+            elif needle_stem in cand_stem and len(needle_stem) >= 5:
                 matches.add((needle, candidate))
-            elif cand_stem in needle_stem and len(cand_stem) >= 4:
+            elif cand_stem in needle_stem and len(cand_stem) >= 5:
                 matches.add((needle, candidate))
     return matches
 
@@ -1764,8 +1812,13 @@ def load_construction_manifest(task_dir: Path) -> dict | None:
         except json.JSONDecodeError:
             return None
     task_name = task_dir.name
-    repo_root = task_dir.parent.parent if task_dir.parent.name == "tasks" else task_dir.parent
-    specs_dir = repo_root / "specs"
+    resolved_task = task_dir.resolve()
+    canonical_tasks = root_adapter.ROOTS.tasks.resolve()
+    if resolved_task.is_relative_to(canonical_tasks):
+        specs_dir = root_adapter.ROOTS.specs
+    else:
+        repo_root = task_dir.parent.parent if task_dir.parent.name == "tasks" else task_dir.parent
+        specs_dir = repo_root / "specs"
     if not specs_dir.is_dir():
         return None
     # Pick the highest-numbered attempt evidence file for this task.
@@ -1941,7 +1994,7 @@ def rc2_oracle_predictability(task_dir: Path) -> dict:
     unpredictable = []
     symbol_predictable: list[dict] = []
     for t in targets:
-        rel = re.sub(r'^/app/', '', t)
+        rel = semantic_frontier_path(re.sub(r'^/app/', '', t))
         pts = path_keywords(rel)
         signal_matches: dict[str, list[str]] = {}
         for signal_name, keywords in signal_sets.items():
@@ -2029,7 +2082,10 @@ def rc3_verifier_shallowness(task_dir: Path) -> dict:
     if not assertions:
         return {"check": "rc3_verifier_shallowness", "severity": "WARN", "detail": "No assertions found"}
 
-    fmt = 0; val = 0; struct = 0; exitc = 0
+    fmt = 0
+    val = 0
+    struct = 0
+    exitc = 0
     for a in assertions:
         s = a.strip()
         if re.search(r'isinstance\(|\.is_file\(\)|\.exists\(\)|\.is_dir\(', s):
@@ -2045,8 +2101,10 @@ def rc3_verifier_shallowness(task_dir: Path) -> dict:
         elif re.search(r'len\(|\.strip\(\)\s*!=\s*""', s):
             struct += 1
         elif re.search(r'is\s+True|is\s+False|is\s+None|==\s*True|==\s*False', s):
-            if re.search(r'\[.*\]\s*(?:is|==)', s): val += 1
-            else: fmt += 1
+            if re.search(r'\[.*\]\s*(?:is|==)', s):
+                val += 1
+            else:
+                fmt += 1
         elif '==' in s or '!=' in s:
             val += 1
         elif re.search(r'>\s*0|>=\s*1', s):
@@ -2662,8 +2720,23 @@ def cr2_flipping_point_contract(task_dir: Path) -> dict:
             "detail": f"flipping_point_contract.locations has duplicate paths: {paths}",
         }
 
-    # Distinct-root check — don't let three paths in the same directory pretend to be distributed.
-    roots = {str(Path(p).parts[0]) if Path(p).parts else p for p in paths}
+    # Distinct-root check — ignore a shared source-tree prefix, but do not let
+    # several files in one leaf directory pretend to be distributed.
+    parent_parts = [Path(path).parts[:-1] for path in paths]
+    common_depth = 0
+    if parent_parts:
+        for position in range(min(len(parts) for parts in parent_parts)):
+            value = parent_parts[0][position]
+            if all(parts[position] == value for parts in parent_parts):
+                common_depth = position + 1
+            else:
+                break
+    roots = set()
+    for parts in parent_parts:
+        if common_depth < len(parts):
+            roots.add(parts[common_depth])
+        else:
+            roots.add("/".join(parts))
     if len(roots) < 2:
         return {
             "check": "cr2_flipping_point_contract",
@@ -3328,7 +3401,7 @@ def exit_code(report: dict) -> int:
 
 
 def format_text_report(task_dir: Path, report: dict) -> str:
-    lines = [f"", f"{'='*70}", f"  Collapse Check: {task_dir}", f"{'='*70}", ""]
+    lines = ["", f"{'='*70}", f"  Collapse Check: {task_dir}", f"{'='*70}", ""]
     frontier = report["frontier_concentration"]
     dominant_root = frontier["dominant_root"] or "none"
     lines.append(

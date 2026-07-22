@@ -1,0 +1,3 @@
+# DIFFICULTY — envelope-rotation-shear REV-2
+
+This task is hard because post-maintenance authentication failures and cross-namespace value leakage come from one shared authority-lineage shear across write binding, scoped key context, strict opening, and predecessor selection. Ordinary key material and crypto wrappers still look healthy, so a future-write-only patch, a context-only patch, a permissive open, or a loose historical search each leaves part of the public recover/maintain/get/audit contract failing. The solver has to reconstruct the coupled invariant from protected state, logs, and diagnostics without a plaintext answer table.

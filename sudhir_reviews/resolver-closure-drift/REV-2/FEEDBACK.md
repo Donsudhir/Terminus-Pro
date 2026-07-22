@@ -1,0 +1,29 @@
+# REV-1 reviewer feedback — resolver-closure-drift
+
+Task UID: 4d74fca0-684f-4ace-a1c2-db55737f6c9a
+Slug: resolver-closure-drift (inferred from test_rNN)
+
+AutoEval: FAILED Build status FAILED
+Build ID: CodeExecutionEnvironment:3c920d0ad9-4b84-af1d-ba89c9ac7a66
+
+Difficulty: EASY - Requires at least HARD for python
+Status: Solvable
+Agent Performance:
+  terminus-claude-opus-4-8: 100.0% (5/5)
+  terminus-gpt5-5: 80.0% (4/5)
+Reference: nop 0.0%, oracle 100.0% (3/3)
+
+Unit Tests: r01-r04,r07,r08,r12 = 10/10; r05,r06,r09,r10,r11 = 9/10
+
+Quality check: 2 X fail - behavior_in_task_description
+Details: instructions describe lockfile format and mention edge-case behaviors from git history, but omit key details tests rely on, specifically build-report.json schema.
+
+Instruction sufficiency FAIL analysis:
+- LegacyAlpha/LegacyBeta + git history/release notes make admissibility bug too discoverable
+- Sorting requirement only in lockfile format line; no symmetric discovery signal in history
+- Agent fixed sill.rs Mixed policy but PATH/rebuild failed; sorting still broken would fail 5 tests
+
+Platform revision guidance:
+- Adjust 0/10 tests toward 1-3/10 if unsolvable
+- Check 10/10 tests for leakage/shortcuts; remove if design-too-easy
+- Goal: hard but solvable

@@ -1,0 +1,14 @@
+{
+  "task_name": "v3-task",
+  "attempt": 0,
+  "best_score": [
+    999,
+    999
+  ],
+  "best_attempt": 0,
+  "plateau_count": 0,
+  "candidates": [],
+  "history": [],
+  "schema_path": "/home/sudhir/Projects/TERMINUS/specs/validation_schema.json",
+  "evidence_contract_version": 3
+}

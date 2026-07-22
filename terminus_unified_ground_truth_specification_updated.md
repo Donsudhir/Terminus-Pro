@@ -21,7 +21,7 @@ This document is a historical reference for Terminus task creation, evaluation, 
 11. [tests/test.sh](https://www.google.com/search?q=%2311-teststestsh)  
 12. [tests/test\_outputs.py (and legacy test\_outputs.yaml)](https://www.google.com/search?q=%2312-teststest_outputspy-and-legacy-test_outputsyaml)  
 13. [tests/test\_m1.py ... tests/test\_mN.py](https://www.google.com/search?q=%2313-teststest_m1py--teststest_mnpy)  
-14. [UI Verifier Stack (tests/README.md, .gitignore, package.json, playwright.config.ts, vitest.config.ts, unit/, e2e/, fixtures/, index.html)](https://www.google.com/search?q=%2314-ui-verifier-stack)  
+14. [UI Verifier Stack (Python pytest + Playwright Python)](https://www.google.com/search?q=%2314-ui-verifier-stack)  
 15. [Logs and Rewards (ctrf.json, reward.txt)](https://www.google.com/search?q=%2315-logs-and-rewards-ctrfjson-rewardtxt)  
 16. [Forbidden & Optional Root Artifacts (rubrics.txt, README.md, jobs/, data/)](https://www.google.com/search?q=%2316-forbidden--optional-root-artifacts)  
 17. [Platform, UI & Workflow Rules](https://www.google.com/search?q=%2317-platform-ui--workflow-rules)
@@ -285,11 +285,17 @@ This document is a historical reference for Terminus task creation, evaluation, 
 
 **Consequence of Violation:** RewardNotFoundError / RewardFileNotFound.
 
-**Rule:** Standard Python/Pytest tasks MUST preserve the official `task-creation.mdc` test.sh command order and control flow. The CI checker semantically validates the pre-`pytest` portion (including the required `$PWD` guard) and validates the final 5-line `reward.txt` footer exactly. UI tasks use a separate template (see `task-creation.mdc`).
+**Rule:** Standard Python/Pytest tasks and evidence-backed in-flight UI tasks
+MUST preserve the official `task-creation.mdc` test.sh command order and control
+flow. The CI checker semantically validates the pre-`pytest` portion (including
+the required `$PWD` guard) and binary `reward.txt` footer. There is no separate
+UI shell template.
 
 **Consequence of Violation:** CI check\_test\_sh failure or reviewer feedback for drifting from the maintained template.
 
-**Rule:** For UI tasks, success MUST require BOTH unit test (npm run test) and E2E test (npm run test:e2e) processes to exit 0\. Test deps and Playwright browsers MUST be installed here at run time.
+**Rule:** For an evidence-backed UI revision, pytest must execute browser
+automation through Playwright's Python bindings. Python verifier dependencies
+and browsers are installed in the image, never at verifier runtime.
 
 **Consequence of Violation:** UI verification failure.
 
@@ -351,25 +357,38 @@ This document is a historical reference for Terminus task creation, evaluation, 
 
 ## **14\. UI Verifier Stack**
 
-> **⚠️ POLICY UPDATE (supersedes the historical text below):** New starts of UI building tasks (subcategory `ui_building`) are no longer accepted. In-progress UI tasks may finish; do not begin new ones. The historical UI verifier stack rules remain useful for in-progress UI work but should not be used to bootstrap new UI tasks. See `task-creation.mdc` "Task types we no longer accept" and `REPO_CONVENTIONS.md` "Task types we no longer accept".
+> **CURRENT POLICY:** The platform recognizes `ui_building` and requires UI
+> verification to remain Python pytest. Browser automation uses Playwright's
+> Python bindings, never a JavaScript/TypeScript Playwright suite. This
+> repository separately house-blocks net-new UI starts.
 
-**Rule (tests/README.md):** Documents the UI structure. If adding React/Vue, authors must add the correct @testing-library packages.
+**Rule:** No UI scaffold is shipped. An evidence-backed in-flight UI revision
+must carry the source-backed house-rule exemption before construction or
+shipping can proceed.
 
-**Rule (tests/package.json):** MUST align scripts (test, test:e2e) with test.sh. Should prefer exact version pinning if reproducible UI installs are needed.
+**Rule (`tests/test_outputs.py`):** Browser checks are ordinary discoverable
+pytest tests and import Playwright's Python bindings. Assertions verify real
+user-observable DOM behavior and map to the public instruction.
 
-**Rule (tests/.gitignore):** Ignores node\_modules. If reproducible installs are needed via npm ci, remove package-lock.json from here and commit it.
+**Rule (`tests/test.sh`):** UI tasks use the same offline pytest runner, CM-007
+safe-path hardening, binary reward footer, and no-trailing-exit semantics as
+other standard pytest tasks. `npm run test`, `npm run test:e2e`, and a separate
+UI reward footer are obsolete.
 
-**Rule (tests/playwright.config.ts):** webServer MUST point Playwright to the real app being served, not a placeholder.
+**Rule (`environment/Dockerfile`):** Pin `playwright` or `pytest-playwright` and
+install the required browser at image-build time via Python. Runtime downloads
+remain forbidden.
 
-**Rule (tests/vitest.config.ts):** MUST include the actual unit-test paths and appropriate DOM environment.
-
-**Rule (tests/unit/\*.spec.ts & tests/e2e/\*.spec.ts):** Placeholder assertions MUST be replaced with real user-observable DOM behavior checks mapping to the instructions.
-
-**Rule (index.html):** Placeholder app MUST be replaced with the task's required UI.
+**Rule:** `tests/package.json`, `tests/vitest.config.*`,
+`tests/playwright.config.*`, and JS/TS verifier specs are rejected as the
+retired verifier generation. The application under `environment/` may still be
+implemented in JavaScript or TypeScript; only the verifier language is fixed.
 
 ## **15\. Logs and Rewards (ctrf.json, reward.txt)**
 
-**Rule:** The verifier MUST emit /logs/verifier/reward.txt. Standard regular/milestone templates use the exact 5-line `reward.txt` footer from `task-creation.mdc`, and UI templates use the separate `reward.txt` block from the UI template there.
+**Rule:** The verifier MUST emit /logs/verifier/reward.txt. Standard,
+milestone, and in-flight UI pytest runners use the semantic binary reward
+footer from `task-creation.mdc`; no separate UI footer exists.
 
 **Rule:** Regular/Milestone templates SHOULD emit /logs/verifier/ctrf.json via the pytest \--ctrf flag for rich reporting.
 
@@ -397,7 +416,7 @@ This document is a historical reference for Terminus task creation, evaluation, 
 
 * **Oracle MUST pass; NOP MUST fail.**  
 * **No 100% Pass Rate:** Tasks where frontier models score 100% will be rejected as too trivial.  
-* **Empirical Evaluation:** Difficulty is based on the *better* performing model (GPT-5.2 or Claude Opus 4.6). Run 5 attempts per model (10 total) before claiming a difficulty level.
+* **Empirical Evaluation:** Difficulty uses the current GPT-5.5 and Claude Opus 4.8 profile (effective 2026-06-12). Run 5 attempts per model (10 total) before claiming a difficulty level. Historical-model evidence remains readable but is not a current calibration.
 
 ### **C. Diversity and Dataset-Balance Rules**
 
@@ -410,7 +429,7 @@ This document is a historical reference for Terminus task creation, evaluation, 
 
 * Use `harbor tasks start-env -p <task-folder> -e docker -a -i` for local interactive building.  
 * Use `harbor run -p <task-folder> -a oracle` to verify the oracle.  
-* Use `harbor tasks check <task-folder> -m "openai/gpt-5.2"` for the repo-local quality check.  
+* Use `harbor tasks check <task-folder> -m "openai/@openai/gpt-5.5"` for the repo-local quality check.  
 * See `commands.md` at the repo root for the full, up-to-date CLI reference.
 
 ### **E. Automated Checks (CI, Behavior Validation, and Agent Review)**

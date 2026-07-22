@@ -1,0 +1,23 @@
+--- a/projects/hawthorn.toml
++++ b/projects/hawthorn.toml
+@@ -1,6 +1,6 @@
+ title = "hawthorn"
+-profile = "plain"
++profile = "mixed"
+ catalog = "/app/archive/catalog.json"
+-roots = ["cedar:300:320:stable:300"]
+-apis = ["cedar:cedar_api"]
++roots = ["alder:100:130:preview:110", "cedar:300:320:stable:310"]
++apis = ["alder:alpha_api", "cedar:cedar_next_api", "birch:beta_api", "elm:elm_api"]
+ seed = "0"
+--- a/src/cli/session.rs
++++ b/src/cli/session.rs
+@@ -45,6 +45,8 @@
+     if args.len() != 3 || args[1] != "solve" {
+         return Err("usage: forge solve PROJECT".to_string());
+     }
++    let _ = fs::remove_file("/app/output/resolve.log");
++    let _ = fs::remove_file("/app/output/build-report.json");
+     let project = Project::load(Path::new(&args[2]))?;
+     let catalog = Catalog::load(&project.catalog)?;
+     let cairn = resolve(&catalog, &project.roots, project.profile, project.seed)?;

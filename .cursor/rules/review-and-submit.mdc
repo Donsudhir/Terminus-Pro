@@ -82,7 +82,9 @@ alwaysApply: false
 - Verifier modules and any Python under `environment/` pass `ruff` (enforced by `run_static_checks.py`; non-Python sources there are out of scope for ruff).
 - `test_outputs.py` exposes discoverable `test_...` functions. (MEDIUM)
 - Milestone tasks: one `steps/milestone_N/tests/test_mN.py` per milestone with assertions in a single `TestMilestoneN` class, plus a per-milestone `steps/milestone_N/tests/test.sh` runner. Each milestone's test file scores only that milestone (not future work) and tolerates state left behind by previous milestones. No root-level `tests/` directory.
-- UI tasks: both unit and E2E verifiers run from `test.sh`. **NEW UI tasks are no longer accepted** — see § 8 Task types below.
+- UI tasks: Python pytest drives Playwright's Python bindings from the standard
+  `test.sh`. JavaScript/TypeScript Playwright and Vitest verifier suites are
+  obsolete. **NEW UI tasks are house-blocked** — see § 8.
 
 ## 5. Task Metadata (HIGH unless noted)
 
@@ -103,7 +105,9 @@ alwaysApply: false
 - All required files present (varies by task type — see `task-creation.mdc`):
   - **Standard:** `instruction.md`, `task.toml`, `output_contract.toml` (authoring metadata, not shipped in zip), `environment/Dockerfile`, `solution/solve.sh`, `tests/test.sh`, `tests/test_outputs.py`.
   - **Milestone:** `task.toml` (with `[[steps]]` blocks), `output_contract.toml`, `environment/Dockerfile`, and one `steps/milestone_N/` directory per milestone — each containing `instruction.md`, `tests/{test.sh, test_mN.py}`, and `solution/{solve.sh, solveN.sh}`. NO top-level `instruction.md`, `tests/`, `solution/`, or `milestones.md` / `milestone_X.md`. The deprecated root-level milestone shape is rejected for new and in-progress submissions.
-  - **UI:** same as standard plus UI test files under `tests/` per the UI template in `task-creation.mdc`. **New UI tasks are no longer accepted** — see § 8.
+  - **UI:** same as standard, with browser automation in Python
+    `tests/test_outputs.py`; no JS/Vitest verifier files. **New UI tasks are
+    house-blocked** — see § 8.
 - Submission zip has files at archive root (no wrapping folder).
 - For milestone tasks: every `[[steps]].name` matches a `steps/<name>/` folder, and every `steps/milestone_N/` folder is referenced by exactly one `[[steps]]` block. No deprecated `milestone_X.md` / `milestones.md` at any depth.
 - No `rubrics.txt` at task root or zip root.
@@ -117,13 +121,16 @@ alwaysApply: false
 - Every test is independently achievable, not chain-dependent on the full solution.
 - Every test accepts any valid solution approach, not just the oracle's exact output.
 - `verifier_health.py` is an **opt-in diagnostic** (Step 3a-V). When run, it must PASS with a behavioral partial-oracle failure. Routine tasks can approve with `--skip-verifier-health`.
-- Oracle passes and NOP fails (Step 2b preflight, 10/10 and 0.0 respectively). Post-upload evaluation on the platform is outside this repo-local gate.
+- Oracle 1x passes and NOP fails in Step 2b; oracle 10x passes in Step 4. Post-upload evaluation on the platform is outside this repo-local gate.
 
 ## 8. Task types (HIGH)
 
 - We are NO LONGER accepting new **multi-container** tasks (`is_multi_container = true` or any `environment/docker-compose.yaml` declaring multiple services).
 - We are NO LONGER accepting new **UI building** tasks (subcategory `ui_building` or use of the UI test template).
-- In-progress tasks of these types may be completed; they will not be rejected solely for type. Reviewers should prioritize moving in-progress instances to submission before the block goes live.
+- In-progress tasks of these types may be completed only with source-backed
+  exemption evidence. An in-flight UI revision must also pass the official
+  pytest + Playwright Python compatibility checks; prior JS/Vitest structure is
+  not grandfathered.
 - New starts in either category are blocked. If a candidate idea would naturally land as multi-container or UI building, the right move is REJECT with a redesign note (or, in Step 2a, reject before drafting).
 
 ## 9. Rubric (milestone tasks) (HIGH)
@@ -195,7 +202,10 @@ alwaysApply: false
 Before packaging or claiming "ready", use the task-scoped static checker for repo-local structural/compliance checks only. It does not replace `collapse_check.py` or the Harbor quality check:
 
 ```bash
-python3 run_static_checks.py --task-dir tasks/<task-name> --version edition_2
+source scripts/sudhir-env.sh
+TASK="$TB3_TASKS_DIR/<task-name>"
+ZIP="$TB3_SUBMISSIONS_DIR/<task-name>.zip"
+python3 run_static_checks.py --task-dir "$TASK" --version edition_2
 ```
 
 This checker objectively enforces the current public-contract rules for declared user-visible outputs, literal `internal_harness_files` leakage in `instruction.md`, and milestone signal-completion directives. It also runs five root-cause checks added to catch the specific failure modes that slipped past earlier reviews:
@@ -208,34 +218,34 @@ This checker objectively enforces the current public-contract rules for declared
 
 Do NOT run bare `ci_checks/*.sh` scripts without a task path — they scan all `tasks/` by default, and legacy tasks will cause spurious failures.
 
-If `ruff` is available: `ruff check tasks/<task-name>`.
+If `ruff` is available: `ruff check "$TASK"`.
 
 ## Packaging Verification
 
 ```bash
-cd tasks/<task-name>
-zip -rq ../../Task_Ready_To_Submit/<task-name>.zip . -x '*/__pycache__/*' '*.pyc' '.*'
-python3 ../../validate_submission_zip.py ../../Task_Ready_To_Submit/<task-name>.zip
+python3 sudhir_task.py package <task-name>
+python3 validate_submission_zip.py "$ZIP"
 ```
 
 Always run `validate_submission_zip.py` immediately after creating a submission zip. Any non-PASS result is blocking and must be fixed before continuing.
+Historical `Task_Ready_To_Submit/` is read-only and must never receive a new package.
 
 Verify: `instruction.md`, `task.toml`, `environment/`, `solution/`, and `tests/` at archive root. Append `--json` for machine-readable output.
 
 ## Review-Loop Discipline
 
-The review loop must stay cheap. Oracle + NOP preflight run **once** in Step 2b (see `workflow-prompts.md`), not once per iteration. The GPT-5.2 quality check (`harbor tasks check`) and `verifier_health.py` are both **opt-in diagnostics** (Step 3a-Q and Step 3a-V respectively). Skip them for routine tasks.
+The review loop must stay cheap. Oracle 1x + NOP run in Step 2b (see `workflow.md`), not oracle 10x. The GPT-5.5 quality check (`harbor tasks check`) and `verifier_health.py` are both **opt-in diagnostics** (Step 3a-Q and Step 3a-V respectively). Skip them for routine tasks.
 
 **When to reach for `verifier_health.py`** (otherwise skip it):
 
 - Platform agent trials scored 0/10 while Step 2b's oracle + NOP look healthy → run the default pass to check randomized-order and partial-oracle discrimination.
 - A specific test looks chain-dependent, order-sensitive, or flaky → narrow with `--only randomized_order` / `--only partial_oracle` and `--focus seed=N` / `--focus variant=LABEL`.
 - A reviewer asked for partial-oracle ablation evidence.
-- Step 2b's 10x oracle stress shows intermittent failures → add `--include-repeat-oracle`.
+- Step 4's 10x oracle stress shows intermittent failures → add `--include-repeat-oracle`.
 
 **When to reach for the quality check** (otherwise skip it):
 
-- A reviewer asked for the GPT-5.2 rubric audit.
+- A reviewer asked for the GPT-5.5 rubric audit.
 - You want to pressure-test instruction/test wording against an LLM judge before final review.
 
 Iteration helpers (when a diagnostic IS running):
@@ -252,15 +262,15 @@ Before claiming a task is approved or ready, run the repo's single approval gate
 
 ```bash
 # Routine path — verifier-health is opt-in:
-python3 approve_task.py --task-dir tasks/<task-name> \
-    --zip Task_Ready_To_Submit/<task-name>.zip \
+python3 approve_task.py --task-dir "$TASK" \
+  --zip "$ZIP" \
     --skip-verifier-health
 
 # Escalated path — Step 3a-V was run:
-python3 verifier_health.py --task-dir tasks/<task-name> \
+python3 verifier_health.py --task-dir "$TASK" \
     --output-json /tmp/<task-name>-verifier-health.json
-python3 approve_task.py --task-dir tasks/<task-name> \
-    --zip Task_Ready_To_Submit/<task-name>.zip \
+python3 approve_task.py --task-dir "$TASK" \
+  --zip "$ZIP" \
     --verifier-health /tmp/<task-name>-verifier-health.json
 ```
 
@@ -278,7 +288,7 @@ Use exactly one of these decisions. Do NOT use "ACCEPT WITH NOTES" to defer conc
 
 All of these must be true:
 
-- Oracle 1.0 (Step 2b preflight, 10/10), NOP 0.0
+- Oracle 1.0 (Step 2b one-run sanity), NOP 0.0, then Step 4 oracle 10/10
 - `collapse_check.py` returns PASS overall (every RC1-RC7 is PASS or a documented WARN)
 - RC6 classification is `symptoms-only` or `cause-revealing` (never `spec-complete`)
 - RC7 band is `substantive` or `borderline` (never `trivial`)
@@ -318,7 +328,7 @@ These must be resolved before any form of approval:
 1. **`verifier_health.py` WAS RUN AND does not show a behavioral partial-oracle failure** → this condition applies only when Step 3a-V was invoked. If every partial fix still passes, or the only failures are compile-only breakage, the verifier does not prove it discriminates between partial and complete fixes. Fix the tests or the ablation strategy. Tasks where `verifier_health.py` was not run (routine path, `--skip-verifier-health`) are not blocked by this rule.
 2. **Discoverability signals found but not eliminated** → `(void)` casts next to zero overrides, `// BUG:` comments, compile flags, hardcoded zeros where fields should be — these must be fixed, not noted.
 3. **`collapse_check.py` FAIL** → at least one mechanical collapse signal is fatal. Fix the flagged issue (rewrite the instruction symptoms-only for RC6, enlarge or restructure the oracle for RC7, rename files, restructure oracle, add output validation to tests, etc.) before any form of approval.
-4. **Quality check was run AND a `task-defect` entry remains** → this condition applies only when Step 3a-Q was invoked. Every `❌ fail` from `harbor tasks check ... -m openai/gpt-5.2` must be classified via `quality_check_adjudicate.py`. Findings classified `task-defect` are blocking and must be repaired before any form of approval. Findings classified `convention-conflict` (the checker's remedy contradicts a rule enforced by `run_static_checks.py`, `collapse_check.py`, or the canonical templates in `task-creation.mdc`) or `unsupported` (the finding cites behavior/files/fields that do not exist in the task) are waivable only when the adjudication entry carries the required evidence — `enforcing_rule.file`+`line` for conventions, `negative_lookup.command`+`expected_stdout` for unsupported. The adjudication artifact `/tmp/<task-name>-quality-check-adjudication.json` is required input to `approve_task.py` when the quality check was run; regenerate it by running `python3 quality_check_adjudicate.py --task-dir tasks/<task-name> --qc-output /tmp/<task-name>-qc.json` after every `harbor tasks check` capture. Never over-specify `instruction.md` or restructure tests purely to pacify a hallucinated finding — adjudicate it instead. Tasks where the quality check was not run are not blocked by this rule.
+4. **Quality check was run AND a `task-defect` entry remains** → this condition applies only when Step 3a-Q was invoked. Every `❌ fail` from `harbor tasks check ... -m openai/@openai/gpt-5.5` must be classified via `quality_check_adjudicate.py`. Findings classified `task-defect` are blocking and must be repaired before any form of approval. Findings classified `convention-conflict` (the checker's remedy contradicts a rule enforced by `run_static_checks.py`, `collapse_check.py`, or the canonical templates in `task-creation.mdc`) or `unsupported` (the finding cites behavior/files/fields that do not exist in the task) are waivable only when the adjudication entry carries the required evidence — `enforcing_rule.file`+`line` for conventions, `negative_lookup.command`+`expected_stdout` for unsupported. The adjudication artifact `/tmp/<task-name>-quality-check-adjudication.json` is required input to `approve_task.py` when the quality check was run; regenerate it by running `python3 quality_check_adjudicate.py --task-dir tasks/<task-name> --qc-output /tmp/<task-name>-qc.json` after every `harbor tasks check` capture. Never over-specify `instruction.md` or restructure tests purely to pacify a hallucinated finding — adjudicate it instead. Tasks where the quality check was not run are not blocked by this rule.
 5. **Environment file count below 20** → the task is `minimal`, which is blocked on the default Edition 2 path. Add substantive environment files or redesign the task before any form of approval.
 
 ---
@@ -360,7 +370,7 @@ Do not tell the user the task is ready until:
 
 - This checklist has been applied
 - The difficulty calibration from `difficulty-calibration.mdc` has been run
-- Oracle (10/10) and NOP (0.0) have been executed in Step 2b (not just claimed)
+- Oracle 1x and NOP 0.0 have been executed in Step 2b, and oracle 10/10 has been executed in Step 4 (not just claimed)
 - No HIGH-severity issues remain
 - No blocking conditions are unresolved (see Decision Criteria above)
 - If `verifier_health.py` was run (Step 3a-V), it PASSED and recorded a behavioral partial-oracle failure

@@ -27,14 +27,28 @@ Terminal-Bench is a popular benchmark for measuring the capabilities of agents a
 
 ## Contributing Tasks
 
-We're actively looking for contributors to add new, challenging tasks. See the [Open Call for Task Contributions](https://docs.google.com/document/d/1pe_gEbhVDgORtYsQv4Dyml8uaR7PZBEyVZnBUrs1z0M/edit?tab=t.0) for goals, timeline, and expectations. See [workflow-prompts.md](workflow-prompts.md) for the step-by-step task creation pipeline and [commands.md](commands.md) for CLI reference.
+We're actively looking for contributors to add new, challenging tasks. See the [Open Call for Task Contributions](https://docs.google.com/document/d/1pe_gEbhVDgORtYsQv4Dyml8uaR7PZBEyVZnBUrs1z0M/edit?tab=t.0) for goals, timeline, and expectations. See [workflow.md](workflow.md) for the step-by-step task creation pipeline and [commands.md](commands.md) for CLI reference.
 
 The default Terminal-Bench 3.0 Edition 2 authoring and review path in this repo is hard-only. Medium tasks are out of scope unless the repo adds a separately named profile.
-Hard-task approval is repo-local and mechanical: `collapse_check.py` + `harbor` oracle/NOP preflight (always-on, Step 2b), plus two opt-in diagnostics — `verifier_health.py` (Step 3a-V) and `harbor tasks check` with adjudication (Step 3a-Q) — gated into `approve_task.py` with a validated submission zip. See [workflow-prompts.md](workflow-prompts.md) and [commands.md](commands.md).
+Newly initialized ideas also use the long-horizon investigation profile: one coherent causal incident, 2-4 reinforcing agent weaknesses, heterogeneous evidence, falsifiable hypotheses, failure/control scenarios, deterministic reproduction, and a credible 20-100 meaningful-action estimate. The estimate guides authoring and is never part of task reward; see [sudhir_knowledge/LONG_HORIZON_TASK_PHILOSOPHY.md](sudhir_knowledge/LONG_HORIZON_TASK_PHILOSOPHY.md).
+Hard-task approval is repo-local and mechanical: `collapse_check.py` + `harbor` oracle/NOP preflight (always-on, Step 2b), plus two opt-in diagnostics — `verifier_health.py` (Step 3a-V) and `harbor tasks check` with adjudication (Step 3a-Q) — gated into `approve_task.py` with a validated submission zip. See [workflow.md](workflow.md) and [commands.md](commands.md).
 Use `tasks/` only for active authoring work. Checked-in tooling fixtures now live under `repo_tests/fixtures/tasks/` so contributors are not trained on negative examples from the primary workspace.
 
 Read the [task proposal rubric](web/TASK_PROPOSAL_RUBRIC.md) before getting started.
-For Step 1 website ideation, use the goal-sized `web/` bundle flow in [workflow-prompts.md](workflow-prompts.md), especially [web/bulk-idea-generation.md](web/bulk-idea-generation.md) and [web/option-a-seed-refinement.md](web/option-a-seed-refinement.md). The default two-prompt flow targets 150 Step-2a-ready seeds unless you ask for a different bank size.
+For Step 1 website ideation, use the goal-sized `web/` bundle flow in [workflow.md](workflow.md), especially [web/bulk-idea-generation.md](web/bulk-idea-generation.md) and [web/option-a-seed-refinement.md](web/option-a-seed-refinement.md). The default two-prompt flow targets 150 Step-2a-ready seeds unless you ask for a different bank size.
+
+## Local Harness Setup
+
+The repository Python environment is locked by `pyproject.toml` and `uv.lock`:
+
+```bash
+uv sync --frozen
+.venv/bin/python -m pytest -q
+.venv/bin/python -m repo_tests
+.venv/bin/ruff check .
+```
+
+Do not run harness tests from Conda base or install repository dependencies globally. External Harbor and Docker versions are recorded in `AGENT SETUP MANIFEST.txt`.
 
 ## Resources
 

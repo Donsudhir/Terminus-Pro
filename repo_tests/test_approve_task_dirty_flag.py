@@ -22,7 +22,7 @@ from unittest import mock
 import approve_task
 import run_static_checks
 import task_integrity
-from repo_tests.cases import FIXTURE_TASKS_DIR
+from repo_tests.current_cases import CLEAN_FIXTURE_NAME, FIXTURE_TASKS_DIR
 
 
 def _build_clean_reporter() -> run_static_checks.Reporter:
@@ -59,11 +59,11 @@ def _write_zip_from_source(task_dir: Path, zip_path: Path) -> None:
 
 
 class ApproveTaskDirtyFlagRegressionTest(unittest.TestCase):
-    """All four tests use implicit-step-restart as the fixture, the same
+    """All four tests use the immutable current clean fixture, the same
     fixture used by test_approve_task.test_clean_fixture_passes_gate.
     Phase A validators are mocked so we only exercise the sentinel logic."""
 
-    fixture_name = "implicit-step-restart"
+    fixture_name = CLEAN_FIXTURE_NAME
 
     def setUp(self) -> None:
         self.tmpdir_obj = tempfile.TemporaryDirectory(prefix="approve-dirty-flag-")

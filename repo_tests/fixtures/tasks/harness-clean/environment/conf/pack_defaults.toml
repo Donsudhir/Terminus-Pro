@@ -1,0 +1,8 @@
+[paths]
+vendor_root = "/app/vendor"
+stage_root = "/app/output/stage"
+tools_bin = "/app/bin"
+
+[build]
+cc = "gcc"
+target_name = "payload"

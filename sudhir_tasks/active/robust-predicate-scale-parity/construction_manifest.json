@@ -1,0 +1,92 @@
+{
+  "symbol_table": [
+    {
+      "path": "native/series.c",
+      "symbol": "eval_band",
+      "kind": "function",
+      "signature": "int eval_band(const double *a, const double *b, int32_t n, double *c);",
+      "purpose": "Evaluates a bounded numerical decision and returns a status plus working value."
+    },
+    {
+      "path": "host/plate.rs",
+      "symbol": "map_state",
+      "kind": "function",
+      "signature": "pub(crate) fn map_state(a: i32, b: &mut Frame) -> i8",
+      "purpose": "Maps a foreign status into host control flow."
+    },
+    {
+      "path": "host/frame.rs",
+      "symbol": "clear_frame",
+      "kind": "function",
+      "signature": "pub(crate) fn clear_frame(a: &mut Frame, b: &[f64])",
+      "purpose": "Initializes per-run magnitude context from current input."
+    },
+    {
+      "path": "analysis/pack.f90",
+      "symbol": "fold_rows",
+      "kind": "function",
+      "signature": "integer(c_int) function fold_rows(a, b, c) bind(C)",
+      "purpose": "Folds integer rows into a stable representation and updates incidence totals."
+    }
+  ],
+  "flipping_point_contract": {
+    "locations": [
+      {
+        "id": "A",
+        "path": "native/series.c",
+        "controls_tests": ["test_r01", "test_r02", "test_r06", "test_r10"]
+      },
+      {
+        "id": "B",
+        "path": "host/plate.rs",
+        "controls_tests": ["test_r03", "test_r06", "test_r07", "test_r10"]
+      },
+      {
+        "id": "C",
+        "path": "host/frame.rs",
+        "controls_tests": ["test_r04", "test_r05", "test_r11", "test_r12"]
+      },
+      {
+        "id": "D",
+        "path": "analysis/pack.f90",
+        "controls_tests": ["test_r07", "test_r08", "test_r09", "test_r12"]
+      }
+    ],
+    "no_single_location_flips_majority": true,
+    "concentration_cap": 0.34
+  },
+  "decoy_manifest": [
+    {
+      "path": "native/window.c",
+      "kind": "helper",
+      "rhymes_with": "eval_band",
+      "non_fix_purpose": "Computes finite range statistics for numerical series."
+    },
+    {
+      "path": "host/router.rs",
+      "kind": "helper",
+      "rhymes_with": "map_state",
+      "non_fix_purpose": "Maps process outcomes for the command entrypoint."
+    },
+    {
+      "path": "host/pool.rs",
+      "kind": "helper",
+      "rhymes_with": "clear_frame",
+      "non_fix_purpose": "Clears reusable scratch storage after completed work."
+    },
+    {
+      "path": "analysis/stats.f90",
+      "kind": "helper",
+      "rhymes_with": "fold_rows",
+      "non_fix_purpose": "Folds scalar marks into aggregate diagnostics."
+    }
+  ],
+  "code_forbidden_tokens": [
+    "geometry", "lab", "app", "connectivity", "report", "point", "cloud",
+    "point-cloud", "batch", "space", "cell", "set", "boundary", "case",
+    "neighbor", "relation", "disagreement", "audit", "summary", "pipeline",
+    "output", "bin", "geomlab", "variant", "identity", "adjacency",
+    "orientation", "validity", "topology", "count", "reproducibility",
+    "digest", "input", "cardinality", "handedness", "structure", "check"
+  ]
+}

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "tasks" / "regional-experiment-contamination"
@@ -96,8 +97,6 @@ for nm, users, regs in [
     pack_fixture(nm, users, regs)
 
 # copy active from alpha
-import shutil
-
 active = ENV / "data" / "active"
 if active.exists():
     shutil.rmtree(active)

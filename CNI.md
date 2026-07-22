@@ -297,7 +297,7 @@ actually produces the expected pass.
 
 **Why on hold.** The empirical gate (`verifier_health.py`'s `repeat_oracle`
 check, opt-in via `--include-repeat-oracle` in Step 3a-V) catches this
-when run, and Step 2b's 10x oracle preflight (`harbor run -a oracle -k 10
+when run, and Step 4's 10x oracle stress (`harbor run -a oracle -k 10
 -n 10`) catches it on the routine path. Adding a static check would
 duplicate the empirical ones and could fire false positives on legitimate
 inversion tests. The right leverage is instead in the review doc: we
@@ -306,7 +306,7 @@ checklist item in `review-and-submit.mdc`.
 
 **What would move this off the back burner.** Evidence that tasks are
 shipping with shipped tests that fail under the oracle despite the
-Step 2b 10x preflight — i.e., a failure mode the preflight systematically
+Step 4 10x stress — i.e., a failure mode the stress systematically
 misses. If that happens, build the check as an AST-level inspector before
 `approve_task.py` consumes any health report.
 
@@ -342,7 +342,7 @@ never copied `task.toml` + `instruction.md` into
 `test_checked_in_submission_zip_names_match_task_names` failed
 for each. Three-instance threshold under §Promotion criterion 1
 reached. Fix landed as Step 4 sub-step 4 (`## 4. Mirror task to
-repo_tests/fixtures/`) in both `workflow-prompts.md` Step 4 and
+repo_tests/fixtures/`) in both `workflow.md` Step 4 and
 `.cursor/skills/tb3-packager/SKILL.md`. No further action; entry
 retained as audit trail.
 
@@ -379,7 +379,7 @@ gates that exist but don't compute their own contract). Fix
 landed as: schema field `naming_pass` (required top-level),
 `_validate_naming_pass` validator with provenance + substring +
 arithmetic checks, `decoy_manifest[].rhymes_with` promoted to
-required, idea-validation.mdc and workflow-prompts.md updated to
+required, idea-validation.mdc and workflow.md updated to
 demand the audit, repo_tests pin. Old stored evidence is not
 re-validated; new attempts produce the field. No further action;
 entry retained as audit trail.

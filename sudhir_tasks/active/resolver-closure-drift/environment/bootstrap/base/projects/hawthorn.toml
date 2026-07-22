@@ -1,0 +1,6 @@
+title = "hawthorn"
+profile = "plain"
+catalog = "/app/archive/catalog.json"
+roots = ["cedar:300:320:stable:300"]
+apis = ["cedar:cedar_api"]
+seed = "0"

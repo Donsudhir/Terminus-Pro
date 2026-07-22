@@ -170,7 +170,7 @@ def _strip_comments_from_text(text: str, ext: str) -> str:
                 out_lines.append(line)
         return "\n".join(out_lines)
     # Default: drop blank lines only
-    return "\n".join(l for l in text.splitlines() if l.strip())
+    return "\n".join(line for line in text.splitlines() if line.strip())
 
 
 def _ext_of_app_path(target_app: str) -> str:
@@ -1893,7 +1893,7 @@ def run_all(task_dir: Path) -> list[dict]:
 # --------------------------------------------------------------------------- #
 
 def _cli():
-    import argparse, sys
+    import argparse
     parser = argparse.ArgumentParser(description="Root-level gate extras")
     parser.add_argument("task_dir", type=Path)
     parser.add_argument("--json", action="store_true")

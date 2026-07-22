@@ -1,0 +1,404 @@
+{
+  "hardness_axes": [
+    {
+      "id": "discover",
+      "name": "Discover",
+      "verdict": "PASS",
+      "reasoning": "Discover remains hard for the intended reasons."
+    },
+    {
+      "id": "synthesize",
+      "name": "Synthesize",
+      "verdict": "PASS",
+      "reasoning": "Synthesize remains hard for the intended reasons."
+    },
+    {
+      "id": "diagnose",
+      "name": "Diagnose",
+      "verdict": "PASS",
+      "reasoning": "Diagnose remains hard for the intended reasons."
+    },
+    {
+      "id": "navigate_coupling",
+      "name": "Navigate coupling",
+      "verdict": "PASS",
+      "reasoning": "Navigate coupling remains hard for the intended reasons."
+    },
+    {
+      "id": "reason_beyond_training",
+      "name": "Reason beyond training",
+      "verdict": "PASS",
+      "reasoning": "Reason beyond training remains hard for the intended reasons."
+    }
+  ],
+  "anti_trivialization_checks": [
+    {
+      "id": "disclosure_collapse",
+      "name": "Disclosure-collapse",
+      "verdict": "PASS",
+      "reasoning": "Disclosure-collapse remains hard for the intended reasons."
+    },
+    {
+      "id": "hidden_instance",
+      "name": "Hidden-instance",
+      "verdict": "PASS",
+      "reasoning": "Hidden-instance remains hard for the intended reasons."
+    },
+    {
+      "id": "single_artifact_repair",
+      "name": "Single-artifact repair",
+      "verdict": "PASS",
+      "reasoning": "Single-artifact repair remains hard for the intended reasons."
+    },
+    {
+      "id": "generalization",
+      "name": "Generalization",
+      "verdict": "PASS",
+      "reasoning": "Generalization remains hard for the intended reasons."
+    },
+    {
+      "id": "prompt_honesty",
+      "name": "Prompt-honesty",
+      "verdict": "PASS",
+      "reasoning": "Prompt-honesty remains hard for the intended reasons."
+    },
+    {
+      "id": "cheating_vs_difficulty",
+      "name": "Cheating-vs-difficulty",
+      "verdict": "PASS",
+      "reasoning": "Cheating-vs-difficulty remains hard for the intended reasons."
+    },
+    {
+      "id": "mechanical_fix_filter",
+      "name": "Mechanical-fix filter",
+      "verdict": "PASS",
+      "reasoning": "Mechanical-fix filter remains hard for the intended reasons."
+    },
+    {
+      "id": "localized_fix",
+      "name": "Localized-fix",
+      "verdict": "PASS",
+      "reasoning": "Localized-fix remains hard for the intended reasons."
+    },
+    {
+      "id": "oracle_locality",
+      "name": "Oracle-locality",
+      "verdict": "PASS",
+      "reasoning": "Oracle-locality remains hard for the intended reasons."
+    },
+    {
+      "id": "small_declarative_cluster",
+      "name": "Small declarative-cluster",
+      "verdict": "PASS",
+      "reasoning": "Small declarative-cluster remains hard for the intended reasons."
+    },
+    {
+      "id": "grep_collapse",
+      "name": "Grep-collapse",
+      "verdict": "PASS",
+      "reasoning": "Grep-collapse remains hard for the intended reasons."
+    },
+    {
+      "id": "pre_factored_helper",
+      "name": "Pre-factored-helper",
+      "verdict": "PASS",
+      "reasoning": "Pre-factored-helper remains hard for the intended reasons."
+    },
+    {
+      "id": "recipe_discount",
+      "name": "Recipe-discount",
+      "verdict": "PASS",
+      "reasoning": "Recipe-discount remains hard for the intended reasons."
+    },
+    {
+      "id": "security_aura_discount",
+      "name": "Security-aura discount",
+      "verdict": "PASS",
+      "reasoning": "Security-aura discount remains hard for the intended reasons."
+    },
+    {
+      "id": "orthogonal_checklist",
+      "name": "Orthogonal-checklist",
+      "verdict": "PASS",
+      "reasoning": "Orthogonal-checklist remains hard for the intended reasons."
+    },
+    {
+      "id": "harness_discount",
+      "name": "Harness-discount",
+      "verdict": "PASS",
+      "reasoning": "Harness-discount remains hard for the intended reasons."
+    },
+    {
+      "id": "one_pass_solvability",
+      "name": "One-pass solvability",
+      "verdict": "PASS",
+      "reasoning": "One-pass solvability remains hard for the intended reasons."
+    },
+    {
+      "id": "hard_only_gate",
+      "name": "Hard-only gate",
+      "verdict": "PASS",
+      "reasoning": "Hard-only gate remains hard for the intended reasons."
+    },
+    {
+      "id": "discovery_budget_test",
+      "name": "Discovery budget test",
+      "verdict": "PASS",
+      "reasoning": "Discovery budget test remains hard for the intended reasons."
+    },
+    {
+      "id": "instruction_specificity_test",
+      "name": "Instruction specificity test",
+      "verdict": "PASS",
+      "reasoning": "Instruction specificity test remains hard for the intended reasons."
+    },
+    {
+      "id": "topology_distribution_test",
+      "name": "Topology distribution test",
+      "verdict": "PASS",
+      "reasoning": "Topology distribution test remains hard for the intended reasons."
+    }
+  ],
+  "rubric_axes": [
+    {
+      "id": "verifiable",
+      "name": "Verifiable",
+      "verdict": "PASS",
+      "reasoning": "Verifiable remains hard for the intended reasons."
+    },
+    {
+      "id": "well_specified",
+      "name": "Well-specified",
+      "verdict": "PASS",
+      "reasoning": "Well-specified remains hard for the intended reasons."
+    },
+    {
+      "id": "solvable",
+      "name": "Solvable",
+      "verdict": "PASS",
+      "reasoning": "Solvable remains hard for the intended reasons."
+    },
+    {
+      "id": "difficult",
+      "name": "Difficult",
+      "verdict": "PASS",
+      "reasoning": "Difficult remains hard for the intended reasons."
+    },
+    {
+      "id": "interesting",
+      "name": "Interesting",
+      "verdict": "PASS",
+      "reasoning": "Interesting remains hard for the intended reasons."
+    },
+    {
+      "id": "outcome_verified",
+      "name": "Outcome-verified",
+      "verdict": "PASS",
+      "reasoning": "Outcome-verified remains hard for the intended reasons."
+    }
+  ],
+  "instruction_completeness_test": {
+    "verdict": "PASS",
+    "reasoning": "The evidence covers every required validation field."
+  },
+  "discovery_budget": [
+    {
+      "discovery": "The future solver must infer that config parsing and verifier behavior interact across subsystems.",
+      "planned_location": "environment/config plus tests/test_outputs.py expectations",
+      "why_instruction_must_not_reveal": "Naming the config-verifier coupling would collapse the diagnosis step."
+    },
+    {
+      "discovery": "The defect should span multiple execution phases instead of a single broken function.",
+      "planned_location": "environment/src/runtime and persisted fixture/state data",
+      "why_instruction_must_not_reveal": "Calling out the multi-phase interaction would identify the fix path too directly."
+    },
+    {
+      "discovery": "The solver should have to recover a non-obvious storage/layout invariant from code and runtime traces.",
+      "planned_location": "environment/storage modules and scenario fixtures",
+      "why_instruction_must_not_reveal": "Describing the hidden invariant in the instruction would turn the task into spec transcription."
+    }
+  ],
+  "instruction_specificity": {
+    "level": "symptoms-only",
+    "reasoning": "The brief names the symptom but not the underlying cause."
+  },
+  "attack_path": {
+    "summary": "A solver must connect the public symptom to multiple internal components.",
+    "reasoning": "The winning fix requires tracing across the environment and tests."
+  },
+  "smallest_plausible_patch": {
+    "summary": "A credible fix touches more than one file and has to preserve invariants.",
+    "reasoning": "A one-line tweak would not satisfy the verifier and the task contract."
+  },
+  "collapse_audit": {
+    "verdict": "PASS",
+    "reasoning": "The task still resists a one-pass mechanical repair.",
+    "residual_hardness": "A reviewer still expects multi-step diagnosis and synthesis.",
+    "red_flags": []
+  },
+  "topology_enumeration": [
+    {
+      "id": "topology_a",
+      "summary": "Distributed invariant across parsing, storage, and verifier layers.",
+      "locations": [
+        "environment/parser/main.py",
+        "environment/storage/layout.py",
+        "environment/verifier/invariants.py"
+      ],
+      "why_no_single_location_suffices": "Changing only one layer breaks coupling with the other two and some tests will still fail."
+    },
+    {
+      "id": "topology_b",
+      "summary": "Three-stage pipeline coordination across ingest, transform, and emit.",
+      "locations": [
+        "environment/ingest/reader.py",
+        "environment/transform/normalizer.py",
+        "environment/emit/writer.py"
+      ],
+      "why_no_single_location_suffices": "A single-stage patch leaves the contract violated at the other two stages."
+    },
+    {
+      "id": "topology_c",
+      "summary": "Cross-cutting state reconciliation across config, runtime, and snapshot.",
+      "locations": [
+        "environment/config/loader.py",
+        "environment/runtime/state.py",
+        "environment/snapshot/persist.py"
+      ],
+      "why_no_single_location_suffices": "Reconciliation requires coordinated writes; patching one file shifts the bug into the other two."
+    }
+  ],
+  "construction_manifest": {
+    "symbol_table": [
+      {
+        "path": "environment/stage_a/op.py",
+        "symbol": "reconcile_b",
+        "kind": "function",
+        "signature": "def reconcile_b(a, b, c):",
+        "purpose": "Reconciles three inputs deterministically."
+      },
+      {
+        "path": "environment/stage_b/apply.py",
+        "symbol": "apply_step_c",
+        "kind": "function",
+        "signature": "def apply_step_c(state, payload):",
+        "purpose": "Applies the canonical transform step to state."
+      },
+      {
+        "path": "environment/stage_c/commit.py",
+        "symbol": "commit_phase_d",
+        "kind": "function",
+        "signature": "def commit_phase_d(ctx):",
+        "purpose": "Commits the phase and persists outcome."
+      }
+    ],
+    "flipping_point_contract": {
+      "locations": [
+        {
+          "id": "A",
+          "path": "environment/stage_a/op.py",
+          "controls_tests": [
+            "test_one",
+            "test_two"
+          ]
+        },
+        {
+          "id": "B",
+          "path": "environment/stage_b/apply.py",
+          "controls_tests": [
+            "test_three"
+          ]
+        },
+        {
+          "id": "C",
+          "path": "environment/stage_c/commit.py",
+          "controls_tests": [
+            "test_four",
+            "test_five"
+          ]
+        }
+      ],
+      "no_single_location_flips_majority": true,
+      "concentration_cap": 0.5
+    },
+    "decoy_manifest": [
+      {
+        "path": "environment/stage_a/legacy.py",
+        "kind": "helper",
+        "rhymes_with": "reconcile_b",
+        "non_fix_purpose": "Provides a deprecated code path the oracle does not touch."
+      },
+      {
+        "path": "environment/stage_b/probe.py",
+        "kind": "helper",
+        "rhymes_with": "apply_step_c",
+        "non_fix_purpose": "Exposes inspection hooks used only by diagnostic scripts."
+      }
+    ],
+    "code_forbidden_tokens": [
+      "lineage",
+      "authority",
+      "precedence"
+    ]
+  },
+  "naming_pass": {
+    "instruction_nouns_extracted": [
+      "lineage",
+      "authority",
+      "precedence"
+    ],
+    "renames_during_drafting": [
+      {
+        "original": "pick_lineage",
+        "renamed_to": "reconcile_b",
+        "reason": "Original symbol name overlapped instruction noun 'lineage'."
+      }
+    ],
+    "test_names_audited": [
+      "test_one",
+      "test_two",
+      "test_three"
+    ],
+    "concentration_math": {
+      "total_tests": 5,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 2,
+          "ratio": 0.4
+        },
+        {
+          "location_id": "B",
+          "test_count": 1,
+          "ratio": 0.2
+        },
+        {
+          "location_id": "C",
+          "test_count": 2,
+          "ratio": 0.4
+        }
+      ]
+    },
+    "recomputed_concentration": {
+      "total_tests": 5,
+      "concentration_cap": 0.5,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 2,
+          "ratio": 0.4
+        },
+        {
+          "location_id": "B",
+          "test_count": 1,
+          "ratio": 0.2
+        },
+        {
+          "location_id": "C",
+          "test_count": 2,
+          "ratio": 0.4
+        }
+      ]
+    }
+  }
+}

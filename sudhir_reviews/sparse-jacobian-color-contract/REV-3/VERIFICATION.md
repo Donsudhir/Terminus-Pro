@@ -1,0 +1,3 @@
+# VERIFICATION — sparse-jacobian-color-contract REV-3
+
+Verification rebuilds through build_all.sh and runs opaque tests test_k01–test_k13. Checks cover permutation and resume parity, directional probes, packed values equal to structural residual coefficients (including a denser overlapping-support family), per-batch scale summary isolation with absolute ref/step expectations, lexicographic run ordering, ledger.active equal to retained packed values, ids preserved as 1..cols, digest stability, and malformed input exiting nonzero without a partial report. pytest runs from /tests with PYTHONSAFEPATH and --confcutdir=/tests.

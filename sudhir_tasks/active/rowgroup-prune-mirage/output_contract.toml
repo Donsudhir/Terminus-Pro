@@ -1,0 +1,28 @@
+user_visible_outputs = [
+  "/app/output/audit.json",
+]
+
+internal_harness_files = [
+  "/app/data/archive/mixed.store",
+  "/app/data/archive/current.store",
+  "/app/data/archive/healthy.store",
+  "/app/data/archive/vault.store",
+]
+
+[structured_outputs.audit]
+target = "/app/output/audit.json"
+format = "json"
+instruction_checks = [
+  "status",
+  "cases",
+  "digest",
+  "case_id",
+  "row_count",
+  "sum_amount",
+  "pages_total",
+  "pages_read",
+  "path",
+  "skipping",
+  "data.store",
+  "report-schema.md",
+]
