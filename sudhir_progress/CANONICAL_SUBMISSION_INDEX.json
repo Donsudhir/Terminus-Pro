@@ -1,6 +1,42 @@
 {
-  "archive_count": 6,
+  "archive_count": 9,
   "archives": {
+    "airspace-conflict-sim-deterministic-replay.zip": {
+      "bytes": 23734,
+      "instruction_sha256": {
+        "instruction.md": "4dc98027c23df22fa83b34888c0f875bd0a2a5eefc6559e27b80e5fa24513fc8"
+      },
+      "layout": "standard",
+      "member_count": 55,
+      "milestones": [],
+      "sha256": "296d6ee6937835d66f661bdea5e4a408d84f467f22004682c98055da3225cc11",
+      "task_toml_sha256": "6a453cb5f899ceb6e2c57a031e29937dc8000833f9b8471d281c088dae4832b0",
+      "validator_valid": true
+    },
+    "device-node-migration-haze.zip": {
+      "bytes": 33564,
+      "instruction_sha256": {
+        "instruction.md": "b2312ede0f3b86f8d24e19d7e631d8fc29e393a0d62f5c00e1eef9fa12b37081"
+      },
+      "layout": "standard",
+      "member_count": 60,
+      "milestones": [],
+      "sha256": "3d78909e8835a75c1b4f0c7f55e53b7c0712065dc0f526e22bbcd6827fd47e24",
+      "task_toml_sha256": "39f77fe4fc37b29b39fea517cb5b7a0dbad2d61fff5c611eda6ee4bfe6622e33",
+      "validator_valid": true
+    },
+    "domain-halo-digest-rift.zip": {
+      "bytes": 24391,
+      "instruction_sha256": {
+        "instruction.md": "9aa2991ad3ed7f67cc65f7a4618a89335b1bb753c02afee7975571ab582001f6"
+      },
+      "layout": "standard",
+      "member_count": 33,
+      "milestones": [],
+      "sha256": "5bd556eed8d59611d1bcff9010064d4a5c1f8b29cd370b1e71973863a48b7a21",
+      "task_toml_sha256": "a8f3123b37ea315b233ce71df6a729fdb28d0f029fe24bfa2476ecb03a59f0ab",
+      "validator_valid": true
+    },
     "envelope-rotation-shear.zip": {
       "bytes": 32245,
       "instruction_sha256": {
@@ -13,27 +49,39 @@
       "task_toml_sha256": "69316aecd0e026e165dd07a70e863e0a0b0a51c8a64ff893deeebd7af6d49abb",
       "validator_valid": true
     },
-    "musl-sysroot-splice.zip": {
-      "bytes": 21082,
+    "mesh-checkpoint-operator-skew.zip": {
+      "bytes": 25920,
       "instruction_sha256": {
-        "instruction.md": "fba2c6089ca46c73b3a20a97af4543b8ac67abd801ba67438934f4c99275f0af"
+        "instruction.md": "d80ea30e5809fe6d5f172030d19e8ee96d149b3a6d8d1fe41fb4e11defd57b93"
+      },
+      "layout": "standard",
+      "member_count": 36,
+      "milestones": [],
+      "sha256": "7869765502289073a1b02563da0656339d26295fd3d4ca49ab62a3735df43075",
+      "task_toml_sha256": "7d0ed471a4a35d2aab5792ce76e2b7cfb58227c55b26084f279ac96e2be50ed4",
+      "validator_valid": true
+    },
+    "musl-sysroot-splice.zip": {
+      "bytes": 21150,
+      "instruction_sha256": {
+        "instruction.md": "2d65d289e50195b5bc909b6dff848692b1a981e476166f04e163763d36ca7ef3"
       },
       "layout": "standard",
       "member_count": 46,
       "milestones": [],
-      "sha256": "5739b009e19f822817ceb48fa98f7142b9f41928a0b14d68016a02450ecc9ee6",
+      "sha256": "e42ffbc62fed3ee8c0288dcb00e4acdae6e7b758473fe3c8df28b21daef4ab47",
       "task_toml_sha256": "47b764a0a95e33df7fc7f0aea852b1be6f908b557275dfa0bbfbcec62e81cc15",
       "validator_valid": true
     },
     "resolver-closure-drift.zip": {
-      "bytes": 39589,
+      "bytes": 40610,
       "instruction_sha256": {
-        "instruction.md": "f99e5e62731803b38bdec3cb2948c8c72ac803979bf67bfaa742101acf861927"
+        "instruction.md": "4da97cecd00939220cbf8ddfa539b1f29423cfad072ffa7a7f9a7168c2166226"
       },
       "layout": "standard",
       "member_count": 77,
       "milestones": [],
-      "sha256": "6d1f0ec9db7d97a6cdff940332133775a298bb9d6ada24d074d6e427abcac48f",
+      "sha256": "5e11eda67223cb733c3e4437c6b57db744fb5e484f848b2b5de2e0dbd6ef4b48",
       "task_toml_sha256": "19756d6ecd885134054157f6a0687365322d55046ed0b37b7e94cfcefa6f1b51",
       "validator_valid": true
     },
@@ -59,18 +107,6 @@
       "milestones": [],
       "sha256": "decd9555517e295ee363f306c35f2e453ee8b8e66f379ff16d6dc6f4c1c63132",
       "task_toml_sha256": "2d34ce0e676e2807fd0437e7a0d10d63c8b18149ae0c35d5f81775e2d792a31b",
-      "validator_valid": true
-    },
-    "sparse-jacobian-color-contract.zip": {
-      "bytes": 32640,
-      "instruction_sha256": {
-        "instruction.md": "f2004d7a1abfca10331814acad2c86043dd2fb152de9a89892c19b825c512be6"
-      },
-      "layout": "standard",
-      "member_count": 43,
-      "milestones": [],
-      "sha256": "50ba04249f0a0a8b8ec798ce1159f67ee39015683a7df6d25d78d6f24b1a65d5",
-      "task_toml_sha256": "9236ed5697830cb4130be553f744249b3c8a135b088c1e7bb11b2e3c76842c55",
       "validator_valid": true
     }
   },

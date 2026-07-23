@@ -1,0 +1,6 @@
+{
+  "analysis": "The system has been patched, rebuilt successfully with /app/tools/build-all, and validated. Bundled audit now produces consistent corrected totals for archived mixed-generation stores, and repeated bundled audit output compares byte-identical. Additional row/batch equivalence checks over mixed and vault stores now agree. Fresh ingest was tested on bundled CSVs; generated stores use data.store and markers now reflect live values, including all-non-live slabs using low=0 high=0 has_absent=1. Fresh row/batch audit cases also agree.",
+  "plan": "No further commands are needed. The task requirements have been satisfied: archived mixed-generation reads are repaired without rewriting stores, both execution lanes agree, healthy selective fast paths remain working, fresh ingest writes faithful live markers, and reports are deterministic.",
+  "commands": [],
+  "task_complete": true
+}

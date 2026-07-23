@@ -1,0 +1,18 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# mkdir -p /tmp/tc; printf '# hdr\nfb_row|/tmp/store_b/data.store|all|0|0|row|0|x\nfb_bat|/tmp/store_b/data.store|
+all|0|0|batch|0|x\nfb_rng_r|/tmp/store_b/data.store|range|0|300|row|1|x\nfb_rng_b|/tmp/store_b/data.store|range|0|300|batch|1|x\nfc_null_r|/tmp/store_c/data.sto
+re|isnull|0|0|row|0|x\nfc_null_b|/tmp/store_c/data.store|isnull|0|0|batch|0|x\n' > /tmp/tc/t.case
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam audit /tmp/tc /tmp/tc/out.json; python3 -c "import json;d=json.load(open('/tmp/tc/out.json'));[pri
+nt(c['case_id'],c['row_count'],c['sum_amount'],c['pages_read'],c['pages_total'],c['path']) for c in d['cases']]"
+fb_row 6 -349 2 2 row
+fb_bat 6 -349 2 2 batch
+fb_rng_r 5 650 2 2 row
+fb_rng_b 5 650 2 2 batch
+fc_null_r 4 0 2 2 row
+fc_null_b 4 0 2 2 batch
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app#

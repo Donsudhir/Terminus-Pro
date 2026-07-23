@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Let me look at the rust ember module: reed.rs (gather/paging), fold.rs, pale.rs, and codec.rs. The fold.rs likely computes the markers (low/high/has_absent). This is where the fresh-ingest marker faithfulness lives.",
+  "plan": "Read the ember module files and codec.",
+  "commands": [
+    {"keystrokes": "cat /app/rust/src/ember/mod.rs /app/rust/src/ember/fold.rs\n", "duration": 0.1}
+  ]
+}
+```

@@ -1,0 +1,31 @@
+{
+  "analysis": "Raw stores reveal mixed generation pages. mixed page 0 generation 2 has markers low/high=100/100 that do not span live current rows 10 and 20 plus inherited/retired origin row -999, and has_absent=1. Current audit m_range/m_narrow skip/read incorrectly due stale markers. Need inspect exact veil and tally implementations; prior combined output truncated key lines.",
+  "plan": "Print veil.cpp, rill/bay,row,store around run_case separately. Then patch: likely make selective numeric gates conservative for older generation/incomplete marker pages with absent/origin variance, and make both row/batch count only live rows consistently. Need identify live definition (present and origin Current?).",
+  "commands": [
+    {
+      "keystrokes": "nl -ba /app/cpp/src/harbor/veil.cpp | sed -n '1,220p'\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "nl -ba /app/cpp/src/lattice/bay.cpp | sed -n '1,260p'\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "nl -ba /app/cpp/src/lattice/rill.cpp | sed -n '1,260p'\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "nl -ba /app/cpp/src/row.cpp | sed -n '1,260p'\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "nl -ba /app/cpp/src/store.cpp | sed -n '1,220p'\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "find /app/rust/src/ember -type f -maxdepth 3 -print -exec sh -c 'echo ===== $1 =====; nl -ba \"$1\" | sed -n \"1,260p\"' sh {} \\;\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+} 

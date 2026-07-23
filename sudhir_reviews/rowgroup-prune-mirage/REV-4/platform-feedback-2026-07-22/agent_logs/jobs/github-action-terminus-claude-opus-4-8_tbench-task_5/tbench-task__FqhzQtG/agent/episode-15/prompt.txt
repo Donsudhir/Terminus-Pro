@@ -1,0 +1,42 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat -A /app/data/archive/mixed.store
+H|2$
+P|0|2|100|100|1|east|west|4$
+R|1|0|-999|east$
+R|1|2|10|east$
+R|1|2|20|west$
+R|0|2|777|west$
+P|1|3|30|600|0|north|south|4$
+R|1|2|30|north$
+R|1|2|40|north$
+R|1|2|500|south$
+R|1|2|600|south$
+P|2|3|-5|-5|0|central|central|1$
+R|1|2|-5|central$
+P|3|3|200|400|0|east|west|3$
+R|1|2|200|east$
+R|1|2|300|north$
+R|1|2|400|west$
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# echo '---VAULT---'; cat -A /app/data/archive/vault.store
+---VAULT---
+H|2$
+P|0|2|5|30|0|north|west|4$
+R|1|2|5|east$
+R|1|0|12|east$
+R|1|2|18|west$
+R|1|2|30|west$
+P|1|3|40|70|0|north|south|4$
+R|1|2|40|north$
+R|1|2|55|north$
+R|1|2|63|south$
+R|1|2|70|south$
+P|2|2|-20|90|1|central|east|3$
+R|1|2|-20|central$
+R|0|2|90|east$
+R|1|2|44|east$
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app#

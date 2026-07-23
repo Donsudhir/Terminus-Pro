@@ -1,0 +1,18 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# cat /app/cpp/include/loam/plan.hpp
+#pragma once
+
+#include "loam/types.hpp"
+
+namespace loam {
+
+Gate turn_b(const Slab& a, const Probe& b);
+std::string turn_d(const Gate& a, const Probe& b);
+
+}  // namespace loam
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app#

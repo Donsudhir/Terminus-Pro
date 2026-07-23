@@ -30,3 +30,33 @@
 - Package `sudhir_tasks_ready_to_submit/resolver-closure-drift.zip` sha256=`6d1f0ec9db7d97a6cdff940332133775a298bb9d6ada24d074d6e427abcac48f` (77 members)
 - CM-015 Seen bumped; TASK-RCD-001 + FAILURE-CM-015 HIT edge in knowledge graph
 - Docker cleaned after package
+
+## 2026-07-22T03:14:50Z — Revision 4
+
+- QC behavior_in_task_description: disclose profile/preview/withdrawn/constraint contracts
+
+## 2026-07-22T03:25:00Z — Revision 4 applied + packaged
+
+- Instruction + `/app/repo/docs/architecture.md`: profiles plain/alpha/beta/mixed, preview/withdrawn, five-field constraints, named edge cases, generated-package generalization (CM-002)
+- GX6 kept at 0 connectives; collapse 0 FAIL / 0 WARN; check-task + gates PASS
+- Harbor: oracle 1x `2026-07-22__08-46-44` mean=1.0; nop `2026-07-22__08-48-12` mean=0.0; oracle 10x `2026-07-22__08-49-12` mean=1.0 Pass@10=1.0
+- Package `sudhir_tasks_ready_to_submit/resolver-closure-drift.zip` sha256=`9693fcdbbf78f2bfe48c8f51c17e4650a6c0442f95af35c4a3ce0bea61fc5e98` (77 members)
+- CM-002 Seen bumped for RCD `4d74fca0` REV-4; Docker cleaned after package
+
+## 2026-07-22T18:51:42Z — Revision 5
+
+- CM-008 EASY opus80/gpt5100; harden veil+quay so sill-only cannot pass; keep QC contracts
+
+## 2026-07-23T00:30:00Z — Revision 5 hardening (in progress)
+
+- Platform EASY: opus 80% / gpt5 100% after REV-4 QC disclosure
+- Closed HeldPin/HeldLane admission shortcut in broken sill; quay always reverse-sorts
+- Did not name sort as a second known bug (instruction-sufficiency suggestion rejected for CM-008)
+- Harbor oracle 1x + nop PASS; oracle 10x blocked by CM-003 (permission-denied container stop / subnet pools)
+- Next: `sudo snap restart docker` (or host Docker restart), then `harbor run … -a oracle -k 10 -n 1`, package
+
+## 2026-07-23T01:20:00Z — Revision 5 packaged
+
+- Oracle 10x clean after Docker restart: `2026-07-23__01-11-53` mean=1.0
+- Package `sudhir_tasks_ready_to_submit/resolver-closure-drift.zip`
+- DSV Humanizer audit PASS; PREUPLOAD complete

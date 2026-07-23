@@ -1,0 +1,41 @@
+Current Terminal Screen:
+>     }
+>
+>     Ok(Mark {
+>         low,
+>         high,
+>         has_absent,
+>     })
+> }
+> RS
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# /app/tools/build-all
+   Compiling loam-ingest v0.8.0 (/app/rust)
+    Finished release [optimized] target(s) in 1.16s
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o bu
+ild/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json && cat /app/output/audit.json
+{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_
+skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_to
+tal":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping"
+:true},{"case_id":"m_range","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":2,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":2,"sum
+_amount":30,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_null","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":4,"path":
+"batch","skipping":false},{"case_id":"m_interact","row_count":3,"sum_amount":25,"pages_total":4,"pages_read":2,"path":"batch","skipping":true},{"case_id":"m_neg
+","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":10,"sum_amount":2095,"pages_total
+":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":
+true},{"case_id":"v_missing","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"batch","skipping":true},{"case_id":"v_check","row_count":2,"sum
+_amount":0,"pages_total":3,"pages_read":2,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"
+row","skipping":false}],"digest":"24f25c278c07378c"}
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app#

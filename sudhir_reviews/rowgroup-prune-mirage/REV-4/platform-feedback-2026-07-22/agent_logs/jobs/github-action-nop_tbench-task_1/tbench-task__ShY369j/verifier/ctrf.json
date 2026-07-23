@@ -1,0 +1,200 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 15,
+            "passed": 0,
+            "failed": 15,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1784599643.933336,
+            "stop": 1784599651.1464217
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_p01",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 7.0121039263904095,
+                "start": 1784599643.9503717,
+                "stop": 1784599650.980497,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p010')\n\n    def test_p01(tmp_path: Path) -> None:\n        \"\"\"Fresh numeric ingestion keeps its recorded value domain faithful.\"\"\"\n        source = _write_csv(tmp_path, \"alpha-01\", True)\n        produced = _ingest(tmp_path, source, \"a1\")\n>       _assert_markers(produced, [(17, 43, 1), (107, 151, 1)])\n\ntest_outputs.py:144: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\npath = PosixPath('/tmp/pytest-of-root/pytest-0/test_p010/a1/data.store')\nexpected = [(17, 43, 1), (107, 151, 1)]\n\n    def _assert_markers(path: Path, expected: list[tuple[int, int, int]]) -> list[dict]:\n        pages = _parse_store(path)\n        assert len(pages) == len(expected)\n        for page, markers in zip(pages, expected, strict=True):\n>           assert (page[\"low\"], page[\"high\"], page[\"has_absent\"]) == markers\nE           assert (-937, 43, 0) == (17, 43, 1)\nE             \nE             At index 0 diff: -937 != 17\nE             Use -v to get more diff\n\ntest_outputs.py:131: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p02",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.004440721124410629,
+                "start": 1784599650.9807942,
+                "stop": 1784599650.9926062,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p020')\n\n    def test_p02(tmp_path: Path) -> None:\n        \"\"\"Archived selective row execution returns the complete invoice window.\"\"\"\n        row = _run_case(tmp_path, \"p02\", MIXED, \"range\", 10, 40, \"row\", True)\n>       _assert_tally(row, 4, 100)\n\ntest_outputs.py:150: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p02', 'pages_read': 1, 'pages_total': 4, 'path': 'row', ...}\ncount = 4, total = 100\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 2 == 4\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p03",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0065091680735349655,
+                "start": 1784599650.9928808,
+                "stop": 1784599651.0057392,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p030')\n\n    def test_p03(tmp_path: Path) -> None:\n        \"\"\"Fresh artifact evidence and archived selective answers agree together.\"\"\"\n        source = _write_csv(tmp_path, \"alpha-03\", True)\n        produced = _ingest(tmp_path, source, \"a3\")\n>       _assert_markers(produced, [(17, 43, 1), (107, 151, 1)])\n\ntest_outputs.py:158: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\npath = PosixPath('/tmp/pytest-of-root/pytest-0/test_p030/a3/data.store')\nexpected = [(17, 43, 1), (107, 151, 1)]\n\n    def _assert_markers(path: Path, expected: list[tuple[int, int, int]]) -> list[dict]:\n        pages = _parse_store(path)\n        assert len(pages) == len(expected)\n        for page, markers in zip(pages, expected, strict=True):\n>           assert (page[\"low\"], page[\"high\"], page[\"has_absent\"]) == markers\nE           assert (-937, 43, 0) == (17, 43, 1)\nE             \nE             At index 0 diff: -937 != 17\nE             Use -v to get more diff\n\ntest_outputs.py:131: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p04",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.005875047296285629,
+                "start": 1784599651.0059488,
+                "stop": 1784599651.021118,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p040')\n\n    def test_p04(tmp_path: Path) -> None:\n        \"\"\"Batch execution counts every absent archived entry exactly once.\"\"\"\n        row = _run_case(tmp_path, \"p04\", MIXED, \"isnull\", 0, 0, \"batch\", False)\n>       _assert_tally(row, 2, 0)\n\ntest_outputs.py:166: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p04', 'pages_read': 4, 'pages_total': 4, 'path': 'batch', ...}\ncount = 2, total = 0\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 1 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p05",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.006886165589094162,
+                "start": 1784599651.0214415,
+                "stop": 1784599651.0354028,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p050')\n\n    def test_p05(tmp_path: Path) -> None:\n        \"\"\"Fresh artifact evidence composes with archived batch absence handling.\"\"\"\n        source = _write_csv(tmp_path, \"alpha-05\", True)\n        produced = _ingest(tmp_path, source, \"a5\")\n>       _assert_markers(produced, [(17, 43, 1), (107, 151, 1)])\n\ntest_outputs.py:173: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\npath = PosixPath('/tmp/pytest-of-root/pytest-0/test_p050/a5/data.store')\nexpected = [(17, 43, 1), (107, 151, 1)]\n\n    def _assert_markers(path: Path, expected: list[tuple[int, int, int]]) -> list[dict]:\n        pages = _parse_store(path)\n        assert len(pages) == len(expected)\n        for page, markers in zip(pages, expected, strict=True):\n>           assert (page[\"low\"], page[\"high\"], page[\"has_absent\"]) == markers\nE           assert (-937, 43, 0) == (17, 43, 1)\nE             \nE             At index 0 diff: -937 != 17\nE             Use -v to get more diff\n\ntest_outputs.py:131: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p06",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0038937050849199295,
+                "start": 1784599651.0356624,
+                "stop": 1784599651.0464487,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p060')\n\n    def test_p06(tmp_path: Path) -> None:\n        \"\"\"The mixed selective-batch window preserves all qualifying values.\"\"\"\n        row = _run_case(tmp_path, \"p06\", MIXED, \"range\", -1000, 25, \"batch\", True)\n>       _assert_tally(row, 3, 25)\n\ntest_outputs.py:181: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p06', 'pages_read': 1, 'pages_total': 4, 'path': 'batch', ...}\ncount = 3, total = 25\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 1 == 3\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p07",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.00662929005920887,
+                "start": 1784599651.0466754,
+                "stop": 1784599651.060202,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p070')\n\n    def test_p07(tmp_path: Path) -> None:\n        \"\"\"A fresh sparse range avoids irrelevant data without widening markers.\"\"\"\n        source = _write_csv(tmp_path, \"beta-07\", False)\n        produced = _ingest(tmp_path, source, \"b7\")\n>       _assert_markers(produced, [(-911, 19, 1), (211, 227, 1)])\n\ntest_outputs.py:188: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\npath = PosixPath('/tmp/pytest-of-root/pytest-0/test_p070/b7/data.store')\nexpected = [(-911, 19, 1), (211, 227, 1)]\n\n    def _assert_markers(path: Path, expected: list[tuple[int, int, int]]) -> list[dict]:\n        pages = _parse_store(path)\n        assert len(pages) == len(expected)\n        for page, markers in zip(pages, expected, strict=True):\n>           assert (page[\"low\"], page[\"high\"], page[\"has_absent\"]) == markers\nE           assert (-911, 863, 1) == (-911, 19, 1)\nE             \nE             At index 1 diff: 863 != 19\nE             Use -v to get more diff\n\ntest_outputs.py:131: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p08",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.00363784097135067,
+                "start": 1784599651.0604198,
+                "stop": 1784599651.070321,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p080')\n\n    def test_p08(tmp_path: Path) -> None:\n        \"\"\"Selective archived and healthy controls retain correct work avoidance.\"\"\"\n        row = _run_case(tmp_path, \"p08\", MIXED, \"range\", 10, 20, \"row\", True)\n>       _assert_tally(row, 2, 30)\n\ntest_outputs.py:197: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p08', 'pages_read': 0, 'pages_total': 4, 'path': 'row', ...}\ncount = 2, total = 30\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 0 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p09",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0031725987792015076,
+                "start": 1784599651.0705667,
+                "stop": 1784599651.079727,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p090')\n\n    def test_p09(tmp_path: Path) -> None:\n        \"\"\"Batch range execution excludes archived absent entries.\"\"\"\n        row = _run_case(tmp_path, \"p09\", MIXED, \"range\", -1000, -1, \"batch\", False)\n>       _assert_tally(row, 1, -5)\n\ntest_outputs.py:207: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p09', 'pages_read': 4, 'pages_total': 4, 'path': 'batch', ...}\ncount = 1, total = -5\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 2 == 1\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p10",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.007942531257867813,
+                "start": 1784599651.0798812,
+                "stop": 1784599651.1002412,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p100')\n\n    def test_p10(tmp_path: Path) -> None:\n        \"\"\"Equivalent fresh ingests produce faithful and byte-stable artifacts.\"\"\"\n        source = _write_csv(tmp_path, \"alpha-10\", True)\n        first = _ingest(tmp_path, source, \"a10-first\")\n        second = _ingest(tmp_path, source, \"a10-second\")\n>       _assert_markers(first, [(17, 43, 1), (107, 151, 1)])\n\ntest_outputs.py:215: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\npath = PosixPath('/tmp/pytest-of-root/pytest-0/test_p100/a10-first/data.store')\nexpected = [(17, 43, 1), (107, 151, 1)]\n\n    def _assert_markers(path: Path, expected: list[tuple[int, int, int]]) -> list[dict]:\n        pages = _parse_store(path)\n        assert len(pages) == len(expected)\n        for page, markers in zip(pages, expected, strict=True):\n>           assert (page[\"low\"], page[\"high\"], page[\"has_absent\"]) == markers\nE           assert (-937, 43, 0) == (17, 43, 1)\nE             \nE             At index 0 diff: -937 != 17\nE             Use -v to get more diff\n\ntest_outputs.py:131: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p11",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0025686342269182205,
+                "start": 1784599651.100395,
+                "stop": 1784599651.1088593,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p110')\n\n    def test_p11(tmp_path: Path) -> None:\n        \"\"\"Neighboring generations preserve the same selective numeric answer.\"\"\"\n        row = _run_case(tmp_path, \"p11\", MIXED, \"range\", 10, 20, \"row\", True)\n>       _assert_tally(row, 2, 30)\n\ntest_outputs.py:227: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p11', 'pages_read': 0, 'pages_total': 4, 'path': 'row', ...}\ncount = 2, total = 30\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 0 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p12",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0030142348259687424,
+                "start": 1784599651.1090076,
+                "stop": 1784599651.1178765,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p120')\n\n    def test_p12(tmp_path: Path) -> None:\n        \"\"\"Full archived batch totals coexist with an active healthy fast path.\"\"\"\n        row = _run_case(tmp_path, \"p12\", MIXED, \"all\", 0, 0, \"batch\", False)\n>       _assert_tally(row, 10, 2095)\n\ntest_outputs.py:235: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p12', 'pages_read': 4, 'pages_total': 4, 'path': 'batch', ...}\ncount = 10, total = 2095\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 11 == 10\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p13",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.002895483747124672,
+                "start": 1784599651.1180258,
+                "stop": 1784599651.126842,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p130')\n\n    def test_p13(tmp_path: Path) -> None:\n        \"\"\"Selective absence probes agree across lanes on neighboring generations.\"\"\"\n        row = _run_case(tmp_path, \"p13\", VAULT, \"isnull\", 0, 0, \"row\", True)\n>       _assert_tally(row, 2, 0)\n\ntest_outputs.py:245: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p13', 'pages_read': 1, 'pages_total': 3, 'path': 'row', ...}\ncount = 2, total = 0\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 1 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p14",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0025061406195163727,
+                "start": 1784599651.1269882,
+                "stop": 1784599651.1352336,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p140')\n\n    def test_p14(tmp_path: Path) -> None:\n        \"\"\"Selective text-code probes stay complete on neighboring generations.\"\"\"\n        row = _run_case(tmp_path, \"p14\", VAULT, \"region_eq\", \"east\", 0, \"row\", True)\n>       _assert_tally(row, 2, 49)\n\ntest_outputs.py:255: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p14', 'pages_read': 1, 'pages_total': 3, 'path': 'row', ...}\ncount = 2, total = 49\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 1 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p15",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.004746273159980774,
+                "start": 1784599651.1353807,
+                "stop": 1784599651.1462612,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p150')\n\n    def test_p15(tmp_path: Path) -> None:\n        \"\"\"Sparse fresh chunks keep faithful markers and consistent answers.\"\"\"\n        source = _write_gamma_csv(tmp_path, \"gamma-15\")\n        produced = _ingest(tmp_path, source, \"g15\")\n>       _assert_markers(produced, [(-999, 31, 0), (0, 0, 1), (55, 73, 1)])\n\ntest_outputs.py:263: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\npath = PosixPath('/tmp/pytest-of-root/pytest-0/test_p150/g15/data.store')\nexpected = [(-999, 31, 0), (0, 0, 1), (55, 73, 1)]\n\n    def _assert_markers(path: Path, expected: list[tuple[int, int, int]]) -> list[dict]:\n        pages = _parse_store(path)\n        assert len(pages) == len(expected)\n        for page, markers in zip(pages, expected, strict=True):\n>           assert (page[\"low\"], page[\"high\"], page[\"has_absent\"]) == markers\nE           assert (401, 434, 1) == (0, 0, 1)\nE             \nE             At index 0 diff: 401 != 0\nE             Use -v to get more diff\n\ntest_outputs.py:131: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

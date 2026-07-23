@@ -1,0 +1,77 @@
+{
+  "acceptance_precedence": [
+    "current platform field requirements and reviewer feedback",
+    "finished task truth from instruction, solution, tests, and evidence",
+    "TERMINUS lifecycle, acceptance, and submission rules",
+    "Humanizer style preferences"
+  ],
+  "files": {
+    "difficulty": {
+      "name": "DIFFICULTY.md",
+      "sha256": "e83a830c1acb80ec98cae961c93cc8abebad1c2e520c2d003255a2ad4eb1772c"
+    },
+    "solution": {
+      "name": "SOLUTION.md",
+      "sha256": "6be3fc052e0294d2f1d12afb3c055f74751d414964296fe15ac00ecd05568424"
+    },
+    "verification": {
+      "name": "VERIFICATION.md",
+      "sha256": "895d25ef60a57d743fdad9e7bab55f880852bdb1e9290ed2808b71ae0b5b8c98"
+    }
+  },
+  "findings": [],
+  "generated_at": "2026-07-23T13:25:41Z",
+  "metrics": {
+    "difficulty": {
+      "hyphenated_compounds": 0,
+      "sentence_words": [
+        31,
+        10,
+        21,
+        11,
+        15
+      ],
+      "sentences": 5,
+      "words": 88
+    },
+    "solution": {
+      "hyphenated_compounds": 0,
+      "sentence_words": [
+        26,
+        14,
+        21,
+        26,
+        10
+      ],
+      "sentences": 5,
+      "words": 97
+    },
+    "verification": {
+      "hyphenated_compounds": 1,
+      "sentence_words": [
+        22,
+        23,
+        12,
+        10,
+        17
+      ],
+      "sentences": 5,
+      "words": 84
+    }
+  },
+  "ok": true,
+  "policy_id": "terminus-dsv-humanizer-acceptance-safe-2026-07-22",
+  "result": "PASS",
+  "scope": [
+    "difficulty",
+    "solution",
+    "verification"
+  ],
+  "semantic_attestation": "The writing agent must compare every claim and obligation with the completed task, solution, tests, platform feedback, project rules, and recorded evidence. Humanizer may change wording and rhythm only. The mechanical validator cannot prove semantic equivalence or platform acceptance.",
+  "transformation_boundary": "wording-and-rhythm-only",
+  "upstream": {
+    "commit": "523374dee72d67c7b2b5f858ea0094ffda49c3ac",
+    "repository": "https://github.com/blader/humanizer",
+    "version": "2.9.1"
+  }
+}

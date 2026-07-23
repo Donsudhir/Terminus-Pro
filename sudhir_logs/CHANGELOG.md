@@ -1,3 +1,182 @@
+## 2026-07-23 - RUN-DHDR-002 - Domain Halo Digest Rift package PASS
+
+- Constructed task from Step 2a GO ([Construct domain-halo task](468befe5-1e29-4fc1-b84e-6613cf77b992));
+  CR1 rename `ember_tally`/`ember_mag`; collapse 0 FAIL / 4 WARN.
+- Preflight PASS; oracle 1x `2026-07-23__18-53-55` mean=1.0; NOP
+  `2026-07-23__18-54-43` mean=0.0; oracle 10x `2026-07-23__18-56-03`
+  mean=1.0 Pass@10=1.0.
+- Canonical `rust:1.85-slim@sha256:9f841bbe…`; no canary strings.
+- REV-1 DSV+RUBRIC+STEP3B+PREUPLOAD; package approved
+  `sudhir_tasks_ready_to_submit/domain-halo-digest-rift.zip`
+  sha256=5bd556eed8d59611d1bcff9010064d4a5c1f8b29cd370b1e71973863a48b7a21
+- Next: upload zip; paste REV-1 DSV+RUBRIC.
+
+## 2026-07-23 - RUN-DHDR-001 - Domain Halo Digest Rift Step 2a GO
+
+- IDEA-0041 `domain-halo-digest-rift`: proposal PASS (Sudhir Check feedback);
+  six-scope uniqueness PASS (`TASK-DHDR-001-RESEARCH.md`); Step 2a attempt 1
+  **0F/0W GO**; finalize lint OK; `idea validation go`.
+- Category `scientific-computing`; languages Rust+C; canonical final image
+  `rust:1.85-slim@sha256:9f841bbe9e7d8e37ceb96ed907265a3a0df7f44e3737d0b100e7907a679acb36`.
+- Specs: `domain-halo-digest-rift.md` + `-reviewer.md` + attempt-1 evidence;
+  three-locus `native/ledge.c::braid_q`, `host/shelf.rs::latch_r`,
+  `native/ember.c::sift_s`; 12 tests @ 4/12; binary `/app/bin/partlab`.
+- Construction **blocked** pending Sudhir OK. Did not scaffold `sudhir_tasks/`.
+
+## 2026-07-23 - RUN-DNMH-002 - Device Node Migration Haze package PASS
+
+- Constructed + Step 2b: preflight PASS (collapse 0 FAIL / 5 WARN); oracle 1x
+  `2026-07-23__04-11-07` then post-edit `2026-07-23__04-18-54` mean=1.0; NOP
+  `2026-07-23__04-11-57` then `2026-07-23__04-19-29` mean=0.0.
+- Collapse remediations: roots `loom/`/`veil/`/`tether/`; CR8 wrappers;
+  `reject_delta`/`reject_stable`; zip parity via `slot.marker` (no `.keep`).
+- Step 3b REV-2 paper (WARN justifications); DSV Humanizer audit + rubric captured.
+- Oracle 10x `2026-07-23__04-13-43` mean=1.0 Pass@10=1.0.
+- Package approved: `sudhir_tasks_ready_to_submit/device-node-migration-haze.zip`
+  sha256=3d78909e8835a75c1b4f0c7f55e53b7c0712065dc0f526e22bbcd6827fd47e24
+- Next: upload zip; paste REV-2 DSV+RUBRIC. Did not touch mesh-checkpoint or SJCC.
+
+## 2026-07-23 - RUN-ACPR-001 - AMG Coarsen Parity Rift Step 2a GO
+
+- IDEA-0036 `amg-coarsen-parity-rift`: board+ingest; COMMON_MISTAKES/WHAT_WORKED loaded.
+- `validate_loop` attempt 1 **0F/0W GO**; finalize lint OK; `idea validation go`.
+- Evidence: `sudhir_ideas/specs/amg-coarsen-parity-rift-attempt-1-evidence.json`.
+- Specs: `amg-coarsen-parity-rift.md` + `-reviewer.md` (Fortran/C++/Rust three-locus;
+  `knurl_p`/`splice_q`/`whorl_r`; 12 tests @ 4/12).
+- Construction **blocked** pending Sudhir OK. Did not touch other slate tasks or SJCC.
+
+## 2026-07-23 - RUN-KCLS-001 - KV Cache Layout Serve Rift Step 2a GO
+
+- IDEA-0035 `kv-cache-layout-serve-rift`: board+ingest; COMMON_MISTAKES/WHAT_WORKED loaded.
+- `validate_loop` attempts 1–2 schema FAIL (`recomputed_concentration`); attempt 3 **0F/0W GO**.
+- Finalize lint OK; `idea validation go` (attempt 3); evidence
+  `sudhir_ideas/specs/kv-cache-layout-serve-rift-attempt-3-evidence.json`.
+- Specs: `kv-cache-layout-serve-rift.md` + `-reviewer.md` (C++/Rust three-locus serve;
+  `plait_m`/`latch_y`/`pivot_z`; 12 tests @ 4/12).
+- Construction **blocked** pending Sudhir OK. Did not touch other slate tasks or SJCC.
+
+## 2026-07-23 - RUN-DNMH-001 - Device Node Migration Haze Step 2a GO
+
+- IDEA-0033 `device-node-migration-haze`: board+ingest; COMMON_MISTAKES/WHAT_WORKED loaded.
+- `validate_loop` attempt 1 schema FAIL (`recomputed_concentration`); attempt 2 **0F/0W GO**.
+- Finalize lint OK; `idea validation go` (attempt 2); evidence
+  `sudhir_ideas/specs/device-node-migration-haze-attempt-2-evidence.json`.
+- Specs: `device-node-migration-haze.md` + `-reviewer.md` (C/Rust three-locus cutover;
+  `knit_p`/`hinge_q`/`moor_r`; 12 tests @ 4/12).
+- Construction **blocked** pending Sudhir OK. Did not touch mesh-checkpoint or SJCC.
+
+## 2026-07-23 - RUN-MCOS-005 - Mesh Checkpoint Step 4 package PASS
+
+- Oracle 10x `2026-07-23__03-14-18` mean=1.0 Pass@10=1.0; post-10x NOP `2026-07-23__03-19-00` mean=0.0.
+- Form-capture + DSV Humanizer audit in REV-1; PREUPLOAD PASS.
+- Package approved: `sudhir_tasks_ready_to_submit/mesh-checkpoint-operator-skew.zip` sha256=41b5091649dac12143f2b2cc3d25f0ad953c09f972972dba59b33de1dee6052d
+- Next: upload zip; paste DIFFICULTY/SOLUTION/VERIFICATION/RUBRIC from REV-1.
+
+## 2026-07-23 - RUN-MCOS-004 - Mesh Checkpoint Step 3b PASS
+
+- Preservation-safe instruction fix: named MESHLAB_INPUT/OUTPUT (no runtime.conf-only deferral).
+- Post-edit preflight PASS; oracle 1x `2026-07-23__03-11-43` mean=1.0; NOP `2026-07-23__03-12-14` mean=0.0.
+- Collapse 0 FAIL / 3–4 WARN justified in `sudhir_reviews/mesh-checkpoint-operator-skew/REV-1/STEP3B.md`.
+- Next: Step 4 (`tb3-packager`) oracle 10x + package.
+
+## 2026-07-23 - RUN-MCOS-003 - Mesh Checkpoint Step 2b PASS
+
+- Task `mesh-checkpoint-operator-skew`: preflight Phase A/B/C PASS (collapse 0 FAIL / 4 WARN for Step 3b).
+- Harbor oracle 1x `2026-07-23__03-08-48` mean=1.0; NOP `2026-07-23__03-09-22` mean=0.0.
+- Phase → gates. Next: Step 3b paper review (`tb3-reviewer`), then Step 4.
+- Note: docker compose down hit permission-denied stop (CM-003 class); trials still scored.
+
+## 2026-07-23 - RUN-MCOS-002 - Slate uniqueness PASS for four companions
+
+- [Uniqueness for 4 slate ideas](5e3e0be7-61ef-4f14-a8f6-bbb8a2a10a4f): device-node-migration-haze, input-ring-physics-desync, kv-cache-layout-serve-rift, amg-coarsen-parity-rift all uniqueness PASS.
+- Research: TASK-DNMH-001, TASK-IRPD-001, TASK-KCLS-001, TASK-ACPR-001.
+- Next for those four: Step 2a. Mesh Checkpoint remains primary construct (task tree not yet created).
+
+## 2026-07-23 - RUN-UNIQUENESS-0033-0036 - Six-scope dossiers PASS (no Step 2a)
+
+- Uniqueness PASS for IDEA-0033..0036 (proposal already passed):
+  - `device-node-migration-haze` → `sudhir_research/TASK-DNMH-001-RESEARCH.md`
+  - `input-ring-physics-desync` → `sudhir_research/TASK-IRPD-001-RESEARCH.md`
+  - `kv-cache-layout-serve-rift` → `sudhir_research/TASK-KCLS-001-RESEARCH.md`
+  - `amg-coarsen-parity-rift` → `sudhir_research/TASK-ACPR-001-RESEARCH.md`
+- Differentiated from dedup-restore, lockstep/procgen, tokenizer-serving, SJCC/Krylov; mesh-checkpoint not treated as collision.
+- Next action per idea: Step 2a (not started in this run).
+
+## 2026-07-22 - RUN-MCOS-001 - Lock slate of 5; Mesh Checkpoint Step 2a GO
+
+- Locked IDEA-0032..0036 proposal=passed; IDEA-0037..0039 proposal=failed (quality Reject/Uncertain).
+- Primary `mesh-checkpoint-operator-skew`: uniqueness PASS (`TASK-MCOS-001-RESEARCH.md`); Step 2a attempt 1 GO 0F/0W; finalize PASS.
+- Next: register task + Step 2b construction for MCOS; uniqueness for remaining four in parallel.
+
+## 2026-07-23 - RUN-0052 - SJCC REV-8 FNV digest + hash-locked verifier
+
+- Opened REV-8 for `sparse-jacobian-color-contract` against stb feedback
+  `d9082cd8-c0ad-4174-a34f-4731f0b63907`: document FNV-1a (or relax verifier),
+  hash-lock verifier deps, test `schema_version` + `runtime.conf` step knobs.
+- Documented exact FNV-1a-64 closed-object payload (includes closing `}`) in
+  `report-format.md`; kept `report.rs` / `_assert_digest` on that contract
+  (document, do not rewrite working digest logic). Added `test_k14`. Replaced
+  verifier requirements with transitive `--hash=sha256` pins and
+  `pip --require-hashes`. Logged CM-024 / FAILURE-SJCC-002 / WW-017.
+- Harbor: oracle 1x mean 1.0 (`jobs/2026-07-23__00-46-04`), NOP 0.0
+  (`jobs/2026-07-23__00-46-35`), oracle 10x mean 1.0 10/10
+  (`jobs/2026-07-23__00-56-36`). Packaged zip sha256
+  `4343b5da35ba3096f35b50f043c2fabe1c7ef4d47af202d30c035b4bedf9efb2`.
+  Next: upload + paste REV-8 DSV/rubric.
+
+## 2026-07-23 - RUN-0052 - musl-sysroot-splice REV-3 lane-tag ledger wording
+
+- Platform Needs Revision: agents added a 4th `lane_tag` ledger row because
+  `instruction.md` said "lane-tag rows." Ledger truth is exactly marker/thread/errno;
+  `LANE_TAG=BRAVO` is stdout-only.
+- REV-3: instruction-only fix; rubric Agent lines unchanged (already separated).
+- Harbor: oracle 1x 1.0, NOP 0.0, oracle 10x 10/10, post-NOP 0.0.
+- Packaged `sudhir_tasks_ready_to_submit/musl-sysroot-splice.zip`
+  sha256 `e42ffbc62fed3ee8c0288dcb00e4acdae6e7b758473fe3c8df28b21daef4ab47`.
+- CM-002 Seen bumped for musl `29a821f1` REV-3.
+
+## 2026-07-22 - RUN-0051 - DSV Humanizer becomes acceptance-safe
+
+- Accepted/indexed ADR-0022. Humanizer remains DSV-only and atomic, but current
+  platform requirements and reviewer feedback now rank first, finished task
+  truth second, TERMINUS project rules third, and style preferences last.
+- The skill now permits only wording and rhythm changes; sentence order is locked.
+  Obligation strength, failure modes, healthy controls, solution facts,
+  verifier properties, technical terms, counts, and evidence claims are locked.
+- Versioned the audit policy as
+  `terminus-dsv-humanizer-acceptance-safe-2026-07-22`. Audit JSON now records
+  exact three-field scope, `wording-and-rhythm-only` boundary, and precedence.
+- Added regression assertions for read-only normalization, acceptance audit
+  metadata, and rejection of any broader semantic-rewrite boundary. Focused
+  suite 17 PASS; full suite 366 PASS / 26 skipped; Ruff PASS. No task, rubric,
+  instruction, code, test, archive, or platform outcome changed.
+- Next: continue the rubric grammar gate.
+
+## 2026-07-22 - RUN-0050 - Strict Humanizer gate for DSV fields
+
+- Accepted/indexed ADR-0021. Pinned the reviewed `blader/humanizer` v2.9.1
+  policy at commit `523374dee72d67c7b2b5f858ea0094ffda49c3ac` with its MIT
+  notice and no runtime network fetch.
+- Added byte-identical agent/Cursor `terminus-dsv-humanizer` skills. Scope is
+  only Difficulty, Solution, and Verification; instructions, rubrics, code,
+  tests, schemas, configuration, and evidence are explicitly excluded.
+- Added `dsv_humanizer.py`: exact openers, atomic 4–5 sentence fields, word and
+  sentence bounds, punctuation/format bans, cross-field phrase checks, and
+  mechanically detectable forms of the 33-pattern Humanizer audit.
+- `form-capture` now rejects partial DSV sets and validates before changing the
+  dossier or registry. PASS creates a content-addressed
+  `DSV-HUMANIZER-AUDIT.json` record.
+- New or recaptured revision dossiers require the audit; stale DSV hashes block
+  packaging and cannot be bypassed with `package --force`. Legacy dossiers stay
+  readable until recaptured or revised.
+- Removed the deliberate-grammar-error instruction. Only the required
+  `The tests checks` opener remains intentionally unusual.
+- Focused DSV/dossier suite: 16 PASS. Scope regression proves rubric-only
+  capture never invokes Humanizer and DSV capture leaves task source bytes
+  unchanged. Full repository suite: 365 PASS / 26 skipped. Ruff PASS. No active
+  task source, package, checksum, or platform outcome changed.
+- Next: continue the separate rubric grammar gate.
+
 ## 2026-07-21 - RUN-0049 - Synchronization program Slice 8 complete
 
 - Accepted/indexed ADR-0020. Added `ci_policy.py` and the 23-check official
@@ -1109,3 +1288,9 @@ bfe79c33-8ab0-4061-9849-08d3207c9927` returned six current submissions:
 - Diagnosed empty difficulty as CM-019 (CodeExecution FAILED + BatchGetBuilds throttle), not non-canonical rust base.
 - Raised build/verifier timeout to 1200s and memory to 8192; CM-016 test.sh early reward.
 - Harbor oracle 1x/NOP/10x PASS; packaged zip sha256 `50ba0424…` for re-upload.
+
+## 2026-07-23 - RUN-0053 - SJCC parked on recurring CM-019
+
+- Latest SJCC feedback is AutoEval CodeExecution FAILED only (no human review).
+- fetch-task eval16: siblings SUCCEEDED; tb_check+difficulty_check FAILED with empty logs.
+- Historical difficulty_check ~3 SUCCEEDED / 14 FAILED. Recommend PARK; no further content REVs until agents run.

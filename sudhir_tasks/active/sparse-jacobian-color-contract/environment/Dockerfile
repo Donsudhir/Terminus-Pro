@@ -27,7 +27,8 @@ RUN apt-get update \
     && python3 -m venv /opt/verifier
 
 COPY verifier-requirements.txt /opt/verifier-requirements.txt
-RUN /opt/verifier/bin/pip install --no-cache-dir -r /opt/verifier-requirements.txt
+RUN /opt/verifier/bin/pip install --no-cache-dir --require-hashes \
+        -r /opt/verifier-requirements.txt
 COPY --chmod=0755 tools/verifier-python /usr/local/bin/python
 RUN rm -rf /root/.cache/pip \
     && ln -sf /usr/local/cargo/bin/rustc /usr/local/bin/rustc \

@@ -1,0 +1,1339 @@
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# clear
+[?2004l[H[J[3J[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# ls -la /app
+[?2004ltotal 4
+drwxr-xr-x 1 root root 90 Jul 21 02:06 .
+drwxr-xr-x 1 root root 71 Jul 21 02:08 ..
+-rw-r--r-- 1 root root 97 Jan  1  1970 Makefile
+drwxr-xr-x 2 root root 49 Jul 21 02:07 bin
+drwxr-xr-x 2 root root 22 Jul 21 02:06 config
+drwxr-xr-x 1 root root 10 Jul 21 02:07 cpp
+drwxr-xr-x 5 root root 63 Jul 21 02:06 data
+drwxr-xr-x 2 root root 92 Jul 21 02:06 docs
+drwxr-xr-x 2 root root 10 Jul 21 02:06 output
+drwxr-xr-x 1 root root 32 Jul 21 02:07 rust
+drwxr-xr-x 2 root root 52 Jul 21 02:06 tools
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# ls -la /app/docs /app/tools /app/bin /app/data
+[?2004l/app/bin:
+total 452
+drwxr-xr-x 2 root root     49 Jul 21 02:07 .
+drwxr-xr-x 1 root root     90 Jul 21 02:06 ..
+-rwxr-xr-x 1 root root  90320 Jul 21 02:07 loam
+-rwxr-xr-x 1 root root 366944 Jul 21 02:07 loam-ingest
+
+/app/data:
+total 0
+drwxr-xr-x 5 root root  63 Jul 21 02:06 .
+drwxr-xr-x 1 root root  90 Jul 21 02:06 ..
+drwxr-xr-x 2 root root 106 Jul 21 02:06 archive
+drwxr-xr-x 2 root root  59 Jul 21 02:06 cases
+drwxr-xr-x 2 root root  82 Jul 21 02:06 fresh
+
+/app/docs:
+total 12
+drwxr-xr-x 2 root root   92 Jul 21 02:06 .
+drwxr-xr-x 1 root root   90 Jul 21 02:06 ..
+-rw-r--r-- 1 root root 1099 Jan  1  1970 architecture.md
+-rw-r--r-- 1 root root  926 Jan  1  1970 format-notes.md
+-rw-r--r-- 1 root root 2309 Jan  1  1970 report-schema.md
+
+/app/tools:
+total 8
+drwxr-xr-x 2 root root  52 Jul 21 02:06 .
+drwxr-xr-x 1 root root  90 Jul 21 02:06 ..
+-rwxr-xr-x 1 root root 347 Jan  1  1970 build-all
+-rwxr-xr-x 1 root root 141 Jan  1  1970 reset-lab
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/docs/architecture.md
+[?2004l# Loam architecture
+
+Loam is a small offline columnar lab used by release engineering before storage
+changes reach the billing warehouse. `rust/` owns import and compaction. It emits
+self-describing slabs with value lanes, presence lanes, origin lanes, text codes,
+and compact markers. `cpp/` owns reads. The harbor stage decides which slabs are
+needed, then either the row reader or lattice reader computes a tally. The row
+reader walks record structs; the lattice reader consumes per-slab column lanes.
+
+The command front end reads every `.case` file in bytewise filename order and
+every record in source order. Structured counters come from the selected reader,
+not from estimates. Artifact files are append-free after creation; a reader must
+not repair them in place.
+
+`/app/tools/reset-lab` restores the bundled drill data before a clean replay.
+
+Older slabs are supported because disaster-recovery snapshots outlive the writer
+that created them. Newer writers can add header generations, but readers remain
+responsible for interpreting each slab according to its own header and local
+markers.
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/docs/format-notes.md
+[?2004l# Format notes from the v2 rollout
+
+These notes were copied from the rollout ticket and may lag the current reader.
+They are useful background only. The operational grading contract for audit JSON,
+per-case counters, ingest output naming, and live-value markers is
+`/app/docs/report-schema.md`.
+
+A file begins with `H|generation`. Each `P` record describes one slab, followed
+by the declared number of `R` records. The row record carries presence, origin,
+amount, and region. Marker fields let readers avoid opening slabs for predicates
+that cannot match.
+
+The v2 rollout assumed the amount lane remained sufficient to recognize missing
+historical values because old producers reserved one amount. The later writer
+kept origin and presence lanes to support mixed compaction and legitimate values
+that overlap old conventions. If these assumptions conflict, the artifact and a
+full reader are stronger evidence than this note.
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/docs/report-schema.md
+[?2004l# Loam audit report contract
+
+This document is the normative grading reference for `/app/bin/loam audit`
+JSON output and for fresh ingest artifacts. Architecture and rollout notes are
+background only; when they disagree with this file, this file wins.
+
+## Audit JSON
+
+UTF-8 JSON object written to the report path passed to `audit`.
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `status` | string | Always the literal `complete` when the run finishes successfully. |
+| `cases` | array | One object per `.case` file, in bytewise filename order. |
+| `digest` | string | Non-empty hex digest of the serialized `cases` body. |
+
+### Each element of `cases`
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `case_id` | string | Identifier from the case line. |
+| `row_count` | integer | Number of qualifying live rows included in the answer. |
+| `sum_amount` | integer | Sum of amounts for those qualifying live rows. |
+| `pages_total` | integer | Number of slabs present in the store for the case. |
+| `pages_read` | integer | Number of slabs actually opened for the case. |
+| `path` | string | Execution lane used: `row` or `batch`. |
+| `skipping` | boolean | Whether selective admission was requested for the case. |
+
+`row_count`, `sum_amount`, `pages_total`, and `pages_read` are the per-case
+answer and work counters. Equivalent modes on the same store and probe must
+agree on `row_count` and `sum_amount`. Selective healthy controls must keep
+`pages_read` strictly below `pages_total` while still returning the correct
+answer. Repeated identical audits must emit byte-identical report files.
+
+## Fresh ingest artifact
+
+`/app/bin/loam ingest <CSV> <store-directory>` writes exactly:
+
+`<store-directory>/data.store`
+
+No other store filename is accepted for grading.
+
+## Faithful live-value markers
+
+Each slab in a store carries numeric markers `low`, `high`, and `has_absent`.
+
+- `low` and `high` span only live amounts in that slab.
+- `has_absent` is true when the slab contains any non-live entry.
+- A slab whose entries are all non-live records `low` 0, `high` 0, and
+  `has_absent` true.
+- Fresh ingest must keep those markers faithful to the live-value domain of the
+  CSV it wrote. Archived mixed-generation stores keep their on-disk markers;
+  readers must interpret them without rewriting the artifact.
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# ls -R /app/cpp /app/rust /app/config
+[?2004l/app/config:
+lab.conf
+
+/app/cpp:
+Makefile  include  src
+
+/app/cpp/include:
+loam
+
+/app/cpp/include/loam:
+exec.hpp  plan.hpp  report.hpp	store.hpp  types.hpp
+
+/app/cpp/src:
+digest.cpp  harbor  lattice  main.cpp  parse.cpp  report.cpp  row.cpp  store.cpp
+
+/app/cpp/src/harbor:
+pale.cpp  veil.cpp
+
+/app/cpp/src/lattice:
+bay.cpp  rill.cpp
+
+/app/rust:
+Cargo.lock  Cargo.toml	src
+
+/app/rust/src:
+codec.rs  ember  main.rs  model.rs  report.rs
+
+/app/rust/src/ember:
+fold.rs  mod.rs  pale.rs  reed.rs
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/tools/build-all
+[?2004l#!/bin/bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+mkdir -p "$ROOT/bin"
+
+cargo build --manifest-path "$ROOT/rust/Cargo.toml" --release --offline
+make -C "$ROOT/cpp" clean all
+install -m 0755 "$ROOT/rust/target/release/loam-ingest" "$ROOT/bin/loam-ingest"
+install -m 0755 "$ROOT/cpp/build/loam" "$ROOT/bin/loam"
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/Makefile
+[?2004l.PHONY: all clean
+
+all:
+	./tools/build-all
+
+clean:
+	$(MAKE) -C cpp clean
+	rm -rf rust/target bin
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/cpp/include/loam/types.hpp
+[?2004l#pragma once
+
+#include <cstdint>
+#include <string>
+#include <vector>
+
+namespace loam {
+
+enum class Origin : std::uint8_t { Retired = 0, Inherited = 1, Current = 2 };
+
+struct Cell {
+    std::uint8_t present{};
+    Origin origin{Origin::Current};
+    std::int64_t amount{};
+    std::string region;
+};
+
+struct Slab {
+    std::size_t id{};
+    std::uint8_t generation{};
+    std::int64_t low{};
+    std::int64_t high{};
+    bool has_absent{};
+    std::string region_low;
+    std::string region_high;
+    std::vector<Cell> cells;
+    std::vector<std::int64_t> amount_lane;
+    std::vector<std::uint8_t> presence_lane;
+    std::vector<std::uint8_t> origin_lane;
+    std::vector<std::string> region_lane;
+};
+
+enum class Op { All, Equal, Range, IsNull, RegionEqual };
+enum class Lane { Row, Batch };
+
+struct Probe {
+    Op op{Op::All};
+    std::int64_t x{};
+    std::int64_t y{};
+    std::string text;
+    Lane lane{Lane::Row};
+    bool skipping{};
+};
+
+struct Gate {
+    bool read{true};
+    std::string note;
+};
+
+struct Tally {
+    std::int64_t row_count{};
+    std::int64_t sum_amount{};
+    std::int64_t pages_read{};
+};
+
+struct CaseSpec {
+    std::string case_id;
+    std::string store_path;
+    Probe probe;
+};
+
+struct CaseResult {
+    std::string case_id;
+    Tally tally;
+    std::int64_t pages_total{};
+    Lane lane{Lane::Row};
+    bool skipping{};
+};
+
+}  // namespace loam
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/cpp/include/loam/store.hpp
+[?2004l#pragma once
+
+#include "loam/types.hpp"
+
+#include <filesystem>
+#include <vector>
+
+namespace loam {
+
+std::vector<Slab> load_store(const std::filesystem::path& path);
+std::vector<CaseSpec> load_cases(const std::filesystem::path& directory);
+CaseResult run_case(const CaseSpec& spec);
+
+}  // namespace loam
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/cpp/src/store.cpp
+[?2004l#include "loam/store.hpp"
+
+#include "loam/exec.hpp"
+#include "loam/plan.hpp"
+
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
+namespace loam {
+namespace {
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> fields;
+    std::size_t start = 0;
+    while (true) {
+        const auto end = line.find('|', start);
+        fields.push_back(line.substr(start, end - start));
+        if (end == std::string::npos) {
+            break;
+        }
+        start = end + 1;
+    }
+    return fields;
+}
+
+}  // namespace
+
+std::vector<Slab> load_store(const std::filesystem::path& path) {
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("cannot open store: " + path.string());
+    }
+
+    std::vector<Slab> slabs;
+    std::string line;
+    while (std::getline(input, line)) {
+        if (line.empty() || line.rfind("H|", 0) == 0) {
+            continue;
+        }
+        const auto page = split(line);
+        if (page.size() != 9 || page[0] != "P") {
+            throw std::runtime_error("bad page record in " + path.string());
+        }
+        Slab slab;
+        slab.id = std::stoull(page[1]);
+        slab.generation = static_cast<std::uint8_t>(std::stoul(page[2]));
+        slab.low = std::stoll(page[3]);
+        slab.high = std::stoll(page[4]);
+        slab.has_absent = page[5] == "1";
+        slab.region_low = page[6];
+        slab.region_high = page[7];
+        const auto row_count = std::stoull(page[8]);
+        for (std::size_t i = 0; i < row_count; ++i) {
+            if (!std::getline(input, line)) {
+                throw std::runtime_error("short page in " + path.string());
+            }
+            const auto row = split(line);
+            if (row.size() != 5 || row[0] != "R") {
+                throw std::runtime_error("bad row record in " + path.string());
+            }
+            const auto presence = static_cast<std::uint8_t>(std::stoul(row[1]));
+            const auto origin = static_cast<std::uint8_t>(std::stoul(row[2]));
+            const auto amount = std::stoll(row[3]);
+            slab.cells.push_back({presence, static_cast<Origin>(origin), amount, row[4]});
+            slab.presence_lane.push_back(presence);
+            slab.origin_lane.push_back(origin);
+            slab.amount_lane.push_back(amount);
+            slab.region_lane.push_back(row[4]);
+        }
+        slabs.push_back(std::move(slab));
+    }
+    return slabs;
+}
+
+CaseResult run_case(const CaseSpec& spec) {
+    const auto slabs = load_store(spec.store_path);
+    Tally total;
+    for (const auto& slab : slabs) {
+        const Gate gate = turn_b(slab, spec.probe);
+        const auto label = turn_d(gate, spec.probe);
+        (void)label;
+        const Tally part = spec.probe.lane == Lane::Batch
+            ? sweep_c(slab, spec.probe, gate)
+            : walk_row(slab, spec.probe, gate);
+        total = sweep_e(total, part);
+    }
+    return {
+        spec.case_id,
+        total,
+        static_cast<std::int64_t>(slabs.size()),
+        spec.probe.lane,
+        spec.probe.skipping,
+    };
+}
+
+}  // namespace loam
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/cpp/include/loam/exec.hpp /app/cpp/include/loam/plan.hpp
+[?2004l#pragma once
+
+#include "loam/types.hpp"
+
+namespace loam {
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c);
+Tally sweep_c(const Slab& a, const Probe& b, const Gate& c);
+Tally sweep_e(const Tally& a, const Tally& b);
+
+}  // namespace loam
+#pragma once
+
+#include "loam/types.hpp"
+
+namespace loam {
+
+Gate turn_b(const Slab& a, const Probe& b);
+std::string turn_d(const Gate& a, const Probe& b);
+
+}  // namespace loam
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/cpp/src/row.cpp
+[?2004l#include "loam/exec.hpp"
+
+namespace loam {
+namespace {
+
+bool is_live(const Cell& cell) {
+    if (cell.origin == Origin::Retired) {
+        return false;
+    }
+    if (cell.origin == Origin::Inherited) {
+        return true;
+    }
+    return cell.present != 0;
+}
+
+bool matches(const Cell& cell, const Probe& probe) {
+    switch (probe.op) {
+        case Op::All:
+            return true;
+        case Op::Equal:
+            return cell.amount == probe.x;
+        case Op::Range:
+            return cell.amount >= probe.x && cell.amount <= probe.y;
+        case Op::IsNull:
+            return false;
+        case Op::RegionEqual:
+            return cell.region == probe.text;
+    }
+    return false;
+}
+
+}  // namespace
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+    for (const auto& cell : a.cells) {
+        const bool live = is_live(cell);
+        if (b.op == Op::IsNull) {
+            if (!live) {
+                ++tally.row_count;
+            }
+            continue;
+        }
+        if (live && matches(cell, b)) {
+            ++tally.row_count;
+            tally.sum_amount += cell.amount;
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/cpp/src/lattice/bay.cpp /app/cpp/src/lattice/rill.cpp
+[?2004l#include "loam/exec.hpp"
+
+namespace loam {
+
+Tally sweep_e(const Tally& a, const Tally& b) {
+    return {
+        a.row_count + b.row_count,
+        a.sum_amount + b.sum_amount,
+        a.pages_read + b.pages_read,
+    };
+}
+
+}  // namespace loam
+#include "loam/exec.hpp"
+
+#include <cstddef>
+#include <vector>
+
+namespace loam {
+
+Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+
+    const std::size_t count = a.amount_lane.size();
+    std::vector<unsigned char> admit(count, 0);
+    for (std::size_t i = 0; i < count; ++i) {
+        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;
+    }
+
+    if (b.op == Op::IsNull) {
+        for (std::size_t i = 0; i < count; ++i) {
+            if (admit[i] == 0) {
+                ++tally.row_count;
+            }
+        }
+        return tally;
+    }
+
+    for (std::size_t i = 0; i < count; ++i) {
+        if (admit[i] == 0) {
+            continue;
+        }
+        bool keep = false;
+        switch (b.op) {
+            case Op::All:
+                keep = true;
+                break;
+            case Op::Equal:
+                keep = a.amount_lane[i] == b.x;
+                break;
+            case Op::Range:
+                keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+                break;
+            case Op::IsNull:
+                keep = false;
+                break;
+            case Op::RegionEqual:
+                keep = a.region_lane[i] == b.text;
+                break;
+        }
+        if (keep) {
+            ++tally.row_count;
+            tally.sum_amount += a.amount_lane[i];
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/cpp/src/harbor/pale.cpp /app/cpp/src/harbor/veil.cpp
+[?2004l#include "loam/plan.hpp"
+
+namespace loam {
+
+std::string turn_d(const Gate& a, const Probe& b) {
+    const char* lane = b.lane == Lane::Batch ? "batch" : "row";
+    return std::string(lane) + ":" + (a.read ? "open:" : "closed:") + a.note;
+}
+
+}  // namespace loam
+#include "loam/plan.hpp"
+
+namespace loam {
+
+Gate turn_b(const Slab& a, const Probe& b) {
+    if (!b.skipping) {
+        return {true, "full"};
+    }
+    if (b.op == Op::All) {
+        return {true, "all"};
+    }
+    if (b.op == Op::IsNull) {
+        return {a.has_absent, a.has_absent ? "possible" : "empty"};
+    }
+    if (b.op == Op::RegionEqual) {
+        const bool read = b.text >= a.region_low && b.text <= a.region_high;
+        return {read, read ? "text-hit" : "text-away"};
+    }
+
+    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+    const bool read = !(right < a.low || left > a.high);
+    return {read, read ? "range-hit" : "range-away"};
+}
+
+}  // namespace loam
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/config/lab.conf; ls -la /app/data/cases /app/data/archive /app/data/fresh
+[?2004lpage_rows=4
+default_path=batch
+default_skipping=true
+report_format=json-v1
+source_epoch=0
+/app/data/archive:
+total 16
+drwxr-xr-x 2 root root 106 Jul 21 02:06 .
+drwxr-xr-x 5 root root  63 Jul 21 02:06 ..
+-rw-r--r-- 1 root root 185 Jul 21 02:06 current.store
+-rw-r--r-- 1 root root 273 Jul 21 02:06 healthy.store
+-rw-r--r-- 1 root root 305 Jul 21 02:06 mixed.store
+-rw-r--r-- 1 root root 249 Jul 21 02:06 vault.store
+
+/app/data/cases:
+total 8
+drwxr-xr-x 2 root root  59 Jul 21 02:06 .
+drwxr-xr-x 5 root root  63 Jul 21 02:06 ..
+-rw-r--r-- 1 root root 359 Jul 21 02:06 control.case
+-rw-r--r-- 1 root root 776 Jul 21 02:06 incident.case
+
+/app/data/fresh:
+total 12
+drwxr-xr-x 2 root root  82 Jul 21 02:06 .
+drwxr-xr-x 5 root root  63 Jul 21 02:06 ..
+-rw-r--r-- 1 root root 136 Jul 21 02:06 orders_a.csv
+-rw-r--r-- 1 root root 137 Jul 21 02:06 orders_b.csv
+-rw-r--r-- 1 root root 135 Jul 21 02:06 orders_c.csv
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/data/cases/*.case 2>/dev/null | head -50
+[?2004l# id|store|operation|x|y|path|skipping|operator note
+c_legit|/app/data/archive/current.store|eq|-999|0|batch|1|legitimate overlap
+h_skip|/app/data/archive/healthy.store|range|100|130|batch|1|selective control
+h_full|/app/data/archive/healthy.store|range|100|130|row|0|full control
+h_region|/app/data/archive/healthy.store|region_eq|north|0|row|1|text control
+# id|store|operation|x|y|path|skipping|operator note
+m_range|/app/data/archive/mixed.store|range|10|40|row|1|invoice window
+m_narrow|/app/data/archive/mixed.store|range|10|20|row|1|narrow window
+m_null|/app/data/archive/mixed.store|isnull|0|0|batch|0|missing count
+m_interact|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed window
+m_neg|/app/data/archive/mixed.store|range|-100|-1|batch|0|negative window
+m_all|/app/data/archive/mixed.store|all|0|0|batch|0|full tally
+v_window|/app/data/archive/vault.store|range|10|50|row|1|vault window
+v_missing|/app/data/archive/vault.store|isnull|0|0|batch|1|vault absent probe
+v_check|/app/data/archive/vault.store|isnull|0|0|row|1|vault absent recheck
+v_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault full control
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# echo '=== current ==='; cat /app/data/archive/current.store; echo '=== healthy ==='; cat /app/data/archive/healthy.store
+[?2004l=== current ===
+H|3
+P|0|3|-999|20|1|east|west|4
+R|1|2|-999|east
+R|0|2|777|west
+R|1|2|10|east
+R|1|2|20|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+=== healthy ===
+H|3
+P|0|3|0|30|0|east|west|4
+R|1|2|0|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+P|2|3|200|230|0|central|west|4
+R|1|2|200|central
+R|1|2|210|east
+R|1|2|220|north
+R|1|2|230|west
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# echo '=== mixed ==='; cat /app/data/archive/mixed.store; echo '=== vault ==='; cat /app/data/archive/vault.store M[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Ke
+[?2004l=== mixed ===
+H|2
+P|0|2|100|100|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|0|2|777|west
+P|1|3|30|600|0|north|south|4
+R|1|2|30|north
+R|1|2|40|north
+R|1|2|500|south
+R|1|2|600|south
+P|2|3|-5|-5|0|central|central|1
+R|1|2|-5|central
+P|3|3|200|400|0|east|west|3
+R|1|2|200|east
+R|1|2|300|north
+R|1|2|400|west
+=== vault ===
+H|2
+P|0|2|5|30|0|north|west|4
+R|1|2|5|east
+R|1|0|12|east
+R|1|2|18|west
+R|1|2|30|west
+P|1|3|40|70|0|north|south|4
+R|1|2|40|north
+R|1|2|55|north
+R|1|2|63|south
+R|1|2|70|south
+P|2|2|-20|90|1|central|east|3
+R|1|2|-20|central
+R|0|2|90|east
+R|1|2|44|east
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/rust/src/model.rs /app/rust/src/codec.rs
+[?2004lpub(crate) const RUNE_VOID: u8 = 0;
+pub(crate) const RUNE_FIXED: u8 = 1;
+
+#[derive(Clone, Debug)]
+pub(crate) struct Cell {
+    pub origin: u8,
+    pub present: u8,
+    pub amount: i64,
+    pub region: String,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct Mark {
+    pub low: i64,
+    pub high: i64,
+    pub has_absent: bool,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct Page {
+    pub id: usize,
+    pub generation: u8,
+    pub mark: Mark,
+    pub region_low: String,
+    pub region_high: String,
+    pub cells: Vec<Cell>,
+}
+
+#[derive(Debug)]
+pub(crate) enum FoldErr {
+    Empty,
+    Shape,
+}
+
+impl std::fmt::Display for FoldErr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Empty => write!(f, "empty lane set"),
+            Self::Shape => write!(f, "lane lengths differ"),
+        }
+    }
+}
+
+impl std::error::Error for FoldErr {}
+use crate::model::{Cell, Page};
+use std::fs::File;
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::path::Path;
+
+pub(crate) fn read_csv(path: &Path) -> Result<Vec<Cell>, Box<dyn std::error::Error>> {
+    let file = File::open(path)?;
+    let mut rows = Vec::new();
+    for (line_no, line) in BufReader::new(file).lines().enumerate() {
+        let line = line?;
+        if line_no == 0 && line.starts_with("origin,") {
+            continue;
+        }
+        if line.trim().is_empty() {
+            continue;
+        }
+        let fields: Vec<&str> = line.split(',').collect();
+        if fields.len() != 4 {
+            return Err(format!("{}:{}: expected four columns", path.display(), line_no + 1).into());
+        }
+        rows.push(Cell {
+            origin: fields[0].parse()?,
+            present: fields[1].parse()?,
+            amount: fields[2].parse()?,
+            region: fields[3].trim().to_owned(),
+        });
+    }
+    Ok(rows)
+}
+
+pub(crate) fn write_pages(path: &Path, pages: &[Page]) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let file = File::create(path)?;
+    let mut out = BufWriter::new(file);
+    writeln!(out, "H|3")?;
+    for page in pages {
+        writeln!(
+            out,
+            "P|{}|{}|{}|{}|{}|{}|{}|{}",
+            page.id,
+            page.generation,
+            page.mark.low,
+            page.mark.high,
+            u8::from(page.mark.has_absent),
+            page.region_low,
+            page.region_high,
+            page.cells.len()
+        )?;
+        for cell in &page.cells {
+            writeln!(
+                out,
+                "R|{}|{}|{}|{}",
+                cell.present, cell.origin, cell.amount, cell.region
+            )?;
+        }
+    }
+    out.flush()?;
+    Ok(())
+}
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/rust/src/ember/mod.rs /app/rust/src/ember/fold.rs
+[?2004lpub(crate) mod fold;
+pub(crate) mod pale;
+pub(crate) mod reed;
+use crate::model::{FoldErr, Mark};
+
+pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+    if a.is_empty() {
+        return Err(FoldErr::Empty);
+    }
+    if a.len() != b.len() || a.len() != c.len() {
+        return Err(FoldErr::Shape);
+    }
+
+    let mut low = a[0];
+    let mut high = a[0];
+    let mut has_absent = false;
+    for (value, present) in a.iter().zip(b.iter()) {
+        low = low.min(*value);
+        high = high.max(*value);
+        has_absent |= *present == 0;
+    }
+
+    Ok(Mark {
+        low,
+        high,
+        has_absent,
+    })
+}
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/rust/src/ember/pale.rs /app/rust/src/ember/reed.rs
+[?2004l#[derive(Clone, Debug, Default)]
+pub(crate) struct Dial {
+    pub jobs: usize,
+    pub cells: usize,
+    pub bytes: usize,
+}
+
+pub(crate) fn tilt_d(a: &mut Dial, b: usize, c: usize) {
+    a.jobs += 1;
+    a.cells += b;
+    a.bytes += c;
+}
+use crate::ember::fold::tilt_a;
+use crate::model::{Cell, FoldErr, Page};
+
+pub(crate) fn gather(cells: Vec<Cell>, width: usize) -> Result<Vec<Page>, FoldErr> {
+    let mut pages = Vec::new();
+    for (id, chunk) in cells.chunks(width).enumerate() {
+        let values: Vec<i64> = chunk.iter().map(|cell| cell.amount).collect();
+        let present: Vec<u8> = chunk.iter().map(|cell| cell.present).collect();
+        let origins: Vec<u8> = chunk.iter().map(|cell| cell.origin).collect();
+        let mark = tilt_a(&values, &present, &origins)?;
+
+        let mut regions: Vec<String> = chunk.iter().map(|cell| cell.region.clone()).collect();
+        regions.sort();
+        let region_low = regions.first().cloned().unwrap_or_default();
+        let region_high = regions.last().cloned().unwrap_or_default();
+        pages.push(Page {
+            id,
+            generation: 3,
+            mark,
+            region_low,
+            region_high,
+            cells: chunk.to_vec(),
+        });
+    }
+    Ok(pages)
+}
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/rust/src/main.rs /app/rust/src/report.rs
+[?2004lmod codec;
+mod ember;
+mod model;
+mod report;
+
+use ember::pale::{tilt_d, Dial};
+use std::path::{Path, PathBuf};
+
+fn main() {
+    if let Err(error) = run() {
+        eprintln!("loam-ingest: {error}");
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() != 3 {
+        return Err("usage: loam-ingest <csv> <store>".into());
+    }
+    let cells = codec::read_csv(Path::new(&args[1]))?;
+    let pages = ember::reed::gather(cells, 4)?;
+    let directory = PathBuf::from(&args[2]);
+    std::fs::create_dir_all(&directory)?;
+    let target = directory.join("data.store");
+    codec::write_pages(&target, &pages)?;
+
+    let size = std::fs::metadata(&target)?.len() as usize;
+    let mut dial = Dial::default();
+    let cell_count = pages.iter().map(|page| page.cells.len()).sum();
+    tilt_d(&mut dial, cell_count, size);
+    eprintln!("{}", report::line(&dial));
+    Ok(())
+}
+use crate::ember::pale::Dial;
+
+pub(crate) fn line(a: &Dial) -> String {
+    format!("jobs={} cells={} bytes={}", a.jobs, a.cells, a.bytes)
+}
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/cpp/src/main.cpp /app/cpp/src/parse.cpp
+[?2004l#include "loam/report.hpp"
+#include "loam/store.hpp"
+
+#include <filesystem>
+#include <iostream>
+#include <stdexcept>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <vector>
+
+namespace {
+
+int run_ingest(const char* input, const char* output) {
+    const pid_t child = fork();
+    if (child == -1) {
+        throw std::runtime_error("fork failed");
+    }
+    if (child == 0) {
+        execl("/app/bin/loam-ingest", "loam-ingest", input, output, nullptr);
+        _exit(127);
+    }
+    int status = 0;
+    if (waitpid(child, &status, 0) == -1) {
+        throw std::runtime_error("waitpid failed");
+    }
+    return WIFEXITED(status) ? WEXITSTATUS(status) : 1;
+}
+
+}  // namespace
+
+int main(int argc, char** argv) {
+    try {
+        if (argc == 4 && std::string(argv[1]) == "audit") {
+            const auto specs = loam::load_cases(argv[2]);
+            std::vector<loam::CaseResult> results;
+            results.reserve(specs.size());
+            for (const auto& spec : specs) {
+                results.push_back(loam::run_case(spec));
+            }
+            loam::write_report(argv[3], results);
+            return 0;
+        }
+        if (argc == 4 && std::string(argv[1]) == "ingest") {
+            return run_ingest(argv[2], argv[3]);
+        }
+        if (argc == 3 && std::string(argv[1]) == "inspect") {
+            const auto slabs = loam::load_store(argv[2]);
+            for (const auto& slab : slabs) {
+                std::cout << slab.id << '|' << static_cast<int>(slab.generation)
+                          << '|' << slab.low << '|' << slab.high << '|'
+                          << (slab.has_absent ? 1 : 0) << '|' << slab.cells.size()
+                          << '\n';
+            }
+            return 0;
+        }
+        std::cerr << "usage: loam audit <case-directory> <report-path>\n"
+                  << "       loam ingest <csv> <store-directory>\n"
+                  << "       loam inspect <store>\n";
+        return 2;
+    } catch (const std::exception& error) {
+        std::cerr << "loam: " << error.what() << '\n';
+        return 1;
+    }
+}
+#include "loam/store.hpp"
+
+#include <algorithm>
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
+namespace loam {
+namespace {
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> fields;
+    std::size_t start = 0;
+    while (true) {
+        const auto end = line.find('|', start);
+        fields.push_back(line.substr(start, end - start));
+        if (end == std::string::npos) {
+            break;
+        }
+        start = end + 1;
+    }
+    return fields;
+}
+
+Op parse_op(const std::string& value) {
+    if (value == "all") return Op::All;
+    if (value == "eq") return Op::Equal;
+    if (value == "range") return Op::Range;
+    if (value == "isnull") return Op::IsNull;
+    if (value == "region_eq") return Op::RegionEqual;
+    throw std::runtime_error("unknown operation: " + value);
+}
+
+Lane parse_lane(const std::string& value) {
+    if (value == "row") return Lane::Row;
+    if (value == "batch") return Lane::Batch;
+    throw std::runtime_error("unknown path: " + value);
+}
+
+}  // namespace
+
+std::vector<CaseSpec> load_cases(const std::filesystem::path& directory) {
+    std::vector<std::filesystem::path> paths;
+    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".case") {
+            paths.push_back(entry.path());
+        }
+    }
+    std::sort(paths.begin(), paths.end());
+
+    std::vector<CaseSpec> cases;
+    for (const auto& path : paths) {
+        std::ifstream input(path);
+        if (!input) {
+            throw std::runtime_error("cannot open case file: " + path.string());
+        }
+        std::string line;
+        while (std::getline(input, line)) {
+            if (line.empty() || line[0] == '#') {
+                continue;
+            }
+            const auto fields = split(line);
+            if (fields.size() != 8) {
+                throw std::runtime_error("bad case row in " + path.string());
+            }
+            Probe probe;
+            probe.op = parse_op(fields[2]);
+            if (probe.op == Op::RegionEqual) {
+                probe.text = fields[3];
+            } else {
+                probe.x = std::stoll(fields[3]);
+                probe.y = std::stoll(fields[4]);
+            }
+            probe.lane = parse_lane(fields[5]);
+            probe.skipping = fields[6] == "1";
+            cases.push_back({fields[0], fields[1], std::move(probe)});
+        }
+    }
+    return cases;
+}
+
+}  // namespace loam
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# grep '^P' /app/data/archive/*.store
+[?2004l/app/data/archive/current.store:P|0|3|-999|20|1|east|west|4
+/app/data/archive/current.store:P|1|3|100|130|0|north|south|4
+/app/data/archive/healthy.store:P|0|3|0|30|0|east|west|4
+/app/data/archive/healthy.store:P|1|3|100|130|0|north|south|4
+/app/data/archive/healthy.store:P|2|3|200|230|0|central|west|4
+/app/data/archive/mixed.store:P|0|2|100|100|1|east|west|4
+/app/data/archive/mixed.store:P|1|3|30|600|0|north|south|4
+/app/data/archive/mixed.store:P|2|3|-5|-5|0|central|central|1
+/app/data/archive/mixed.store:P|3|3|200|400|0|east|west|3
+/app/data/archive/vault.store:P|0|2|5|30|0|north|west|4
+/app/data/archive/vault.store:P|1|3|40|70|0|north|south|4
+/app/data/archive/vault.store:P|2|2|-20|90|1|central|east|3
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat > /app/cpp/src/lattice/rill.cpp <<'EOF'
+[?2004l[?2004h> #include "loam/exec.hpp"
+[?2004l[?2004h> 
+[?2004l[?2004h> #include <cstddef>
+[?2004l[?2004h> #include <vector>
+[?2004l[?2004h> 
+[?2004l[?2004h> namespace loam {
+[?2004l[?2004h> namespace {
+[?2004l[?2004h> 
+[?2004l[?2004h> bool lane_is_live(std::uint8_t origin, std::uint8_t present) {
+[?2004l[?2004h>     // Mirror the row reader's liveness contract exactly.
+[?2004l[?2004h>     if (origin == static_cast<std::uint8_t>(Origin::Retired)) {
+[?2004l[?2004h>         return false;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if (origin == static_cast<std::uint8_t>(Origin::Inherited)) {
+[?2004l[?2004h>         return true;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return present != 0;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> }  // namespace
+[?2004l[?2004h> 
+[?2004l[?2004h> Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+[?2004l[?2004h>     Tally tally;
+[?2004l[?2004h>     if (!c.read) {
+[?2004l[?2004h>         return tally;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     tally.pages_read = 1;
+[?2004l[?2004h> 
+[?2004l[?2004h>     const std::size_t count = a.amount_lane.size();
+[?2004l[?2004h>     std::vector<unsigned char> admit(count, 0);
+[?2004l[?2004h>     for (std::size_t i = 0; i < count; ++i) {
+[?2004l[?2004h>         admit[i] = lane_is_live(a.origin_lane[i], a.presence_lane[i]) ? 1 : 0;
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     if (b.op == Op::IsNull) {
+[?2004l[?2004h>         for (std::size_t i = 0; i < count; ++i) {
+[?2004l[?2004h>             if (admit[i] == 0) {
+[?2004l[?2004h>                 ++tally.row_count;
+[?2004l[?2004h>             }
+[?2004l[?2004h>         }
+[?2004l[?2004h>         return tally;
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     for (std::size_t i = 0; i < count; ++i) {
+[?2004l[?2004h>         if (admit[i] == 0) {
+[?2004l[?2004h>             continue;
+[?2004l[?2004h>         }
+[?2004l[?2004h>         bool keep = false;
+[?2004l[?2004h>         switch (b.op) {
+[?2004l[?2004h>             case Op::All:
+[?2004l[?2004h>                 keep = true;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>             case Op::Equal:
+[?2004l[?2004h>                 keep = a.amount_lane[i] == b.x;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>             case Op::Range:
+[?2004l[?2004h>                 keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>             case Op::IsNull:
+[?2004l[?2004h>                 keep = false;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>             case Op::RegionEqual:
+[?2004l[?2004h>                 keep = a.region_lane[i] == b.text;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>         }
+[?2004l[?2004h>         if (keep) {
+[?2004l[?2004h>             ++tally.row_count;
+[?2004l[?2004h>             tally.sum_amount += a.amount_lane[i];
+[?2004l[?2004h>         }
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return tally;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> }  // namespace loam
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat > /app/cpp/src/harbor/veil.cpp <<'EOF'
+[?2004l[?2004h> #include "loam/plan.hpp"
+[?2004l[?2004h> 
+[?2004l[?2004h> namespace loam {
+[?2004l[?2004h> namespace {
+[?2004l[?2004h> 
+[?2004l[?2004h> // Markers (low/high/has_absent/region_low/region_high) are only trustworthy
+[?2004l[?2004h> // on faithfully written slabs. Archived mixed-generation slabs (older
+[?2004l[?2004h> // generations) carry incomplete markers, so selective admission must not skip
+[?2004l[?2004h> // them; the reader opens them and lets the exact per-cell scan decide.
+[?2004l[?2004h> constexpr std::uint8_t kFaithfulGeneration = 3;
+[?2004l[?2004h> 
+[?2004l[?2004h> bool markers_faithful(const Slab& a) {
+[?2004l[?2004h>     return a.generation >= kFaithfulGeneration;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> }  // namespace
+[?2004l[?2004h> 
+[?2004l[?2004h> Gate turn_b(const Slab& a, const Probe& b) {
+[?2004l[?2004h>     if (!b.skipping) {
+[?2004l[?2004h>         return {true, "full"};
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if (b.op == Op::All) {
+[?2004l[?2004h>         return {true, "all"};
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if (!markers_faithful(a)) {
+[?2004l[?2004h>         return {true, "unfaithful-markers"};
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if (b.op == Op::IsNull) {
+[?2004l[?2004h>         return {a.has_absent, a.has_absent ? "possible" : "empty"};
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if (b.op == Op::RegionEqual) {
+[?2004l[?2004h>         const bool read = b.text >= a.region_low && b.text <= a.region_high;
+[?2004l[?2004h>         return {read, read ? "text-hit" : "text-away"};
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+[?2004l[?2004h>     const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+[?2004l[?2004h>     const bool read = !(right < a.low || left > a.high);
+[?2004l[?2004h>     return {read, read ? "range-hit" : "range-away"};
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> }  // namespace loam
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat > /app/rust/src/ember/fold.rs <<'EOF'
+[?2004l[?2004h> use crate::model::{FoldErr, Mark};
+[?2004l[?2004h> 
+[?2004l[?2004h> // Liveness contract shared with the readers:
+[?2004l[?2004h> //   origin 0 (Retired)   -> never live
+[?2004l[?2004h> //   origin 1 (Inherited) -> always live
+[?2004l[?2004h> //   origin 2 (Current)   -> live only when present != 0
+[?2004l[?2004h> fn cell_is_live(origin: u8, present: u8) -> bool {
+[?2004l[?2004h>     match origin {
+[?2004l[?2004h>         0 => false,
+[?2004l[?2004h>         1 => true,
+[?2004l[?2004h>         _ => present != 0,
+[?2004l[?2004h>     }
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+[?2004l[?2004h>     if a.is_empty() {
+[?2004l[?2004h>         return Err(FoldErr::Empty);
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if a.len() != b.len() || a.len() != c.len() {
+[?2004l[?2004h>         return Err(FoldErr::Shape);
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     let mut low: Option<i64> = None;
+[?2004l[?2004h>     let mut high: Option<i64> = None;
+[?2004l[?2004h>     let mut has_absent = false;
+[?2004l[?2004h> 
+[?2004l[?2004h>     for ((value, present), origin) in a.iter().zip(b.iter()).zip(c.iter()) {
+[?2004l[?2004h>         if cell_is_live(*origin, *present) {
+[?2004l[?2004h>             low = Some(low.map_or(*value, |cur| cur.min(*value)));
+[?2004l[?2004h>             high = Some(high.map_or(*value, |cur| cur.max(*value)));
+[?2004l[?2004h>         } else {
+[?2004l[?2004h>             has_absent = true;
+[?2004l[?2004h>         }
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     // A slab whose entries are all non-live records low 0, high 0, has_absent true.
+[?2004l[?2004h>     Ok(Mark {
+[?2004l[?2004h>         low: low.unwrap_or(0),
+[?2004l[?2004h>         high: high.unwrap_or(0),
+[?2004l[?2004h>         has_absent,
+[?2004l[?2004h>     })
+[?2004l[?2004h> }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/tools/build-all
+[?2004l[0m[0m[1m[32m   Compiling[0m loam-ingest v0.8.0 (/app/rust)
+[0m[0m[1m[36m    Building[0m [                             ] 0/1: loam-ingest(bin)                                                                                            [K[0m[1m[33mwarning[0m[0m[1m: constant `RUNE_VOID` is never used[0m
+[0m [0m[0m[1m[38;5;12m--> [0m[0msrc/model.rs:1:1[0m
+[0m  [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m1[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0mpub(crate) const RUNE_VOID: u8 = 0;[0m
+[0m  [0m[0m[1m[38;5;12m| [0m[0m[1m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m  [0m[0m[1m[38;5;12m|[0m
+[0m  [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(dead_code)]` on by default[0m
+
+[0m[0m[1m[36m    Building[0m [                             ] 0/1: loam-ingest(bin)                                                                                            [K[0m[1m[33mwarning[0m[0m[1m: constant `RUNE_FIXED` is never used[0m
+[0m [0m[0m[1m[38;5;12m--> [0m[0msrc/model.rs:2:1[0m
+[0m  [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m2[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0mpub(crate) const RUNE_FIXED: u8 = 1;[0m
+[0m  [0m[0m[1m[38;5;12m| [0m[0m[1m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[0m[1m[36m    Building[0m [                             ] 0/1: loam-ingest(bin)                                                                                            [K[0m[0m[1m[33mwarning[0m[1m:[0m `loam-ingest` (bin "loam-ingest") generated 2 warnings
+[0m[0m[1m[32m    Finished[0m release [optimized] target(s) in 1.23s
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o build/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json
+[?2004l[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat /app/output/audit.json
+[?2004l{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"m_range","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":2,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":2,"sum_amount":30,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_null","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_interact","row_count":3,"sum_amount":25,"pages_total":4,"pages_read":2,"path":"batch","skipping":true},{"case_id":"m_neg","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":10,"sum_amount":2095,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"v_missing","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"batch","skipping":true},{"case_id":"v_check","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"row","skipping":false}],"digest":"24f25c278c07378c"}
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cp /app/output/audit.json /app/output/run1.json
+[?2004l[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json
+[?2004l[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# diff /app/output/run1.json /app/output/audit.json && echo IDENTICAL
+[?2004lIDENTICAL
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# for f in a b c; do echo "=== orders_$f ==="; cat /app/data/fresh/orders_$f.csv; done
+[?2004l=== orders_a ===
+origin,presence,amount,region
+0,1,-999,east
+2,1,10,east
+2,1,20,west
+2,1,30,west
+2,1,100,north
+2,0,555,north
+2,1,120,south
+2,1,130,south
+=== orders_b ===
+origin,presence,amount,region
+2,1,-999,east
+2,1,5,east
+2,0,777,west
+2,1,15,west
+0,1,-999,north
+2,1,200,north
+2,1,210,south
+2,1,220,south
+=== orders_c ===
+origin,presence,amount,region
+2,1,-999,east
+2,1,8,east
+2,1,21,west
+2,1,34,west
+0,1,301,north
+2,0,317,north
+0,0,329,south
+0,1,343,south
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# mkdir -p /tmp/s_a /tmp/s_b /tmp/s_c
+[?2004l[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/s_a
+[?2004ljobs=1 cells=8 bytes=182
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam ingest /app/data/fresh/orders_b.csv /tmp/s_b
+[?2004ljobs=1 cells=8 bytes=185
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam ingest /app/data/fresh/orders_c.csv /tmp/s_c
+[?2004ljobs=1 cells=8 bytes=179
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# echo '--- a ---'; cat /tmp/s_a/data.store; echo '--- inspect a ---'; /app/bin/loam inspect /tmp/s_a/data.store
+[?2004l--- a ---
+H|3
+P|0|3|10|30|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|1|north|south|4
+R|1|2|100|north
+R|0|2|555|north
+R|1|2|120|south
+R|1|2|130|south
+--- inspect a ---
+0|3|10|30|1|4
+1|3|100|130|1|4
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# echo '--- b ---'; cat /tmp/s_b/data.store
+[?2004l--- b ---
+H|3
+P|0|3|-999|15|1|east|west|4
+R|1|2|-999|east
+R|1|2|5|east
+R|0|2|777|west
+R|1|2|15|west
+P|1|3|200|220|1|north|south|4
+R|1|0|-999|north
+R|1|2|200|north
+R|1|2|210|south
+R|1|2|220|south
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# echo '--- c ---'; cat /tmp/s_c/data.store
+[?2004l--- c ---
+H|3
+P|0|3|-999|34|0|east|west|4
+R|1|2|-999|east
+R|1|2|8|east
+R|1|2|21|west
+R|1|2|34|west
+P|1|3|0|0|1|north|south|4
+R|1|0|301|north
+R|0|2|317|north
+R|0|0|329|south
+R|1|0|343|south
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json && grep -o '"digest":"[^"]*"' /app/output/audit.json
+[?2004l"digest":"24f25c278c07378c"
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# mkdir -p /tmp/fc; printf 'f_row|/tmp/s_a/data.store|range|10|130|row|1|x\nf_batch|/tmp/s_a/data.store|range|10|130|batch|1|x\nf_null_r|/tmp/s_a/data.store|isnull|0|0|row|1|x\nf_null_b|/tmp/s_a/data.store|isnull|0|0|batch|1|x\n' > /tmp/fc/f.case
+[?2004l[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam audit /tmp/fc /tmp/fc/out.json; cat /tmp/fc/out.json
+[?2004l{"status":"complete","cases":[{"case_id":"f_row","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"f_batch","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","skipping":true},{"case_id":"f_null_r","row_count":2,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"f_null_b","row_count":2,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"batch","skipping":true}],"digest":"9a87c08e2182b58f"}
+[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# rm -rf /tmp/s_a /tmp/s_b /tmp/s_c /tmp/fc /app/output/run1.json
+[?2004l[?2004hroot@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# 

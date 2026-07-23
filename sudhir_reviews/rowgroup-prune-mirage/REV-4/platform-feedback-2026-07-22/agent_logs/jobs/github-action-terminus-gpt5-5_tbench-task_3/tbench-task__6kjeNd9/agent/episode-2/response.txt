@@ -1,0 +1,23 @@
+{
+  "analysis": "Audit currently emits plausible output but likely contains incorrect archived mixed-generation answers: e.g. c_legit includes -999 despite selective read, and mixed/vault cases may disagree across paths. Need inspect case definitions and reader/writer marker logic.",
+  "plan": "Print the case files and relevant architecture/format docs. Then inspect C++ headers/source and Rust ingest source to identify marker semantics and lane-specific filtering.",
+  "commands": [
+    {
+      "keystrokes": "echo '--- cases'; for f in /app/data/cases/*.case; do echo \"### $f\"; cat \"$f\"; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "echo '--- architecture'; cat /app/docs/architecture.md; echo '--- format'; cat /app/docs/format-notes.md\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,220p' /app/cpp/include/loam/store.hpp; sed -n '1,220p' /app/cpp/include/loam/plan.hpp; sed -n '1,180p' /app/cpp/include/loam/exec.hpp; sed -n '1,180p' /app/cpp/include/loam/types.hpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,260p' /app/cpp/src/store.cpp; sed -n '1,260p' /app/cpp/src/row.cpp\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+} 

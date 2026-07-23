@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Build succeeded. Now let me test the ingest: ingest orders_a and inspect the resulting markers to verify faithful live-value markers.",
+  "plan": "Ingest all three fresh CSVs, inspect the resulting stores, and verify markers are faithful. Then test that fresh stores produce agreeing answers across modes.",
+  "commands": [
+    {"keystrokes": "rm -rf /tmp/fresh; mkdir -p /tmp/fresh/a /tmp/fresh/b /tmp/fresh/c\n/app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/fresh/a\n/app/bin/loam ingest /app/data/fresh/orders_b.csv /tmp/fresh/b\n/app/bin/loam ingest /app/data/fresh/orders_c.csv /tmp/fresh/c\n", "duration": 1.0},
+    {"keystrokes": "echo '=== a store ==='; cat /tmp/fresh/a/data.store; echo '=== b store ==='; cat /tmp/fresh/b/data.store; echo '=== c store ==='; cat /tmp/fresh/c/data.store\n", "duration": 0.1}
+  ]
+}
+```

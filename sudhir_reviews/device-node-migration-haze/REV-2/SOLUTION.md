@@ -1,0 +1,3 @@
+# SOLUTION — device-node-migration-haze REV-2
+
+The repair restores packed special rematerialization so major minor identity matches the pre cutover contract and special entry mode owner fidelity follows the roster seed rather than plain file masking. Post swap open path rebinding must resolve under the destination staging root. Rebuild with the project Makefile then invoke /app/bin/haze so /app/output/cutover_report.json comes from the compiled binary. Failing fixtures must pass open identity and path probes while the file only control stays green and invalid fixtures stay rejected. Do not hand write the report or replace bundled fixtures.

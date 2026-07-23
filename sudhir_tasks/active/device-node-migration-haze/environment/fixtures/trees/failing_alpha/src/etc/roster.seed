@@ -1,0 +1,6 @@
+dev/ttyS0 0660 0 5
+dev/null 0666 0 0
+dev/loop0 0660 0 6
+svc/agent.conf 0644 0 0
+svc/agent.log 0644 0 0
+svc/run.sh 0755 0 0

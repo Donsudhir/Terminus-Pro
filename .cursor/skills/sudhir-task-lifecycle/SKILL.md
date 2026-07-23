@@ -70,7 +70,9 @@ rendered view. Common flow:
   evidence (lifecycle rule: any edit reruns gates).
 - `evidence` / `feedback-capture` / `form-capture` / `rubric-capture` — store
   Harbor jobs and every Snorkel form paste (difficulty, solution, verification,
-  rubric) under the current REV.
+   rubric) under the current REV. Difficulty/Solution/Verification are an atomic
+   acceptance-safe Humanizer set; platform requirements, task truth, and
+   project rules outrank style.
 - `learn-check <slug>` — print applicable CM preventions; verify PREUPLOAD.
 - `package <slug>` — build zip, store SHA-256; requires PREUPLOAD checklist
   (or `--force`).
@@ -97,5 +99,8 @@ Phases: idea → step2a → construct → gates → review → package → submi
 6. New platform rejection or local surprise: append
    `sudhir_knowledge/COMMON_MISTAKES.md` and a `FAILURE-*` graph node in the
    same session (ADR-0010). Do not leave the lesson only in chat.
-7. Before upload: `form-capture` (or filled DIFFICULTY/SOLUTION/VERIFICATION/RUBRIC
-   in `REV-<n>/`), `evidence` for Harbor jobs, tick PREUPLOAD, then `package`.
+7. Before upload: load `terminus-dsv-humanizer`, preserve acceptance semantics,
+   and capture all three DSV fields together so the audit is created. Capture
+   the rubric, record Harbor
+   `evidence`, tick PREUPLOAD, then `package`. Direct DSV pastes do not satisfy
+   the gate.

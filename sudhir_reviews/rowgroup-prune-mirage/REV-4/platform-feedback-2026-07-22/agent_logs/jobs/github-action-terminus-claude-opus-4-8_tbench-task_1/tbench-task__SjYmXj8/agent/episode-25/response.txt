@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Excellent! All results now match my expected computations:\n- c_legit: 1, -999 (legit overlap preserved) ✓\n- h_skip=h_full: 4,460 (equivalent modes agree, healthy selective pages_read=1<3) ✓\n- h_region: 3,430 ✓\n- m_range: 4,100 (slab0 now read); m_narrow: 2,30 ✓\n- m_null: 2 (isnull now correct) ✓\n- m_interact: 3,25; m_neg: 1,-5; m_all: 10,2095 ✓\n- v_missing=v_check=v_full: all 2,0 (equivalent modes AGREE now!) ✓\n- v_window: 4,132 ✓\n\nHealthy selective controls still prune (h_skip reads 1<3). Equivalent modes agree. Now I need to verify determinism (byte-identical across runs) and test the fresh ingest path with faithful markers.",
+  "plan": "1. Verify determinism: run audit twice and compare bytes. 2. Test fresh ingest: ingest a CSV, check data.store markers are faithful, then audit works on it. Let me first check determinism and the fresh CSVs.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /tmp/a1.json; /app/bin/loam audit /app/data/cases /tmp/a2.json; cmp /tmp/a1.json /tmp/a2.json && echo IDENTICAL\n", "duration": 1.0},
+    {"keystrokes": "head -5 /app/data/fresh/orders_a.csv\n", "duration": 0.1}
+  ]
+}
+```

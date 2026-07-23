@@ -1,0 +1,6 @@
+{
+  "analysis": "The system has been repaired and validated. The C++ batch path now uses the same live-row semantics as the row path, so retired rows are excluded, inherited rows are included, and current rows depend on presence. Selective reads now conservatively open legacy mixed-generation slabs whose markers can be incomplete, including legacy slabs with absent markers or varied origin lanes. The Rust ingest path now writes faithful live-value markers: low/high are computed only from live rows, has_absent is set for any non-live row, and all-non-live slabs use low=0/high=0/has_absent=1. The project was rebuilt with /app/tools/build-all. The bundled audit is complete and deterministic across repeated runs. Additional equivalent-mode checks show row and batch paths agree on row_count and sum_amount for archived mixed stores, vault cases, healthy controls, and freshly ingested stores. Healthy selective skipping still uses the fast path, with h_skip reading 1 of 3 pages.",
+  "plan": "No further commands are needed. The repaired binaries are built under /app/bin and the required bundled audit command has been run successfully. Fresh ingest behavior was also verified by ingesting bundled CSV files and inspecting the resulting data.store markers.",
+  "commands": [],
+  "task_complete": true
+}

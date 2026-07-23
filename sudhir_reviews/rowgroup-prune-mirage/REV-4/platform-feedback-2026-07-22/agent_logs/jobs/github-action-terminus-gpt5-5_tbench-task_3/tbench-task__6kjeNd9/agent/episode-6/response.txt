@@ -1,0 +1,23 @@
+{
+  "analysis": "The first patch built and changed audit to more consistent-looking results: batch now excludes retired rows and counts current-present=0 rows as null, and legacy gen2 slabs are no longer skipped based on unsafe numeric/null markers. Need validate byte-stability, row/batch equivalence on constructed cases, and fresh ingest marker correctness. Also inspect patched files briefly for accidental issues.",
+  "plan": "Run audit twice and compare bytes. Create temporary ingested stores from bundled CSVs, inspect their page markers to confirm low/high only cover live rows and has_absent is set for non-live. Create a temporary case directory exercising row and batch equivalent probes with and without skipping on fresh stores to verify totals agree and selective gen3 skipping still occurs where possible.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '1,220p' /app/cpp/src/harbor/veil.cpp; sed -n '1,240p' /app/cpp/src/lattice/rill.cpp; sed -n '1,180p' /app/rust/src/ember/fold.rs\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit1.json && /app/bin/loam audit /app/data/cases /app/output/audit2.json && cmp -s /app/output/audit1.json /app/output/audit2.json && echo audit-repeat-identical\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "rm -rf /app/output/fresh_a /app/output/fresh_b /app/output/fresh_c /app/output/tmpcases && /app/bin/loam ingest /app/data/fresh/orders_a.csv /app/output/fresh_a >/app/output/ingest_a.out 2>/app/output/ingest_a.err && /app/bin/loam ingest /app/data/fresh/orders_b.csv /app/output/fresh_b >/app/output/ingest_b.out 2>/app/output/ingest_b.err && /app/bin/loam ingest /app/data/fresh/orders_c.csv /app/output/fresh_c >/app/output/ingest_c.out 2>/app/output/ingest_c.err && for f in /app/output/fresh_*/data.store; do echo \"### $f\"; cat \"$f\"; done\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "mkdir -p /app/output/tmpcases && cat > /app/output/tmpcases/equiv.case <<'EOF'\na_all_row|/app/output/fresh_a/data.store|all|0|0|row|0|x\na_all_batch|/app/output/fresh_a/data.store|all|0|0|batch|0|x\na_null_row|/app/output/fresh_a/data.store|isnull|0|0|row|0|x\na_null_batch|/app/output/fresh_a/data.store|isnull|0|0|batch|0|x\na_range_row_skip|/app/output/fresh_a/data.store|range|100|130|row|1|x\na_range_batch_skip|/app/output/fresh_a/data.store|range|100|130|batch|1|x\nb_eq_row|/app/output/fresh_b/data.store|eq|-999|0|row|1|x\nb_eq_batch|/app/output/fresh_b/data.store|eq|-999|0|batch|1|x\nc_all_row|/app/output/fresh_c/data.store|all|0|0|row|0|x\nc_all_batch|/app/output/fresh_c/data.store|all|0|0|batch|0|x\nc_null_row|/app/output/fresh_c/data.store|isnull|0|0|row|1|x\nc_null_batch|/app/output/fresh_c/data.store|isnull|0|0|batch|1|x\nEOF\n/app/bin/loam audit /app/output/tmpcases /app/output/tmp-audit.json && cat /app/output/tmp-audit.json\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+} 

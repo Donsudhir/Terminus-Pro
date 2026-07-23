@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Now I need to see the actual reader logic. The key concept is 'liveness' of a cell. A cell is live based on presence lane, but old producers used a reserved amount value to mark missing. Let me look at row.cpp, the lattice readers, and store.cpp.",
+  "plan": "Read row.cpp, lattice/bay.cpp, lattice/rill.cpp, and store.cpp to find how liveness is determined and where the discrepancy is.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/row.cpp\n", "duration": 0.1}
+  ]
+}
+```

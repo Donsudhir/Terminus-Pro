@@ -1,0 +1,663 @@
+{
+  "hardness_axes": [
+    {
+      "id": "discover",
+      "name": "Discover",
+      "verdict": "PASS",
+      "reasoning": "The public symptoms describe plausible residual norms with twin field-digest disagreement and a healthy no-checkpoint control, but they do not identify the geometry-token binding across the language boundary, the post-remesh operator-reuse keying failure, or the pre-remesh packing/digest fold. Those facts must be recovered from C++, Rust, Fortran, logs, and twin/control runs."
+    },
+    {
+      "id": "synthesize",
+      "name": "Synthesize",
+      "verdict": "PASS",
+      "reasoning": "Interrupted/uninterrupted parity requires coordinated behavior across native geometry lifecycle, host checkpoint shelf and assembly reuse, and pack-side field fold/digest. No single module owns the complete invariant."
+    },
+    {
+      "id": "diagnose",
+      "name": "Diagnose",
+      "verdict": "PASS",
+      "reasoning": "The instruction reports residual-green / field-digest disagreement, twin divergence, and healthy no-checkpoint behavior without naming operator caches, stale assembly, invalidation, geometry tokens, or fix sites."
+    },
+    {
+      "id": "navigate_coupling",
+      "name": "Navigate coupling",
+      "verdict": "PASS",
+      "reasoning": "Persisting a correct geometry token still fails if post-remesh assembly reuse is keyed on the wrong identity; correct reuse still fails if packing/digest folds pre-remesh order; and packing-only repairs leave twin residual contracts red when the shelf and native lifecycle disagree."
+    },
+    {
+      "id": "reason_beyond_training",
+      "name": "Reason beyond training",
+      "verdict": "PASS",
+      "reasoning": "A textbook checkpoint I/O or 'clear the preconditioner' recipe cannot reconcile mixed-language remesh+resume twin digests. The project-specific geometry-token, reuse-keying, and fold-order coupling is not a standard recipe completion."
+    }
+  ],
+  "anti_trivialization_checks": [
+    {
+      "id": "disclosure_collapse",
+      "name": "Disclosure-collapse",
+      "verdict": "PASS",
+      "reasoning": "An honest statement of twin field-digest parity, residual contracts, and no-checkpoint byte stability does not reveal which of the three language-boundary authorities is inconsistent."
+    },
+    {
+      "id": "hidden_instance",
+      "name": "Hidden-instance",
+      "verdict": "PASS",
+      "reasoning": "The design covers remesh+resume cases, never-interrupted twins, and healthy no-checkpoint controls across generated variants rather than hiding one corrupted fixture."
+    },
+    {
+      "id": "single_artifact_repair",
+      "name": "Single-artifact repair",
+      "verdict": "PASS",
+      "reasoning": "Three coordinated locations across distinct native/, host/, and pack/ roots are required; replacing one checkpoint blob or report cannot satisfy regenerated twin/control checks."
+    },
+    {
+      "id": "generalization",
+      "name": "Generalization",
+      "verdict": "PASS",
+      "reasoning": "The verifier regenerates interrupted/uninterrupted pairs and no-checkpoint controls from bundled families, so fixes must generalize beyond named cases."
+    },
+    {
+      "id": "prompt_honesty",
+      "name": "Prompt-honesty",
+      "verdict": "PASS",
+      "reasoning": "The instruction names observable parity failures, invocation, normative report schema path, and completion conditions while withholding only implementation causes and fix sites."
+    },
+    {
+      "id": "cheating_vs_difficulty",
+      "name": "Cheating-vs-difficulty",
+      "verdict": "PASS",
+      "reasoning": "Regeneration and twin/control matrices prevent hardcoding, but residual difficulty is cross-language remesh+resume diagnosis rather than those anti-cheating mechanisms."
+    },
+    {
+      "id": "mechanical_fix_filter",
+      "name": "Mechanical-fix filter",
+      "verdict": "PASS",
+      "reasoning": "The core work is not dependency placement, timeouts, reward formatting, or metadata repair."
+    },
+    {
+      "id": "localized_fix",
+      "name": "Localized-fix",
+      "verdict": "PASS",
+      "reasoning": "The selected topology places one location in native/, one in host/, and one in pack/, each controlling 4 of 12 tests under a 0.5 concentration cap."
+    },
+    {
+      "id": "oracle_locality",
+      "name": "Oracle-locality",
+      "verdict": "PASS",
+      "reasoning": "The planned oracle performs substantive geometry-token, shelf/reuse-keying, and fold/digest changes rather than replacing one short file or toggling one compiler option."
+    },
+    {
+      "id": "small_declarative_cluster",
+      "name": "Small declarative-cluster",
+      "verdict": "PASS",
+      "reasoning": "No finite table, threshold list, schema block, or configuration cluster contains the solution; the cited schema only documents report keys."
+    },
+    {
+      "id": "grep_collapse",
+      "name": "Grep-collapse",
+      "verdict": "PASS",
+      "reasoning": "Selected fix paths and symbols use opaque span/shelf/fold and braid_q/latch_r/sift_s vocabulary that does not contain any noun extracted from the public instruction."
+    },
+    {
+      "id": "pre_factored_helper",
+      "name": "Pre-factored-helper",
+      "verdict": "PASS",
+      "reasoning": "The selected functions do not mirror public terms such as checkpoint, remesh, residual, digest, twin, or parity."
+    },
+    {
+      "id": "recipe_discount",
+      "name": "Recipe-discount",
+      "verdict": "PASS",
+      "reasoning": "A known checkpoint-serialization or global-cache-clear recipe cannot repair the geometry-token binding, post-remesh reuse keying, and pack-side fold-order coupling together."
+    },
+    {
+      "id": "security_aura_discount",
+      "name": "Security-aura discount",
+      "verdict": "PASS",
+      "reasoning": "This is a scientific-computing task and does not rely on security language or exploit framing for difficulty."
+    },
+    {
+      "id": "orthogonal_checklist",
+      "name": "Orthogonal-checklist",
+      "verdict": "PASS",
+      "reasoning": "Twin parity, residual contracts, and no-checkpoint stability are one coupled remesh+resume invariant spanning three language authorities, not independent checklist bullets."
+    },
+    {
+      "id": "harness_discount",
+      "name": "Harness-discount",
+      "verdict": "PASS",
+      "reasoning": "Docker and mixed-language compilation provide realism, while residual hardness comes from geometry/lifecycle and numerical digest decisions."
+    },
+    {
+      "id": "one_pass_solvability",
+      "name": "One-pass solvability",
+      "verdict": "PASS",
+      "reasoning": "Opening the obvious entrypoint does not reveal the three locations, and a naive global flush leaves twin digest and fold-order failures."
+    },
+    {
+      "id": "hard_only_gate",
+      "name": "Hard-only gate",
+      "verdict": "PASS",
+      "reasoning": "The bounded task requires professional remesh+resume, mixed-language numerics, and twin-control scientific verification within an expert-hours scope."
+    },
+    {
+      "id": "discovery_budget_test",
+      "name": "Discovery budget test",
+      "verdict": "PASS",
+      "reasoning": "Three non-trivial discoveries are committed below, each with a distinct planned location and a reason it must remain absent from the public instruction."
+    },
+    {
+      "id": "instruction_specificity_test",
+      "name": "Instruction specificity test",
+      "verdict": "PASS",
+      "reasoning": "The drafted instruction stays at symptoms-only: no algorithm names, thresholds, cause phrases such as operator cache or stale assembly, or named fix sites."
+    },
+    {
+      "id": "topology_distribution_test",
+      "name": "Topology distribution test",
+      "verdict": "PASS",
+      "reasoning": "Three distinct candidate topologies are enumerated below, each requiring at least three coordinating locations; the selected topology distributes tests across three locations at 4/12 each."
+    }
+  ],
+  "rubric_axes": [
+    {
+      "id": "verifiable",
+      "name": "Verifiable",
+      "verdict": "PASS",
+      "reasoning": "Twin field-digest parity, residual contracts, no-checkpoint byte stability, and regenerated parity_report.json checks are all programmatic."
+    },
+    {
+      "id": "well_specified",
+      "name": "Well-specified",
+      "verdict": "PASS",
+      "reasoning": "The symptoms-only instruction clearly identifies invocation, normative schema path, twin/control outcomes, and prohibited hardcoding without revealing implementation causes."
+    },
+    {
+      "id": "solvable",
+      "name": "Solvable",
+      "verdict": "PASS",
+      "reasoning": "The design bounds the defect to a small existing mixed-language solver; an expert familiar with remesh+resume and FFI can complete the coordinated changes in roughly three to eight hours."
+    },
+    {
+      "id": "difficult",
+      "name": "Difficult",
+      "verdict": "PASS",
+      "reasoning": "The task stays hard after honest disclosure because residual-green twin disagreement does not identify which geometry, shelf, or fold authority is inconsistent."
+    },
+    {
+      "id": "interesting",
+      "name": "Interesting",
+      "verdict": "PASS",
+      "reasoning": "Reliable checkpoint/restart after adaptive remesh is paid production work in FEM and multiphysics solvers."
+    },
+    {
+      "id": "outcome_verified",
+      "name": "Outcome-verified",
+      "verdict": "PASS",
+      "reasoning": "The tests accept any implementation producing correct twin/control numerical outcomes and do not require the oracle's exact code shape."
+    }
+  ],
+  "instruction_completeness_test": {
+    "verdict": "PASS",
+    "reasoning": "The instruction is sufficient to judge the final parity report and twin/control outcomes but insufficient to locate or derive the three fixes without deeply reading and running the codebase."
+  },
+  "discovery_budget": [
+    {
+      "discovery": "The mid-run checkpoint omits or misbinds a geometry generation token that must round-trip across the C++/Rust boundary so post-remesh identity matches the never-interrupted twin.",
+      "planned_location": "environment/native/span.cpp::braid_q",
+      "why_instruction_must_not_reveal": "Naming a missing geometry token or cross-language binding would collapse the native diagnosis into a disclosed serialization edit."
+    },
+    {
+      "discovery": "After remesh, host-side assembly/operator reuse continues under a pre-remesh identity key, so residual norms can look plausible while the solution trajectory diverges from the twin.",
+      "planned_location": "environment/host/shelf.rs::latch_r",
+      "why_instruction_must_not_reveal": "Naming operator reuse, cache keying, or invalidation would directly expose the host repair and convert the task into a recipe."
+    },
+    {
+      "discovery": "Pack-side field packing and digest folding retain pre-remesh ordering or scratch, so emitted solution-field digests disagree even when upstream residuals look ordinary.",
+      "planned_location": "environment/pack/fold.f90::sift_s",
+      "why_instruction_must_not_reveal": "Naming pre-remesh ordering or retained scratch would reduce the Fortran work to a disclosed layout flip."
+    }
+  ],
+  "instruction_specificity": {
+    "level": "symptoms-only",
+    "reasoning": "The public draft describes residual-green twin field-digest disagreement, healthy no-checkpoint stability, and a cited report schema without naming algorithms, thresholds, operator caches, stale assembly, invalidation, or causes."
+  },
+  "investigation_profile": {
+    "weakness_areas": [
+      "long_horizon_debugging",
+      "multi_component_reasoning",
+      "partial_failures",
+      "ambiguous_bug_report"
+    ],
+    "causal_chain": [
+      {
+        "stage": 1,
+        "evidence": "Run the bundled remesh+resume case beside its never-interrupted twin and the fresh no-checkpoint control; compare residual norms, iteration counts, and solution-field digests.",
+        "finding": "Residual norms and iteration counts can look plausible after resume while field digests disagree with the twin; the no-checkpoint control stays correct.",
+        "unlocks_next": "The conditional matrix justifies treating residual-green / digest-red as one remesh+resume incident rather than a general residual bug."
+      },
+      {
+        "stage": 2,
+        "evidence": "Inspect run logs, metrics counters, and parity_report.json fields for interrupted versus uninterrupted trajectories.",
+        "finding": "Disagreement concentrates on solution-field digests and pointwise residual samples after the remesh boundary, not on fresh no-checkpoint runs.",
+        "unlocks_next": "Investigation can focus on state that crosses the pause/remesh/resume boundary across language roots."
+      },
+      {
+        "stage": 3,
+        "evidence": "Trace checkpoint shelf contents and native geometry lifecycle observations across the FFI boundary for matched twins.",
+        "finding": "A geometry generation token is omitted or rebound incorrectly when the shelf restores mid-run state.",
+        "unlocks_next": "Geometry-identity repair becomes a necessary but not sufficient stage before reuse and packing are trusted."
+      },
+      {
+        "stage": 4,
+        "evidence": "Compare host assembly/operator reuse decisions before and after remesh using deterministic probes and shelf keys.",
+        "finding": "Reuse continues under a pre-remesh identity, explaining residual-plausible / digest-wrong behavior after resume.",
+        "unlocks_next": "Reuse keying must be repaired in concert with geometry identity; packing still remains unchecked."
+      },
+      {
+        "stage": 5,
+        "evidence": "Inspect pack-side fold/digest intermediates and ordering metadata for remeshed versus uninterrupted trajectories.",
+        "finding": "Digest folding retains pre-remesh ordering or scratch, so emitted digests disagree even after upstream residuals look ordinary.",
+        "unlocks_next": "The three authorities can now be repaired as one coupled invariant and verified end-to-end."
+      },
+      {
+        "stage": 6,
+        "evidence": "Apply coordinated repairs at native, host, and pack locations; rebuild; rerun twin, interrupted, and no-checkpoint matrices.",
+        "finding": "Interrupted and uninterrupted trajectories agree on field digests and residual contracts; the healthy no-checkpoint control remains byte-identical.",
+        "unlocks_next": "This closes the incident with deterministic outcome evidence."
+      }
+    ],
+    "evidence_surfaces": [
+      {
+        "surface": "code",
+        "planned_location": "environment/native/, environment/host/, and environment/pack/",
+        "question_answered": "Which language roots own geometry lifecycle, checkpoint shelf/reuse, and field fold/digest?"
+      },
+      {
+        "surface": "runtime-state",
+        "planned_location": "Deterministic observations from /app/bin/meshlab twin and control runs",
+        "question_answered": "Where do residual norms stay plausible while solution-field digests diverge?"
+      },
+      {
+        "surface": "logs",
+        "planned_location": "environment/fixtures/logs/run_trace.ndjson",
+        "question_answered": "Which pause/remesh/resume phases correlate with twin disagreement?"
+      },
+      {
+        "surface": "metrics",
+        "planned_location": "Emitted iteration and residual-norm counters in /app/output/parity_report.json",
+        "question_answered": "Do iteration/residual metrics mask the digest failure mode?"
+      },
+      {
+        "surface": "filesystem",
+        "planned_location": "environment/fixtures/cases/ and mid-run shelf artifacts under /app/var/shelf/",
+        "question_answered": "What durable mid-run state exists for interrupted trajectories versus fresh controls?"
+      }
+    ],
+    "competing_hypotheses": [
+      {
+        "hypothesis": "The residual evaluation kernel itself is numerically wrong after remesh.",
+        "why_plausible": "Pointwise residual samples disagree with the twin after resume.",
+        "falsifier": "Fresh no-checkpoint runs on the same remeshed geometry remain correct and byte-stable, and residual norms on interrupted runs stay within ordinary bands."
+      },
+      {
+        "hypothesis": "Checkpoint I/O truncates or corrupts solution values randomly on disk.",
+        "why_plausible": "Only interrupted trajectories diverge, suggesting durable state damage.",
+        "falsifier": "Shelf byte digests for non-geometry payloads match twin snapshots while disagreement tracks remesh identity boundaries rather than random storage geometry."
+      },
+      {
+        "hypothesis": "The twin harness compares different bundled cases or different output slots.",
+        "why_plausible": "Field-digest disagreement can look like a harness mismatch.",
+        "falsifier": "Case identity keys and input cardinality in parity_report.json match across interrupted and uninterrupted runs; only post-remesh solution digests diverge."
+      }
+    ],
+    "conditional_failures": [
+      {
+        "scenario": "Mid-run checkpoint then remesh then resume on a bundled case",
+        "role": "failing",
+        "expected_behavior": "After repair, solution-field digests and residual contracts agree with the never-interrupted twin."
+      },
+      {
+        "scenario": "Generated remesh+resume variants with the same public contract",
+        "role": "failing",
+        "expected_behavior": "Interrupted/uninterrupted parity generalizes beyond the bundled incident case."
+      },
+      {
+        "scenario": "Fresh runs that never checkpoint on the same families",
+        "role": "healthy-control",
+        "expected_behavior": "Remain correct and byte-identical across clean rebuilds before and after repair."
+      },
+      {
+        "scenario": "Never-interrupted twin on the same case without mid-run pause",
+        "role": "healthy-control",
+        "expected_behavior": "Provides the digest and residual reference that interrupted trajectories must match after repair."
+      }
+    ],
+    "estimated_meaningful_actions": 48,
+    "determinism_strategy": "Ship fixed C++/Rust/Fortran sources, bundled cases, shelf fixtures, and logs in one offline container. Reset from immutable inputs before each scenario, avoid clocks and runtime entropy, sort filesystem traversal, pin reduction order for digests, and derive expected twin/control properties from verifier-owned regeneration.",
+    "domain_reasoning": {
+      "domain": "Scientific computing for mesh-based solvers with checkpoint/restart after remesh and mixed-language field digests.",
+      "why_not_trivia": "The solver does not need an obscure standard clause. They must reconcile geometry identity, post-remesh reuse, and packing/digest fold across three languages while proving twin parity and preserving a healthy no-checkpoint control."
+    }
+  },
+  "attack_path": {
+    "summary": "Reproduce twin digest disagreement beside a healthy no-checkpoint control, falsify residual-kernel and random-IO hypotheses, then reconcile geometry-token binding, post-remesh reuse keying, and pack-side fold order across three roots.",
+    "reasoning": "The path requires experiments and cross-language model building; no prompt noun, file name, or single failed assertion reveals all three locations."
+  },
+  "smallest_plausible_patch": {
+    "summary": "Coordinated substantive edits to one C++ geometry lifecycle function, one Rust shelf/reuse function, and one Fortran fold/digest function, together exceeding a trivial patch.",
+    "reasoning": "Any strict subset leaves at least one twin-parity, residual-contract, or no-checkpoint stability property failing."
+  },
+  "collapse_audit": {
+    "verdict": "PASS",
+    "reasoning": "The editable frontier spans three non-obvious locations across three language roots, the instruction remains symptoms-only, no declarative cluster or reference digest exists, and the planned oracle adds substantive logic rather than deleting or toggling one feature.",
+    "residual_hardness": "After the complete file tree is visible, the solver must still identify why remesh+resume trajectories cross different geometry, reuse, and fold authorities and then preserve one twin/control invariant through three locations.",
+    "red_flags": []
+  },
+  "topology_enumeration": [
+    {
+      "id": "topology_a_selected",
+      "summary": "Geometry-token binding, post-remesh reuse keying, and pack-side fold/digest disagree across native, host, and pack roots.",
+      "locations": [
+        "native/span.cpp::braid_q",
+        "host/shelf.rs::latch_r",
+        "pack/fold.f90::sift_s"
+      ],
+      "why_no_single_location_suffices": "A correct geometry token can still be ignored by reuse keying, correct reuse can still emit wrong digests under pre-remesh fold order, and packing-only repairs leave twin residual contracts red when shelf and native lifecycle disagree."
+    },
+    {
+      "id": "topology_b_lifecycle_chain",
+      "summary": "Checkpoint write, remesh authority handoff, resume rebind, and digest emission form a four-stage lifecycle chain.",
+      "locations": [
+        "host/shelf.rs::latch_r",
+        "native/span.cpp::braid_q",
+        "host/relay.rs::rebind_u",
+        "pack/fold.f90::sift_s"
+      ],
+      "why_no_single_location_suffices": "Correct shelf writes are useless if geometry identity is wrong, correct geometry is useless if resume rebinds the wrong authority, and correct upstream state is useless if digests fold the wrong order."
+    },
+    {
+      "id": "topology_c_reduction_convention",
+      "summary": "Native index maps, host reuse keys, and Fortran reduction order use incompatible conventions after remesh.",
+      "locations": [
+        "native/index.cpp::map_v",
+        "host/shelf.rs::latch_r",
+        "pack/fold.f90::sift_s"
+      ],
+      "why_no_single_location_suffices": "Changing one convention only moves the disagreement to another boundary; producers and consumers must represent the same post-remesh identity-to-digest map."
+    }
+  ],
+  "construction_manifest": {
+    "symbol_table": [
+      {
+        "path": "native/span.cpp",
+        "symbol": "braid_q",
+        "kind": "function",
+        "signature": "int32_t braid_q(const int32_t* a, int32_t b, uint64_t* c);",
+        "purpose": "Records and restores a geometry generation token across the native lifecycle boundary."
+      },
+      {
+        "path": "host/shelf.rs",
+        "symbol": "latch_r",
+        "kind": "function",
+        "signature": "pub(crate) fn latch_r(a: u64, b: &mut Shelf) -> i8",
+        "purpose": "Rebinds host reuse context from shelf state after a remesh-capable restore."
+      },
+      {
+        "path": "pack/fold.f90",
+        "symbol": "sift_s",
+        "kind": "function",
+        "signature": "integer(c_int) function sift_s(a, b, c) bind(C)",
+        "purpose": "Folds solution samples into a stable digest under the active ordering."
+      }
+    ],
+    "flipping_point_contract": {
+      "locations": [
+        {
+          "id": "A",
+          "path": "native/span.cpp",
+          "controls_tests": [
+            "test_m01",
+            "test_m02",
+            "test_m06",
+            "test_m10"
+          ]
+        },
+        {
+          "id": "B",
+          "path": "host/shelf.rs",
+          "controls_tests": [
+            "test_m03",
+            "test_m05",
+            "test_m07",
+            "test_m11"
+          ]
+        },
+        {
+          "id": "C",
+          "path": "pack/fold.f90",
+          "controls_tests": [
+            "test_m04",
+            "test_m08",
+            "test_m09",
+            "test_m12"
+          ]
+        }
+      ],
+      "no_single_location_flips_majority": true,
+      "concentration_cap": 0.5
+    },
+    "decoy_manifest": [
+      {
+        "path": "native/ledge.cpp",
+        "kind": "helper",
+        "rhymes_with": "braid_q",
+        "non_fix_purpose": "Computes ordinary geometry statistics for diagnostic banners."
+      },
+      {
+        "path": "host/locker.rs",
+        "kind": "helper",
+        "rhymes_with": "latch_r",
+        "non_fix_purpose": "Maps display codes for status lines without affecting shelf rebinds."
+      },
+      {
+        "path": "pack/tally.f90",
+        "kind": "helper",
+        "rhymes_with": "sift_s",
+        "non_fix_purpose": "Folds scalar diagnostic marks into aggregate counters."
+      }
+    ],
+    "code_forbidden_tokens": [
+      "scientific",
+      "mesh",
+      "lab",
+      "app",
+      "case",
+      "checkpoints",
+      "mid-run",
+      "remeshes",
+      "resumes",
+      "resume",
+      "residual",
+      "norms",
+      "iteration",
+      "counts",
+      "solution-field",
+      "digests",
+      "twin",
+      "pointwise",
+      "samples",
+      "runs",
+      "checkpoint",
+      "rebuilds",
+      "pipeline",
+      "interrupted",
+      "uninterrupted",
+      "trajectories",
+      "agreement",
+      "field",
+      "contracts",
+      "healthy",
+      "no-checkpoint",
+      "control",
+      "bin",
+      "meshlab",
+      "output",
+      "parity_report",
+      "json",
+      "keys",
+      "layout",
+      "schema",
+      "docs",
+      "parity-report-schema",
+      "inputs",
+      "report",
+      "checks",
+      "compiled",
+      "bundled"
+    ]
+  },
+  "naming_pass": {
+    "instruction_nouns_extracted": [
+      "scientific",
+      "mesh",
+      "lab",
+      "app",
+      "case",
+      "checkpoints",
+      "mid-run",
+      "remeshes",
+      "resumes",
+      "resume",
+      "residual",
+      "norms",
+      "iteration",
+      "counts",
+      "solution-field",
+      "digests",
+      "twin",
+      "pointwise",
+      "samples",
+      "runs",
+      "checkpoint",
+      "rebuilds",
+      "pipeline",
+      "interrupted",
+      "uninterrupted",
+      "trajectories",
+      "agreement",
+      "field",
+      "contracts",
+      "healthy",
+      "no-checkpoint",
+      "control",
+      "bin",
+      "meshlab",
+      "output",
+      "parity_report",
+      "json",
+      "keys",
+      "layout",
+      "schema",
+      "docs",
+      "parity-report-schema",
+      "inputs",
+      "report",
+      "checks",
+      "compiled",
+      "bundled"
+    ],
+    "renames_during_drafting": [
+      {
+        "original": "native/mesh_geom.cpp",
+        "renamed_to": "native/span.cpp",
+        "reason": "Removed instruction noun mesh from a selected fix path."
+      },
+      {
+        "original": "host/checkpoint.rs",
+        "renamed_to": "host/shelf.rs",
+        "reason": "Removed instruction noun checkpoint from a selected fix path."
+      },
+      {
+        "original": "host/operator_cache.rs",
+        "renamed_to": "host/shelf.rs",
+        "reason": "Removed cause-revealing operator/cache naming from the host frontier."
+      },
+      {
+        "original": "pack/field_digest.f90",
+        "renamed_to": "pack/fold.f90",
+        "reason": "Removed instruction nouns field and digests from a selected fix path."
+      },
+      {
+        "original": "bind_geometry_token",
+        "renamed_to": "braid_q",
+        "reason": "Avoided geometry/token vocabulary adjacent to the public remesh contract."
+      },
+      {
+        "original": "invalidate_operator",
+        "renamed_to": "latch_r",
+        "reason": "Avoided cause-revealing invalidate/operator vocabulary on the fix path."
+      },
+      {
+        "original": "fold_solution_digest",
+        "renamed_to": "sift_s",
+        "reason": "Avoided solution/digest vocabulary from the public instruction."
+      }
+    ],
+    "test_names_audited": [
+      "test_m01",
+      "test_m02",
+      "test_m03",
+      "test_m04",
+      "test_m05",
+      "test_m06",
+      "test_m07",
+      "test_m08",
+      "test_m09",
+      "test_m10",
+      "test_m11",
+      "test_m12"
+    ],
+    "concentration_math": {
+      "total_tests": 12,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    },
+    "recomputed_concentration": {
+      "total_tests": 12,
+      "concentration_cap": 0.5,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    }
+  }
+}

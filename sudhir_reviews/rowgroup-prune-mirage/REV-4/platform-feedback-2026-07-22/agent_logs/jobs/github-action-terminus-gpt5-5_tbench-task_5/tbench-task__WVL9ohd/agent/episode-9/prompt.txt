@@ -1,0 +1,41 @@
+Current Terminal Screen:
+R|1|2|200|north
+R|1|2|210|south
+R|1|2|220|south
+### /tmp/fresh_c
+0|3|-999|34|0|4
+1|3|0|0|1|4
+H|3
+P|0|3|-999|34|0|east|west|4
+R|1|2|-999|east
+R|1|2|8|east
+R|1|2|21|west
+R|1|2|34|west
+P|1|3|0|0|1|north|south|4
+R|1|0|301|north
+R|0|2|317|north
+R|0|0|329|south
+R|1|0|343|south
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# mkdir -p /tmp/freshcases && cat > /tmp/freshcases/f.case <<'EOF'
+> # id|store|operation|x|y|path|skipping|operator note
+> fa_all_row|/tmp/fresh_a/data.store|all|0|0|row|0|x
+> fa_all_batch|/tmp/fresh_a/data.store|all|0|0|batch|0|x
+> fa_null_row|/tmp/fresh_a/data.store|isnull|0|0|row|1|x
+> fa_null_batch|/tmp/fresh_a/data.store|isnull|0|0|batch|1|x
+> fa_range_row|/tmp/fresh_a/data.store|range|-1000|1000|row|1|x
+> fa_range_batch|/tmp/fresh_a/data.store|range|-1000|1000|batch|1|x
+> fb_all_row|/tmp/fresh_b/data.store|all|0|0|row|0|x
+> fb_all_batch|/tmp/fresh_b/data.store|all|0|0|batch|0|x
+> fc_all_row|/tmp/fresh_c/data.store|all|0|0|row|0|x
+> fc_all_batch|/tmp/fresh_c/data.store|all|0|0|batch|0|x
+> EOF
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# /app/bin/loam audit /tmp/freshcases /tmp/fresh.json && cat /tmp/fresh.json
+{"status":"complete","cases":[{"case_id":"fa_all_row","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"row","skipping":false},{"case_id":"f
+a_all_batch","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","skipping":false},{"case_id":"fa_null_row","row_count":2,"sum_amount":
+0,"pages_total":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"fa_null_batch","row_count":2,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"ba
+tch","skipping":true},{"case_id":"fa_range_row","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"fa_range
+_batch","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","skipping":true},{"case_id":"fb_all_row","row_count":6,"sum_amount":-349,"p
+ages_total":2,"pages_read":2,"path":"row","skipping":false},{"case_id":"fb_all_batch","row_count":6,"sum_amount":-349,"pages_total":2,"pages_read":2,"path":"bat
+ch","skipping":false},{"case_id":"fc_all_row","row_count":4,"sum_amount":-936,"pages_total":2,"pages_read":2,"path":"row","skipping":false},{"case_id":"fc_all_b
+atch","row_count":4,"sum_amount":-936,"pages_total":2,"pages_read":2,"path":"batch","skipping":false}],"digest":"cac5513359459543"}
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app#

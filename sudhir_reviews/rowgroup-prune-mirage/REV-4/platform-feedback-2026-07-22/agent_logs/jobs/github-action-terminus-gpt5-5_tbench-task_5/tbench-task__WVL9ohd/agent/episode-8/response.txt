@@ -1,0 +1,19 @@
+{
+  "analysis": "Build and audit validation succeeded: bundled audit now has corrected mixed/vault totals and repeated output is byte-identical (CMP:0). The temporary equivalence audit confirms row and batch agree for the mixed/vault probes. The last command accidentally started an unterminated shell for-loop because `echo ### $d` treated `#` as a comment, so the shell is at the secondary `>` prompt waiting for `done`.",
+  "plan": "First close the pending for-loop with `done`. Then rerun fresh ingest inspection using quoted echo markers to avoid shell comments, and run the fresh audit equivalence cases.",
+  "commands": [
+    {
+      "keystrokes": "done\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "for d in /tmp/fresh_a /tmp/fresh_b /tmp/fresh_c; do echo \"### $d\"; /app/bin/loam inspect \"$d/data.store\"; cat \"$d/data.store\"; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "mkdir -p /tmp/freshcases && cat > /tmp/freshcases/f.case <<'EOF'\n# id|store|operation|x|y|path|skipping|operator note\nfa_all_row|/tmp/fresh_a/data.store|all|0|0|row|0|x\nfa_all_batch|/tmp/fresh_a/data.store|all|0|0|batch|0|x\nfa_null_row|/tmp/fresh_a/data.store|isnull|0|0|row|1|x\nfa_null_batch|/tmp/fresh_a/data.store|isnull|0|0|batch|1|x\nfa_range_row|/tmp/fresh_a/data.store|range|-1000|1000|row|1|x\nfa_range_batch|/tmp/fresh_a/data.store|range|-1000|1000|batch|1|x\nfb_all_row|/tmp/fresh_b/data.store|all|0|0|row|0|x\nfb_all_batch|/tmp/fresh_b/data.store|all|0|0|batch|0|x\nfc_all_row|/tmp/fresh_c/data.store|all|0|0|row|0|x\nfc_all_batch|/tmp/fresh_c/data.store|all|0|0|batch|0|x\nEOF\n/app/bin/loam audit /tmp/freshcases /tmp/fresh.json && cat /tmp/fresh.json\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+} 

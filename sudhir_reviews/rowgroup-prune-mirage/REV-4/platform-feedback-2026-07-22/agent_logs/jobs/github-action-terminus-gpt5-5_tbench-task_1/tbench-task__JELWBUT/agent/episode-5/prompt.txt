@@ -1,0 +1,146 @@
+New Terminal Output:
+
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# cat cpp/src/harbor/veil.cpp
+#include "loam/plan.hpp"
+
+namespace loam {
+
+Gate turn_b(const Slab& a, const Probe& b) {
+    if (!b.skipping) {
+        return {true, "full"};
+    }
+    if (b.op == Op::All) {
+        return {true, "all"};
+    }
+    if (b.op == Op::IsNull) {
+        return {a.has_absent, a.has_absent ? "possible" : "empty"};
+    }
+    if (b.op == Op::RegionEqual) {
+        const bool read = b.text >= a.region_low && b.text <= a.region_high;
+        return {read, read ? "text-hit" : "text-away"};
+    }
+
+    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+    const bool read = !(right < a.low || left > a.high);
+    return {read, read ? "range-hit" : "range-away"};
+}
+
+}  // namespace loam
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# cat cpp/src/lattice/bay.cpp
+#include "loam/exec.hpp"
+
+namespace loam {
+
+Tally sweep_e(const Tally& a, const Tally& b) {
+    return {
+        a.row_count + b.row_count,
+        a.sum_amount + b.sum_amount,
+        a.pages_read + b.pages_read,
+    };
+}
+
+}  // namespace loam
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# cat cpp/src/lattice/rill.cpp
+#include "loam/exec.hpp"
+
+#include <cstddef>
+#include <vector>
+
+namespace loam {
+
+Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+
+    const std::size_t count = a.amount_lane.size();
+    std::vector<unsigned char> admit(count, 0);
+    for (std::size_t i = 0; i < count; ++i) {
+        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;
+    }
+
+    if (b.op == Op::IsNull) {
+        for (std::size_t i = 0; i < count; ++i) {
+            if (admit[i] == 0) {
+                ++tally.row_count;
+            }
+        }
+        return tally;
+    }
+
+    for (std::size_t i = 0; i < count; ++i) {
+        if (admit[i] == 0) {
+            continue;
+        }
+        bool keep = false;
+        switch (b.op) {
+            case Op::All:
+                keep = true;
+                break;
+            case Op::Equal:
+                keep = a.amount_lane[i] == b.x;
+                break;
+            case Op::Range:
+                keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+                break;
+            case Op::IsNull:
+                keep = false;
+                break;
+            case Op::RegionEqual:
+                keep = a.region_lane[i] == b.text;
+                break;
+        }
+        if (keep) {
+            ++tally.row_count;
+            tally.sum_amount += a.amount_lane[i];
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# cat cpp/Makefile
+CXX ?= g++
+CXXFLAGS ?= -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude
+LDFLAGS ?=
+
+SOURCES := $(shell find src -type f -name '*.cpp' | sort)
+OBJECTS := $(patsubst src/%.cpp,build/%.o,$(SOURCES))
+TARGET := build/loam
+
+.PHONY: all clean
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+        $(CXX) $(CXXFLAGS) $(OBJECTS) $(LDFLAGS) -o $@
+
+build/%.o: src/%.cpp
+        @mkdir -p $(dir $@)
+        $(CXX) $(CXXFLAGS) -c $< -o $@
+
+clean:
+        rm -rf build
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# cat Makefile
+.PHONY: all clean
+
+all:
+        ./tools/build-all
+
+clean:
+        $(MAKE) -C cpp clean
+        rm -rf rust/target bin
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# cat tools/build-all
+#!/bin/bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+mkdir -p "$ROOT/bin"
+
+cargo build --manifest-path "$ROOT/rust/Cargo.toml" --release --offline
+make -C "$ROOT/cpp" clean all
+install -m 0755 "$ROOT/rust/target/release/loam-ingest" "$ROOT/bin/loam-ingest"
+install -m 0755 "$ROOT/cpp/build/loam" "$ROOT/bin/loam"
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app#

@@ -1,0 +1,3 @@
+# SOLUTION — domain-halo-digest-rift REV-1
+
+The repair restores fringe packing after the map change and brings host stage readiness in line with native buffers before later stages claim they are done. Fold ordering must follow the active post map sample order before checksums are emitted. Rebuild with the project Makefile then invoke /app/bin/partlab so /app/output/parity_report.json comes from the compiled binary. Changed map runs and the never remapped twin must share matching fold checksums plus sample contracts while the steady control stays byte identical across clean repeats. Do not hand write the report or replace bundled inputs.

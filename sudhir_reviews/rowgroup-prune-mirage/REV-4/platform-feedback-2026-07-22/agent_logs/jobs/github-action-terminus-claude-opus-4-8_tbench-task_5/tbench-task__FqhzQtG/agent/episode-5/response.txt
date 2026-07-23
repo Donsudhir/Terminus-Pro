@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Found the bug. In the row reader (row.cpp), is_live() considers a cell live if: Retired->false, Inherited->true, Current->present!=0. But in the lattice/batch reader (rill.cpp), admit[i] is set purely based on presence_lane[i] != 0, ignoring the origin lane entirely. So for Inherited-origin cells with present==0, the row reader counts them as live but the batch reader excludes them. This is the divergence on mixed-generation stores with varied origin lanes. The batch reader must replicate the same is_live logic using origin_lane and presence_lane.",
+  "plan": "Read the harbor (planning/gating) files and store.cpp to fully understand markers and the gate/skip logic before fixing. Also check the main.cpp and report.cpp.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/harbor/pale.cpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/src/harbor/veil.cpp\n", "duration": 0.1}
+  ]
+}
+```

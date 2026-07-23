@@ -1,0 +1,158 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 15,
+            "passed": 14,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1784599869.768916,
+            "stop": 1784599875.313641
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_p01",
+                "status": "passed",
+                "duration": 5.451918292790651,
+                "start": 1784599869.7840884,
+                "stop": 1784599875.236311,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p02",
+                "status": "passed",
+                "duration": 0.00232575461268425,
+                "start": 1784599875.2365286,
+                "stop": 1784599875.2390118,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p03",
+                "status": "passed",
+                "duration": 0.005377983674407005,
+                "start": 1784599875.2391837,
+                "stop": 1784599875.2447298,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p04",
+                "status": "passed",
+                "duration": 0.002100510522723198,
+                "start": 1784599875.244874,
+                "stop": 1784599875.2470875,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p05",
+                "status": "passed",
+                "duration": 0.004454081878066063,
+                "start": 1784599875.2472112,
+                "stop": 1784599875.2517855,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p06",
+                "status": "passed",
+                "duration": 0.0018639545887708664,
+                "start": 1784599875.2519112,
+                "stop": 1784599875.2538836,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p07",
+                "status": "passed",
+                "duration": 0.005335085093975067,
+                "start": 1784599875.2540054,
+                "stop": 1784599875.259454,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p08",
+                "status": "passed",
+                "duration": 0.005188584327697754,
+                "start": 1784599875.259598,
+                "stop": 1784599875.2649007,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p09",
+                "status": "passed",
+                "duration": 0.0018288902938365936,
+                "start": 1784599875.2650213,
+                "stop": 1784599875.2669578,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p10",
+                "status": "passed",
+                "duration": 0.010722223669290543,
+                "start": 1784599875.2670739,
+                "stop": 1784599875.2779212,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p11",
+                "status": "passed",
+                "duration": 0.004204846918582916,
+                "start": 1784599875.2780473,
+                "stop": 1784599875.2823617,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p12",
+                "status": "passed",
+                "duration": 0.0032925717532634735,
+                "start": 1784599875.2824793,
+                "stop": 1784599875.285895,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p13",
+                "status": "passed",
+                "duration": 0.003448059782385826,
+                "start": 1784599875.286019,
+                "stop": 1784599875.2896335,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p14",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.001977350562810898,
+                "start": 1784599875.2897503,
+                "stop": 1784599875.3045294,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p140')\n\n    def test_p14(tmp_path: Path) -> None:\n        \"\"\"Selective text-code probes stay complete on neighboring generations.\"\"\"\n        row = _run_case(tmp_path, \"p14\", VAULT, \"region_eq\", \"east\", 0, \"row\", True)\n>       _assert_tally(row, 2, 49)\n\ntest_outputs.py:255: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p14', 'pages_read': 1, 'pages_total': 3, 'path': 'row', ...}\ncount = 2, total = 49\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 1 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p15",
+                "status": "passed",
+                "duration": 0.008680015802383423,
+                "start": 1784599875.3046834,
+                "stop": 1784599875.3134887,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            }
+        ]
+    }
+}

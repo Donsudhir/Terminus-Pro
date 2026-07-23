@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Both fixes applied. Now rebuild and re-run the audit. I expect m_all to change from 11/1096 to 10/2095, and other batch cases on mixed store that included the retired -999 to change. Let me rebuild.",
+  "plan": "Rebuild and run audit again.",
+  "commands": [
+    {"keystrokes": "/app/tools/build-all 2>&1 | tail -5\n", "duration": 30.0}
+  ]
+}
+```

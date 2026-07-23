@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Report/digest are deterministic (FNV-1a). Now let me build the current state and run the audit to see the baseline behavior and understand the discrepancies concretely.",
+  "plan": "Build the project and run the audit on the bundled cases to see current output, comparing row vs batch behaviors.",
+  "commands": [
+    {"keystrokes": "/app/tools/build-all 2>&1 | tail -20\n", "duration": 30.0}
+  ]
+}
+```

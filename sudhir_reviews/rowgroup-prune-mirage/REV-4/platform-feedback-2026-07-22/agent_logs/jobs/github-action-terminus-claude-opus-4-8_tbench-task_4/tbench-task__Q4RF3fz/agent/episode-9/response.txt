@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Now I understand the data. The R records are: R|presence|origin|amount|region. Origin: 0=Retired, 1=Inherited, 2=Current. \n\nRow reader is_live: Retired(0)->false, Inherited(1)->true, Current(2)->present!=0.\n\nKey cases:\n- current.store slab 0: R|0|2|777|west has present=0, origin=2 (Current) -> NOT live in row reader. Amount 777. This is a v3 generation where present=0 marks absent. R|1|2|-999 present=1 origin=2 -> live, amount -999 (legitimate overlap!).\n- mixed.store slab 0 (gen 2): R|1|0|-999 present=1 origin=0 (Retired) -> NOT live (this is the v2 way of marking absent using amount -999 and origin retired). R|0|2|777 present=0 origin=2 -> not live.\n\nThe batch reader sweep_c uses admit = presence!=0 only. It ignores origin entirely. So for R|1|0|-999 (Retired, present=1): row reader says NOT live (Retired), batch reader says admit=1 (present!=0) -> DISAGREEMENT. For R|0|2|777 (Current, present=0): both agree not live.\n\nSo the fix: batch admit must mirror is_live: Retired->0, Inherited->1, Current->present!=0.",
+  "plan": "Fix sweep_c admit computation to use origin_lane matching row reader's is_live. Let me verify the isnull semantics too - row reader counts !live for IsNull, batch counts admit==0. These must match. So making admit == is_live fixes both. Now edit rill.cpp.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/include/loam/exec.hpp\n", "duration": 0.1}
+  ]
+}
+```

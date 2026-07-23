@@ -1,0 +1,39 @@
+{
+  "analysis": "Baseline builds and audit runs. The bundled report shows suspect disagreement patterns on mixed archived cases: e.g. m_range selective row reads only 1 page and returns 70, while full m_all/m_neg indicate additional live amounts exist. Need inspect store/case parsing and fast path admission logic. Also verify ingest marker generation.",
+  "plan": "Inspect source headers/implementation and case files. Decode/print store metadata if needed. Search for marker logic and selective page skip conditions, then patch reader to treat incomplete/untrusted archived markers conservatively while preserving healthy selective skips, and patch ingest marker calculation if it includes absent values.",
+  "commands": [
+    {
+      "keystrokes": "find /app/cpp -type f | sort\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "printf '--- cases ---\\n'; for f in /app/data/cases/*.case; do echo \"$f\"; cat \"$f\"; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,240p' /app/cpp/src/store.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,240p' /app/cpp/src/row.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,240p' /app/cpp/src/parse.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,260p' /app/cpp/src/main.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,260p' /app/rust/src/codec.rs\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,240p' /app/rust/src/main.rs\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

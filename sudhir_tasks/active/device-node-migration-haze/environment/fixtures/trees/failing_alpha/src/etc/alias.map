@@ -1,0 +1,4 @@
+ttyS0=dev/ttyS0
+null=dev/null
+loop0=dev/loop0
+agent_log=svc/agent.log

@@ -1,0 +1,31 @@
+{
+  "analysis": "Audit currently runs and emits report. Suspicious bundled cases include mixed archived selective reads: m_range pages_read=1 row path result 70, m_all full batch sum 1096, etc. Need inspect source and case/store formats to identify marker/fast path bug and ingest marker behavior.",
+  "plan": "Read architecture/format docs, case files, then inspect C++ reader/audit and Rust ingest code. Also examine archive stores textual/binary format to infer slab markers and rows.",
+  "commands": [
+    {
+      "keystrokes": "cat /app/docs/architecture.md\ncat /app/docs/format-notes.md\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "printf '\\n--- cases ---\\n'; for f in /app/data/cases/*.case; do echo '###' $f; cat $f; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "printf '\\n--- archive strings/head ---\\n'; for f in /app/data/archive/*.store; do echo '###' $f; file $f; sed -n '1,80p' $f 2>/dev/null || true; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,240p' /app/cpp/src/store.cpp\nsed -n '1,240p' /app/cpp/src/main.cpp\nsed -n '1,220p' /app/cpp/src/parse.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,240p' /app/cpp/src/report.cpp\nsed -n '1,220p' /app/cpp/src/row.cpp\nsed -n '1,200p' /app/cpp/src/digest.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,260p' /app/rust/src/main.rs\nsed -n '1,260p' /app/rust/src/codec.rs\nsed -n '1,220p' /app/rust/src/model.rs\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

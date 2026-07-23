@@ -11,6 +11,7 @@ from unittest import mock
 import run_static_checks
 import sudhir_dossier
 import sudhir_task
+from repo_tests.test_dsv_humanizer import PASSING_TEXTS
 
 
 class SudhirDossierHelpersTest(unittest.TestCase):
@@ -90,9 +91,9 @@ class SudhirTaskDossierCommandsTest(unittest.TestCase):
             texts = root / "paste"
             texts.mkdir()
             for name, body in {
-                "d.txt": "This task is hard because unit test.",
-                "s.txt": "The solution rebuilds the path.",
-                "v.txt": "The tests checks exact cases.",
+                "d.txt": PASSING_TEXTS["difficulty"],
+                "s.txt": PASSING_TEXTS["solution"],
+                "v.txt": PASSING_TEXTS["verification"],
                 "r.txt": "Agent emits report digest, +5\n",
             }.items():
                 (texts / name).write_text(body, encoding="utf-8")
@@ -127,9 +128,10 @@ class SudhirTaskDossierCommandsTest(unittest.TestCase):
                 self.assertEqual(rc, 0)
                 rev = reviews / "form-task" / "REV-1"
                 self.assertIn("This task is hard because", (rev / "DIFFICULTY.md").read_text())
-                self.assertIn("The solution rebuilds", (rev / "SOLUTION.md").read_text())
+                self.assertIn("The repair establishes", (rev / "SOLUTION.md").read_text())
                 self.assertIn("The tests checks", (rev / "VERIFICATION.md").read_text())
                 self.assertIn("Agent emits report digest", (rev / "RUBRIC.md").read_text())
+                self.assertTrue((rev / sudhir_dossier.DSV_AUDIT_FILE).is_file())
 
 
 class Cm007StaticCheckTest(unittest.TestCase):

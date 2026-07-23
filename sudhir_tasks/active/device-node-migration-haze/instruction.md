@@ -1,0 +1,7 @@
+The cutover lab under `/app` copies a service root between staging trees. The tool reports success from file counts and exit codes. After cutover, device-backed services fail to open required nodes, lose major/minor identity, or bind the wrong path, while ordinary file bytes look intact. A non-device healthy control tree still migrates cleanly. Deliberately invalid device fixtures must remain rejected.
+
+Correct the pipeline so post-cutover opens, identities, and paths match the pre-cutover contract on failing fixtures, the file-only control stays green, and invalid fixtures stay rejected. Rebuild and invoke `/app/bin/haze`. Emit `/app/output/cutover_report.json` whose keys and layout follow the normative schema in `/app/docs/cutover-report-schema.md`. Do not replace the bundled fixtures or write the report by hand; the checks regenerate it through the compiled pipeline.
+
+Default input and output paths come from `/app/conf/runtime.conf`. Laboratory runs may override them with the `HAZE_TREES`, `HAZE_LEDGER`, and `HAZE_OUTPUT` environment variables. Repeated clean runs of the same inputs must be byte-identical. Malformed input must exit nonzero without writing a partial report.
+
+`/app/docs/cutover-report-schema.md` is the normative schema for `/app/output/cutover_report.json`. Graded fields include schema_version, runs, family, tag, mode, entry_count, exit_code, open_ok, identity_ok, path_ok, mode_ok, rejected, probes, summary, failing_ok, control_stable, reject_stable, and digest. Exact reproducibility digest rules live only in that schema document.

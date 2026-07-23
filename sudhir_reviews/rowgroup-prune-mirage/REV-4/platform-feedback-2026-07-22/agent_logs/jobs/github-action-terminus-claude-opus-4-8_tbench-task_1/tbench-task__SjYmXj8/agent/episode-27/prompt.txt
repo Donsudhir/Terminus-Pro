@@ -1,0 +1,31 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# cat /app/data/fresh/orders_a.csv
+origin,presence,amount,region
+0,1,-999,east
+2,1,10,east
+2,1,20,west
+2,1,30,west
+2,1,100,north
+2,0,555,north
+2,1,120,south
+2,1,130,south
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/store_a
+jobs=1 cells=8 bytes=182
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# cat /tmp/store_a/data.store
+H|3
+P|0|3|10|30|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|1|north|south|4
+R|1|2|100|north
+R|0|2|555|north
+R|1|2|120|south
+R|1|2|130|south
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app#

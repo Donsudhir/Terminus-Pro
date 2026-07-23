@@ -1,0 +1,19 @@
+{
+  "analysis": "Initial audit succeeds but likely contains incorrect entries: for example c_legit reports -999 which suggests a non-live/absent value is being included, and mixed archived selective cases may be skipping pages incorrectly. Need inspect source and store format.",
+  "plan": "Read architecture/format notes, case definitions, and source files for parsing stores, filtering live rows, skip logic, and ingest. Then identify marker/absent semantics and patch both C++ audit and Rust ingest if needed.",
+  "commands": [
+    {
+      "keystrokes": "cat /app/docs/architecture.md\nprintf '\\n--- format ---\\n'\ncat /app/docs/format-notes.md\nprintf '\\n--- cases ---\\n'\ncat /app/data/cases/*.case\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,240p' cpp/src/store.cpp\nprintf '\\n--- row ---\\n'\nsed -n '1,240p' cpp/src/row.cpp\nprintf '\\n--- parse ---\\n'\nsed -n '1,220p' cpp/src/parse.cpp\nprintf '\\n--- main ---\\n'\nsed -n '1,260p' cpp/src/main.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,260p' cpp/src/report.cpp\nprintf '\\n--- digest ---\\n'\nsed -n '1,160p' cpp/src/digest.cpp\nprintf '\\n--- rust codec ---\\n'\nsed -n '1,260p' rust/src/codec.rs\nprintf '\\n--- rust main ---\\n'\nsed -n '1,260p' rust/src/main.rs\nprintf '\\n--- rust model ---\\n'\nsed -n '1,220p' rust/src/model.rs\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

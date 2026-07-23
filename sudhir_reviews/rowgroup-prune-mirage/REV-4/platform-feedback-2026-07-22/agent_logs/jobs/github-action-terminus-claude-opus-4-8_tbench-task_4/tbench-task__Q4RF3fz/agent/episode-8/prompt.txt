@@ -1,0 +1,48 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# ls -la /app/data/archive /app/data/cases /app/data/fresh
+/app/data/archive:
+total 16
+drwxr-xr-x 2 root root 106 Jul 21 02:06 .
+drwxr-xr-x 5 root root  63 Jul 21 02:06 ..
+-rw-r--r-- 1 root root 185 Jul 21 02:06 current.store
+-rw-r--r-- 1 root root 273 Jul 21 02:06 healthy.store
+-rw-r--r-- 1 root root 305 Jul 21 02:06 mixed.store
+-rw-r--r-- 1 root root 249 Jul 21 02:06 vault.store
+
+/app/data/cases:
+total 8
+drwxr-xr-x 2 root root  59 Jul 21 02:06 .
+drwxr-xr-x 5 root root  63 Jul 21 02:06 ..
+-rw-r--r-- 1 root root 359 Jul 21 02:06 control.case
+-rw-r--r-- 1 root root 776 Jul 21 02:06 incident.case
+
+/app/data/fresh:
+total 12
+drwxr-xr-x 2 root root  66 Jul 21 02:06 .
+drwxr-xr-x 5 root root  63 Jul 21 02:06 ..
+-rw-r--r-- 1 root root 136 Jul 21 02:06 orders_a.csv
+-rw-r--r-- 1 root root 137 Jul 21 02:06 orders_b.csv
+-rw-r--r-- 1 root root 135 Jul 21 02:06 orders_c.csv
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# cat /app/data/cases/*.case 2>/dev/null | head -50
+# id|store|operation|x|y|path|skipping|operator note
+c_legit|/app/data/archive/current.store|eq|-999|0|batch|1|legitimate overlap
+h_skip|/app/data/archive/healthy.store|range|100|130|batch|1|selective control
+h_full|/app/data/archive/healthy.store|range|100|130|row|0|full control
+h_region|/app/data/archive/healthy.store|region_eq|north|0|row|1|text control
+# id|store|operation|x|y|path|skipping|operator note
+m_range|/app/data/archive/mixed.store|range|10|40|row|1|invoice window
+m_narrow|/app/data/archive/mixed.store|range|10|20|row|1|narrow window
+m_null|/app/data/archive/mixed.store|isnull|0|0|batch|0|missing count
+m_interact|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed window
+m_neg|/app/data/archive/mixed.store|range|-100|-1|batch|0|negative window
+m_all|/app/data/archive/mixed.store|all|0|0|batch|0|full tally
+v_window|/app/data/archive/vault.store|range|10|50|row|1|vault window
+v_missing|/app/data/archive/vault.store|isnull|0|0|batch|1|vault absent probe
+v_check|/app/data/archive/vault.store|isnull|0|0|row|1|vault absent recheck
+v_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault full control
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app#

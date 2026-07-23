@@ -1,0 +1,11 @@
+{
+  "analysis": "We have confirmed Rust marker fold is wrong: it spans all amounts rather than live-only and ignores non-live origin markers. C++ gate still trusts old low/high on gen2 slabs, which causes m_narrow to skip page0 incorrectly. Need inspect batch source output that didn't appear due screen limits, then patch both.",
+  "plan": "Use find with sed to print paths, and cat specific suspected files. Then patch Rust fold to compute live markers over present!=0 and origin!=0 (for fresh origin lanes), low/high 0 if no live rows, has_absent if any non-live. Patch C++ selective gate to avoid numeric skipping for old generation slabs with absent/incomplete markers, preserving gen3 healthy fast paths.",
+  "commands": [
+    {
+      "keystrokes": "find /app/cpp/src -type f -name '*.cpp' -printf '%p\\n'\nfor f in $(find /app/cpp/src -type f -name '*.cpp' | sort); do case \"$f\" in */row.cpp|*/harbor/veil.cpp|*/lattice/*|*batch*|*sweep*) echo \"### $f\"; cat \"$f\";; esac; done\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

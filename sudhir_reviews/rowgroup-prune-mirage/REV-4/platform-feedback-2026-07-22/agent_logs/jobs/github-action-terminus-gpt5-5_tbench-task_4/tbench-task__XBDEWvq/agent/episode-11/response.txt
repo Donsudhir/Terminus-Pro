@@ -1,0 +1,15 @@
+{
+  "analysis": "The build now succeeds and the bundled audit is deterministic across repeated runs. Results changed in the expected areas: mixed/vault archived generation-2 slabs are opened instead of trusting incomplete markers, and batch no longer treats retired-origin rows as live. Healthy cases and fast-path skipping are preserved (h_skip still reads 1 of 3 pages). Need do a quick fresh ingest validation to ensure data.store is written and markers are live-value faithful.",
+  "plan": "Run /app/bin/loam ingest on bundled fresh CSVs into temporary directories, inspect the generated data.store headers, and run a small audit over fresh stores with equivalent row/batch cases to ensure readers agree. This also verifies the public ingest entry point.",
+  "commands": [
+    {
+      "keystrokes": "rm -rf /app/output/fresh_test /app/output/fresh_cases /app/output/fresh_audit.json\nmkdir -p /app/output/fresh_test /app/output/fresh_cases\nfor c in /app/data/fresh/*.csv; do d=/app/output/fresh_test/$(basename \"$c\" .csv); /app/bin/loam ingest \"$c\" \"$d\"; echo \"### $d/data.store\"; cat \"$d/data.store\"; done\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "cat > /app/output/fresh_cases/fresh.case <<'EOF'\n# id|store|operation|x|y|path|skipping|operator note\nfa_row|/app/output/fresh_test/orders_a/data.store|all|0|0|row|0|fresh all row\nfa_batch|/app/output/fresh_test/orders_a/data.store|all|0|0|batch|0|fresh all batch\nfa_range_row|/app/output/fresh_test/orders_a/data.store|range|-1000|1000|row|1|fresh range row\nfa_range_batch|/app/output/fresh_test/orders_a/data.store|range|-1000|1000|batch|1|fresh range batch\nfb_null_row|/app/output/fresh_test/orders_b/data.store|isnull|0|0|row|1|fresh null row\nfb_null_batch|/app/output/fresh_test/orders_b/data.store|isnull|0|0|batch|1|fresh null batch\nEOF\n/app/bin/loam audit /app/output/fresh_cases /app/output/fresh_audit.json && cat /app/output/fresh_audit.json\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+} 

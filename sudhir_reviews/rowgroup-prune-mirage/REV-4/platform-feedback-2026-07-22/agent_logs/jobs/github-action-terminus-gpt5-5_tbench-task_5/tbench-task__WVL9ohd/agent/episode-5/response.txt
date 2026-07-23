@@ -1,0 +1,15 @@
+{
+  "analysis": "Need patch C++ batch live semantics and gate interpretation. Before patching, inspect full archived stores and maybe run equivalent manual cases to infer correct rows/totals/pages_read. Then edit source.",
+  "plan": "Display full vault/mixed/current stores. Create a temporary case file with equivalent row/batch/skipping/non-skipping probes over mixed/vault to compare current behavior and guide expected behavior.",
+  "commands": [
+    {
+      "keystrokes": "for f in /app/data/archive/mixed.store /app/data/archive/vault.store /app/data/archive/current.store; do echo \"### $f\"; cat \"$f\"; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "rm -rf /tmp/loamcases && mkdir -p /tmp/loamcases && cat > /tmp/loamcases/x.case <<'EOF'\n# id|store|operation|x|y|path|skipping|operator note\nmr_row_full|/app/data/archive/mixed.store|range|10|40|row|0|x\nmr_batch_full|/app/data/archive/mixed.store|range|10|40|batch|0|x\nmr_row_skip|/app/data/archive/mixed.store|range|10|40|row|1|x\nmr_batch_skip|/app/data/archive/mixed.store|range|10|40|batch|1|x\nmi_row_full|/app/data/archive/mixed.store|range|-1000|25|row|0|x\nmi_batch_full|/app/data/archive/mixed.store|range|-1000|25|batch|0|x\nmi_row_skip|/app/data/archive/mixed.store|range|-1000|25|row|1|x\nmi_batch_skip|/app/data/archive/mixed.store|range|-1000|25|batch|1|x\nmall_row|/app/data/archive/mixed.store|all|0|0|row|0|x\nmall_batch|/app/data/archive/mixed.store|all|0|0|batch|0|x\nmn_row_full|/app/data/archive/mixed.store|range|10|20|row|0|x\nmn_batch_full|/app/data/archive/mixed.store|range|10|20|batch|0|x\nmn_row_skip|/app/data/archive/mixed.store|range|10|20|row|1|x\nmn_batch_skip|/app/data/archive/mixed.store|range|10|20|batch|1|x\nvis_row_full|/app/data/archive/vault.store|isnull|0|0|row|0|x\nvis_batch_full|/app/data/archive/vault.store|isnull|0|0|batch|0|x\nvis_row_skip|/app/data/archive/vault.store|isnull|0|0|row|1|x\nvis_batch_skip|/app/data/archive/vault.store|isnull|0|0|batch|1|x\nEOF\n/app/bin/loam audit /tmp/loamcases /tmp/x.json && cat /tmp/x.json\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+} 

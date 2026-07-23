@@ -1,0 +1,72 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app# cat /app/docs/architecture.md /app/docs/format-notes.md
+# Loam architecture
+
+Loam is a small offline columnar lab used by release engineering before storage
+changes reach the billing warehouse. `rust/` owns import and compaction. It emits
+self-describing slabs with value lanes, presence lanes, origin lanes, text codes,
+and compact markers. `cpp/` owns reads. The harbor stage decides which slabs are
+needed, then either the row reader or lattice reader computes a tally. The row
+reader walks record structs; the lattice reader consumes per-slab column lanes.
+
+The command front end reads every `.case` file in bytewise filename order and
+every record in source order. Structured counters come from the selected reader,
+not from estimates. Artifact files are append-free after creation; a reader must
+not repair them in place.
+
+`/app/tools/reset-lab` restores the bundled drill data before a clean replay.
+
+Older slabs are supported because disaster-recovery snapshots outlive the writer
+that created them. Newer writers can add header generations, but readers remain
+responsible for interpreting each slab according to its own header and local
+markers.
+# Format notes from the v2 rollout
+
+These notes were copied from the rollout ticket and may lag the current reader.
+They are useful background only. The operational grading contract for audit JSON,
+per-case counters, ingest output naming, and live-value markers is
+`/app/docs/report-schema.md`.
+
+A file begins with `H|generation`. Each `P` record describes one slab, followed
+by the declared number of `R` records. The row record carries presence, origin,
+amount, and region. Marker fields let readers avoid opening slabs for predicates
+that cannot match.
+
+The v2 rollout assumed the amount lane remained sufficient to recognize missing
+historical values because old producers reserved one amount. The later writer
+kept origin and presence lanes to support mixed compaction and legitimate values
+that overlap old conventions. If these assumptions conflict, the artifact and a
+full reader are stronger evidence than this note.
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app# cat /app/tools/build-all /app/tools/reset-lab /app/Makefile
+#!/bin/bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+mkdir -p "$ROOT/bin"
+
+cargo build --manifest-path "$ROOT/rust/Cargo.toml" --release --offline
+make -C "$ROOT/cpp" clean all
+install -m 0755 "$ROOT/rust/target/release/loam-ingest" "$ROOT/bin/loam-ingest"
+install -m 0755 "$ROOT/cpp/build/loam" "$ROOT/bin/loam"
+#!/bin/bash
+set -euo pipefail
+
+rm -rf /app/data
+mkdir -p /app/data
+cp -R /opt/loam-seed/. /app/data/
+rm -rf /app/output
+mkdir -p /app/output
+.PHONY: all clean
+
+all:
+        ./tools/build-all
+
+clean:
+        $(MAKE) -C cpp clean
+        rm -rf rust/target bin
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app#

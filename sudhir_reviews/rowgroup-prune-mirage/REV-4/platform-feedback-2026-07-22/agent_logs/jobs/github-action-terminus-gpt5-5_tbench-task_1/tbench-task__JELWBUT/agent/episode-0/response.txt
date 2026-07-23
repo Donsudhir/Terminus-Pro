@@ -1,0 +1,23 @@
+{
+  "analysis": "We are at a shell prompt in /app with no commands run yet. Need inspect repository structure, understand implementation, reproduce audit, identify discrepancy, patch, rebuild, and verify.",
+  "plan": "List files, inspect docs/schema and source tree, then run the bundled audit to see current output. After that, locate code handling store markers/selective reads/batch execution and fix marker semantics for archived mixed-generation stores and fresh ingest.",
+  "commands": [
+    {
+      "keystrokes": "ls -la\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "find . -maxdepth 3 -type f | sed 's#^./##' | sort | head -200\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/docs/report-schema.md\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && cat /app/output/audit.json\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+}

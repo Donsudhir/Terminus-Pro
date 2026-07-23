@@ -1,6 +1,6 @@
 # Platform snapshot (sanitized)
 
-Captured: 2026-07-22T03:00:34Z
+Captured: 2026-07-23T13:16:09Z
 
 ## Scalars
 - difficulty: HARD

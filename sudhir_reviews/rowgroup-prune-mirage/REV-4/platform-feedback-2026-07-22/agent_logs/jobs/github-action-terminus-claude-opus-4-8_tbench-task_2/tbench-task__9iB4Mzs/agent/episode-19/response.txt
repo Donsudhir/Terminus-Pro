@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "All three fixes written. Now rebuild with the build-all tool.",
+  "plan": "Run /app/tools/build-all and observe for errors.",
+  "commands": [
+    {"keystrokes": "/app/tools/build-all\n", "duration": 30.0}
+  ]
+}
+```

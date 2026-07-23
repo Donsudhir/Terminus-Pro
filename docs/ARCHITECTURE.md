@@ -65,6 +65,7 @@ any of those.
   index, refreshed by package/revise transactions.
 - `repo_tests/fixtures/submission_index.json` — immutable historical-corpus
   regression index.
+- `dsv_humanizer.py` — acceptance-safe atomic DSV policy and hash audit.
 
 ## Task skeletons
 
@@ -88,6 +89,7 @@ No UI scaffold is shipped; exempt revisions use pytest + Playwright Python.
 - `sudhir_knowledge/LONG_HORIZON_TASK_PHILOSOPHY.md` — new-idea causal
   investigation doctrine and anti-overengineering boundary.
 - `skills/` (path locked in phase 2) — opt-in workflow macros.
+- `.agents/skills/terminus-dsv-humanizer/` — pinned DSV-only model audit.
 
 ## Test layer
 

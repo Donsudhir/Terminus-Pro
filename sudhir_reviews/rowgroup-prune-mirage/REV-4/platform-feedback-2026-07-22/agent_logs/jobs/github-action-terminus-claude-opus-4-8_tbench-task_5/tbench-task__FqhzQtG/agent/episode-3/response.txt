@@ -1,0 +1,11 @@
+```json
+{
+  "analysis": "I see the data model. Cell has present, origin, amount, region. Slab has markers low/high/has_absent. Need to understand how 'live' rows are determined and how the two readers (row and batch) differ.",
+  "plan": "Read the exec and plan headers, then the reader implementations (row.cpp, lattice/bay.cpp, lattice/rill.cpp, harbor/pale.cpp, harbor/veil.cpp).",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/include/loam/exec.hpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/include/loam/plan.hpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/include/loam/report.hpp\n", "duration": 0.1}
+  ]
+}
+```

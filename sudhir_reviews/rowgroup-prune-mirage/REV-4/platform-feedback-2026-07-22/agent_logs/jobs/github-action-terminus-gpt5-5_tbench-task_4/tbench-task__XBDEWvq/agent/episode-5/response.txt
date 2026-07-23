@@ -1,0 +1,19 @@
+{
+  "analysis": "The terminal is showing the Rust reed module: it passes amount, present, origin lanes to fold. We need inspect exact fold and C++ batch source; prior large output likely omitted it. Then apply focused patches.",
+  "plan": "Print cpp source filenames, batch/lattice implementation files, and Rust fold. If batch has a separate live predicate bug, patch it. Also create shared helper if needed.",
+  "commands": [
+    {
+      "keystrokes": "find /app/cpp/src -type f -name '*.cpp' -print | sort\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "for f in /app/cpp/src/lattice/*.cpp /app/cpp/src/batch*.cpp /app/cpp/src/*batch*.cpp /app/cpp/src/row.cpp /app/cpp/src/harbor/veil.cpp; do [ -f \"$f\" ] && { echo \"### $f\"; nl -ba \"$f\" | sed -n '1,220p'; }; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "echo '### rust fold'; nl -ba /app/rust/src/ember/fold.rs | sed -n '1,220p'\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+} 

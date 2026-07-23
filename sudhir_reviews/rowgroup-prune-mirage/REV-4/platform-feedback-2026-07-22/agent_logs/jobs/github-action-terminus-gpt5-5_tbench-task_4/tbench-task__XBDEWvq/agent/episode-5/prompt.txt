@@ -1,0 +1,41 @@
+Current Terminal Screen:
+     5      let mut pages = Vec::new();
+     6      for (id, chunk) in cells.chunks(width).enumerate() {
+     7          let values: Vec<i64> = chunk.iter().map(|cell| cell.amount).collect();
+     8          let present: Vec<u8> = chunk.iter().map(|cell| cell.present).collect();
+     9          let origins: Vec<u8> = chunk.iter().map(|cell| cell.origin).collect();
+    10          let mark = tilt_a(&values, &present, &origins)?;
+    11
+    12          let mut regions: Vec<String> = chunk.iter().map(|cell| cell.region.clone()).collect();
+    13          regions.sort();
+    14          let region_low = regions.first().cloned().unwrap_or_default();
+    15          let region_high = regions.last().cloned().unwrap_or_default();
+    16          pages.push(Page {
+    17              id,
+    18              generation: 3,
+    19              mark,
+    20              region_low,
+    21              region_high,
+    22              cells: chunk.to_vec(),
+    23          });
+    24      }
+    25      Ok(pages)
+    26  }
+### /app/rust/src/ember/pale.rs
+     1  #[derive(Clone, Debug, Default)]
+     2  pub(crate) struct Dial {
+     3      pub jobs: usize,
+     4      pub cells: usize,
+     5      pub bytes: usize,
+     6  }
+     7
+     8  pub(crate) fn tilt_d(a: &mut Dial, b: usize, c: usize) {
+     9      a.jobs += 1;
+    10      a.cells += b;
+    11      a.bytes += c;
+    12  }
+### /app/rust/src/ember/mod.rs
+     1  pub(crate) mod fold;
+     2  pub(crate) mod pale;
+     3  pub(crate) mod reed;
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app#

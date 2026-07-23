@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "parse.cpp parses case files. Now let me look at store.cpp which loads the store and interprets slabs/generations/markers.",
+  "plan": "Read store.cpp.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/store.cpp\n", "duration": 0.1}
+  ]
+}
+```

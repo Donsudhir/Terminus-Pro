@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "FOUND THE BUG. In rill.cpp (batch/lattice reader), the 'admit' logic only checks `presence_lane[i] != 0`. But the row reader's is_live logic is: Retired=false, Inherited=true, Current=present!=0. So the batch reader ignores origin_lane entirely! For Inherited entries with present==0, the row reader considers them live but the batch reader does not. And for Retired entries with present!=0, row reader says not-live but batch says live. This is the disagreement on mixed-generation stores with varied origin lanes. I need to fix the admit logic in rill.cpp to match is_live.",
+  "plan": "Before fixing, let me look at harbor (pale.cpp, veil.cpp) for the skip/admission logic which uses markers, and check store.cpp/parse.cpp for how markers/generation are interpreted. The 'incomplete markers' and 'skipping' fast path may also cause issues.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/harbor/pale.cpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/src/harbor/veil.cpp\n", "duration": 0.1}
+  ]
+}
+```

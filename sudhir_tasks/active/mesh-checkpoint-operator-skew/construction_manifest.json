@@ -1,0 +1,75 @@
+{
+  "symbol_table": [
+    {
+      "path": "native/span.cpp",
+      "symbol": "braid_q",
+      "kind": "function",
+      "signature": "int32_t braid_q(const int32_t* a, int32_t b, uint64_t* c);",
+      "purpose": "Records and restores a geometry generation token across the native lifecycle boundary."
+    },
+    {
+      "path": "host/shelf.rs",
+      "symbol": "latch_r",
+      "kind": "function",
+      "signature": "pub(crate) fn latch_r(a: u64, b: &mut Shelf) -> i8",
+      "purpose": "Rebinds host reuse context from shelf state after a remesh-capable restore."
+    },
+    {
+      "path": "pack/fold.f90",
+      "symbol": "sift_s",
+      "kind": "function",
+      "signature": "integer(c_int) function sift_s(a, b, c) bind(C)",
+      "purpose": "Folds solution samples into a stable digest under the active ordering."
+    }
+  ],
+  "flipping_point_contract": {
+    "locations": [
+      {
+        "id": "A",
+        "path": "native/span.cpp",
+        "controls_tests": ["test_m01", "test_m02", "test_m06", "test_m10"]
+      },
+      {
+        "id": "B",
+        "path": "host/shelf.rs",
+        "controls_tests": ["test_m03", "test_m05", "test_m07", "test_m11"]
+      },
+      {
+        "id": "C",
+        "path": "pack/fold.f90",
+        "controls_tests": ["test_m04", "test_m08", "test_m09", "test_m12"]
+      }
+    ],
+    "no_single_location_flips_majority": true,
+    "concentration_cap": 0.5
+  },
+  "decoy_manifest": [
+    {
+      "path": "native/ledge.cpp",
+      "kind": "helper",
+      "rhymes_with": "braid_q",
+      "non_fix_purpose": "Computes ordinary geometry statistics for diagnostic banners."
+    },
+    {
+      "path": "host/locker.rs",
+      "kind": "helper",
+      "rhymes_with": "latch_r",
+      "non_fix_purpose": "Maps display codes for status lines without affecting shelf rebinds."
+    },
+    {
+      "path": "pack/tally.f90",
+      "kind": "helper",
+      "rhymes_with": "sift_s",
+      "non_fix_purpose": "Folds scalar diagnostic marks into aggregate counters."
+    }
+  ],
+  "code_forbidden_tokens": [
+    "scientific", "mesh", "lab", "app", "case", "checkpoints", "mid-run", "remeshes",
+    "resumes", "resume", "residual", "norms", "iteration", "counts", "solution-field",
+    "digests", "twin", "pointwise", "samples", "runs", "checkpoint", "rebuilds",
+    "pipeline", "interrupted", "uninterrupted", "trajectories", "agreement", "field",
+    "contracts", "healthy", "no-checkpoint", "control", "bin", "meshlab", "output",
+    "parity_report", "json", "keys", "layout", "schema", "docs", "parity-report-schema",
+    "inputs", "report", "checks", "compiled", "bundled"
+  ]
+}

@@ -23,4 +23,6 @@ instruction_checks = [
   "ledger",
   "digest",
   "scale summary",
+  "schema_version",
+  "report-format",
 ]

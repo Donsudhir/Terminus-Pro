@@ -1,0 +1,11 @@
+```json
+{
+  "analysis": "Fresh ingest markers are now faithful:\n- Slab0: cells -999(origin0=Retired,not live), 10,20,30(live). Live range [10,30]. Marker low=10,high=30 ✓. has_absent=1 (retired -999 present) ✓.\n- Slab1: 100(live),555(present0,not live),120,130(live). Live range [100,130]. Marker low=100,high=130 ✓. has_absent=1 (present=0 entry) ✓.\n\nThis is correct. Now let me verify the fresh store works through the audit contract with equivalent modes agreeing. Let me create a test case directory pointing at the fresh store and run both row and batch with/without skip to confirm agreement.",
+  "plan": "Create test cases for the fresh store covering row/batch and skip/full for range and isnull, run audit, verify equivalent modes agree and selective prunes.",
+  "commands": [
+    {"keystrokes": "mkdir -p /tmp/fcases; printf 'f_row|/tmp/store_a/data.store|range|10|130|row|0|full\\nf_batch|/tmp/store_a/data.store|range|10|130|batch|0|full\\nf_rskip|/tmp/store_a/data.store|range|10|130|row|1|skip\\nf_bskip|/tmp/store_a/data.store|range|10|130|batch|1|skip\\nf_null_r|/tmp/store_a/data.store|isnull|0|0|row|0|null\\nf_null_b|/tmp/store_a/data.store|isnull|0|0|batch|1|null\\nf_narrow|/tmp/store_a/data.store|range|10|30|batch|1|narrow\\n' > /tmp/fcases/f.case\n", "duration": 0.1},
+    {"keystrokes": "/app/bin/loam audit /tmp/fcases /tmp/fout.json\n", "duration": 1.0},
+    {"keystrokes": "python3 -m json.tool /tmp/fout.json\n", "duration": 0.3}
+  ]
+}
+```

@@ -1,0 +1,6 @@
+{"phase":"prep","family":"failing_alpha","note":"stage copy begin"}
+{"phase":"swap","family":"failing_alpha","note":"staging swap"}
+{"phase":"probe","family":"failing_alpha","note":"open probe"}
+{"phase":"prep","family":"control_plain","note":"stage copy begin"}
+{"phase":"swap","family":"control_plain","note":"staging swap"}
+{"phase":"prep","family":"reject_delta","note":"reject candidate"}

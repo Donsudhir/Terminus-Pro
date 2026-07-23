@@ -1,0 +1,23 @@
+{
+  "analysis": "The rebuilt audit now returns corrected bundled totals: retired origin rows are excluded from live sums and included as nulls, while current legitimate -999 remains live. However, the selective isnull gate should be made fully safe for any legacy generation slab, not just legacy slabs with an origin=0 visible, because old has_absent markers may be incomplete. Need make that small robustness adjustment and verify repeatability and fresh ingest markers.",
+  "plan": "Patch the isnull selective gate to always read generation<3 slabs. Rebuild. Run the bundled audit twice and compare bytes. Ingest the sample fresh CSVs into temp directories, inspect the generated marker records, and run a small custom fresh audit to exercise the resulting stores.",
+  "commands": [
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np=Path('cpp/src/harbor/veil.cpp')\ns=p.read_text()\ns=s.replace('''    if (b.op == Op::IsNull) {\\n        const bool possible = a.has_absent || legacy_has_retired(a);\\n        return {possible, possible ? \"possible\" : \"empty\"};\\n    }\\n''','''    if (b.op == Op::IsNull) {\\n        const bool possible = a.generation < 3 || a.has_absent || legacy_has_retired(a);\\n        return {possible, possible ? \"possible\" : \"empty\"};\\n    }\\n''')\np.write_text(s)\nPY\n/app/tools/build-all\n",
+      "duration": 10.0
+    },
+    {
+      "keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && cp /app/output/audit.json /tmp/audit1.json && /app/bin/loam audit /app/data/cases /tmp/audit2.json && cmp -s /tmp/audit1.json /tmp/audit2.json && cat /app/output/audit.json\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "rm -rf /tmp/loam-fresh && mkdir -p /tmp/loam-fresh\nfor csv in /app/data/fresh/*.csv; do name=$(basename \"$csv\" .csv); /app/bin/loam ingest \"$csv\" \"/tmp/loam-fresh/$name\"; echo \"--- $name csv\"; cat \"$csv\"; echo \"--- $name inspect\"; /app/bin/loam inspect \"/tmp/loam-fresh/$name/data.store\"; done\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "mkdir -p /tmp/loam-fresh-cases\ncat > /tmp/loam-fresh-cases/fresh.case <<'EOF'\na_all|/tmp/loam-fresh/orders_a/data.store|all|0|0|batch|0|fresh all\na_null|/tmp/loam-fresh/orders_a/data.store|isnull|0|0|row|1|fresh null\na_range_row|/tmp/loam-fresh/orders_a/data.store|range|-1000|1000|row|1|fresh range row\na_range_batch|/tmp/loam-fresh/orders_a/data.store|range|-1000|1000|batch|1|fresh range batch\nb_all|/tmp/loam-fresh/orders_b/data.store|all|0|0|batch|0|fresh all\nc_null|/tmp/loam-fresh/orders_c/data.store|isnull|0|0|batch|1|fresh null\nEOF\n/app/bin/loam audit /tmp/loam-fresh-cases /tmp/loam-fresh-audit.json && cat /tmp/loam-fresh-audit.json\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+} 

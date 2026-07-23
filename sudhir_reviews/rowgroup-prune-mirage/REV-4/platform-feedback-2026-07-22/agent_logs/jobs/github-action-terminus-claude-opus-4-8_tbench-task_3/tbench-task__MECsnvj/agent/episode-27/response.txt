@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "Everything validates:\n1. Archive stores are UNCHANGED (diff against seed = ARCHIVE_UNCHANGED). Readers interpret them without rewriting.\n2. Audit is DETERMINISTIC (byte-identical across runs) with status complete, cases, digest present.\n3. Both fast paths (row + batch) still in use.\n4. Equivalent modes now agree on row_count and sum_amount for archived mixed-gen stores (m_range/m_narrow/m_interact/m_neg/m_all/m_null, and vault v_missing/v_check/v_full all consistent).\n5. Healthy selective controls keep pages_read < pages_total (h_skip=1<3) and correct answers.\n6. Fresh ingest writes faithful markers: low/high span only live amounts, has_absent when any non-live present, all-non-live slab => 0/0/true.\n7. Fresh stores audit correctly with equivalent modes agreeing.\n\nThe root causes fixed:\n- cpp/src/lattice/rill.cpp: batch reader admission now uses the same is_live rule (origin Retired=not live, Inherited=live, Current=present!=0) instead of presence-only, matching the row reader.\n- cpp/src/harbor/veil.cpp: skip fast path no longer trusts legacy (generation < 3) slab markers, which carried non-live amounts and unreliable has_absent; those slabs are read so answers stay correct while gen-3 markers still enable skipping.\n- rust/src/ember/fold.rs: fresh ingest marker computation now spans only live amounts and sets has_absent for any non-live entry, with the all-non-live edge case recording 0/0/true.\n\nThe task is complete.",
+  "plan": "All requirements met. The task is complete.",
+  "commands": [],
+  "task_complete": true
+}
+```

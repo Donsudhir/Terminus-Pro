@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "The harbor (turn_b) uses markers low/high/has_absent for skipping. The core bug is in rill.cpp (batch reader) which ignores origin_lane. I need the batch reader to apply the same liveness rule: Retired=not live, Inherited=live, Current=present!=0. Let me also examine the Rust ingest side and the data cases to understand markers. First let me look at the data directory and a store file.",
+  "plan": "Examine the data directory, cases, and a sample store file to understand the format and mixed generations.",
+  "commands": [
+    {"keystrokes": "ls -R /app/data | head -50\n", "duration": 0.1},
+    {"keystrokes": "ls /app/data/cases\n", "duration": 0.1}
+  ]
+}
+```

@@ -1,0 +1,76 @@
+{
+  "symbol_table": [
+    {
+      "path": "loom/loom.c",
+      "symbol": "knit_p",
+      "kind": "function",
+      "signature": "int32_t knit_p(const uint8_t* a, size_t b, uint64_t* c);",
+      "purpose": "Decodes packed ledger records and rematerializes special entries into the destination staging tree."
+    },
+    {
+      "path": "veil/veil.rs",
+      "symbol": "hinge_q",
+      "kind": "function",
+      "signature": "pub(crate) fn hinge_q(a: u64, b: &mut Roster) -> i8",
+      "purpose": "Applies mode and owner fidelity for entries during cutover using the active roster context."
+    },
+    {
+      "path": "tether/tether.rs",
+      "symbol": "moor_r",
+      "kind": "function",
+      "signature": "pub(crate) fn moor_r(a: u64, b: &mut Anchor) -> i8",
+      "purpose": "Rebinds open targets after staging swap under the active relative-anchor context."
+    }
+  ],
+  "flipping_point_contract": {
+    "locations": [
+      {
+        "id": "A",
+        "path": "loom/loom.c",
+        "controls_tests": ["test_h01", "test_h02", "test_h06", "test_h10"]
+      },
+      {
+        "id": "B",
+        "path": "veil/veil.rs",
+        "controls_tests": ["test_h03", "test_h05", "test_h07", "test_h11"]
+      },
+      {
+        "id": "C",
+        "path": "tether/tether.rs",
+        "controls_tests": ["test_h04", "test_h08", "test_h09", "test_h12"]
+      }
+    ],
+    "no_single_location_flips_majority": true,
+    "concentration_cap": 0.5
+  },
+  "decoy_manifest": [
+    {
+      "path": "loom/ledge.c",
+      "kind": "helper",
+      "rhymes_with": "knit_p",
+      "non_fix_purpose": "Counts ordinary entries for diagnostic banners without rematerializing specials."
+    },
+    {
+      "path": "veil/cloak.rs",
+      "kind": "helper",
+      "rhymes_with": "hinge_q",
+      "non_fix_purpose": "Maps display codes for status lines without changing roster fidelity."
+    },
+    {
+      "path": "tether/berth.rs",
+      "kind": "helper",
+      "rhymes_with": "moor_r",
+      "non_fix_purpose": "Formats alias labels for logs without rebinding open targets."
+    }
+  ],
+  "code_forbidden_tokens": [
+    "app", "bin", "bind", "broken", "bundled", "bytes", "checks", "code", "codes", "compiled", "contract",
+    "control", "counts", "cutover", "cutover-report-schema", "cutover_report", "device",
+    "device-backed", "docs", "emit", "exit", "expected", "failing", "file", "file-only", "fixture",
+    "fixtures", "green", "hand", "haze", "healthy", "identities", "identity", "intact", "invoke",
+    "json", "keys", "lab", "layout", "major", "major/minor", "migrates", "minor", "node", "nodes",
+    "non-device", "normative", "opens", "ordinary", "output", "path", "paths", "pipeline",
+    "pre-cutover", "rebuild", "regenerate", "rejected", "remain", "replace", "report", "required",
+    "root", "schema", "service", "services", "staging", "success", "tool", "tree", "trees", "write"
+  ]
+}

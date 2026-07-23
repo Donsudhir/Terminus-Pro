@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "The store loads slabs. run_case uses turn_b (gate/harbor), then sweep_c (batch/lattice) or walk_row (row reader). Let me read the harbor (turn_b/turn_d), the row reader, and the lattice reader.",
+  "plan": "Read row.cpp, harbor files, and lattice files.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/row.cpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/src/harbor/pale.cpp /app/cpp/src/harbor/veil.cpp\n", "duration": 0.1}
+  ]
+}
+```

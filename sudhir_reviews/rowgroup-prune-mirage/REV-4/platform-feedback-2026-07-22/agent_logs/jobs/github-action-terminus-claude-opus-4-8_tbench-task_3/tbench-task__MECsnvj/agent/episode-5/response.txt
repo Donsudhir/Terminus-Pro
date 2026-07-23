@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "The row reader's is_live logic: Retired=not live, Inherited=live, Current=present!=0. This is the reference/row logic. Now I need to see the lattice (batch) reader to find where it disagrees.",
+  "plan": "Read bay.cpp and rill.cpp (lattice batch reader).",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/lattice/bay.cpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/src/lattice/rill.cpp\n", "duration": 0.1}
+  ]
+}
+```

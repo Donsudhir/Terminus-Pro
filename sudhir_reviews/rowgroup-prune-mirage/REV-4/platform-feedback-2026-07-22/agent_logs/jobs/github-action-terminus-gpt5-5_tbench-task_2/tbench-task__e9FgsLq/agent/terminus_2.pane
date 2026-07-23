@@ -1,0 +1,2123 @@
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# clear
+[?2004l[H[J[3J[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# ls -la
+[?2004ltotal 4
+drwxr-xr-x 1 root root 90 Jul 21 02:06 .
+drwxr-xr-x 1 root root 71 Jul 21 02:08 ..
+-rw-r--r-- 1 root root 97 Jan  1  1970 Makefile
+drwxr-xr-x 2 root root 49 Jul 21 02:07 bin
+drwxr-xr-x 2 root root 30 Jul 21 02:06 config
+drwxr-xr-x 1 root root 10 Jul 21 02:07 cpp
+drwxr-xr-x 5 root root 63 Jul 21 02:06 data
+drwxr-xr-x 2 root root 92 Jul 21 02:06 docs
+drwxr-xr-x 2 root root 10 Jul 21 02:06 output
+drwxr-xr-x 1 root root 32 Jul 21 02:07 rust
+drwxr-xr-x 2 root root 52 Jul 21 02:06 tools
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# find . -maxdepth 3 -type f | sed 's#^./##' | sort | head -200
+[?2004lMakefile
+bin/loam
+bin/loam-ingest
+config/lab.conf
+cpp/Makefile
+cpp/src/digest.cpp
+cpp/src/main.cpp
+cpp/src/parse.cpp
+cpp/src/report.cpp
+cpp/src/row.cpp
+cpp/src/store.cpp
+data/archive/current.store
+data/archive/healthy.store
+data/archive/mixed.store
+data/archive/vault.store
+data/cases/control.case
+data/cases/incident.case
+data/fresh/orders_a.csv
+data/fresh/orders_b.csv
+data/fresh/orders_c.csv
+docs/architecture.md
+docs/format-notes.md
+docs/report-schema.md
+rust/Cargo.lock
+rust/Cargo.toml
+rust/src/codec.rs
+rust/src/main.rs
+rust/src/model.rs
+rust/src/report.rs
+tools/build-all
+tools/reset-lab
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# cat /app/docs/report-schema.md
+[?2004l# Loam audit report contract
+
+This document is the normative grading reference for `/app/bin/loam audit`
+JSON output and for fresh ingest artifacts. Architecture and rollout notes are
+background only; when they disagree with this file, this file wins.
+
+## Audit JSON
+
+UTF-8 JSON object written to the report path passed to `audit`.
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `status` | string | Always the literal `complete` when the run finishes successfully. |
+| `cases` | array | One object per `.case` file, in bytewise filename order. |
+| `digest` | string | Non-empty hex digest of the serialized `cases` body. |
+
+### Each element of `cases`
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `case_id` | string | Identifier from the case line. |
+| `row_count` | integer | Number of qualifying live rows included in the answer. |
+| `sum_amount` | integer | Sum of amounts for those qualifying live rows. |
+| `pages_total` | integer | Number of slabs present in the store for the case. |
+| `pages_read` | integer | Number of slabs actually opened for the case. |
+| `path` | string | Execution lane used: `row` or `batch`. |
+| `skipping` | boolean | Whether selective admission was requested for the case. |
+
+`row_count`, `sum_amount`, `pages_total`, and `pages_read` are the per-case
+answer and work counters. Equivalent modes on the same store and probe must
+agree on `row_count` and `sum_amount`. Selective healthy controls must keep
+`pages_read` strictly below `pages_total` while still returning the correct
+answer. Repeated identical audits must emit byte-identical report files.
+
+## Fresh ingest artifact
+
+`/app/bin/loam ingest <CSV> <store-directory>` writes exactly:
+
+`<store-directory>/data.store`
+
+No other store filename is accepted for grading.
+
+## Faithful live-value markers
+
+Each slab in a store carries numeric markers `low`, `high`, and `has_absent`.
+
+- `low` and `high` span only live amounts in that slab.
+- `has_absent` is true when the slab contains any non-live entry.
+- A slab whose entries are all non-live records `low` 0, `high` 0, and
+  `has_absent` true.
+- Fresh ingest must keep those markers faithful to the live-value domain of the
+  CSV it wrote. Archived mixed-generation stores keep their on-disk markers;
+  readers must interpret them without rewriting the artifact.
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# /app/tools/build-all
+[?2004l[0m[0m[1m[32m   Compiling[0m loam-ingest v0.8.0 (/app/rust)
+[0m[0m[1m[36m    Building[0m [                             ] 0/1: loam-ingest(bin)                                                                                            [K[0m[1m[33mwarning[0m[0m[1m: constant `RUNE_VOID` is never used[0m
+[0m [0m[0m[1m[38;5;12m--> [0m[0msrc/model.rs:1:1[0m
+[0m  [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m1[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0mpub(crate) const RUNE_VOID: u8 = 0;[0m
+[0m  [0m[0m[1m[38;5;12m| [0m[0m[1m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+[0m  [0m[0m[1m[38;5;12m|[0m
+[0m  [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(dead_code)]` on by default[0m
+
+[0m[0m[1m[36m    Building[0m [                             ] 0/1: loam-ingest(bin)                                                                                            [K[0m[1m[33mwarning[0m[0m[1m: constant `RUNE_FIXED` is never used[0m
+[0m [0m[0m[1m[38;5;12m--> [0m[0msrc/model.rs:2:1[0m
+[0m  [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m2[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0mpub(crate) const RUNE_FIXED: u8 = 1;[0m
+[0m  [0m[0m[1m[38;5;12m| [0m[0m[1m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+
+[0m[0m[1m[36m    Building[0m [                             ] 0/1: loam-ingest(bin)                                                                                            [K[0m[0m[1m[33mwarning[0m[1m:[0m `loam-ingest` (bin "loam-ingest") generated 2 warnings
+[0m[0m[1m[32m    Finished[0m release [optimized] target(s) in 1.71s
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o build/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json && cat /app/output/audit.json
+[?2004l{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"m_range","row_count":2,"sum_amount":70,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":0,"sum_amount":0,"pages_total":4,"pages_read":0,"path":"row","skipping":true},{"case_id":"m_null","row_count":1,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_interact","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":1,"path":"batch","skipping":true},{"case_id":"m_neg","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":11,"sum_amount":1096,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"v_missing","row_count":1,"sum_amount":0,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"v_check","row_count":1,"sum_amount":0,"pages_total":3,"pages_read":1,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"row","skipping":false}],"digest":"386f5d5d6e94d3e9"}
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# find /app/cpp -type f | sort
+[?2004l/app/cpp/Makefile
+/app/cpp/build/digest.o
+/app/cpp/build/harbor/pale.o
+/app/cpp/build/harbor/veil.o
+/app/cpp/build/lattice/bay.o
+/app/cpp/build/lattice/rill.o
+/app/cpp/build/loam
+/app/cpp/build/main.o
+/app/cpp/build/parse.o
+/app/cpp/build/report.o
+/app/cpp/build/row.o
+/app/cpp/build/store.o
+/app/cpp/include/loam/exec.hpp
+/app/cpp/include/loam/plan.hpp
+/app/cpp/include/loam/report.hpp
+/app/cpp/include/loam/store.hpp
+/app/cpp/include/loam/types.hpp
+/app/cpp/src/digest.cpp
+/app/cpp/src/harbor/pale.cpp
+/app/cpp/src/harbor/veil.cpp
+/app/cpp/src/lattice/bay.cpp
+/app/cpp/src/lattice/rill.cpp
+/app/cpp/src/main.cpp
+/app/cpp/src/parse.cpp
+/app/cpp/src/report.cpp
+/app/cpp/src/row.cpp
+/app/cpp/src/store.cpp
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# printf '--- cases ---\n'; for f in /app/data/cases/*.case; do echo "$f"; cat "$f"; done
+[?2004lbash: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+/app/data/cases/control.case
+# id|store|operation|x|y|path|skipping|operator note
+c_legit|/app/data/archive/current.store|eq|-999|0|batch|1|legitimate overlap
+h_skip|/app/data/archive/healthy.store|range|100|130|batch|1|selective control
+h_full|/app/data/archive/healthy.store|range|100|130|row|0|full control
+h_region|/app/data/archive/healthy.store|region_eq|north|0|row|1|text control
+/app/data/cases/incident.case
+# id|store|operation|x|y|path|skipping|operator note
+m_range|/app/data/archive/mixed.store|range|10|40|row|1|invoice window
+m_narrow|/app/data/archive/mixed.store|range|10|20|row|1|narrow window
+m_null|/app/data/archive/mixed.store|isnull|0|0|batch|0|missing count
+m_interact|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed window
+m_neg|/app/data/archive/mixed.store|range|-100|-1|batch|0|negative window
+m_all|/app/data/archive/mixed.store|all|0|0|batch|0|full tally
+v_window|/app/data/archive/vault.store|range|10|50|row|1|vault window
+v_missing|/app/data/archive/vault.store|isnull|0|0|batch|1|vault absent probe
+v_check|/app/data/archive/vault.store|isnull|0|0|row|1|vault absent recheck
+v_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault full control
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# sed -n '1,240p' /app/cpp/src/store.cpp
+[?2004l#include "loam/store.hpp"
+
+#include "loam/exec.hpp"
+#include "loam/plan.hpp"
+
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
+namespace loam {
+namespace {
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> fields;
+    std::size_t start = 0;
+    while (true) {
+        const auto end = line.find('|', start);
+        fields.push_back(line.substr(start, end - start));
+        if (end == std::string::npos) {
+            break;
+        }
+        start = end + 1;
+    }
+    return fields;
+}
+
+}  // namespace
+
+std::vector<Slab> load_store(const std::filesystem::path& path) {
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("cannot open store: " + path.string());
+    }
+
+    std::vector<Slab> slabs;
+    std::string line;
+    while (std::getline(input, line)) {
+        if (line.empty() || line.rfind("H|", 0) == 0) {
+            continue;
+        }
+        const auto page = split(line);
+        if (page.size() != 9 || page[0] != "P") {
+            throw std::runtime_error("bad page record in " + path.string());
+        }
+        Slab slab;
+        slab.id = std::stoull(page[1]);
+        slab.generation = static_cast<std::uint8_t>(std::stoul(page[2]));
+        slab.low = std::stoll(page[3]);
+        slab.high = std::stoll(page[4]);
+        slab.has_absent = page[5] == "1";
+        slab.region_low = page[6];
+        slab.region_high = page[7];
+        const auto row_count = std::stoull(page[8]);
+        for (std::size_t i = 0; i < row_count; ++i) {
+            if (!std::getline(input, line)) {
+                throw std::runtime_error("short page in " + path.string());
+            }
+            const auto row = split(line);
+            if (row.size() != 5 || row[0] != "R") {
+                throw std::runtime_error("bad row record in " + path.string());
+            }
+            const auto presence = static_cast<std::uint8_t>(std::stoul(row[1]));
+            const auto origin = static_cast<std::uint8_t>(std::stoul(row[2]));
+            const auto amount = std::stoll(row[3]);
+            slab.cells.push_back({presence, static_cast<Origin>(origin), amount, row[4]});
+            slab.presence_lane.push_back(presence);
+            slab.origin_lane.push_back(origin);
+            slab.amount_lane.push_back(amount);
+            slab.region_lane.push_back(row[4]);
+        }
+        slabs.push_back(std::move(slab));
+    }
+    return slabs;
+}
+
+CaseResult run_case(const CaseSpec& spec) {
+    const auto slabs = load_store(spec.store_path);
+    Tally total;
+    for (const auto& slab : slabs) {
+        const Gate gate = turn_b(slab, spec.probe);
+        const auto label = turn_d(gate, spec.probe);
+        (void)label;
+        const Tally part = spec.probe.lane == Lane::Batch
+            ? sweep_c(slab, spec.probe, gate)
+            : walk_row(slab, spec.probe, gate);
+        total = sweep_e(total, part);
+    }
+    return {
+        spec.case_id,
+        total,
+        static_cast<std::int64_t>(slabs.size()),
+        spec.probe.lane,
+        spec.probe.skipping,
+    };
+}
+
+}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# sed -n '1,240p' /app/cpp/src/row.cpp
+[?2004l#include "loam/exec.hpp"
+
+namespace loam {
+namespace {
+
+bool is_live(const Cell& cell) {
+    if (cell.origin == Origin::Retired) {
+        return false;
+    }
+    if (cell.origin == Origin::Inherited) {
+        return true;
+    }
+    return cell.present != 0;
+}
+
+bool matches(const Cell& cell, const Probe& probe) {
+    switch (probe.op) {
+        case Op::All:
+            return true;
+        case Op::Equal:
+            return cell.amount == probe.x;
+        case Op::Range:
+            return cell.amount >= probe.x && cell.amount <= probe.y;
+        case Op::IsNull:
+            return false;
+        case Op::RegionEqual:
+            return cell.region == probe.text;
+    }
+    return false;
+}
+
+}  // namespace
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+    for (const auto& cell : a.cells) {
+        const bool live = is_live(cell);
+        if (b.op == Op::IsNull) {
+            if (!live) {
+                ++tally.row_count;
+            }
+            continue;
+        }
+        if (live && matches(cell, b)) {
+            ++tally.row_count;
+            tally.sum_amount += cell.amount;
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# sed -n '1,240p' /app/cpp/src/parse.cpp
+[?2004l#include "loam/store.hpp"
+
+#include <algorithm>
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
+namespace loam {
+namespace {
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> fields;
+    std::size_t start = 0;
+    while (true) {
+        const auto end = line.find('|', start);
+        fields.push_back(line.substr(start, end - start));
+        if (end == std::string::npos) {
+            break;
+        }
+        start = end + 1;
+    }
+    return fields;
+}
+
+Op parse_op(const std::string& value) {
+    if (value == "all") return Op::All;
+    if (value == "eq") return Op::Equal;
+    if (value == "range") return Op::Range;
+    if (value == "isnull") return Op::IsNull;
+    if (value == "region_eq") return Op::RegionEqual;
+    throw std::runtime_error("unknown operation: " + value);
+}
+
+Lane parse_lane(const std::string& value) {
+    if (value == "row") return Lane::Row;
+    if (value == "batch") return Lane::Batch;
+    throw std::runtime_error("unknown path: " + value);
+}
+
+}  // namespace
+
+std::vector<CaseSpec> load_cases(const std::filesystem::path& directory) {
+    std::vector<std::filesystem::path> paths;
+    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".case") {
+            paths.push_back(entry.path());
+        }
+    }
+    std::sort(paths.begin(), paths.end());
+
+    std::vector<CaseSpec> cases;
+    for (const auto& path : paths) {
+        std::ifstream input(path);
+        if (!input) {
+            throw std::runtime_error("cannot open case file: " + path.string());
+        }
+        std::string line;
+        while (std::getline(input, line)) {
+            if (line.empty() || line[0] == '#') {
+                continue;
+            }
+            const auto fields = split(line);
+            if (fields.size() != 8) {
+                throw std::runtime_error("bad case row in " + path.string());
+            }
+            Probe probe;
+            probe.op = parse_op(fields[2]);
+            if (probe.op == Op::RegionEqual) {
+                probe.text = fields[3];
+            } else {
+                probe.x = std::stoll(fields[3]);
+                probe.y = std::stoll(fields[4]);
+            }
+            probe.lane = parse_lane(fields[5]);
+            probe.skipping = fields[6] == "1";
+            cases.push_back({fields[0], fields[1], std::move(probe)});
+        }
+    }
+    return cases;
+}
+
+}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# sed -n '1,260p' /app/cpp/src/main.cpp
+[?2004l#include "loam/report.hpp"
+#include "loam/store.hpp"
+
+#include <filesystem>
+#include <iostream>
+#include <stdexcept>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <vector>
+
+namespace {
+
+int run_ingest(const char* input, const char* output) {
+    const pid_t child = fork();
+    if (child == -1) {
+        throw std::runtime_error("fork failed");
+    }
+    if (child == 0) {
+        execl("/app/bin/loam-ingest", "loam-ingest", input, output, nullptr);
+        _exit(127);
+    }
+    int status = 0;
+    if (waitpid(child, &status, 0) == -1) {
+        throw std::runtime_error("waitpid failed");
+    }
+    return WIFEXITED(status) ? WEXITSTATUS(status) : 1;
+}
+
+}  // namespace
+
+int main(int argc, char** argv) {
+    try {
+        if (argc == 4 && std::string(argv[1]) == "audit") {
+            const auto specs = loam::load_cases(argv[2]);
+            std::vector<loam::CaseResult> results;
+            results.reserve(specs.size());
+            for (const auto& spec : specs) {
+                results.push_back(loam::run_case(spec));
+            }
+            loam::write_report(argv[3], results);
+            return 0;
+        }
+        if (argc == 4 && std::string(argv[1]) == "ingest") {
+            return run_ingest(argv[2], argv[3]);
+        }
+        if (argc == 3 && std::string(argv[1]) == "inspect") {
+            const auto slabs = loam::load_store(argv[2]);
+            for (const auto& slab : slabs) {
+                std::cout << slab.id << '|' << static_cast<int>(slab.generation)
+                          << '|' << slab.low << '|' << slab.high << '|'
+                          << (slab.has_absent ? 1 : 0) << '|' << slab.cells.size()
+                          << '\n';
+            }
+            return 0;
+        }
+        std::cerr << "usage: loam audit <case-directory> <report-path>\n"
+                  << "       loam ingest <csv> <store-directory>\n"
+                  << "       loam inspect <store>\n";
+        return 2;
+    } catch (const std::exception& error) {
+        std::cerr << "loam: " << error.what() << '\n';
+        return 1;
+    }
+}
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# sed -n '1,260p' /app/rust/src/codec.rs
+[?2004luse crate::model::{Cell, Page};
+use std::fs::File;
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::path::Path;
+
+pub(crate) fn read_csv(path: &Path) -> Result<Vec<Cell>, Box<dyn std::error::Error>> {
+    let file = File::open(path)?;
+    let mut rows = Vec::new();
+    for (line_no, line) in BufReader::new(file).lines().enumerate() {
+        let line = line?;
+        if line_no == 0 && line.starts_with("origin,") {
+            continue;
+        }
+        if line.trim().is_empty() {
+            continue;
+        }
+        let fields: Vec<&str> = line.split(',').collect();
+        if fields.len() != 4 {
+            return Err(format!("{}:{}: expected four columns", path.display(), line_no + 1).into());
+        }
+        rows.push(Cell {
+            origin: fields[0].parse()?,
+            present: fields[1].parse()?,
+            amount: fields[2].parse()?,
+            region: fields[3].trim().to_owned(),
+        });
+    }
+    Ok(rows)
+}
+
+pub(crate) fn write_pages(path: &Path, pages: &[Page]) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let file = File::create(path)?;
+    let mut out = BufWriter::new(file);
+    writeln!(out, "H|3")?;
+    for page in pages {
+        writeln!(
+            out,
+            "P|{}|{}|{}|{}|{}|{}|{}|{}",
+            page.id,
+            page.generation,
+            page.mark.low,
+            page.mark.high,
+            u8::from(page.mark.has_absent),
+            page.region_low,
+            page.region_high,
+            page.cells.len()
+        )?;
+        for cell in &page.cells {
+            writeln!(
+                out,
+                "R|{}|{}|{}|{}",
+                cell.present, cell.origin, cell.amount, cell.region
+            )?;
+        }
+    }
+    out.flush()?;
+    Ok(())
+}
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# sed -n '1,240p' /app/rust/src/main.rs
+[?2004lmod codec;
+mod ember;
+mod model;
+mod report;
+
+use ember::pale::{tilt_d, Dial};
+use std::path::{Path, PathBuf};
+
+fn main() {
+    if let Err(error) = run() {
+        eprintln!("loam-ingest: {error}");
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() != 3 {
+        return Err("usage: loam-ingest <csv> <store>".into());
+    }
+    let cells = codec::read_csv(Path::new(&args[1]))?;
+    let pages = ember::reed::gather(cells, 4)?;
+    let directory = PathBuf::from(&args[2]);
+    std::fs::create_dir_all(&directory)?;
+    let target = directory.join("data.store");
+    codec::write_pages(&target, &pages)?;
+
+    let size = std::fs::metadata(&target)?.len() as usize;
+    let mut dial = Dial::default();
+    let cell_count = pages.iter().map(|page| page.cells.len()).sum();
+    tilt_d(&mut dial, cell_count, size);
+    eprintln!("{}", report::line(&dial));
+    Ok(())
+}
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# for f in /app/cpp/include/loam/*.hpp /app/cpp/src/harbor/*.cpp /app/cpp/src/lattice/*.cpp /app/cpp/src/store.cpp /app/cpp/src/row.cpp /app/cpp/src/parse.cpp; do echo "===== $f ====="; nl -ba "$f" | sed -n '1,240p'; done
+[?2004l===== /app/cpp/include/loam/exec.hpp =====
+     1	#pragma once
+     2	
+     3	#include "loam/types.hpp"
+     4	
+     5	namespace loam {
+     6	
+     7	Tally walk_row(const Slab& a, const Probe& b, const Gate& c);
+     8	Tally sweep_c(const Slab& a, const Probe& b, const Gate& c);
+     9	Tally sweep_e(const Tally& a, const Tally& b);
+    10	
+    11	}  // namespace loam
+===== /app/cpp/include/loam/plan.hpp =====
+     1	#pragma once
+     2	
+     3	#include "loam/types.hpp"
+     4	
+     5	namespace loam {
+     6	
+     7	Gate turn_b(const Slab& a, const Probe& b);
+     8	std::string turn_d(const Gate& a, const Probe& b);
+     9	
+    10	}  // namespace loam
+===== /app/cpp/include/loam/report.hpp =====
+     1	#pragma once
+     2	
+     3	#include "loam/types.hpp"
+     4	
+     5	#include <filesystem>
+     6	#include <string>
+     7	#include <vector>
+     8	
+     9	namespace loam {
+    10	
+    11	void write_report(const std::filesystem::path& path, const std::vector<CaseResult>& cases);
+    12	std::string digest_hex(const std::string& text);
+    13	std::string lane_name(Lane lane);
+    14	
+    15	}  // namespace loam
+===== /app/cpp/include/loam/store.hpp =====
+     1	#pragma once
+     2	
+     3	#include "loam/types.hpp"
+     4	
+     5	#include <filesystem>
+     6	#include <vector>
+     7	
+     8	namespace loam {
+     9	
+    10	std::vector<Slab> load_store(const std::filesystem::path& path);
+    11	std::vector<CaseSpec> load_cases(const std::filesystem::path& directory);
+    12	CaseResult run_case(const CaseSpec& spec);
+    13	
+    14	}  // namespace loam
+===== /app/cpp/include/loam/types.hpp =====
+     1	#pragma once
+     2	
+     3	#include <cstdint>
+     4	#include <string>
+     5	#include <vector>
+     6	
+     7	namespace loam {
+     8	
+     9	enum class Origin : std::uint8_t { Retired = 0, Inherited = 1, Current = 2 };
+    10	
+    11	struct Cell {
+    12	    std::uint8_t present{};
+    13	    Origin origin{Origin::Current};
+    14	    std::int64_t amount{};
+    15	    std::string region;
+    16	};
+    17	
+    18	struct Slab {
+    19	    std::size_t id{};
+    20	    std::uint8_t generation{};
+    21	    std::int64_t low{};
+    22	    std::int64_t high{};
+    23	    bool has_absent{};
+    24	    std::string region_low;
+    25	    std::string region_high;
+    26	    std::vector<Cell> cells;
+    27	    std::vector<std::int64_t> amount_lane;
+    28	    std::vector<std::uint8_t> presence_lane;
+    29	    std::vector<std::uint8_t> origin_lane;
+    30	    std::vector<std::string> region_lane;
+    31	};
+    32	
+    33	enum class Op { All, Equal, Range, IsNull, RegionEqual };
+    34	enum class Lane { Row, Batch };
+    35	
+    36	struct Probe {
+    37	    Op op{Op::All};
+    38	    std::int64_t x{};
+    39	    std::int64_t y{};
+    40	    std::string text;
+    41	    Lane lane{Lane::Row};
+    42	    bool skipping{};
+    43	};
+    44	
+    45	struct Gate {
+    46	    bool read{true};
+    47	    std::string note;
+    48	};
+    49	
+    50	struct Tally {
+    51	    std::int64_t row_count{};
+    52	    std::int64_t sum_amount{};
+    53	    std::int64_t pages_read{};
+    54	};
+    55	
+    56	struct CaseSpec {
+    57	    std::string case_id;
+    58	    std::string store_path;
+    59	    Probe probe;
+    60	};
+    61	
+    62	struct CaseResult {
+    63	    std::string case_id;
+    64	    Tally tally;
+    65	    std::int64_t pages_total{};
+    66	    Lane lane{Lane::Row};
+    67	    bool skipping{};
+    68	};
+    69	
+    70	}  // namespace loam
+===== /app/cpp/src/harbor/pale.cpp =====
+     1	#include "loam/plan.hpp"
+     2	
+     3	namespace loam {
+     4	
+     5	std::string turn_d(const Gate& a, const Probe& b) {
+     6	    const char* lane = b.lane == Lane::Batch ? "batch" : "row";
+     7	    return std::string(lane) + ":" + (a.read ? "open:" : "closed:") + a.note;
+     8	}
+     9	
+    10	}  // namespace loam
+===== /app/cpp/src/harbor/veil.cpp =====
+     1	#include "loam/plan.hpp"
+     2	
+     3	namespace loam {
+     4	
+     5	Gate turn_b(const Slab& a, const Probe& b) {
+     6	    if (!b.skipping) {
+     7	        return {true, "full"};
+     8	    }
+     9	    if (b.op == Op::All) {
+    10	        return {true, "all"};
+    11	    }
+    12	    if (b.op == Op::IsNull) {
+    13	        return {a.has_absent, a.has_absent ? "possible" : "empty"};
+    14	    }
+    15	    if (b.op == Op::RegionEqual) {
+    16	        const bool read = b.text >= a.region_low && b.text <= a.region_high;
+    17	        return {read, read ? "text-hit" : "text-away"};
+    18	    }
+    19	
+    20	    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+    21	    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+    22	    const bool read = !(right < a.low || left > a.high);
+    23	    return {read, read ? "range-hit" : "range-away"};
+    24	}
+    25	
+    26	}  // namespace loam
+===== /app/cpp/src/lattice/bay.cpp =====
+     1	#include "loam/exec.hpp"
+     2	
+     3	namespace loam {
+     4	
+     5	Tally sweep_e(const Tally& a, const Tally& b) {
+     6	    return {
+     7	        a.row_count + b.row_count,
+     8	        a.sum_amount + b.sum_amount,
+     9	        a.pages_read + b.pages_read,
+    10	    };
+    11	}
+    12	
+    13	}  // namespace loam
+===== /app/cpp/src/lattice/rill.cpp =====
+     1	#include "loam/exec.hpp"
+     2	
+     3	#include <cstddef>
+     4	#include <vector>
+     5	
+     6	namespace loam {
+     7	
+     8	Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+     9	    Tally tally;
+    10	    if (!c.read) {
+    11	        return tally;
+    12	    }
+    13	    tally.pages_read = 1;
+    14	
+    15	    const std::size_t count = a.amount_lane.size();
+    16	    std::vector<unsigned char> admit(count, 0);
+    17	    for (std::size_t i = 0; i < count; ++i) {
+    18	        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;
+    19	    }
+    20	
+    21	    if (b.op == Op::IsNull) {
+    22	        for (std::size_t i = 0; i < count; ++i) {
+    23	            if (admit[i] == 0) {
+    24	                ++tally.row_count;
+    25	            }
+    26	        }
+    27	        return tally;
+    28	    }
+    29	
+    30	    for (std::size_t i = 0; i < count; ++i) {
+    31	        if (admit[i] == 0) {
+    32	            continue;
+    33	        }
+    34	        bool keep = false;
+    35	        switch (b.op) {
+    36	            case Op::All:
+    37	                keep = true;
+    38	                break;
+    39	            case Op::Equal:
+    40	                keep = a.amount_lane[i] == b.x;
+    41	                break;
+    42	            case Op::Range:
+    43	                keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+    44	                break;
+    45	            case Op::IsNull:
+    46	                keep = false;
+    47	                break;
+    48	            case Op::RegionEqual:
+    49	                keep = a.region_lane[i] == b.text;
+    50	                break;
+    51	        }
+    52	        if (keep) {
+    53	            ++tally.row_count;
+    54	            tally.sum_amount += a.amount_lane[i];
+    55	        }
+    56	    }
+    57	    return tally;
+    58	}
+    59	
+    60	}  // namespace loam
+===== /app/cpp/src/store.cpp =====
+     1	#include "loam/store.hpp"
+     2	
+     3	#include "loam/exec.hpp"
+     4	#include "loam/plan.hpp"
+     5	
+     6	#include <fstream>
+     7	#include <stdexcept>
+     8	#include <string>
+     9	
+    10	namespace loam {
+    11	namespace {
+    12	
+    13	std::vector<std::string> split(const std::string& line) {
+    14	    std::vector<std::string> fields;
+    15	    std::size_t start = 0;
+    16	    while (true) {
+    17	        const auto end = line.find('|', start);
+    18	        fields.push_back(line.substr(start, end - start));
+    19	        if (end == std::string::npos) {
+    20	            break;
+    21	        }
+    22	        start = end + 1;
+    23	    }
+    24	    return fields;
+    25	}
+    26	
+    27	}  // namespace
+    28	
+    29	std::vector<Slab> load_store(const std::filesystem::path& path) {
+    30	    std::ifstream input(path);
+    31	    if (!input) {
+    32	        throw std::runtime_error("cannot open store: " + path.string());
+    33	    }
+    34	
+    35	    std::vector<Slab> slabs;
+    36	    std::string line;
+    37	    while (std::getline(input, line)) {
+    38	        if (line.empty() || line.rfind("H|", 0) == 0) {
+    39	            continue;
+    40	        }
+    41	        const auto page = split(line);
+    42	        if (page.size() != 9 || page[0] != "P") {
+    43	            throw std::runtime_error("bad page record in " + path.string());
+    44	        }
+    45	        Slab slab;
+    46	        slab.id = std::stoull(page[1]);
+    47	        slab.generation = static_cast<std::uint8_t>(std::stoul(page[2]));
+    48	        slab.low = std::stoll(page[3]);
+    49	        slab.high = std::stoll(page[4]);
+    50	        slab.has_absent = page[5] == "1";
+    51	        slab.region_low = page[6];
+    52	        slab.region_high = page[7];
+    53	        const auto row_count = std::stoull(page[8]);
+    54	        for (std::size_t i = 0; i < row_count; ++i) {
+    55	            if (!std::getline(input, line)) {
+    56	                throw std::runtime_error("short page in " + path.string());
+    57	            }
+    58	            const auto row = split(line);
+    59	            if (row.size() != 5 || row[0] != "R") {
+    60	                throw std::runtime_error("bad row record in " + path.string());
+    61	            }
+    62	            const auto presence = static_cast<std::uint8_t>(std::stoul(row[1]));
+    63	            const auto origin = static_cast<std::uint8_t>(std::stoul(row[2]));
+    64	            const auto amount = std::stoll(row[3]);
+    65	            slab.cells.push_back({presence, static_cast<Origin>(origin), amount, row[4]});
+    66	            slab.presence_lane.push_back(presence);
+    67	            slab.origin_lane.push_back(origin);
+    68	            slab.amount_lane.push_back(amount);
+    69	            slab.region_lane.push_back(row[4]);
+    70	        }
+    71	        slabs.push_back(std::move(slab));
+    72	    }
+    73	    return slabs;
+    74	}
+    75	
+    76	CaseResult run_case(const CaseSpec& spec) {
+    77	    const auto slabs = load_store(spec.store_path);
+    78	    Tally total;
+    79	    for (const auto& slab : slabs) {
+    80	        const Gate gate = turn_b(slab, spec.probe);
+    81	        const auto label = turn_d(gate, spec.probe);
+    82	        (void)label;
+    83	        const Tally part = spec.probe.lane == Lane::Batch
+    84	            ? sweep_c(slab, spec.probe, gate)
+    85	            : walk_row(slab, spec.probe, gate);
+    86	        total = sweep_e(total, part);
+    87	    }
+    88	    return {
+    89	        spec.case_id,
+    90	        total,
+    91	        static_cast<std::int64_t>(slabs.size()),
+    92	        spec.probe.lane,
+    93	        spec.probe.skipping,
+    94	    };
+    95	}
+    96	
+    97	}  // namespace loam
+===== /app/cpp/src/row.cpp =====
+     1	#include "loam/exec.hpp"
+     2	
+     3	namespace loam {
+     4	namespace {
+     5	
+     6	bool is_live(const Cell& cell) {
+     7	    if (cell.origin == Origin::Retired) {
+     8	        return false;
+     9	    }
+    10	    if (cell.origin == Origin::Inherited) {
+    11	        return true;
+    12	    }
+    13	    return cell.present != 0;
+    14	}
+    15	
+    16	bool matches(const Cell& cell, const Probe& probe) {
+    17	    switch (probe.op) {
+    18	        case Op::All:
+    19	            return true;
+    20	        case Op::Equal:
+    21	            return cell.amount == probe.x;
+    22	        case Op::Range:
+    23	            return cell.amount >= probe.x && cell.amount <= probe.y;
+    24	        case Op::IsNull:
+    25	            return false;
+    26	        case Op::RegionEqual:
+    27	            return cell.region == probe.text;
+    28	    }
+    29	    return false;
+    30	}
+    31	
+    32	}  // namespace
+    33	
+    34	Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+    35	    Tally tally;
+    36	    if (!c.read) {
+    37	        return tally;
+    38	    }
+    39	    tally.pages_read = 1;
+    40	    for (const auto& cell : a.cells) {
+    41	        const bool live = is_live(cell);
+    42	        if (b.op == Op::IsNull) {
+    43	            if (!live) {
+    44	                ++tally.row_count;
+    45	            }
+    46	            continue;
+    47	        }
+    48	        if (live && matches(cell, b)) {
+    49	            ++tally.row_count;
+    50	            tally.sum_amount += cell.amount;
+    51	        }
+    52	    }
+    53	    return tally;
+    54	}
+    55	
+    56	}  // namespace loam
+===== /app/cpp/src/parse.cpp =====
+     1	#include "loam/store.hpp"
+     2	
+     3	#include <algorithm>
+     4	#include <fstream>
+     5	#include <stdexcept>
+     6	#include <string>
+     7	
+     8	namespace loam {
+     9	namespace {
+    10	
+    11	std::vector<std::string> split(const std::string& line) {
+    12	    std::vector<std::string> fields;
+    13	    std::size_t start = 0;
+    14	    while (true) {
+    15	        const auto end = line.find('|', start);
+    16	        fields.push_back(line.substr(start, end - start));
+    17	        if (end == std::string::npos) {
+    18	            break;
+    19	        }
+    20	        start = end + 1;
+    21	    }
+    22	    return fields;
+    23	}
+    24	
+    25	Op parse_op(const std::string& value) {
+    26	    if (value == "all") return Op::All;
+    27	    if (value == "eq") return Op::Equal;
+    28	    if (value == "range") return Op::Range;
+    29	    if (value == "isnull") return Op::IsNull;
+    30	    if (value == "region_eq") return Op::RegionEqual;
+    31	    throw std::runtime_error("unknown operation: " + value);
+    32	}
+    33	
+    34	Lane parse_lane(const std::string& value) {
+    35	    if (value == "row") return Lane::Row;
+    36	    if (value == "batch") return Lane::Batch;
+    37	    throw std::runtime_error("unknown path: " + value);
+    38	}
+    39	
+    40	}  // namespace
+    41	
+    42	std::vector<CaseSpec> load_cases(const std::filesystem::path& directory) {
+    43	    std::vector<std::filesystem::path> paths;
+    44	    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+    45	        if (entry.is_regular_file() && entry.path().extension() == ".case") {
+    46	            paths.push_back(entry.path());
+    47	        }
+    48	    }
+    49	    std::sort(paths.begin(), paths.end());
+    50	
+    51	    std::vector<CaseSpec> cases;
+    52	    for (const auto& path : paths) {
+    53	        std::ifstream input(path);
+    54	        if (!input) {
+    55	            throw std::runtime_error("cannot open case file: " + path.string());
+    56	        }
+    57	        std::string line;
+    58	        while (std::getline(input, line)) {
+    59	            if (line.empty() || line[0] == '#') {
+    60	                continue;
+    61	            }
+    62	            const auto fields = split(line);
+    63	            if (fields.size() != 8) {
+    64	                throw std::runtime_error("bad case row in " + path.string());
+    65	            }
+    66	            Probe probe;
+    67	            probe.op = parse_op(fields[2]);
+    68	            if (probe.op == Op::RegionEqual) {
+    69	                probe.text = fields[3];
+    70	            } else {
+    71	                probe.x = std::stoll(fields[3]);
+    72	                probe.y = std::stoll(fields[4]);
+    73	            }
+    74	            probe.lane = parse_lane(fields[5]);
+    75	            probe.skipping = fields[6] == "1";
+    76	            cases.push_back({fields[0], fields[1], std::move(probe)});
+    77	        }
+    78	    }
+    79	    return cases;
+    80	}
+    81	
+    82	}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# find /app/rust/src -type f | sort | while read f; do echo "===== $f ====="; nl -ba "$f" | sed -n '1,260p'; done
+[?2004l===== /app/rust/src/codec.rs =====
+     1	use crate::model::{Cell, Page};
+     2	use std::fs::File;
+     3	use std::io::{BufRead, BufReader, BufWriter, Write};
+     4	use std::path::Path;
+     5	
+     6	pub(crate) fn read_csv(path: &Path) -> Result<Vec<Cell>, Box<dyn std::error::Error>> {
+     7	    let file = File::open(path)?;
+     8	    let mut rows = Vec::new();
+     9	    for (line_no, line) in BufReader::new(file).lines().enumerate() {
+    10	        let line = line?;
+    11	        if line_no == 0 && line.starts_with("origin,") {
+    12	            continue;
+    13	        }
+    14	        if line.trim().is_empty() {
+    15	            continue;
+    16	        }
+    17	        let fields: Vec<&str> = line.split(',').collect();
+    18	        if fields.len() != 4 {
+    19	            return Err(format!("{}:{}: expected four columns", path.display(), line_no + 1).into());
+    20	        }
+    21	        rows.push(Cell {
+    22	            origin: fields[0].parse()?,
+    23	            present: fields[1].parse()?,
+    24	            amount: fields[2].parse()?,
+    25	            region: fields[3].trim().to_owned(),
+    26	        });
+    27	    }
+    28	    Ok(rows)
+    29	}
+    30	
+    31	pub(crate) fn write_pages(path: &Path, pages: &[Page]) -> Result<(), Box<dyn std::error::Error>> {
+    32	    if let Some(parent) = path.parent() {
+    33	        std::fs::create_dir_all(parent)?;
+    34	    }
+    35	    let file = File::create(path)?;
+    36	    let mut out = BufWriter::new(file);
+    37	    writeln!(out, "H|3")?;
+    38	    for page in pages {
+    39	        writeln!(
+    40	            out,
+    41	            "P|{}|{}|{}|{}|{}|{}|{}|{}",
+    42	            page.id,
+    43	            page.generation,
+    44	            page.mark.low,
+    45	            page.mark.high,
+    46	            u8::from(page.mark.has_absent),
+    47	            page.region_low,
+    48	            page.region_high,
+    49	            page.cells.len()
+    50	        )?;
+    51	        for cell in &page.cells {
+    52	            writeln!(
+    53	                out,
+    54	                "R|{}|{}|{}|{}",
+    55	                cell.present, cell.origin, cell.amount, cell.region
+    56	            )?;
+    57	        }
+    58	    }
+    59	    out.flush()?;
+    60	    Ok(())
+    61	}
+===== /app/rust/src/ember/fold.rs =====
+     1	use crate::model::{FoldErr, Mark};
+     2	
+     3	pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+     4	    if a.is_empty() {
+     5	        return Err(FoldErr::Empty);
+     6	    }
+     7	    if a.len() != b.len() || a.len() != c.len() {
+     8	        return Err(FoldErr::Shape);
+     9	    }
+    10	
+    11	    let mut low = a[0];
+    12	    let mut high = a[0];
+    13	    let mut has_absent = false;
+    14	    for (value, present) in a.iter().zip(b.iter()) {
+    15	        low = low.min(*value);
+    16	        high = high.max(*value);
+    17	        has_absent |= *present == 0;
+    18	    }
+    19	
+    20	    Ok(Mark {
+    21	        low,
+    22	        high,
+    23	        has_absent,
+    24	    })
+    25	}
+===== /app/rust/src/ember/mod.rs =====
+     1	pub(crate) mod fold;
+     2	pub(crate) mod pale;
+     3	pub(crate) mod reed;
+===== /app/rust/src/ember/pale.rs =====
+     1	#[derive(Clone, Debug, Default)]
+     2	pub(crate) struct Dial {
+     3	    pub jobs: usize,
+     4	    pub cells: usize,
+     5	    pub bytes: usize,
+     6	}
+     7	
+     8	pub(crate) fn tilt_d(a: &mut Dial, b: usize, c: usize) {
+     9	    a.jobs += 1;
+    10	    a.cells += b;
+    11	    a.bytes += c;
+    12	}
+===== /app/rust/src/ember/reed.rs =====
+     1	use crate::ember::fold::tilt_a;
+     2	use crate::model::{Cell, FoldErr, Page};
+     3	
+     4	pub(crate) fn gather(cells: Vec<Cell>, width: usize) -> Result<Vec<Page>, FoldErr> {
+     5	    let mut pages = Vec::new();
+     6	    for (id, chunk) in cells.chunks(width).enumerate() {
+     7	        let values: Vec<i64> = chunk.iter().map(|cell| cell.amount).collect();
+     8	        let present: Vec<u8> = chunk.iter().map(|cell| cell.present).collect();
+     9	        let origins: Vec<u8> = chunk.iter().map(|cell| cell.origin).collect();
+    10	        let mark = tilt_a(&values, &present, &origins)?;
+    11	
+    12	        let mut regions: Vec<String> = chunk.iter().map(|cell| cell.region.clone()).collect();
+    13	        regions.sort();
+    14	        let region_low = regions.first().cloned().unwrap_or_default();
+    15	        let region_high = regions.last().cloned().unwrap_or_default();
+    16	        pages.push(Page {
+    17	            id,
+    18	            generation: 3,
+    19	            mark,
+    20	            region_low,
+    21	            region_high,
+    22	            cells: chunk.to_vec(),
+    23	        });
+    24	    }
+    25	    Ok(pages)
+    26	}
+===== /app/rust/src/main.rs =====
+     1	mod codec;
+     2	mod ember;
+     3	mod model;
+     4	mod report;
+     5	
+     6	use ember::pale::{tilt_d, Dial};
+     7	use std::path::{Path, PathBuf};
+     8	
+     9	fn main() {
+    10	    if let Err(error) = run() {
+    11	        eprintln!("loam-ingest: {error}");
+    12	        std::process::exit(1);
+    13	    }
+    14	}
+    15	
+    16	fn run() -> Result<(), Box<dyn std::error::Error>> {
+    17	    let args: Vec<String> = std::env::args().collect();
+    18	    if args.len() != 3 {
+    19	        return Err("usage: loam-ingest <csv> <store>".into());
+    20	    }
+    21	    let cells = codec::read_csv(Path::new(&args[1]))?;
+    22	    let pages = ember::reed::gather(cells, 4)?;
+    23	    let directory = PathBuf::from(&args[2]);
+    24	    std::fs::create_dir_all(&directory)?;
+    25	    let target = directory.join("data.store");
+    26	    codec::write_pages(&target, &pages)?;
+    27	
+    28	    let size = std::fs::metadata(&target)?.len() as usize;
+    29	    let mut dial = Dial::default();
+    30	    let cell_count = pages.iter().map(|page| page.cells.len()).sum();
+    31	    tilt_d(&mut dial, cell_count, size);
+    32	    eprintln!("{}", report::line(&dial));
+    33	    Ok(())
+    34	}
+===== /app/rust/src/model.rs =====
+     1	pub(crate) const RUNE_VOID: u8 = 0;
+     2	pub(crate) const RUNE_FIXED: u8 = 1;
+     3	
+     4	#[derive(Clone, Debug)]
+     5	pub(crate) struct Cell {
+     6	    pub origin: u8,
+     7	    pub present: u8,
+     8	    pub amount: i64,
+     9	    pub region: String,
+    10	}
+    11	
+    12	#[derive(Clone, Debug)]
+    13	pub(crate) struct Mark {
+    14	    pub low: i64,
+    15	    pub high: i64,
+    16	    pub has_absent: bool,
+    17	}
+    18	
+    19	#[derive(Clone, Debug)]
+    20	pub(crate) struct Page {
+    21	    pub id: usize,
+    22	    pub generation: u8,
+    23	    pub mark: Mark,
+    24	    pub region_low: String,
+    25	    pub region_high: String,
+    26	    pub cells: Vec<Cell>,
+    27	}
+    28	
+    29	#[derive(Debug)]
+    30	pub(crate) enum FoldErr {
+    31	    Empty,
+    32	    Shape,
+    33	}
+    34	
+    35	impl std::fmt::Display for FoldErr {
+    36	    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    37	        match self {
+    38	            Self::Empty => write!(f, "empty lane set"),
+    39	            Self::Shape => write!(f, "lane lengths differ"),
+    40	        }
+    41	    }
+    42	}
+    43	
+    44	impl std::error::Error for FoldErr {}
+===== /app/rust/src/report.rs =====
+     1	use crate::ember::pale::Dial;
+     2	
+     3	pub(crate) fn line(a: &Dial) -> String {
+     4	    format!("jobs={} cells={} bytes={}", a.jobs, a.cells, a.bytes)
+     5	}
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# for s in /app/data/archive/*.store; do echo "===== inspect $s ====="; /app/bin/loam inspect "$s"; echo "===== raw $s ====="; cat "$s"; done
+[?2004l===== inspect /app/data/archive/current.store =====
+0|3|-999|20|1|4
+1|3|100|130|0|4
+===== raw /app/data/archive/current.store =====
+H|3
+P|0|3|-999|20|1|east|west|4
+R|1|2|-999|east
+R|0|2|777|west
+R|1|2|10|east
+R|1|2|20|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+===== inspect /app/data/archive/healthy.store =====
+0|3|0|30|0|4
+1|3|100|130|0|4
+2|3|200|230|0|4
+===== raw /app/data/archive/healthy.store =====
+H|3
+P|0|3|0|30|0|east|west|4
+R|1|2|0|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+P|2|3|200|230|0|central|west|4
+R|1|2|200|central
+R|1|2|210|east
+R|1|2|220|north
+R|1|2|230|west
+===== inspect /app/data/archive/mixed.store =====
+0|2|100|100|1|4
+1|3|30|600|0|4
+2|3|-5|-5|0|1
+3|3|200|400|0|3
+===== raw /app/data/archive/mixed.store =====
+H|2
+P|0|2|100|100|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|0|2|777|west
+P|1|3|30|600|0|north|south|4
+R|1|2|30|north
+R|1|2|40|north
+R|1|2|500|south
+R|1|2|600|south
+P|2|3|-5|-5|0|central|central|1
+R|1|2|-5|central
+P|3|3|200|400|0|east|west|3
+R|1|2|200|east
+R|1|2|300|north
+R|1|2|400|west
+===== inspect /app/data/archive/vault.store =====
+0|2|5|30|0|4
+1|3|40|70|0|4
+2|2|-20|90|1|3
+===== raw /app/data/archive/vault.store =====
+H|2
+P|0|2|5|30|0|north|west|4
+R|1|2|5|east
+R|1|0|12|east
+R|1|2|18|west
+R|1|2|30|west
+P|1|3|40|70|0|north|south|4
+R|1|2|40|north
+R|1|2|55|north
+R|1|2|63|south
+R|1|2|70|south
+P|2|2|-20|90|1|central|east|3
+R|1|2|-20|central
+R|0|2|90|east
+R|1|2|44|east
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# nl -ba /app/cpp/src/harbor/veil.cpp | sed -n '1,220p'
+[?2004l     1	#include "loam/plan.hpp"
+     2	
+     3	namespace loam {
+     4	
+     5	Gate turn_b(const Slab& a, const Probe& b) {
+     6	    if (!b.skipping) {
+     7	        return {true, "full"};
+     8	    }
+     9	    if (b.op == Op::All) {
+    10	        return {true, "all"};
+    11	    }
+    12	    if (b.op == Op::IsNull) {
+    13	        return {a.has_absent, a.has_absent ? "possible" : "empty"};
+    14	    }
+    15	    if (b.op == Op::RegionEqual) {
+    16	        const bool read = b.text >= a.region_low && b.text <= a.region_high;
+    17	        return {read, read ? "text-hit" : "text-away"};
+    18	    }
+    19	
+    20	    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+    21	    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+    22	    const bool read = !(right < a.low || left > a.high);
+    23	    return {read, read ? "range-hit" : "range-away"};
+    24	}
+    25	
+    26	}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# nl -ba /app/cpp/src/lattice/bay.cpp | sed -n '1,260p'
+[?2004l     1	#include "loam/exec.hpp"
+     2	
+     3	namespace loam {
+     4	
+     5	Tally sweep_e(const Tally& a, const Tally& b) {
+     6	    return {
+     7	        a.row_count + b.row_count,
+     8	        a.sum_amount + b.sum_amount,
+     9	        a.pages_read + b.pages_read,
+    10	    };
+    11	}
+    12	
+    13	}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# nl -ba /app/cpp/src/lattice/rill.cpp | sed -n '1,260p'
+[?2004l     1	#include "loam/exec.hpp"
+     2	
+     3	#include <cstddef>
+     4	#include <vector>
+     5	
+     6	namespace loam {
+     7	
+     8	Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+     9	    Tally tally;
+    10	    if (!c.read) {
+    11	        return tally;
+    12	    }
+    13	    tally.pages_read = 1;
+    14	
+    15	    const std::size_t count = a.amount_lane.size();
+    16	    std::vector<unsigned char> admit(count, 0);
+    17	    for (std::size_t i = 0; i < count; ++i) {
+    18	        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;
+    19	    }
+    20	
+    21	    if (b.op == Op::IsNull) {
+    22	        for (std::size_t i = 0; i < count; ++i) {
+    23	            if (admit[i] == 0) {
+    24	                ++tally.row_count;
+    25	            }
+    26	        }
+    27	        return tally;
+    28	    }
+    29	
+    30	    for (std::size_t i = 0; i < count; ++i) {
+    31	        if (admit[i] == 0) {
+    32	            continue;
+    33	        }
+    34	        bool keep = false;
+    35	        switch (b.op) {
+    36	            case Op::All:
+    37	                keep = true;
+    38	                break;
+    39	            case Op::Equal:
+    40	                keep = a.amount_lane[i] == b.x;
+    41	                break;
+    42	            case Op::Range:
+    43	                keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+    44	                break;
+    45	            case Op::IsNull:
+    46	                keep = false;
+    47	                break;
+    48	            case Op::RegionEqual:
+    49	                keep = a.region_lane[i] == b.text;
+    50	                break;
+    51	        }
+    52	        if (keep) {
+    53	            ++tally.row_count;
+    54	            tally.sum_amount += a.amount_lane[i];
+    55	        }
+    56	    }
+    57	    return tally;
+    58	}
+    59	
+    60	}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# nl -ba /app/cpp/src/row.cpp | sed -n '1,260p'
+[?2004l     1	#include "loam/exec.hpp"
+     2	
+     3	namespace loam {
+     4	namespace {
+     5	
+     6	bool is_live(const Cell& cell) {
+     7	    if (cell.origin == Origin::Retired) {
+     8	        return false;
+     9	    }
+    10	    if (cell.origin == Origin::Inherited) {
+    11	        return true;
+    12	    }
+    13	    return cell.present != 0;
+    14	}
+    15	
+    16	bool matches(const Cell& cell, const Probe& probe) {
+    17	    switch (probe.op) {
+    18	        case Op::All:
+    19	            return true;
+    20	        case Op::Equal:
+    21	            return cell.amount == probe.x;
+    22	        case Op::Range:
+    23	            return cell.amount >= probe.x && cell.amount <= probe.y;
+    24	        case Op::IsNull:
+    25	            return false;
+    26	        case Op::RegionEqual:
+    27	            return cell.region == probe.text;
+    28	    }
+    29	    return false;
+    30	}
+    31	
+    32	}  // namespace
+    33	
+    34	Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+    35	    Tally tally;
+    36	    if (!c.read) {
+    37	        return tally;
+    38	    }
+    39	    tally.pages_read = 1;
+    40	    for (const auto& cell : a.cells) {
+    41	        const bool live = is_live(cell);
+    42	        if (b.op == Op::IsNull) {
+    43	            if (!live) {
+    44	                ++tally.row_count;
+    45	            }
+    46	            continue;
+    47	        }
+    48	        if (live && matches(cell, b)) {
+    49	            ++tally.row_count;
+    50	            tally.sum_amount += cell.amount;
+    51	        }
+    52	    }
+    53	    return tally;
+    54	}
+    55	
+    56	}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# nl -ba /app/cpp/src/store.cpp | sed -n '1,220p'
+[?2004l     1	#include "loam/store.hpp"
+     2	
+     3	#include "loam/exec.hpp"
+     4	#include "loam/plan.hpp"
+     5	
+     6	#include <fstream>
+     7	#include <stdexcept>
+     8	#include <string>
+     9	
+    10	namespace loam {
+    11	namespace {
+    12	
+    13	std::vector<std::string> split(const std::string& line) {
+    14	    std::vector<std::string> fields;
+    15	    std::size_t start = 0;
+    16	    while (true) {
+    17	        const auto end = line.find('|', start);
+    18	        fields.push_back(line.substr(start, end - start));
+    19	        if (end == std::string::npos) {
+    20	            break;
+    21	        }
+    22	        start = end + 1;
+    23	    }
+    24	    return fields;
+    25	}
+    26	
+    27	}  // namespace
+    28	
+    29	std::vector<Slab> load_store(const std::filesystem::path& path) {
+    30	    std::ifstream input(path);
+    31	    if (!input) {
+    32	        throw std::runtime_error("cannot open store: " + path.string());
+    33	    }
+    34	
+    35	    std::vector<Slab> slabs;
+    36	    std::string line;
+    37	    while (std::getline(input, line)) {
+    38	        if (line.empty() || line.rfind("H|", 0) == 0) {
+    39	            continue;
+    40	        }
+    41	        const auto page = split(line);
+    42	        if (page.size() != 9 || page[0] != "P") {
+    43	            throw std::runtime_error("bad page record in " + path.string());
+    44	        }
+    45	        Slab slab;
+    46	        slab.id = std::stoull(page[1]);
+    47	        slab.generation = static_cast<std::uint8_t>(std::stoul(page[2]));
+    48	        slab.low = std::stoll(page[3]);
+    49	        slab.high = std::stoll(page[4]);
+    50	        slab.has_absent = page[5] == "1";
+    51	        slab.region_low = page[6];
+    52	        slab.region_high = page[7];
+    53	        const auto row_count = std::stoull(page[8]);
+    54	        for (std::size_t i = 0; i < row_count; ++i) {
+    55	            if (!std::getline(input, line)) {
+    56	                throw std::runtime_error("short page in " + path.string());
+    57	            }
+    58	            const auto row = split(line);
+    59	            if (row.size() != 5 || row[0] != "R") {
+    60	                throw std::runtime_error("bad row record in " + path.string());
+    61	            }
+    62	            const auto presence = static_cast<std::uint8_t>(std::stoul(row[1]));
+    63	            const auto origin = static_cast<std::uint8_t>(std::stoul(row[2]));
+    64	            const auto amount = std::stoll(row[3]);
+    65	            slab.cells.push_back({presence, static_cast<Origin>(origin), amount, row[4]});
+    66	            slab.presence_lane.push_back(presence);
+    67	            slab.origin_lane.push_back(origin);
+    68	            slab.amount_lane.push_back(amount);
+    69	            slab.region_lane.push_back(row[4]);
+    70	        }
+    71	        slabs.push_back(std::move(slab));
+    72	    }
+    73	    return slabs;
+    74	}
+    75	
+    76	CaseResult run_case(const CaseSpec& spec) {
+    77	    const auto slabs = load_store(spec.store_path);
+    78	    Tally total;
+    79	    for (const auto& slab : slabs) {
+    80	        const Gate gate = turn_b(slab, spec.probe);
+    81	        const auto label = turn_d(gate, spec.probe);
+    82	        (void)label;
+    83	        const Tally part = spec.probe.lane == Lane::Batch
+    84	            ? sweep_c(slab, spec.probe, gate)
+    85	            : walk_row(slab, spec.probe, gate);
+    86	        total = sweep_e(total, part);
+    87	    }
+    88	    return {
+    89	        spec.case_id,
+    90	        total,
+    91	        static_cast<std::int64_t>(slabs.size()),
+    92	        spec.probe.lane,
+    93	        spec.probe.skipping,
+    94	    };
+    95	}
+    96	
+    97	}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# find /app/rust/src/ember -type f -maxdepth 3 -print -exec sh -c 'echo ===== $1 =====; nl -ba "$1" | sed -n "1,260p"' sh {} \;
+[?2004lfind: warning: you have specified the global option -maxdepth after the argument -type, but global options are not positional, i.e., -maxdepth affects tests specified before it as well as those specified after it.  Please specify global options before other arguments.
+/app/rust/src/ember/fold.rs
+===== /app/rust/src/ember/fold.rs =====
+     1	use crate::model::{FoldErr, Mark};
+     2	
+     3	pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+     4	    if a.is_empty() {
+     5	        return Err(FoldErr::Empty);
+     6	    }
+     7	    if a.len() != b.len() || a.len() != c.len() {
+     8	        return Err(FoldErr::Shape);
+     9	    }
+    10	
+    11	    let mut low = a[0];
+    12	    let mut high = a[0];
+    13	    let mut has_absent = false;
+    14	    for (value, present) in a.iter().zip(b.iter()) {
+    15	        low = low.min(*value);
+    16	        high = high.max(*value);
+    17	        has_absent |= *present == 0;
+    18	    }
+    19	
+    20	    Ok(Mark {
+    21	        low,
+    22	        high,
+    23	        has_absent,
+    24	    })
+    25	}
+/app/rust/src/ember/mod.rs
+===== /app/rust/src/ember/mod.rs =====
+     1	pub(crate) mod fold;
+     2	pub(crate) mod pale;
+     3	pub(crate) mod reed;
+/app/rust/src/ember/pale.rs
+===== /app/rust/src/ember/pale.rs =====
+     1	#[derive(Clone, Debug, Default)]
+     2	pub(crate) struct Dial {
+     3	    pub jobs: usize,
+     4	    pub cells: usize,
+     5	    pub bytes: usize,
+     6	}
+     7	
+     8	pub(crate) fn tilt_d(a: &mut Dial, b: usize, c: usize) {
+     9	    a.jobs += 1;
+    10	    a.cells += b;
+    11	    a.bytes += c;
+    12	}
+/app/rust/src/ember/reed.rs
+===== /app/rust/src/ember/reed.rs =====
+     1	use crate::ember::fold::tilt_a;
+     2	use crate::model::{Cell, FoldErr, Page};
+     3	
+     4	pub(crate) fn gather(cells: Vec<Cell>, width: usize) -> Result<Vec<Page>, FoldErr> {
+     5	    let mut pages = Vec::new();
+     6	    for (id, chunk) in cells.chunks(width).enumerate() {
+     7	        let values: Vec<i64> = chunk.iter().map(|cell| cell.amount).collect();
+     8	        let present: Vec<u8> = chunk.iter().map(|cell| cell.present).collect();
+     9	        let origins: Vec<u8> = chunk.iter().map(|cell| cell.origin).collect();
+    10	        let mark = tilt_a(&values, &present, &origins)?;
+    11	
+    12	        let mut regions: Vec<String> = chunk.iter().map(|cell| cell.region.clone()).collect();
+    13	        regions.sort();
+    14	        let region_low = regions.first().cloned().unwrap_or_default();
+    15	        let region_high = regions.last().cloned().unwrap_or_default();
+    16	        pages.push(Page {
+    17	            id,
+    18	            generation: 3,
+    19	            mark,
+    20	            region_low,
+    21	            region_high,
+    22	            cells: chunk.to_vec(),
+    23	        });
+    24	    }
+    25	    Ok(pages)
+    26	}
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# cat /app/cpp/src/row.cpp
+[?2004l#include "loam/exec.hpp"
+
+namespace loam {
+namespace {
+
+bool is_live(const Cell& cell) {
+    if (cell.origin == Origin::Retired) {
+        return false;
+    }
+    if (cell.origin == Origin::Inherited) {
+        return true;
+    }
+    return cell.present != 0;
+}
+
+bool matches(const Cell& cell, const Probe& probe) {
+    switch (probe.op) {
+        case Op::All:
+            return true;
+        case Op::Equal:
+            return cell.amount == probe.x;
+        case Op::Range:
+            return cell.amount >= probe.x && cell.amount <= probe.y;
+        case Op::IsNull:
+            return false;
+        case Op::RegionEqual:
+            return cell.region == probe.text;
+    }
+    return false;
+}
+
+}  // namespace
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+    for (const auto& cell : a.cells) {
+        const bool live = is_live(cell);
+        if (b.op == Op::IsNull) {
+            if (!live) {
+                ++tally.row_count;
+            }
+            continue;
+        }
+        if (live && matches(cell, b)) {
+            ++tally.row_count;
+            tally.sum_amount += cell.amount;
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# python3 - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> p=Path('/app/cpp/src/lattice/rill.cpp')
+[?2004l[?2004h> s=p.read_text()
+[?2004l[?2004h> s=s.replace('''#include <cstddef>\n#include <vector>\n''','''#include <cstddef>\n#include <vector>\n''')
+[?2004l[?2004h> s=s.replace('''    const std::size_t count = a.amount_lane.size();\n    std::vector<unsigned char> admit(count, 0);\n    for (std::size_t i = 0; i < count; ++i) {\n        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;\n    }\n''','''    const std::size_t count = a.amount_lane.size();\n    std::vector<unsigned char> admit(count, 0);\n    for (std::size_t i = 0; i < count; ++i) {\n        const auto origin = static_cast<Origin>(a.origin_lane[i]);\n        if (origin == Origin::Retired) {\n            admit[i] = 0;\n        } else if (origin == Origin::Inherited) {\n            admit[i] = 1;\n        } else {\n            admit[i] = a.presence_lane[i] != 0 ? 1 : 0;\n        }\n    }\n''')
+[?2004l[?2004h> p.write_text(s)
+[?2004l[?2004h> PY
+[?2004l[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# 
+[?2004l[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# grep -n . /app/cpp/src/lattice/rill.cpp | sed -n '1,120p'
+[?2004l1:#include "loam/exec.hpp"
+3:#include <cstddef>
+4:#include <vector>
+6:namespace loam {
+8:Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+9:    Tally tally;
+10:    if (!c.read) {
+11:        return tally;
+12:    }
+13:    tally.pages_read = 1;
+15:    const std::size_t count = a.amount_lane.size();
+16:    std::vector<unsigned char> admit(count, 0);
+17:    for (std::size_t i = 0; i < count; ++i) {
+18:        const auto origin = static_cast<Origin>(a.origin_lane[i]);
+19:        if (origin == Origin::Retired) {
+20:            admit[i] = 0;
+21:        } else if (origin == Origin::Inherited) {
+22:            admit[i] = 1;
+23:        } else {
+24:            admit[i] = a.presence_lane[i] != 0 ? 1 : 0;
+25:        }
+26:    }
+28:    if (b.op == Op::IsNull) {
+29:        for (std::size_t i = 0; i < count; ++i) {
+30:            if (admit[i] == 0) {
+31:                ++tally.row_count;
+32:            }
+33:        }
+34:        return tally;
+35:    }
+37:    for (std::size_t i = 0; i < count; ++i) {
+38:        if (admit[i] == 0) {
+39:            continue;
+40:        }
+41:        bool keep = false;
+42:        switch (b.op) {
+43:            case Op::All:
+44:                keep = true;
+45:                break;
+46:            case Op::Equal:
+47:                keep = a.amount_lane[i] == b.x;
+48:                break;
+49:            case Op::Range:
+50:                keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+51:                break;
+52:            case Op::IsNull:
+53:                keep = false;
+54:                break;
+55:            case Op::RegionEqual:
+56:                keep = a.region_lane[i] == b.text;
+57:                break;
+58:        }
+59:        if (keep) {
+60:            ++tally.row_count;
+61:            tally.sum_amount += a.amount_lane[i];
+62:        }
+63:    }
+64:    return tally;
+65:}
+67:}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# python3 - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> p=Path('/app/cpp/src/harbor/veil.cpp')
+[?2004l[?2004h> s=p.read_text()
+[?2004l[?2004h> s=s.replace('''    if (b.op == Op::RegionEqual) {\n        const bool read = b.text >= a.region_low && b.text <= a.region_high;\n        return {read, read ? "text-hit" : "text-away"};\n    }\n\n    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;\n    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;\n    const bool read = !(right < a.low || left > a.high);\n    return {read, read ? "range-hit" : "range-away"};\n''','''    if (b.op == Op::RegionEqual) {\n        const bool read = b.text >= a.region_low && b.text <= a.region_high;\n        return {read, read ? "text-hit" : "text-away"};\n    }\n\n    // Generation 3 stores carry faithful live-value numeric markers.  Some\n    // archived generation 2 slabs were written with incomplete mixed-origin\n    // markers; if a slab also records absent/non-live entries, its low/high\n    // cannot safely exclude a numeric probe.  Keep selective reads fast on\n    // healthy slabs, but open these legacy mixed slabs conservatively.\n    if (a.generation < 3 && a.has_absent) {\n        return {true, "legacy-open"};\n    }\n\n    const std::int64_t left = b.x;\n    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;\n    const bool read = !(right < a.low || left > a.high);\n    return {read, read ? "range-hit" : "range-away"};\n''')
+[?2004l[?2004h> p.write_text(s)
+[?2004l[?2004h> PY
+[?2004l[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# 
+[?2004l[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# grep -n . /app/cpp/src/harbor/veil.cpp | sed -n '1,120p'
+[?2004l1:#include "loam/plan.hpp"
+3:namespace loam {
+5:Gate turn_b(const Slab& a, const Probe& b) {
+6:    if (!b.skipping) {
+7:        return {true, "full"};
+8:    }
+9:    if (b.op == Op::All) {
+10:        return {true, "all"};
+11:    }
+12:    if (b.op == Op::IsNull) {
+13:        return {a.has_absent, a.has_absent ? "possible" : "empty"};
+14:    }
+15:    if (b.op == Op::RegionEqual) {
+16:        const bool read = b.text >= a.region_low && b.text <= a.region_high;
+17:        return {read, read ? "text-hit" : "text-away"};
+18:    }
+20:    // Generation 3 stores carry faithful live-value numeric markers.  Some
+21:    // archived generation 2 slabs were written with incomplete mixed-origin
+22:    // markers; if a slab also records absent/non-live entries, its low/high
+23:    // cannot safely exclude a numeric probe.  Keep selective reads fast on
+24:    // healthy slabs, but open these legacy mixed slabs conservatively.
+25:    if (a.generation < 3 && a.has_absent) {
+26:        return {true, "legacy-open"};
+27:    }
+29:    const std::int64_t left = b.x;
+30:    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+31:    const bool read = !(right < a.low || left > a.high);
+32:    return {read, read ? "range-hit" : "range-away"};
+33:}
+35:}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# python3 - <<'PY'
+[?2004l[?2004h> from pathlib import Path
+[?2004l[?2004h> p=Path('/app/cpp/src/harbor/veil.cpp')
+[?2004l[?2004h> s=p.read_text()
+[?2004l[?2004h> s=s.replace('''namespace loam {\n\nGate turn_b(const Slab& a, const Probe& b) {\n''','''namespace loam {\nnamespace {\n\nbool legacy_origin_varies(const Slab& slab) {\n    if (slab.generation >= 3) {\n        return false;\n    }\n    for (const auto origin : slab.origin_lane) {\n        if (static_cast<Origin>(origin) != Origin::Current) {\n            return true;\n        }\n    }\n    return false;\n}\n\n}  // namespace\n\nGate turn_b(const Slab& a, const Probe& b) {\n''')
+[?2004l[?2004h> s=s.replace('''    if (b.op == Op::IsNull) {\n        return {a.has_absent, a.has_absent ? "possible" : "empty"};\n    }\n''','''    if (b.op == Op::IsNull) {\n        const bool read = a.has_absent || legacy_origin_varies(a);\n        return {read, read ? "possible" : "empty"};\n    }\n''')
+[?2004l[?2004h> s=s.replace('''    if (a.generation < 3 && a.has_absent) {\n        return {true, "legacy-open"};\n    }\n''','''    if (a.generation < 3 && (a.has_absent || legacy_origin_varies(a))) {\n        return {true, "legacy-open"};\n    }\n''')
+[?2004l[?2004h> p.write_text(s)
+[?2004l[?2004h> PY
+[?2004l[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# cat /app/cpp/src/harbor/veil.cpp
+[?2004l#include "loam/plan.hpp"
+
+namespace loam {
+namespace {
+
+bool legacy_origin_varies(const Slab& slab) {
+    if (slab.generation >= 3) {
+        return false;
+    }
+    for (const auto origin : slab.origin_lane) {
+        if (static_cast<Origin>(origin) != Origin::Current) {
+            return true;
+        }
+    }
+    return false;
+}
+
+}  // namespace
+
+Gate turn_b(const Slab& a, const Probe& b) {
+    if (!b.skipping) {
+        return {true, "full"};
+    }
+    if (b.op == Op::All) {
+        return {true, "all"};
+    }
+    if (b.op == Op::IsNull) {
+        const bool read = a.has_absent || legacy_origin_varies(a);
+        return {read, read ? "possible" : "empty"};
+    }
+    if (b.op == Op::RegionEqual) {
+        const bool read = b.text >= a.region_low && b.text <= a.region_high;
+        return {read, read ? "text-hit" : "text-away"};
+    }
+
+    // Generation 3 stores carry faithful live-value numeric markers.  Some
+    // archived generation 2 slabs were written with incomplete mixed-origin
+    // markers; if a slab also records absent/non-live entries, its low/high
+    // cannot safely exclude a numeric probe.  Keep selective reads fast on
+    // healthy slabs, but open these legacy mixed slabs conservatively.
+    if (a.generation < 3 && (a.has_absent || legacy_origin_varies(a))) {
+        return {true, "legacy-open"};
+    }
+
+    const std::int64_t left = b.x;
+    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+    const bool read = !(right < a.low || left > a.high);
+    return {read, read ? "range-hit" : "range-away"};
+}
+
+}  // namespace loam
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# cat > /app/rust/src/ember/fold.rs <<'RS'
+[?2004l[?2004h> use crate::model::{FoldErr, Mark, RUNE_FIXED, RUNE_VOID};
+[?2004l[?2004h> 
+[?2004l[?2004h> fn is_live(present: u8, origin: u8) -> bool {
+[?2004l[?2004h>     if origin == RUNE_VOID {
+[?2004l[?2004h>         return false;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if origin == RUNE_FIXED {
+[?2004l[?2004h>         return true;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     present != 0
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+[?2004l[?2004h>     if a.is_empty() {
+[?2004l[?2004h>         return Err(FoldErr::Empty);
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if a.len() != b.len() || a.len() != c.len() {
+[?2004l[?2004h>         return Err(FoldErr::Shape);
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     let mut low: Option<i64> = None;
+[?2004l[?2004h>     let mut high: Option<i64> = None;
+[?2004l[?2004h>     let mut has_absent = false;
+[?2004l[?2004h> 
+[?2004l[?2004h>     for ((value, present), origin) in a.iter().zip(b.iter()).zip(c.iter()) {
+[?2004l[?2004h>         if is_live(*present, *origin) {
+[?2004l[?2004h>             low = Some(low.map_or(*value, |current| current.min(*value)));
+[?2004l[?2004h>             high = Some(high.map_or(*value, |current| current.max(*value)));
+[?2004l[?2004h>         } else {
+[?2004l[?2004h>             has_absent = true;
+[?2004l[?2004h>         }
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     Ok(Mark {
+[?2004l[?2004h>         low: low.unwrap_or(0),
+[?2004l[?2004h>         high: high.unwrap_or(0),
+[?2004l[?2004h>         has_absent,
+[?2004l[?2004h>     })
+[?2004l[?2004h> }
+[?2004l[?2004h> RS
+[?2004l[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# cat /app/rust/src/ember/fold.rs
+[?2004luse crate::model::{FoldErr, Mark, RUNE_FIXED, RUNE_VOID};
+
+fn is_live(present: u8, origin: u8) -> bool {
+    if origin == RUNE_VOID {
+        return false;
+    }
+    if origin == RUNE_FIXED {
+        return true;
+    }
+    present != 0
+}
+
+pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+    if a.is_empty() {
+        return Err(FoldErr::Empty);
+    }
+    if a.len() != b.len() || a.len() != c.len() {
+        return Err(FoldErr::Shape);
+    }
+
+    let mut low: Option<i64> = None;
+    let mut high: Option<i64> = None;
+    let mut has_absent = false;
+
+    for ((value, present), origin) in a.iter().zip(b.iter()).zip(c.iter()) {
+        if is_live(*present, *origin) {
+            low = Some(low.map_or(*value, |current| current.min(*value)));
+            high = Some(high.map_or(*value, |current| current.max(*value)));
+        } else {
+            has_absent = true;
+        }
+    }
+
+    Ok(Mark {
+        low: low.unwrap_or(0),
+        high: high.unwrap_or(0),
+        has_absent,
+    })
+}
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# /app/tools/build-all
+[?2004l[0m[0m[1m[32m   Compiling[0m loam-ingest v0.8.0 (/app/rust)
+[0m[0m[1m[36m    Building[0m [                             ] 0/1: loam-ingest(bin)                                                                                            [K[0m[0m[1m[32m    Finished[0m release [optimized] target(s) in 0.99s
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o build/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json && cat /app/output/audit.json && cp /app/output/audit.json /app/output/audit.1.json && /app/bin/loam audit /app/data/cases /app/output/audit.2.json && cmp -s /app/output/audit.1.json /app/output/audit.2.json && echo deterministic
+[?2004l{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"m_range","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":2,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":2,"sum_amount":30,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_null","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_interact","row_count":3,"sum_amount":25,"pages_total":4,"pages_read":2,"path":"batch","skipping":true},{"case_id":"m_neg","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":10,"sum_amount":2095,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"v_missing","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"batch","skipping":true},{"case_id":"v_check","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"row","skipping":false}],"digest":"24f25c278c07378c"}
+deterministic
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# rm -rf /app/output/fresh_a /app/output/fresh_b /app/output/fresh_c; /app/bin/loam ingest /app/data/fresh/orders_a.csv /app/output/fresh_a; /app/bin/loam ingest /app/data/fresh/orders_b.csv /app/output/fresh_b; /app/bin/loam ingest /app/data/fresh/orders_c.csv /app/output/fresh_c; for s in /app/output/fresh_*/data.store; do echo "===== $s ====="; /app/bin/loam inspect "$s"; cat "$s"; done
+[?2004ljobs=1 cells=8 bytes=182
+jobs=1 cells=8 bytes=185
+jobs=1 cells=8 bytes=179
+===== /app/output/fresh_a/data.store =====
+0|3|10|30|1|4
+1|3|100|130|1|4
+H|3
+P|0|3|10|30|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|1|north|south|4
+R|1|2|100|north
+R|0|2|555|north
+R|1|2|120|south
+R|1|2|130|south
+===== /app/output/fresh_b/data.store =====
+0|3|-999|15|1|4
+1|3|200|220|1|4
+H|3
+P|0|3|-999|15|1|east|west|4
+R|1|2|-999|east
+R|1|2|5|east
+R|0|2|777|west
+R|1|2|15|west
+P|1|3|200|220|1|north|south|4
+R|1|0|-999|north
+R|1|2|200|north
+R|1|2|210|south
+R|1|2|220|south
+===== /app/output/fresh_c/data.store =====
+0|3|-999|34|0|4
+1|3|0|0|1|4
+H|3
+P|0|3|-999|34|0|east|west|4
+R|1|2|-999|east
+R|1|2|8|east
+R|1|2|21|west
+R|1|2|34|west
+P|1|3|0|0|1|north|south|4
+R|1|0|301|north
+R|0|2|317|north
+R|0|0|329|south
+R|1|0|343|south
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# echo '--- bundled audit ---'; cat /app/output/audit.json; echo; echo '--- deterministic cmp ---'; cmp -s /app/output/audit.1.json /app/output/audit.2.json && echo OK || echo MISMATCH
+[?2004l--- bundled audit ---
+{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"m_range","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":2,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":2,"sum_amount":30,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_null","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_interact","row_count":3,"sum_amount":25,"pages_total":4,"pages_read":2,"path":"batch","skipping":true},{"case_id":"m_neg","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":10,"sum_amount":2095,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"v_missing","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"batch","skipping":true},{"case_id":"v_check","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"row","skipping":false}],"digest":"24f25c278c07378c"}
+
+--- deterministic cmp ---
+OK
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# rm -rf /app/output/checkcases; mkdir -p /app/output/checkcases
+[?2004l[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# cat > /app/output/checkcases/equiv.case <<'EOF'
+[?2004l[?2004h> # id|store|operation|x|y|path|skipping|operator note
+[?2004l[?2004h> mix_range_row_skip|/app/data/archive/mixed.store|range|10|40|row|1|mixed row selective
+[?2004l[?2004h> mix_range_batch_full|/app/data/archive/mixed.store|range|10|40|batch|0|mixed batch full
+[?2004l[?2004h> mix_interact_batch_skip|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed batch selective
+[?2004l[?2004h> mix_interact_row_full|/app/data/archive/mixed.store|range|-1000|25|row|0|mixed row full
+[?2004l[?2004h> mix_null_batch_skip|/app/data/archive/mixed.store|isnull|0|0|batch|1|mixed null selective
+[?2004l[?2004h> mix_null_row_full|/app/data/archive/mixed.store|isnull|0|0|row|0|mixed null full
+[?2004l[?2004h> mix_all_batch_full|/app/data/archive/mixed.store|all|0|0|batch|0|mixed all batch
+[?2004l[?2004h> mix_all_row_full|/app/data/archive/mixed.store|all|0|0|row|0|mixed all row
+[?2004l[?2004h> vault_null_batch_skip|/app/data/archive/vault.store|isnull|0|0|batch|1|vault null selective batch
+[?2004l[?2004h> vault_null_row_skip|/app/data/archive/vault.store|isnull|0|0|row|1|vault null selective row
+[?2004l[?2004h> vault_null_row_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault null full
+[?2004l[?2004h> healthy_range_batch_skip|/app/data/archive/healthy.store|range|100|130|batch|1|healthy selective
+[?2004l[?2004h> healthy_range_row_full|/app/data/archive/healthy.store|range|100|130|row|0|healthy full
+[?2004l[?2004h> fresh_a_range_row_skip|/app/output/fresh_a/data.store|range|10|130|row|1|fresh selective row
+[?2004l[?2004h> fresh_a_range_batch_full|/app/output/fresh_a/data.store|range|10|130|batch|0|fresh full batch
+[?2004l[?2004h> fresh_c_null_batch_skip|/app/output/fresh_c/data.store|isnull|0|0|batch|1|fresh null selective
+[?2004l[?2004h> fresh_c_null_row_full|/app/output/fresh_c/data.store|isnull|0|0|row|0|fresh null full
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# /app/bin/loam audit /app/output/checkcases /app/output/checkcases/report.json && cat /app/output/checkcases/report.json
+[?2004l{"status":"complete","cases":[{"case_id":"mix_range_row_skip","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":2,"path":"row","skipping":true},{"case_id":"mix_range_batch_full","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"mix_interact_batch_skip","row_count":3,"sum_amount":25,"pages_total":4,"pages_read":2,"path":"batch","skipping":true},{"case_id":"mix_interact_row_full","row_count":3,"sum_amount":25,"pages_total":4,"pages_read":4,"path":"row","skipping":false},{"case_id":"mix_null_batch_skip","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":1,"path":"batch","skipping":true},{"case_id":"mix_null_row_full","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"row","skipping":false},{"case_id":"mix_all_batch_full","row_count":10,"sum_amount":2095,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"mix_all_row_full","row_count":10,"sum_amount":2095,"pages_total":4,"pages_read":4,"path":"row","skipping":false},{"case_id":"vault_null_batch_skip","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"batch","skipping":true},{"case_id":"vault_null_row_skip","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"row","skipping":true},{"case_id":"vault_null_row_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"healthy_range_batch_skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"healthy_range_row_full","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"fresh_a_range_row_skip","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"fresh_a_range_batch_full","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","skipping":false},{"case_id":"fresh_c_null_batch_skip","row_count":4,"sum_amount":0,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"fresh_c_null_row_full","row_count":4,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"row","skipping":false}],"digest":"77b8c7c3f7b6b5c5"}
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# python3 - <<'PY'
+[?2004l[?2004h> import json
+[?2004l[?2004h> p='/app/output/checkcases/report.json'
+[?2004l[?2004h> r=json.load(open(p))
+[?2004l[?2004h> for c in r['cases']:
+[?2004l[?2004h>     print(c['case_id'], c['row_count'], c['sum_amount'], 'pages', c['pages_read'], '/', c['pages_total'], c['path'], c['skipping'])
+[?2004l[?2004h> PY
+[?2004lmix_range_row_skip 4 100 pages 2 / 4 row True
+mix_range_batch_full 4 100 pages 4 / 4 batch False
+mix_interact_batch_skip 3 25 pages 2 / 4 batch True
+mix_interact_row_full 3 25 pages 4 / 4 row False
+mix_null_batch_skip 2 0 pages 1 / 4 batch True
+mix_null_row_full 2 0 pages 4 / 4 row False
+mix_all_batch_full 10 2095 pages 4 / 4 batch False
+mix_all_row_full 10 2095 pages 4 / 4 row False
+vault_null_batch_skip 2 0 pages 2 / 3 batch True
+vault_null_row_skip 2 0 pages 2 / 3 row True
+vault_null_row_full 2 0 pages 3 / 3 row False
+healthy_range_batch_skip 4 460 pages 1 / 3 batch True
+healthy_range_row_full 4 460 pages 3 / 3 row False
+fresh_a_range_row_skip 6 410 pages 2 / 2 row True
+fresh_a_range_batch_full 6 410 pages 2 / 2 batch False
+fresh_c_null_batch_skip 4 0 pages 1 / 2 batch True
+fresh_c_null_row_full 4 0 pages 2 / 2 row False
+[?2004hroot@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# 

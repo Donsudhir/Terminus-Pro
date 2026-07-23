@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Byte-identical across runs. Now test fresh ingest and verify markers are faithful. Let me look at the CSV files and ingest them.",
+  "plan": "Cat a CSV, ingest it, inspect resulting data.store markers, verify low/high span live only and has_absent correct.",
+  "commands": [
+    {"keystrokes": "for f in a b c; do echo \"=== orders_$f ===\"; cat /app/data/fresh/orders_$f.csv; done\n", "duration": 0.1}
+  ]
+}
+```

@@ -1,0 +1,216 @@
+New Terminal Output:
+
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# sed -n '1,220p' /app/cpp/src/harbor/veil.cpp; sed -n '1,240p' /app/cpp/src/lattice/rill.cpp; sed -n '1,180p' /ap
+p/rust/src/ember/fold.rs
+#include "loam/plan.hpp"
+
+namespace loam {
+
+Gate turn_b(const Slab& a, const Probe& b) {
+    if (!b.skipping) {
+        return {true, "full"};
+    }
+    if (b.op == Op::All) {
+        return {true, "all"};
+    }
+    if (b.op == Op::IsNull) {
+        if (a.generation < 3) {
+            return {true, "legacy-null"};
+        }
+        return {a.has_absent, a.has_absent ? "possible" : "empty"};
+    }
+    if (b.op == Op::RegionEqual) {
+        const bool read = b.text >= a.region_low && b.text <= a.region_high;
+        return {read, read ? "text-hit" : "text-away"};
+    }
+
+    if (a.generation < 3) {
+        return {true, "legacy-range"};
+    }
+
+    const std::int64_t left = b.x;
+    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+    const bool read = !(right < a.low || left > a.high);
+    return {read, read ? "range-hit" : "range-away"};
+}
+
+}  // namespace loam
+#include "loam/exec.hpp"
+
+#include <cstddef>
+#include <vector>
+
+namespace loam {
+namespace {
+
+bool is_live(std::uint8_t present, std::uint8_t origin) {
+    const auto decoded = static_cast<Origin>(origin);
+    if (decoded == Origin::Retired) {
+        return false;
+    }
+    if (decoded == Origin::Inherited) {
+        return true;
+    }
+    return present != 0;
+}
+
+}  // namespace
+
+Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+
+    const std::size_t count = a.amount_lane.size();
+    std::vector<unsigned char> admit(count, 0);
+    for (std::size_t i = 0; i < count; ++i) {
+        admit[i] = is_live(a.presence_lane[i], a.origin_lane[i]) ? 1 : 0;
+    }
+
+    if (b.op == Op::IsNull) {
+        for (std::size_t i = 0; i < count; ++i) {
+            if (admit[i] == 0) {
+                ++tally.row_count;
+            }
+        }
+        return tally;
+    }
+
+    for (std::size_t i = 0; i < count; ++i) {
+        if (admit[i] == 0) {
+            continue;
+        }
+        bool keep = false;
+        switch (b.op) {
+            case Op::All:
+                keep = true;
+                break;
+            case Op::Equal:
+                keep = a.amount_lane[i] == b.x;
+                break;
+            case Op::Range:
+                keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+                break;
+            case Op::IsNull:
+                keep = false;
+                break;
+            case Op::RegionEqual:
+                keep = a.region_lane[i] == b.text;
+                break;
+        }
+        if (keep) {
+            ++tally.row_count;
+            tally.sum_amount += a.amount_lane[i];
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+use crate::model::{FoldErr, Mark};
+
+fn is_live(present: u8, origin: u8) -> bool {
+    match origin {
+        0 => false,
+        1 => true,
+        _ => present != 0,
+    }
+}
+
+pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+    if a.is_empty() {
+        return Err(FoldErr::Empty);
+    }
+    if a.len() != b.len() || a.len() != c.len() {
+        return Err(FoldErr::Shape);
+    }
+
+    let mut low: Option<i64> = None;
+    let mut high: Option<i64> = None;
+    let mut has_absent = false;
+    for ((value, present), origin) in a.iter().zip(b.iter()).zip(c.iter()) {
+        if is_live(*present, *origin) {
+            low = Some(low.map_or(*value, |current| current.min(*value)));
+            high = Some(high.map_or(*value, |current| current.max(*value)));
+        } else {
+            has_absent = true;
+        }
+    }
+
+    Ok(Mark {
+        low: low.unwrap_or(0),
+        high: high.unwrap_or(0),
+        has_absent,
+    })
+}
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# /app/bin/loam audit /app/data/cases /app/output/audit1.json && /app/bin/loam audit /app/data/cases /app/output/a
+udit2.json && cmp -s /app/output/audit1.json /app/output/audit2.json && echo audit-repeat-identical
+audit-repeat-identical
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# rm -rf /app/output/fresh_a /app/output/fresh_b /app/output/fresh_c /app/output/tmpcases && /app/bin/loam ingest
+/app/data/fresh/orders_a.csv /app/output/fresh_a >/app/output/ingest_a.out 2>/app/output/ingest_a.err && /app/bin/loam ingest /app/data/fresh/orders_b.csv /app/
+output/fresh_b >/app/output/ingest_b.out 2>/app/output/ingest_b.err && /app/bin/loam ingest /app/data/fresh/orders_c.csv /app/output/fresh_c >/app/output/ingest
+_c.out 2>/app/output/ingest_c.err && for f in /app/output/fresh_*/data.store; do echo "### $f"; cat "$f"; done
+### /app/output/fresh_a/data.store
+H|3
+P|0|3|10|30|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|1|north|south|4
+R|1|2|100|north
+R|0|2|555|north
+R|1|2|120|south
+R|1|2|130|south
+### /app/output/fresh_b/data.store
+H|3
+P|0|3|-999|15|1|east|west|4
+R|1|2|-999|east
+R|1|2|5|east
+R|0|2|777|west
+R|1|2|15|west
+P|1|3|200|220|1|north|south|4
+R|1|0|-999|north
+R|1|2|200|north
+R|1|2|210|south
+R|1|2|220|south
+### /app/output/fresh_c/data.store
+H|3
+P|0|3|-999|34|0|east|west|4
+R|1|2|-999|east
+R|1|2|8|east
+R|1|2|21|west
+R|1|2|34|west
+P|1|3|0|0|1|north|south|4
+R|1|0|301|north
+R|0|2|317|north
+R|0|0|329|south
+R|1|0|343|south
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# mkdir -p /app/output/tmpcases && cat > /app/output/tmpcases/equiv.case <<'EOF'
+> a_all_row|/app/output/fresh_a/data.store|all|0|0|row|0|x
+> a_all_batch|/app/output/fresh_a/data.store|all|0|0|batch|0|x
+> a_null_row|/app/output/fresh_a/data.store|isnull|0|0|row|0|x
+> a_null_batch|/app/output/fresh_a/data.store|isnull|0|0|batch|0|x
+> a_range_row_skip|/app/output/fresh_a/data.store|range|100|130|row|1|x
+> a_range_batch_skip|/app/output/fresh_a/data.store|range|100|130|batch|1|x
+> b_eq_row|/app/output/fresh_b/data.store|eq|-999|0|row|1|x
+> b_eq_batch|/app/output/fresh_b/data.store|eq|-999|0|batch|1|x
+> c_all_row|/app/output/fresh_c/data.store|all|0|0|row|0|x
+> c_all_batch|/app/output/fresh_c/data.store|all|0|0|batch|0|x
+> c_null_row|/app/output/fresh_c/data.store|isnull|0|0|row|1|x
+> c_null_batch|/app/output/fresh_c/data.store|isnull|0|0|batch|1|x
+> EOF
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# /app/bin/loam audit /app/output/tmpcases /app/output/tmp-audit.json && cat /app/output/tmp-audit.json
+{"status":"complete","cases":[{"case_id":"a_all_row","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"row","skipping":false},{"case_id":"a_
+all_batch","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","skipping":false},{"case_id":"a_null_row","row_count":2,"sum_amount":0,"
+pages_total":2,"pages_read":2,"path":"row","skipping":false},{"case_id":"a_null_batch","row_count":2,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"batch
+","skipping":false},{"case_id":"a_range_row_skip","row_count":3,"sum_amount":350,"pages_total":2,"pages_read":1,"path":"row","skipping":true},{"case_id":"a_rang
+e_batch_skip","row_count":3,"sum_amount":350,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"b_eq_row","row_count":1,"sum_amount":-99
+9,"pages_total":2,"pages_read":1,"path":"row","skipping":true},{"case_id":"b_eq_batch","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"ba
+tch","skipping":true},{"case_id":"c_all_row","row_count":4,"sum_amount":-936,"pages_total":2,"pages_read":2,"path":"row","skipping":false},{"case_id":"c_all_bat
+ch","row_count":4,"sum_amount":-936,"pages_total":2,"pages_read":2,"path":"batch","skipping":false},{"case_id":"c_null_row","row_count":4,"sum_amount":0,"pages_
+total":2,"pages_read":1,"path":"row","skipping":true},{"case_id":"c_null_batch","row_count":4,"sum_amount":0,"pages_total":2,"pages_read":1,"path":"batch","skip
+ping":true}],"digest":"26c5c82b0c393685"}
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app#

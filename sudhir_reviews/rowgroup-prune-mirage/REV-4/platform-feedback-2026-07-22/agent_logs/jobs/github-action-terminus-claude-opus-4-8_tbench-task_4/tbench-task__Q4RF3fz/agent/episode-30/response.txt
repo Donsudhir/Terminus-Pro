@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "I've verified all the fixes are working correctly. Let me do one final comprehensive verification before confirming completion, including a full clean rebuild via build-all and re-running the bundled audit to ensure the persisted source changes compile and produce consistent results.",
+  "plan": "Do a final clean rebuild and audit run to confirm everything is stable and self-consistent.",
+  "commands": [
+    {"keystrokes": "cd /app && make clean >/dev/null 2>&1; ./tools/build-all >/dev/null 2>&1 && echo BUILD_OK\n", "duration": 25.0},
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && md5sum /app/output/audit.json; /app/bin/loam audit /app/data/cases /tmp/re.json; diff /app/output/audit.json /tmp/re.json && echo DETERMINISTIC\n", "duration": 2.0}
+  ]
+}
+```

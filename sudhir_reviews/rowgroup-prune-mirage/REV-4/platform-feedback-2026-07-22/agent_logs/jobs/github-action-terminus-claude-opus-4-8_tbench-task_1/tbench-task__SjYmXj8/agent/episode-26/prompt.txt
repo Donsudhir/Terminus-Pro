@@ -1,0 +1,16 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# /app/bin/loam audit /app/data/cases /tmp/a1.json; /app/bin/loam audit /app/data/cases /tmp/a2.json; cmp /tmp/a1.
+json /tmp/a2.json && echo IDENTICAL
+IDENTICAL
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# head -5 /app/data/fresh/orders_a.csv
+origin,presence,amount,region
+0,1,-999,east
+2,1,10,east
+2,1,20,west
+2,1,30,west
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app#

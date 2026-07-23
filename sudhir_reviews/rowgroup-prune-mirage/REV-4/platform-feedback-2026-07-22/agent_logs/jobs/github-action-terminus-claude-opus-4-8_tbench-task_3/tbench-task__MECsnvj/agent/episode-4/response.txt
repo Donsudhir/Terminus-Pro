@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "I see the data model. A Cell has present, origin, amount, region. Origin can be Retired/Inherited/Current. The key question is: what makes an entry 'live'? Likely present flag AND origin not Retired. Let me look at the row reader and lattice reader to find the discrepancy.",
+  "plan": "Read row.cpp and the lattice readers (bay.cpp, rill.cpp) to compare how they count live rows.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/row.cpp\n", "duration": 0.1}
+  ]
+}
+```

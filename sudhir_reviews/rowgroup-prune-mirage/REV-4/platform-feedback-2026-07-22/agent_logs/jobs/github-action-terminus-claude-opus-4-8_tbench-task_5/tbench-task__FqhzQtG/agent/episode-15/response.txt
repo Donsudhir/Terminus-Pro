@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Now let me trace carefully. Origin: 0=Retired, 1=Inherited, 2=Current. is_live: Retired->false, Inherited->true, Current->present!=0.\n\nMIXED store slabs:\nSlab0 (gen2, low=100,high=100,has_absent=1): rows:\n- R|1|0|-999 (present=1,retired) -> NOT live\n- R|1|2|10 (current,present) -> live, amount 10\n- R|1|2|20 -> live, 20\n- R|0|2|777 (current,absent) -> NOT live\nLive amounts: 10,20.\n\nSlab1 (gen3,low=30,high=600,absent=0): all current present: 30,40,500,600 all live.\nSlab2 (gen3,-5..-5): R|1|2|-5 live.\nSlab3 (gen3,200..400): 200,300,400 all live.\n\nm_all (batch, skipping=false, All op): should count all LIVE rows. Live rows: slab0: 10,20 (2 rows, sum 30); slab1: 30,40,500,600 (4, sum 1170); slab2: -5 (1, sum -5); slab3: 200,300,400 (3, sum 900). Total live: 2+4+1+3=10 rows, sum=30+1170-5+900=2095.\n\nBut current batch output m_all: row_count=11, sum=1096. Current batch admits presence!=0: slab0 admits -999,10,20 (777 absent excluded) = 3 rows sum -969; slab1: 4 rows 1170; slab2: 1 row -5; slab3: 3 rows 900. Total: 3+4+1+3=11 rows, sum=-969+1170-5+900=1096. Yes! matches. So batch wrongly includes the retired -999.\n\nThe correct answer (row reader logic) would give 10 rows, sum 2095. The fix to rill.cpp makes batch match row. \n\nNow c_legit: batch, eq -999, skipping. Store current.store. Let me check that. It says row_count=1, sum=-999. 'legitimate overlap' — this is a legit value of -999 that happens to overlap the old retired sentinel convention. So -999 as a legitimate current present value SHOULD be counted. Let me check current.store.",
+  "plan": "View current.store and healthy.store to verify the fix handles the 'legitimate -999' case correctly (it should, since we use origin+presence, not amount sentinel).",
+  "commands": [
+    {"keystrokes": "cat -A /app/data/archive/current.store\n", "duration": 0.1},
+    {"keystrokes": "echo '---HEALTHY---'; cat -A /app/data/archive/healthy.store\n", "duration": 0.1}
+  ]
+}
+```

@@ -1,0 +1,129 @@
+================================================================================
+                         REVIEW REPORT: tbench-task
+================================================================================
+
+Status:        ⚠️ WARNING
+Task Location: /root/harbor_tasks/tbench-task
+
+--------------------------------------------------------------------------------
+SUMMARY
+--------------------------------------------------------------------------------
+
+This task presents a dual-language (Rust + C++) columnar storage system with
+intentional bugs in three source files: the Rust marker computation ignores
+liveness, the C++ slab-pruning planner omits legacy-generation handling, and the
+C++ lattice reader ignores origin lanes. The agent must diagnose disagreements
+between row-path and batch-path execution on archived mixed-generation stores,
+fix the three buggy modules, and ensure fresh ingestion writes faithful markers
+—all while preserving healthy-case behavior. The test suite contains 15 pytest
+functions covering ingestion markers, selective/batch reads, absence probes,
+cross-store consistency, idempotency, and text-code predicates.
+
+================================================================================
+                              WARNINGS ⚠️
+================================================================================
+
+--------------------------------------------------------------------------------
+1. Non-Canonical Docker Base Image
+--------------------------------------------------------------------------------
+
+File:    tbench-task/environment/Dockerfile (line 2)
+Problem: Uses public.ecr.aws/docker/library/gcc:13-bookworm which is not one of
+         the canonical t-bench base images. The task needs both g++ and rustc/
+         cargo, which is a legitimate reason no single canonical image may cover
+         this combination, but the deviation should be documented or proposed as
+         a list addition.
+
+Current code:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FROM public.ecr.aws/docker/library/gcc:13-bookworm@sha256:930f2ebe23927... │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Suggested fix: If the canonical base image list does not yet cover a combined
+C++/Rust toolchain, propose adding gcc:13-bookworm (or a multi-lang variant) to
+the canonical list. Alternatively, use the canonical Debian bookworm-slim base
+and install both toolchains explicitly. This is acceptable as-is if the team
+agrees on the justification.
+
+Explanation: Tasks requiring two compiled languages (Rust + C++20) have a
+credible justification for needing a non-standard base. This is a low-severity
+deviation but should be acknowledged.
+
+--------------------------------------------------------------------------------
+2. Instruction Clarity — Terse and Assumes Significant Domain Context
+--------------------------------------------------------------------------------
+
+File:    tbench-task/instruction.md (lines 1-6)
+Problem: The instruction is dense and uses project-internal jargon ("origin
+         lanes", "presence lanes", "selective reads", "batch execution",
+         "mixed-generation stores", "incomplete markers") without defining them
+         upfront. While the architecture docs and format-notes in /app/docs/
+         provide background, the task description itself could be clearer about
+         what "the disagreement" is and which files are expected to contain bugs.
+
+Current approach: A single paragraph describes the symptom, rebuild command,
+drill invocation, and fresh-ingest contract all at once.
+
+Suggested fix: Add a brief "Symptoms" section naming the specific mismatch
+(row-path vs batch-path on mixed.store), and explicitly note that the reader
+modules in rust/ and cpp/ are the repair targets. Reference the docs for schema
+details but make the top-level goal unmistakable.
+
+Explanation: An agent unfamiliar with the codebase may struggle to locate the
+fault without clearer signposting. The current text is solvable but relies
+heavily on the agent inferring where to look from indirect phrasing.
+
+================================================================================
+                             SUGGESTIONS 💡
+================================================================================
+
+--------------------------------------------------------------------------------
+1. Test Docstrings Could Be More Diagnostic
+--------------------------------------------------------------------------------
+
+File:    tbench-task/tests/test_outputs.py (various)
+
+Current approach: Docstrings like "Fresh numeric ingestion keeps its recorded
+value domain faithful" are poetic but could be more specific about what exact
+values or invariants they check.
+
+Suggested improvement:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  def test_p01(tmp_path: Path) -> None:                                      │
+│      """Ingesting alpha CSV produces page markers (17,43,has_absent=1)       │
+│      and (107,151,has_absent=1) reflecting only live-value bounds."""        │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+Rationale: More diagnostic docstrings help identify which behavior failed when
+reading test output, especially with 15 tests covering overlapping scenarios.
+
+================================================================================
+                            OVERALL ASSESSMENT
+================================================================================
+
+This is a well-crafted, challenging debugging task that exercises real systems-
+programming skills across a Rust/C++ mixed-language codebase. The intentional
+bugs are non-trivial and require understanding columnar storage semantics. The
+test suite is comprehensive and deterministic.
+
+Key Strengths:
+  ✓ Realistic mixed-language codebase with coherent architecture
+  ✓ Bugs require genuine reasoning about liveness, origin lanes, and legacy
+    format compatibility — no shortcut solutions
+  ✓ 15 tests provide thorough coverage including cross-mode consistency,
+    idempotency, fresh ingestion, and regression controls
+
+Key Weaknesses:
+  ✗ Non-canonical base image (justifiable but should be documented)
+  ✗ Instruction density may slow agent orientation; could benefit from clearer
+    symptom description
+
+Evaluates: cross-language debugging, columnar storage semantics, predicate
+           push-down logic, backwards-compatible format evolution
+
+================================================================================
+  RECOMMENDATION: ✅ READY TO USE
+
+  The task is structurally sound, well-tested, and anti-cheat resistant. The
+  two warnings are minor and do not affect correctness or fairness.
+================================================================================

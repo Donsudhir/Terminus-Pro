@@ -1,0 +1,291 @@
+New Terminal Output:
+
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# find /app/cpp -type f | sort
+/app/cpp/Makefile
+/app/cpp/build/digest.o
+/app/cpp/build/harbor/pale.o
+/app/cpp/build/harbor/veil.o
+/app/cpp/build/lattice/bay.o
+/app/cpp/build/lattice/rill.o
+/app/cpp/build/loam
+/app/cpp/build/main.o
+/app/cpp/build/parse.o
+/app/cpp/build/report.o
+/app/cpp/build/row.o
+/app/cpp/build/store.o
+/app/cpp/include/loam/exec.hpp
+/app/cpp/include/loam/plan.hpp
+/app/cpp/include/loam/report.hpp
+/app/cpp/include/loam/store.hpp
+/app/cpp/include/loam/types.hpp
+/app/cpp/src/digest.cpp
+/app/cpp/src/harbor/pale.cpp
+/app/cpp/src/harbor/veil.cpp
+/app/cpp/src/lattice/bay.cpp
+/app/cpp/src/lattice/rill.cpp
+/app/cpp/src/main.cpp
+/app/cpp/src/parse.cpp
+/app/cpp/src/report.cpp
+/app/cpp/src/row.cpp
+/app/cpp/src/store.cpp
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# printf '--- cases ---\n'; for f in /app/data/cases/*.case; do echo "$f"; cat "$f"; done
+bash: printf: --: invalid option
+printf: usage: printf [-v var] format [arguments]
+/app/data/cases/control.case
+# id|store|operation|x|y|path|skipping|operator note
+c_legit|/app/data/archive/current.store|eq|-999|0|batch|1|legitimate overlap
+h_skip|/app/data/archive/healthy.store|range|100|130|batch|1|selective control
+h_full|/app/data/archive/healthy.store|range|100|130|row|0|full control
+h_region|/app/data/archive/healthy.store|region_eq|north|0|row|1|text control
+/app/data/cases/incident.case
+# id|store|operation|x|y|path|skipping|operator note
+m_range|/app/data/archive/mixed.store|range|10|40|row|1|invoice window
+m_narrow|/app/data/archive/mixed.store|range|10|20|row|1|narrow window
+m_null|/app/data/archive/mixed.store|isnull|0|0|batch|0|missing count
+m_interact|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed window
+m_neg|/app/data/archive/mixed.store|range|-100|-1|batch|0|negative window
+m_all|/app/data/archive/mixed.store|all|0|0|batch|0|full tally
+v_window|/app/data/archive/vault.store|range|10|50|row|1|vault window
+v_missing|/app/data/archive/vault.store|isnull|0|0|batch|1|vault absent probe
+v_check|/app/data/archive/vault.store|isnull|0|0|row|1|vault absent recheck
+v_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault full control
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# sed -n '1,240p' /app/cpp/src/store.cpp
+#include "loam/store.hpp"
+
+#include "loam/exec.hpp"
+#include "loam/plan.hpp"
+
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
+namespace loam {
+namespace {
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> fields;
+    std::size_t start = 0;
+    while (true) {
+        const auto end = line.find('|', start);
+        fields.push_back(line.substr(start, end - start));
+        if (end == std::string::npos) {
+            break;
+        }
+        start = end + 1;
+    }
+    return fields;
+}
+
+}  // namespace
+
+std::vector<Slab> load_store(const std::filesystem::path& path) {
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("cannot open store: " + path.string());
+    }
+
+    std::vector<Slab> slabs;
+    std::string line;
+    while (std::getline(input, line)) {
+        if (line.empty() || line.rfind("H|", 0) == 0) {
+            continue;
+        }
+        const auto page = split(line);
+        if (page.size() != 9 || page[0] != "P") {
+            throw std::runtime_error("bad page record in " + path.string());
+        }
+        Slab slab;
+        slab.id = std::stoull(page[1]);
+        slab.generation = static_cast<std::uint8_t>(std::stoul(page[2]));
+        slab.low = std::stoll(page[3]);
+        slab.high = std::stoll(page[4]);
+        slab.has_absent = page[5] == "1";
+        slab.region_low = page[6];
+        slab.region_high = page[7];
+        const auto row_count = std::stoull(page[8]);
+        for (std::size_t i = 0; i < row_count; ++i) {
+            if (!std::getline(input, line)) {
+                throw std::runtime_error("short page in " + path.string());
+            }
+            const auto row = split(line);
+            if (row.size() != 5 || row[0] != "R") {
+                throw std::runtime_error("bad row record in " + path.string());
+            }
+            const auto presence = static_cast<std::uint8_t>(std::stoul(row[1]));
+            const auto origin = static_cast<std::uint8_t>(std::stoul(row[2]));
+            const auto amount = std::stoll(row[3]);
+            slab.cells.push_back({presence, static_cast<Origin>(origin), amount, row[4]});
+            slab.presence_lane.push_back(presence);
+            slab.origin_lane.push_back(origin);
+            slab.amount_lane.push_back(amount);
+            slab.region_lane.push_back(row[4]);
+        }
+        slabs.push_back(std::move(slab));
+    }
+    return slabs;
+}
+
+CaseResult run_case(const CaseSpec& spec) {
+    const auto slabs = load_store(spec.store_path);
+    Tally total;
+    for (const auto& slab : slabs) {
+        const Gate gate = turn_b(slab, spec.probe);
+        const auto label = turn_d(gate, spec.probe);
+ 
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+de <sys/wait.h>
+#include <unistd.h>
+#include <vector>
+
+namespace {
+
+int run_ingest(const char* input, const char* output) {
+    const pid_t child = fork();
+    if (child == -1) {
+        throw std::runtime_error("fork failed");
+    }
+    if (child == 0) {
+        execl("/app/bin/loam-ingest", "loam-ingest", input, output, nullptr);
+        _exit(127);
+    }
+    int status = 0;
+    if (waitpid(child, &status, 0) == -1) {
+        throw std::runtime_error("waitpid failed");
+    }
+    return WIFEXITED(status) ? WEXITSTATUS(status) : 1;
+}
+
+}  // namespace
+
+int main(int argc, char** argv) {
+    try {
+        if (argc == 4 && std::string(argv[1]) == "audit") {
+            const auto specs = loam::load_cases(argv[2]);
+            std::vector<loam::CaseResult> results;
+            results.reserve(specs.size());
+            for (const auto& spec : specs) {
+                results.push_back(loam::run_case(spec));
+            }
+            loam::write_report(argv[3], results);
+            return 0;
+        }
+        if (argc == 4 && std::string(argv[1]) == "ingest") {
+            return run_ingest(argv[2], argv[3]);
+        }
+        if (argc == 3 && std::string(argv[1]) == "inspect") {
+            const auto slabs = loam::load_store(argv[2]);
+            for (const auto& slab : slabs) {
+                std::cout << slab.id << '|' << static_cast<int>(slab.generation)
+                          << '|' << slab.low << '|' << slab.high << '|'
+                          << (slab.has_absent ? 1 : 0) << '|' << slab.cells.size()
+                          << '\n';
+            }
+            return 0;
+        }
+        std::cerr << "usage: loam audit <case-directory> <report-path>\n"
+                  << "       loam ingest <csv> <store-directory>\n"
+                  << "       loam inspect <store>\n";
+        return 2;
+    } catch (const std::exception& error) {
+        std::cerr << "loam: " << error.what() << '\n';
+        return 1;
+    }
+}
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# sed -n '1,260p' /app/rust/src/codec.rs
+use crate::model::{Cell, Page};
+use std::fs::File;
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::path::Path;
+
+pub(crate) fn read_csv(path: &Path) -> Result<Vec<Cell>, Box<dyn std::error::Error>> {
+    let file = File::open(path)?;
+    let mut rows = Vec::new();
+    for (line_no, line) in BufReader::new(file).lines().enumerate() {
+        let line = line?;
+        if line_no == 0 && line.starts_with("origin,") {
+            continue;
+        }
+        if line.trim().is_empty() {
+            continue;
+        }
+        let fields: Vec<&str> = line.split(',').collect();
+        if fields.len() != 4 {
+            return Err(format!("{}:{}: expected four columns", path.display(), line_no + 1).into());
+        }
+        rows.push(Cell {
+            origin: fields[0].parse()?,
+            present: fields[1].parse()?,
+            amount: fields[2].parse()?,
+            region: fields[3].trim().to_owned(),
+        });
+    }
+    Ok(rows)
+}
+
+pub(crate) fn write_pages(path: &Path, pages: &[Page]) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let file = File::create(path)?;
+    let mut out = BufWriter::new(file);
+    writeln!(out, "H|3")?;
+    for page in pages {
+        writeln!(
+            out,
+            "P|{}|{}|{}|{}|{}|{}|{}|{}",
+            page.id,
+            page.generation,
+            page.mark.low,
+            page.mark.high,
+            u8::from(page.mark.has_absent),
+            page.region_low,
+            page.region_high,
+            page.cells.len()
+        )?;
+        for cell in &page.cells {
+            writeln!(
+                out,
+                "R|{}|{}|{}|{}",
+                cell.present, cell.origin, cell.amount, cell.region
+            )?;
+        }
+    }
+    out.flush()?;
+    Ok(())
+}
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# sed -n '1,240p' /app/rust/src/main.rs
+mod codec;
+mod ember;
+mod model;
+mod report;
+
+use ember::pale::{tilt_d, Dial};
+use std::path::{Path, PathBuf};
+
+fn main() {
+    if let Err(error) = run() {
+        eprintln!("loam-ingest: {error}");
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() != 3 {
+        return Err("usage: loam-ingest <csv> <store>".into());
+    }
+    let cells = codec::read_csv(Path::new(&args[1]))?;
+    let pages = ember::reed::gather(cells, 4)?;
+    let directory = PathBuf::from(&args[2]);
+    std::fs::create_dir_all(&directory)?;
+    let target = directory.join("data.store");
+    codec::write_pages(&target, &pages)?;
+
+    let size = std::fs::metadata(&target)?.len() as usize;
+    let mut dial = Dial::default();
+    let cell_count = pages.iter().map(|page| page.cells.len()).sum();
+    tilt_d(&mut dial, cell_count, size);
+    eprintln!("{}", report::line(&dial));
+    Ok(())
+}
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app#

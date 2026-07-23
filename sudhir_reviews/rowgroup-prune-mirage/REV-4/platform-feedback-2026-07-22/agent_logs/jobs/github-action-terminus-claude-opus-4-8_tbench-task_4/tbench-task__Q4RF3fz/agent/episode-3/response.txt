@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "I need to read the C++ readers and headers to understand slab interpretation. Let me look at the types and store first.",
+  "plan": "Read the header files and store parsing code.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/include/loam/types.hpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/include/loam/store.hpp\n", "duration": 0.1}
+  ]
+}
+```

@@ -1,0 +1,41 @@
+Current Terminal Screen:
+H|3
+P|0|3|-999|15|1|east|west|4
+R|1|2|-999|east
+R|1|2|5|east
+R|0|2|777|west
+R|1|2|15|west
+P|1|3|200|220|1|north|south|4
+R|1|0|-999|north
+R|1|2|200|north
+R|1|2|210|south
+R|1|2|220|south
+jobs=1 cells=8 bytes=179
+### /app/output/fresh_test/orders_c/data.store
+H|3
+P|0|3|-999|34|0|east|west|4
+R|1|2|-999|east
+R|1|2|8|east
+R|1|2|21|west
+R|1|2|34|west
+P|1|3|0|0|1|north|south|4
+R|1|0|301|north
+R|0|2|317|north
+R|0|0|329|south
+R|1|0|343|south
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app# cat > /app/output/fresh_cases/fresh.case <<'EOF'
+> # id|store|operation|x|y|path|skipping|operator note
+> fa_row|/app/output/fresh_test/orders_a/data.store|all|0|0|row|0|fresh all row
+> fa_batch|/app/output/fresh_test/orders_a/data.store|all|0|0|batch|0|fresh all batch
+> fa_range_row|/app/output/fresh_test/orders_a/data.store|range|-1000|1000|row|1|fresh range row
+> fa_range_batch|/app/output/fresh_test/orders_a/data.store|range|-1000|1000|batch|1|fresh range batch
+> fb_null_row|/app/output/fresh_test/orders_b/data.store|isnull|0|0|row|1|fresh null row
+> fb_null_batch|/app/output/fresh_test/orders_b/data.store|isnull|0|0|batch|1|fresh null batch
+> EOF
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app# /app/bin/loam audit /app/output/fresh_cases /app/output/fresh_audit.json && cat /app/output/fresh_audit.json
+{"status":"complete","cases":[{"case_id":"fa_row","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"row","skipping":false},{"case_id":"fa_ba
+tch","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","skipping":false},{"case_id":"fa_range_row","row_count":6,"sum_amount":410,"pa
+ges_total":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"fa_range_batch","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batc
+h","skipping":true},{"case_id":"fb_null_row","row_count":2,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"fb_null_batch
+","row_count":2,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"batch","skipping":true}],"digest":"94a3e223f173cde9"}
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app#

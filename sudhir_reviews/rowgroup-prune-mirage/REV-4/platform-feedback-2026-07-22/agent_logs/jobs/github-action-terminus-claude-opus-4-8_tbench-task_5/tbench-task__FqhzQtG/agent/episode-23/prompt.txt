@@ -1,0 +1,27 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/data/fresh/orders_b.csv; echo '---C---'; cat /app/data/fresh/orders_c.csv
+origin,presence,amount,region
+2,1,-999,east
+2,1,5,east
+2,0,777,west
+2,1,15,west
+0,1,-999,north
+2,1,200,north
+2,1,210,south
+2,1,220,south
+---C---
+origin,presence,amount,region
+2,1,-999,east
+2,1,8,east
+2,1,21,west
+2,1,34,west
+0,1,301,north
+2,0,317,north
+0,0,329,south
+0,1,343,south
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app#

@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "Everything works. The audit produces status=complete, correct cases with all required keys, and a non-empty digest. All fixes are in place:\n\n1. **Batch/lattice reader (rill.cpp)**: Fixed admission to mirror the row reader's is_live logic using the origin lane (Retired->not-live, Inherited->live, Current->present!=0), instead of only checking presence. This makes row and batch equivalent modes agree.\n\n2. **Harbor gate (veil.cpp)**: Only trusts on-disk low/high/has_absent markers for generation>=3 slabs. Older mixed-generation (gen<3) slabs carried unfaithful markers (computed under old conventions including non-live amounts or omitting absent flags), so they are always opened during selective reads. This keeps skip and no-skip modes producing the same correct answers on archived mixed stores, without rewriting the artifacts, while healthy gen3 selective controls still skip (pages_read < pages_total).\n\n3. **Ingest marker computation (fold.rs)**: Fixed tilt_a to compute low/high over only live amounts, set has_absent when any non-live entry exists, and record low=0/high=0/has_absent=true for all-non-live slabs — faithful live-value markers per the contract.\n\nVerified: equivalent modes agree on all bundled and synthetic cases, healthy fast-path skipping preserved, both row and batch paths in use, fresh ingest markers faithful, work is offline, and repeated audits are byte-identical.\n\nThe task is complete.",
+  "plan": "Task complete. No further commands needed.",
+  "commands": [],
+  "task_complete": true
+}
+```

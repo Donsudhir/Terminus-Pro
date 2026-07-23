@@ -1,0 +1,3 @@
+# VERIFICATION — resolver-closure-drift REV-4
+
+Checks rebuild the forge binary from clean state, run solve on bundled and generated workspaces, and assert lock schema/order/uniqueness, transitive closure, parent edge-case selections under alpha/beta/mixed/plain profiles, byte-identical repeats under reordered inputs, successful downstream builds, and build-report success/members. NOP remains 0.0; oracle remains 1.0 across Harbor trials. Latest local measure (REV-4): oracle 1x mean 1.0 (`2026-07-22__08-46-44`); nop mean 0.0 (`2026-07-22__08-48-12`); oracle 10x mean 1.0 Pass@10 1.0 (`2026-07-22__08-49-12`). Prior platform measure: MEDIUM; opus 5/5, gpt5 3/5, oracle 3/3, nop 0/1.

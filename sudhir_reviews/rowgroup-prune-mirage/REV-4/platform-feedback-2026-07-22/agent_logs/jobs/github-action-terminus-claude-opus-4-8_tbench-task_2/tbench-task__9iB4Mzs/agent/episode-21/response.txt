@@ -1,0 +1,11 @@
+```json
+{
+  "analysis": "Let me verify correctness by manually checking key equivalent-mode pairs and correctness:\n\nm_range (range 10..40 row skipping): result row_count=4 sum=100. Let me verify: mixed slab0 live 10,20 (in [10,40]); slab1 live 30,40 (in range); 500,600 out; slab2 -5 out; slab3 200,300,400 out. So matches: 10,20,30,40 -> count4 sum=100. Correct! pages_read=2 (slab0 gen2 forced read, slab1 gen3 range-hit read; slab2 gen3 -5..-5 skip; slab3 gen3 200..400 skip). Good.\n\nm_interact (range -1000..25 batch skipping): matches live amounts in [-1000,25]: slab0 10,20; slab2 -5. slab1 30+ out. slab3 out. count=3 sum=25. matches. pages_read=2 (slab0 forced gen2, slab2 gen3 -5 in range read; slab1 gen3 30..600 skip; slab3 200..400 skip). Good.\n\nm_null (isnull batch skipping=0 full): non-live entries: slab0 R|1|0|-999(retired) + R|0|2|777 =2; others 0. count=2. Good.\n\nm_all (all): all live rows: slab0:10,20 (2); slab1:30,40,500,600(4); slab2:-5(1); slab3:200,300,400(3) = 10 rows sum=10+20+30+40+500+600-5+200+300+400=2095. Correct!\n\nvault: v_window range 10..50 row skipping: live in [10,50]: slab0 live 5,18,30 -> 18,30 in range; slab1 40,55,63,70 ->40; slab2 -20,44 ->44. count: 18,30,40,44 =4 sum=132. Correct!\nv_missing/v_check isnull skipping =2 (slab0 retired 12, slab2 dead 90). v_full=2. All agree now! \n\nc_legit eq -999: count1 sum-999. Correct (legitimate overlap live value).\nHealthy: h_skip=h_full row_count4 sum460, agree; h_region 3/430.\n\nAll equivalent modes agree and are correct. Now verify byte-identical repeated runs and fresh ingest markers.",
+  "plan": "Run audit again to a second file and diff. Then test fresh ingest and verify markers.",
+  "commands": [
+    {"keystrokes": "cp /app/output/audit.json /app/output/run1.json\n", "duration": 0.1},
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json\n", "duration": 1.0},
+    {"keystrokes": "diff /app/output/run1.json /app/output/audit.json && echo IDENTICAL\n", "duration": 0.1}
+  ]
+}
+```

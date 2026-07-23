@@ -1,0 +1,3 @@
+# DIFFICULTY — sparse-jacobian-color-contract REV-8
+
+This task is hard because a green rebuild of one batch is not enough. Correct packed output needs several authorities at once including valid probe grouping under equation conflicts and clean resume seed stitching. It also needs Euclidean residual magnitude with the residual scaled step for the active batch alone plus unpack orientation that preserves packing and native equation participation beyond the bare term table. Agents often fix most of those pieces and still score zero when one last mile contract fails including a broken FNV-1a digest boundary. High test pass rates overstate ease because an eleven of thirteen near miss is reward zero while NOP stays at zero percent and oracle at one hundred.

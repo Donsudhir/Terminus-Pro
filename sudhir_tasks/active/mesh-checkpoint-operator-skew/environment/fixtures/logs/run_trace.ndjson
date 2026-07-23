@@ -1,0 +1,5 @@
+{"event":"start","family":"alpha","note":"cold trajectory began"}
+{"event":"half","family":"alpha","note":"mid marker recorded"}
+{"event":"refine","family":"alpha","note":"span width changed"}
+{"event":"continue","family":"alpha","note":"post marker advance"}
+{"event":"finish","family":"alpha","note":"parity rows emitted"}

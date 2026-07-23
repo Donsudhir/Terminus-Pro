@@ -1,0 +1,17 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json && echo OK
+OK
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# md5sum /app/data/archive/*.store
+2588d7c899e5cb6a16057aa2fb98704d  /app/data/archive/current.store
+c29b7fb50d1af4d290a380ce4f5d3286  /app/data/archive/healthy.store
+484001a17f1acf525762c969b439c0b6  /app/data/archive/mixed.store
+6242438e1cba88b9731fac291c65cf47  /app/data/archive/vault.store
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# head -c 200 /app/output/audit.json; echo
+{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_
+skip","row_count":4,"sum_amount":460,"pa
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app#

@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Row reader is_live logic: Retired->not live, Inherited->live, Current->present!=0. Now let me see the batch reader (lattice) which may compute liveness differently, and the harbor gate which decides skipping.",
+  "plan": "Read lattice/bay.cpp, lattice/rill.cpp, harbor/pale.cpp, harbor/veil.cpp.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/lattice/bay.cpp /app/cpp/src/lattice/rill.cpp\n", "duration": 0.1}
+  ]
+}
+```

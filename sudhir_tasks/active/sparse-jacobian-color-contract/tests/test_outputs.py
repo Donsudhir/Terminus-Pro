@@ -224,9 +224,16 @@ def _fnv1a(payload):
 
 
 def _assert_digest(document, raw):
+    """Accept the documented FNV-1a contract from /app/docs/report-format.md.
+
+    Payload is the complete compact JSON object with schema_version + runs only,
+    including its closing '}', then FNV-1a-64 formatted as 16 lowercase hex.
+    """
     digest = document["digest"]
     suffix = f',"digest":"{digest}"}}\n'
     assert raw.endswith(suffix)
+    # Strip ,"digest":"..."}\n and restore the object-closing brace that was
+    # part of the hashed payload (not an open prefix without '}').
     payload = (raw[: -len(suffix)] + "}").encode()
     assert digest == f"{_fnv1a(payload):016x}"
 
@@ -256,6 +263,15 @@ def _expected_span(rows, cols, terms, base, scale, shift, step_floor=1.0e-8, ste
 
 def _assert_ids(item, cols):
     assert item["ids"] == list(range(1, cols + 1))
+
+
+def _expected_schema_version():
+    """Derive schema_version from the normative report-format doc (not a bare literal)."""
+    text = (APP / "docs" / "report-format.md").read_text(encoding="utf-8")
+    marker = "`schema_version` — integer, currently `"
+    start = text.index(marker) + len(marker)
+    end = text.index("`", start)
+    return int(text[start:end])
 
 
 def test_k01(tmp_path):
@@ -603,3 +619,84 @@ def test_k13(tmp_path):
     )
     assert completed.returncode != 0
     assert not output.exists()
+
+
+def test_k14(tmp_path):
+    """schema_version is present and runtime.conf step knobs are honored."""
+    conf_path = APP / "conf" / "runtime.conf"
+    original = conf_path.read_text(encoding="utf-8")
+    family = {
+        "name": "conf_a",
+        "dim": 4,
+        "rows": 3,
+        "terms": PRISM_TERMS,
+        "base": [0.5, 1.5, 2.5, 1.0],
+        "tags": [{"name": "base", "scale": 1.0, "shift": [0.0, 0.0, 0.0, 0.0]}],
+    }
+    # Keep step_floor at the documented default so the gauge inner floor and
+    # apply_floor contract stay aligned; change step_gain to prove config load.
+    try:
+        conf_path.write_text(
+            "input /app/data/families.resid\n"
+            "output /app/output/sensitivity_report.json\n"
+            "step_floor 1e-8\n"
+            "step_gain 2.0\n",
+            encoding="utf-8",
+        )
+        document, raw = _run_case(tmp_path, [family], "k14_override")
+        assert document["schema_version"] == _expected_schema_version()
+        _assert_digest(document, raw)
+        item = _item(document, "conf_a", "base")
+        expected_ref, expected_step = _expected_span(
+            3,
+            4,
+            PRISM_TERMS,
+            family["base"],
+            1.0,
+            family["tags"][0]["shift"],
+            step_floor=1.0e-8,
+            step_gain=2.0,
+        )
+        assert item["span_info"]["ref"] == pytest.approx(expected_ref, rel=0, abs=1e-6)
+        assert item["span_info"]["step"] == pytest.approx(expected_step, rel=0, abs=1e-12)
+        _, default_step = _expected_span(
+            3, 4, PRISM_TERMS, family["base"], 1.0, family["tags"][0]["shift"]
+        )
+        assert item["span_info"]["step"] != pytest.approx(default_step, rel=0, abs=1e-12)
+    finally:
+        conf_path.write_text(original, encoding="utf-8")
+
+    restored, restored_raw = _run_case(tmp_path, [family], "k14_defaults")
+    assert restored["schema_version"] == _expected_schema_version()
+    _assert_digest(restored, restored_raw)
+    restored_item = _item(restored, "conf_a", "base")
+    _, default_step = _expected_span(
+        3, 4, PRISM_TERMS, family["base"], 1.0, family["tags"][0]["shift"]
+    )
+    assert restored_item["span_info"]["step"] == pytest.approx(default_step, rel=0, abs=1e-12)
+
+    # Separate floor-binding check: large step_floor must raise emitted step.
+    try:
+        conf_path.write_text(
+            "input /app/data/families.resid\n"
+            "output /app/output/sensitivity_report.json\n"
+            "step_floor 1e-3\n"
+            "step_gain 0.5\n",
+            encoding="utf-8",
+        )
+        floored, _ = _run_case(tmp_path, [family], "k14_floor")
+        floored_item = _item(floored, "conf_a", "base")
+        _, floored_step = _expected_span(
+            3,
+            4,
+            PRISM_TERMS,
+            family["base"],
+            1.0,
+            family["tags"][0]["shift"],
+            step_floor=1.0e-3,
+            step_gain=0.5,
+        )
+        assert floored_item["span_info"]["step"] == pytest.approx(floored_step, rel=0, abs=1e-12)
+        assert floored_item["span_info"]["step"] == pytest.approx(1.0e-3, rel=0, abs=1e-12)
+    finally:
+        conf_path.write_text(original, encoding="utf-8")

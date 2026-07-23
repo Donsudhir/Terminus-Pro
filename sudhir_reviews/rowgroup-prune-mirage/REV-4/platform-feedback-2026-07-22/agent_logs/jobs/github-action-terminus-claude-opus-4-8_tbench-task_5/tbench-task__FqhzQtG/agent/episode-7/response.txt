@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Confirmed. Both readers get the same slab data with presence_lane and origin_lane. The row reader uses is_live() considering origin (Retired=false, Inherited=true, Current=present). The batch reader (rill.cpp) only checks presence_lane != 0, ignoring origin. This is the divergence. The fix is to make rill.cpp compute admit[i] using the same is_live logic. Let me look at the data files and the Rust ingest code to understand markers and confirm the fix, and check for any additional divergences.",
+  "plan": "Look at the data store files, cases, and Rust ingest code (model.rs, codec.rs, ember/*).",
+  "commands": [
+    {"keystrokes": "cat /app/data/cases/control.case /app/data/cases/incident.case\n", "duration": 0.1},
+    {"keystrokes": "head -30 /app/data/archive/mixed.store\n", "duration": 0.1}
+  ]
+}
+```

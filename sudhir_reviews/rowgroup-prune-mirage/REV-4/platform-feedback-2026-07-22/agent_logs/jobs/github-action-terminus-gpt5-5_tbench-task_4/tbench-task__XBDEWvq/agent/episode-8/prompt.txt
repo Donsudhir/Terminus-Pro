@@ -1,0 +1,35 @@
+New Terminal Output:
+loam
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app# find /app/cpp/src -type f -name '*.cpp' | sort | tr '\n' ' '; echo
+/app/cpp/src/digest.cpp /app/cpp/src/harbor/pale.cpp /app/cpp/src/harbor/veil.cpp /app/cpp/src/lattice/bay.cpp /app/cpp/src/lattice/rill.cpp /app/cpp/src/main.c
+pp /app/cpp/src/parse.cpp /app/cpp/src/report.cpp /app/cpp/src/row.cpp /app/cpp/src/store.cpp
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app# ls -R /app/cpp/src
+/app/cpp/src:
+digest.cpp  harbor  lattice  main.cpp  parse.cpp  report.cpp  row.cpp  store.cpp
+
+/app/cpp/src/harbor:
+pale.cpp  veil.cpp
+
+/app/cpp/src/lattice:
+bay.cpp  rill.cpp
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app# find /app/cpp/src -type f -name '*.cpp' | sort | xargs grep -n "Tally\|sweep_c\|presence_lane\|origin_lane\|amou
+nt_lane\|Retired\|Inherited"
+/app/cpp/src/lattice/bay.cpp:5:Tally sweep_e(const Tally& a, const Tally& b) {
+/app/cpp/src/lattice/rill.cpp:8:Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+/app/cpp/src/lattice/rill.cpp:9:    Tally tally;
+/app/cpp/src/lattice/rill.cpp:15:    const std::size_t count = a.amount_lane.size();
+/app/cpp/src/lattice/rill.cpp:18:        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;
+/app/cpp/src/lattice/rill.cpp:40:                keep = a.amount_lane[i] == b.x;
+/app/cpp/src/lattice/rill.cpp:43:                keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+/app/cpp/src/lattice/rill.cpp:54:            tally.sum_amount += a.amount_lane[i];
+/app/cpp/src/row.cpp:7:    if (cell.origin == Origin::Retired) {
+/app/cpp/src/row.cpp:10:    if (cell.origin == Origin::Inherited) {
+/app/cpp/src/row.cpp:34:Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+/app/cpp/src/row.cpp:35:    Tally tally;
+/app/cpp/src/store.cpp:66:            slab.presence_lane.push_back(presence);
+/app/cpp/src/store.cpp:67:            slab.origin_lane.push_back(origin);
+/app/cpp/src/store.cpp:68:            slab.amount_lane.push_back(amount);
+/app/cpp/src/store.cpp:78:    Tally total;
+/app/cpp/src/store.cpp:83:        const Tally part = spec.probe.lane == Lane::Batch
+/app/cpp/src/store.cpp:84:            ? sweep_c(slab, spec.probe, gate)
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app#

@@ -1,0 +1,344 @@
+New Terminal Output:
+
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# for f in /app/cpp/include/loam/*.hpp /app/cpp/src/harbor/*.cpp /app/cpp/src/lattice/*.cpp /app/cpp/src/store.cpp
+ /app/cpp/src/row.cpp /app/cpp/src/parse.cpp; do echo "===== $f ====="; nl -ba "$f" | sed -n '1,240p'; done
+===== /app/cpp/include/loam/exec.hpp =====
+     1  #pragma once
+     2
+     3  #include "loam/types.hpp"
+     4
+     5  namespace loam {
+     6
+     7  Tally walk_row(const Slab& a, const Probe& b, const Gate& c);
+     8  Tally sweep_c(const Slab& a, const Probe& b, const Gate& c);
+     9  Tally sweep_e(const Tally& a, const Tally& b);
+    10
+    11  }  // namespace loam
+===== /app/cpp/include/loam/plan.hpp =====
+     1  #pragma once
+     2
+     3  #include "loam/types.hpp"
+     4
+     5  namespace loam {
+     6
+     7  Gate turn_b(const Slab& a, const Probe& b);
+     8  std::string turn_d(const Gate& a, const Probe& b);
+     9
+    10  }  // namespace loam
+===== /app/cpp/include/loam/report.hpp =====
+     1  #pragma once
+     2
+     3  #include "loam/types.hpp"
+     4
+     5  #include <filesystem>
+     6  #include <string>
+     7  #include <vector>
+     8
+     9  namespace loam {
+    10
+    11  void write_report(const std::filesystem::path& path, const std::vector<CaseResult>& cases);
+    12  std::string digest_hex(const std::string& text);
+    13  std::string lane_name(Lane lane);
+    14
+    15  }  // namespace loam
+===== /app/cpp/include/loam/store.hpp =====
+     1  #pragma once
+     2
+     3  #include "loam/types.hpp"
+     4
+     5  #include <filesystem>
+     6  #include <vector>
+     7
+     8  namespace loam {
+     9
+    10  std::vector<Slab> load_store(const std::filesystem::path& path);
+    11  std::vector<CaseSpec> load_cases(const std::filesystem::path& directory);
+    12  CaseResult run_case(const CaseSpec& spec);
+    13
+    14  }  // namespace loam
+===== /app/cpp/include/loam/types.hpp =====
+     1  #pragma once
+     2
+     3  #include <cstdint>
+     4  #include <string>
+     5  #include <vector>
+     6
+     7  namespace loam {
+     8
+     9  enum class Origin : std::uint8_t { Retired = 0, Inherited = 1, Current = 2 };
+    10
+    11  struct Cell {
+    12      std::uint8_t present{};
+    13      Origin origin{Origin::Current};
+    14      std::int64_t amount{};
+    15      std::string region;
+    16  };
+    17
+    18  struct Slab {
+    19      std::size_t id{};
+    20      std::uint8_t generation{};
+    21      std::int64_t low{};
+    22      std::int64_t high{};
+    23      bool has_absent{};
+    24      std::string region_low;
+    25      std::string region_high;
+    26      std::vector<Cell> cells;
+    27      std::vector<std::int64_t> amount_lane;
+    28      std::vector<std::uint8_t> presence_lane;
+    29      std::vector<std::uint8_t> origin_lane;
+    30      std::vector<std::string> region_lane;
+    31  };
+    32
+    33  enum class Op { All, Equal, Range, IsNull, RegionEqual };
+    34  enum class Lane { Row, Batch };
+    35
+    36  struct Probe {
+    37      Op op{Op::All};
+    38      std::int64_t x{};
+    39      std::int64_t y{};
+    40      std::string text;
+    41      Lane lane{Lane::Row};
+    42      bool skipping{};
+    43  };
+    44
+    45  struct Gate {
+    46      bool read{true};
+    47      std::string note;
+    48  };
+    49
+    50  struct Tally {
+    51      std::int64_t row_count{};
+    52      std::int64_t sum_amount{};
+    53      std::int64_t pages_read{};
+    54  };
+    55
+    56  struct CaseSpec {
+    57      std::string case_id;
+    58      std::string store_path;
+    59      Probe probe;
+    60  };
+    61
+    62  struct CaseResult {
+    63      std::string case_id;
+    64      Tally tally;
+    65      std::int64_t pages_total{};
+    66      Lane lane{Lane::Row};
+    67      bool skipping{};
+    68  };
+    69
+    70  }  // namespace loam
+===== /app/cpp/src/harbor/pale.cpp =====
+     1  #include "loam/plan.hpp"
+     2
+     3  namespace loam {
+     4
+     5  std::string turn_d(const Gate& a, const Probe& b) {
+     6      const char* lane = b.lane == Lane::Batch ? "batch" : "row";
+     7      return std::string(lane) + ":" + (a.read ? "open:" : "closed:") + a.note;
+     8  }
+     9
+    10  }  // namespace loam
+===== /app/cpp/src/harbor/veil.cpp =====
+     1  #include "loam/plan.hpp"
+     2
+     3  namespace loam {
+     4
+     5  Gate turn_b(const Slab& a, const Probe& b) {
+     6      if (!b.skipping) {
+     7          return {true, "full"};
+     8      }
+     9      if (b.op == Op::All) {
+    10          return {true, "all"};
+    11      }
+    12      if (b.op == Op::IsNull) {
+    13          return {a.has_absent, a.has_absent ? "possible" : "empty"};
+    14      }
+    15      if (b.op == Op::RegionEqual) {
+    16          const bool read = b.text >= a.region_low && b.text <= a.region_high;
+    17          return {read, read ? "text-hit" : "text-away"};
+    18      }
+    19
+    20      const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+    21      const std::int64_t right = b.op =
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+first().cloned().unwrap_or_default();
+    15          let region_high = regions.last().cloned().unwrap_or_default();
+    16          pages.push(Page {
+    17              id,
+    18              generation: 3,
+    19              mark,
+    20              region_low,
+    21              region_high,
+    22              cells: chunk.to_vec(),
+    23          });
+    24      }
+    25      Ok(pages)
+    26  }
+===== /app/rust/src/main.rs =====
+     1  mod codec;
+     2  mod ember;
+     3  mod model;
+     4  mod report;
+     5
+     6  use ember::pale::{tilt_d, Dial};
+     7  use std::path::{Path, PathBuf};
+     8
+     9  fn main() {
+    10      if let Err(error) = run() {
+    11          eprintln!("loam-ingest: {error}");
+    12          std::process::exit(1);
+    13      }
+    14  }
+    15
+    16  fn run() -> Result<(), Box<dyn std::error::Error>> {
+    17      let args: Vec<String> = std::env::args().collect();
+    18      if args.len() != 3 {
+    19          return Err("usage: loam-ingest <csv> <store>".into());
+    20      }
+    21      let cells = codec::read_csv(Path::new(&args[1]))?;
+    22      let pages = ember::reed::gather(cells, 4)?;
+    23      let directory = PathBuf::from(&args[2]);
+    24      std::fs::create_dir_all(&directory)?;
+    25      let target = directory.join("data.store");
+    26      codec::write_pages(&target, &pages)?;
+    27
+    28      let size = std::fs::metadata(&target)?.len() as usize;
+    29      let mut dial = Dial::default();
+    30      let cell_count = pages.iter().map(|page| page.cells.len()).sum();
+    31      tilt_d(&mut dial, cell_count, size);
+    32      eprintln!("{}", report::line(&dial));
+    33      Ok(())
+    34  }
+===== /app/rust/src/model.rs =====
+     1  pub(crate) const RUNE_VOID: u8 = 0;
+     2  pub(crate) const RUNE_FIXED: u8 = 1;
+     3
+     4  #[derive(Clone, Debug)]
+     5  pub(crate) struct Cell {
+     6      pub origin: u8,
+     7      pub present: u8,
+     8      pub amount: i64,
+     9      pub region: String,
+    10  }
+    11
+    12  #[derive(Clone, Debug)]
+    13  pub(crate) struct Mark {
+    14      pub low: i64,
+    15      pub high: i64,
+    16      pub has_absent: bool,
+    17  }
+    18
+    19  #[derive(Clone, Debug)]
+    20  pub(crate) struct Page {
+    21      pub id: usize,
+    22      pub generation: u8,
+    23      pub mark: Mark,
+    24      pub region_low: String,
+    25      pub region_high: String,
+    26      pub cells: Vec<Cell>,
+    27  }
+    28
+    29  #[derive(Debug)]
+    30  pub(crate) enum FoldErr {
+    31      Empty,
+    32      Shape,
+    33  }
+    34
+    35  impl std::fmt::Display for FoldErr {
+    36      fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    37          match self {
+    38              Self::Empty => write!(f, "empty lane set"),
+    39              Self::Shape => write!(f, "lane lengths differ"),
+    40          }
+    41      }
+    42  }
+    43
+    44  impl std::error::Error for FoldErr {}
+===== /app/rust/src/report.rs =====
+     1  use crate::ember::pale::Dial;
+     2
+     3  pub(crate) fn line(a: &Dial) -> String {
+     4      format!("jobs={} cells={} bytes={}", a.jobs, a.cells, a.bytes)
+     5  }
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# for s in /app/data/archive/*.store; do echo "===== inspect $s ====="; /app/bin/loam inspect "$s"; echo "===== ra
+w $s ====="; cat "$s"; done
+===== inspect /app/data/archive/current.store =====
+0|3|-999|20|1|4
+1|3|100|130|0|4
+===== raw /app/data/archive/current.store =====
+H|3
+P|0|3|-999|20|1|east|west|4
+R|1|2|-999|east
+R|0|2|777|west
+R|1|2|10|east
+R|1|2|20|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+===== inspect /app/data/archive/healthy.store =====
+0|3|0|30|0|4
+1|3|100|130|0|4
+2|3|200|230|0|4
+===== raw /app/data/archive/healthy.store =====
+H|3
+P|0|3|0|30|0|east|west|4
+R|1|2|0|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+P|2|3|200|230|0|central|west|4
+R|1|2|200|central
+R|1|2|210|east
+R|1|2|220|north
+R|1|2|230|west
+===== inspect /app/data/archive/mixed.store =====
+0|2|100|100|1|4
+1|3|30|600|0|4
+2|3|-5|-5|0|1
+3|3|200|400|0|3
+===== raw /app/data/archive/mixed.store =====
+H|2
+P|0|2|100|100|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|0|2|777|west
+P|1|3|30|600|0|north|south|4
+R|1|2|30|north
+R|1|2|40|north
+R|1|2|500|south
+R|1|2|600|south
+P|2|3|-5|-5|0|central|central|1
+R|1|2|-5|central
+P|3|3|200|400|0|east|west|3
+R|1|2|200|east
+R|1|2|300|north
+R|1|2|400|west
+===== inspect /app/data/archive/vault.store =====
+0|2|5|30|0|4
+1|3|40|70|0|4
+2|2|-20|90|1|3
+===== raw /app/data/archive/vault.store =====
+H|2
+P|0|2|5|30|0|north|west|4
+R|1|2|5|east
+R|1|0|12|east
+R|1|2|18|west
+R|1|2|30|west
+P|1|3|40|70|0|north|south|4
+R|1|2|40|north
+R|1|2|55|north
+R|1|2|63|south
+R|1|2|70|south
+P|2|2|-20|90|1|central|east|3
+R|1|2|-20|central
+R|0|2|90|east
+R|1|2|44|east
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app#

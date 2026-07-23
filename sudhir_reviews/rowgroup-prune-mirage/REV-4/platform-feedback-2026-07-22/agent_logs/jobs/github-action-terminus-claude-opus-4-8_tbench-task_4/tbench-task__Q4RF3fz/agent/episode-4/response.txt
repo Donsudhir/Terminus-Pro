@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "The Cell has present, origin, amount. A 'live' entry likely means present and origin is Current (or not Retired). Let me examine the store parsing and the readers.",
+  "plan": "Read store.cpp, row.cpp, and the lattice reader files.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/store.cpp\n", "duration": 0.1}
+  ]
+}
+```

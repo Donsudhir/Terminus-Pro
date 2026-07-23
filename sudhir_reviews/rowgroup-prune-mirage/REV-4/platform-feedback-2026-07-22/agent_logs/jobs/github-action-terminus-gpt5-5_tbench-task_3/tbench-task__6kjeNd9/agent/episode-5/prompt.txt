@@ -1,0 +1,243 @@
+New Terminal Output:
+
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# cat /app/rust/src/codec.rs
+use crate::model::{Cell, Page};
+use std::fs::File;
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::path::Path;
+
+pub(crate) fn read_csv(path: &Path) -> Result<Vec<Cell>, Box<dyn std::error::Error>> {
+    let file = File::open(path)?;
+    let mut rows = Vec::new();
+    for (line_no, line) in BufReader::new(file).lines().enumerate() {
+        let line = line?;
+        if line_no == 0 && line.starts_with("origin,") {
+            continue;
+        }
+        if line.trim().is_empty() {
+            continue;
+        }
+        let fields: Vec<&str> = line.split(',').collect();
+        if fields.len() != 4 {
+            return Err(format!("{}:{}: expected four columns", path.display(), line_no + 1).into());
+        }
+        rows.push(Cell {
+            origin: fields[0].parse()?,
+            present: fields[1].parse()?,
+            amount: fields[2].parse()?,
+            region: fields[3].trim().to_owned(),
+        });
+    }
+    Ok(rows)
+}
+
+pub(crate) fn write_pages(path: &Path, pages: &[Page]) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let file = File::create(path)?;
+    let mut out = BufWriter::new(file);
+    writeln!(out, "H|3")?;
+    for page in pages {
+        writeln!(
+            out,
+            "P|{}|{}|{}|{}|{}|{}|{}|{}",
+            page.id,
+            page.generation,
+            page.mark.low,
+            page.mark.high,
+            u8::from(page.mark.has_absent),
+            page.region_low,
+            page.region_high,
+            page.cells.len()
+        )?;
+        for cell in &page.cells {
+            writeln!(
+                out,
+                "R|{}|{}|{}|{}",
+                cell.present, cell.origin, cell.amount, cell.region
+            )?;
+        }
+    }
+    out.flush()?;
+    Ok(())
+}
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# cat /app/cpp/src/parse.cpp
+#include "loam/store.hpp"
+
+#include <algorithm>
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
+namespace loam {
+namespace {
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> fields;
+    std::size_t start = 0;
+    while (true) {
+        const auto end = line.find('|', start);
+        fields.push_back(line.substr(start, end - start));
+        if (end == std::string::npos) {
+            break;
+        }
+        start = end + 1;
+    }
+    return fields;
+}
+
+Op parse_op(const std::string& value) {
+    if (value == "all") return Op::All;
+    if (value == "eq") return Op::Equal;
+    if (value == "range") return Op::Range;
+    if (value == "isnull") return Op::IsNull;
+    if (value == "region_eq") return Op::RegionEqual;
+    throw std::runtime_error("unknown operation: " + value);
+}
+
+Lane parse_lane(const std::string& value) {
+    if (value == "row") return Lane::Row;
+    if (value == "batch") return Lane::Batch;
+    throw std::runtime_error("unknown path: " + value);
+}
+
+}  // namespace
+
+std::vector<CaseSpec> load_cases(const std::filesystem::path& directory) {
+    std::vector<std::filesystem::path> paths;
+    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".case") {
+            paths.push_back(entry.path());
+        }
+    }
+    std::sort(paths.begin(), paths.end());
+
+    std::vector<CaseSpec> cases;
+    for (const auto& path : paths) {
+        std::ifstream input(path);
+        if (!input) {
+            throw std::runtime_error("cannot open case file: " + path.string());
+        }
+        std::string line;
+        while (std::getline(input, line)) {
+            if (line.empty() || line[0] == '#') {
+                continue;
+            }
+            const auto fields = split(line);
+            if (fields.size() != 8) {
+                throw std::runtime_error("bad case row in " + path.string());
+            }
+            Probe probe;
+            probe.op = parse_op(fields[2]);
+            if (probe.op == Op::RegionEqual) {
+                probe.text = fields[3];
+            } else {
+                probe.x = std::stoll(fields[3]);
+                probe.y = std::stoll(fields[4]);
+            }
+            probe.lane = parse_lane(fields[5]);
+            probe.skipping = fields[6] == "1";
+            cases.push_back({fields[0], fields[1], std::move(probe)});
+        }
+    }
+    return cases;
+}
+
+}  // namespace loam
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# for f in /app/data/archive/*.store; do echo "### $f"; nl -ba "$f"; done
+### /app/data/archive/current.store
+     1  H|3
+     2  P|0|3|-999|20|1|east|west|4
+     3  R|1|2|-999|east
+     4  R|0|2|777|west
+     5  R|1|2|10|east
+     6  R|1|2|20|west
+     7  P|1|3|100|130|0|north|south|4
+     8  R|1|2|100|north
+     9  R|1|2|110|north
+    10  R|1|2|120|south
+    11  R|1|2|130|south
+### /app/data/archive/healthy.store
+     1  H|3
+     2  P|0|3|0|30|0|east|west|4
+     3  R|1|2|0|east
+     4  R|1|2|10|east
+     5  R|1|2|20|west
+     6  R|1|2|30|west
+     7  P|1|3|100|130|0|north|south|4
+     8  R|1|2|100|north
+     9  R|1|2|110|north
+    10  R|1|2|120|south
+    11  R|1|2|130|south
+    12  P|2|3|200|230|0|central|west|4
+    13  R|1|2|200|central
+    14  R|1|2|210|east
+    15  R|1|2|220|north
+    16  R|1|2|230|west
+### /app/data/archive/mixed.store
+     1  H|2
+     2  P|0|2|100|100|1|east|west|4
+     3  R|1|0|-999|east
+     4  R|1|2|10|east
+     5  R|1|2|20|west
+     6  R|0|2|777|west
+     7  P|1|3|30|600|0|north|south|4
+     8  R|1|2|30|north
+     9  R|1|2|40|north
+    10  R|1|2|500|south
+    11  R|1|2|600|south
+    12  P|2|3|-5|-5|0|central|central|1
+    13  R|1|2|-5|central
+    14  P|3|3|200|400|0|east|west|3
+    15  R|1|2|200|east
+    16  R|1|2|300|north
+    17  R|1|2|400|west
+### /app/data/archive/vault.store
+     1  H|2
+     2  P|0|2|5|30|0|north|west|4
+     3  R|1|2|5|east
+     4  R|1|0|12|east
+     5  R|1|2|18|west
+     6  R|1|2|30|west
+     7  P|1|3|40|70|0|north|south|4
+     8  R|1|2|40|north
+     9  R|1|2|55|north
+    10  R|1|2|63|south
+    11  R|1|2|70|south
+    12  P|2|2|-20|90|1|central|east|3
+    13  R|1|2|-20|central
+    14  R|0|2|90|east
+    15  R|1|2|44|east
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# for f in /app/data/fresh/*.csv; do echo "### $f"; cat "$f"; done
+### /app/data/fresh/orders_a.csv
+origin,presence,amount,region
+0,1,-999,east
+2,1,10,east
+2,1,20,west
+2,1,30,west
+2,1,100,north
+2,0,555,north
+2,1,120,south
+2,1,130,south
+### /app/data/fresh/orders_b.csv
+origin,presence,amount,region
+2,1,-999,east
+2,1,5,east
+2,0,777,west
+2,1,15,west
+0,1,-999,north
+2,1,200,north
+2,1,210,south
+2,1,220,south
+### /app/data/fresh/orders_c.csv
+origin,presence,amount,region
+2,1,-999,east
+2,1,8,east
+2,1,21,west
+2,1,34,west
+0,1,301,north
+2,0,317,north
+0,0,329,south
+0,1,343,south
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app#

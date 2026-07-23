@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Cell has present, origin, amount, region. Slab has markers low/high/has_absent. There's an amount_lane, presence_lane, origin_lane. The 'live' definition matters. Let me look at the reader logic - row.cpp, lattice (bay/rill), harbor (pale/veil), and store.cpp.",
+  "plan": "Read store.cpp, row.cpp, and the harbor + lattice files.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/store.cpp\n", "duration": 0.1}
+  ]
+}
+```

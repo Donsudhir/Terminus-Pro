@@ -1,0 +1,63 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.4.1, pluggy-1.6.0
+cachedir: /tmp/pytest_cache
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 15 items
+
+test_outputs.py ...............                                          [100%]
+
+==================================== PASSES ====================================
+___________________________________ test_p01 ___________________________________
+---------------------------- Captured stdout setup -----------------------------
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o build/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+---------------------------- Captured stderr setup -----------------------------
+    Finished release [optimized] target(s) in 0.00s
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+___________________________________ test_p03 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+___________________________________ test_p05 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+___________________________________ test_p07 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=185
+___________________________________ test_p10 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+jobs=1 cells=8 bytes=182
+___________________________________ test_p15 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=12 bytes=265
+=========================== short test summary info ============================
+PASSED test_outputs.py::test_p01
+PASSED test_outputs.py::test_p02
+PASSED test_outputs.py::test_p03
+PASSED test_outputs.py::test_p04
+PASSED test_outputs.py::test_p05
+PASSED test_outputs.py::test_p06
+PASSED test_outputs.py::test_p07
+PASSED test_outputs.py::test_p08
+PASSED test_outputs.py::test_p09
+PASSED test_outputs.py::test_p10
+PASSED test_outputs.py::test_p11
+PASSED test_outputs.py::test_p12
+PASSED test_outputs.py::test_p13
+PASSED test_outputs.py::test_p14
+PASSED test_outputs.py::test_p15
+============================== 15 passed in 5.88s ==============================

@@ -1,0 +1,13 @@
+scenario,flight_id,base_priority,eta_tick
+alpha,A101,3,7
+alpha,A102,2,6
+alpha,A103,4,8
+alpha,A104,1,5
+beta,B201,2,4
+beta,B202,5,9
+beta,B203,3,6
+beta,B204,1,3
+gamma,G301,2,2
+gamma,G302,3,5
+gamma,G303,4,7
+gamma,G304,2,6

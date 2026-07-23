@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Fresh ingest markers are now faithful:\n- orders_a slab0: live {10,20,30} => low=10,high=30, has_absent=true (Retired -999 present). Output P|0|3|10|30|1. Correct!\n- slab1: live {100,120,130} => low=100,high=130, has_absent=true (555 Current present0 nonlive). Output P|1|3|100|130|1. Correct!\n\nAudit is byte-identical across runs. Let me verify orders_c which has an all-non-live-ish slab to confirm the (0,0,true) edge case, and verify the fresh store round-trips through audit with equivalent modes agreeing.",
+  "plan": "Ingest orders_c and check the all-non-live slab. orders_c slab1 (cells4-7): (0,1,301)Retired notlive; (2,0,317)Current present0 notlive; (0,0,329)Retired notlive; (0,1,343)Retired notlive => ALL non-live => low=0,high=0,has_absent=true.",
+  "commands": [
+    {"keystrokes": "rm -rf /tmp/store_c && /app/bin/loam ingest /app/data/fresh/orders_c.csv /tmp/store_c 2>/dev/null; cat /tmp/store_c/data.store\n", "duration": 1.0},
+    {"keystrokes": "rm -rf /tmp/store_b && /app/bin/loam ingest /app/data/fresh/orders_b.csv /tmp/store_b 2>/dev/null; cat /tmp/store_b/data.store\n", "duration": 1.0}
+  ]
+}
+```

@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Everything works: ingest is byte-identical across runs, audit output is byte-identical, row and batch modes agree on both archived and fresh stores, healthy cases and their fast-path (pages_read < pages_total for selective controls) behavior is preserved, and fresh ingest markers are faithful to live-value domains including the all-non-live edge case. The archived stores are read without rewriting (readers only interpret markers).\n\nSummary of fixes:\n1. /app/cpp/src/lattice/rill.cpp (batch reader): admit now uses full is_live logic (origin_lane + presence_lane) matching the row reader, instead of only checking presence_lane. This fixes divergence on mixed-generation stores with retired/inherited origins.\n2. /app/rust/src/ember/fold.rs (ingest marker computation): tilt_a now computes low/high spanning only live amounts and sets has_absent when any non-live entry exists, with all-non-live slabs recording low=0,high=0,has_absent=true.\n\nLet me do a final rebuild+audit to leave the system in the final, correct state.",
+  "plan": "Final rebuild and generate the canonical audit.json output.",
+  "commands": [
+    {"keystrokes": "/app/tools/build-all 2>&1 | tail -3\n", "duration": 30.0},
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json; echo EXIT:$?; head -c 200 /app/output/audit.json; echo\n", "duration": 2.0}
+  ]
+}
+```

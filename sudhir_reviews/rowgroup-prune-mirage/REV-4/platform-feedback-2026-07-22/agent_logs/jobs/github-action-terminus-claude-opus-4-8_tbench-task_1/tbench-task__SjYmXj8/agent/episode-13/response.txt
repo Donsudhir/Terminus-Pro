@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Found the second bug in ingest (fold.rs / tilt_a):\n\n1. It computes low/high over ALL amounts including non-live ones. Should only span LIVE amounts. The parameter `c` (origins) is not even used for filtering.\n2. has_absent only checks present==0, but per spec should be set when any non-live entry present. Non-live = origin==Retired OR (origin==Current AND present==0). Actually liveness rule: Retired->not live, Inherited->live, Current->present!=0. So a cell is non-live if: origin==Retired, or (origin!=Inherited && present==0). Let me define is_live consistently.\n\nis_live(origin, present):\n- origin==0 (Retired) -> false\n- origin==1 (Inherited) -> true\n- origin==2 (Current) -> present != 0\n\nnon-live = !is_live.\n\nSo tilt_a needs:\n- low/high span only live amounts.\n- has_absent = any non-live entry.\n- If all entries non-live: low=0, high=0, has_absent=true (per report-schema).\n\nLet me check codec.rs and pale.rs to understand constants (RUNE_VOID/RUNE_FIXED) and how origin/present are read from CSV.",
+  "plan": "Read codec.rs and pale.rs to fully understand CSV parsing (origin/present interpretation) before fixing.",
+  "commands": [
+    {"keystrokes": "cat /app/rust/src/codec.rs\n", "duration": 0.1},
+    {"keystrokes": "cat /app/rust/src/ember/pale.rs /app/rust/src/report.rs\n", "duration": 0.1}
+  ]
+}
+```

@@ -23,7 +23,7 @@ review, and communication detail lives under `.cursor/rules/`.
 3. Step 2b: preflight + oracle 1x + NOP. Step 4 only: oracle 10x.
 4. Edits invalidate evidence; rerun gates. Never alter checksums.
 5. Claim no status without command output.
-6. Store every form paste in `REV-<n>/`.
+6. Store every form paste in `REV-<n>/`; DSV Humanizer never outranks acceptance.
 7. Require `.dockerignore`; clean Docker after packaging.
 8. Log new failures in `COMMON_MISTAKES.md` immediately.
 9. No Python-primary solvable core (ADR-0014); verifier-only pytest is fine.

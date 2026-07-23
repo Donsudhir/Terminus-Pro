@@ -382,6 +382,36 @@ Do not commit `.step2b-checksum` (different contributors will produce different
 values for the same task in different working states). The recommended
 `.gitignore` entry is `tasks/*/.step2b-checksum`.
 
+## Strict Difficulty / Solution / Verification gate
+
+The three DSV fields are one atomic set. Load the project-local
+`terminus-dsv-humanizer` skill, audit all 33 pinned Humanizer patterns against
+the finished task evidence, then run the mechanical gate before capture.
+Platform requirements, task truth, and TERMINUS rules always outrank style;
+Humanizer may change wording and rhythm only:
+
+```bash
+python3 dsv_humanizer.py \
+    --difficulty-file /tmp/difficulty.txt \
+    --solution-file /tmp/solution.txt \
+    --verification-file /tmp/verification.txt
+
+python3 sudhir_task.py form-capture <task-name> \
+    --difficulty-file /tmp/difficulty.txt \
+    --solution-file /tmp/solution.txt \
+    --verification-file /tmp/verification.txt
+```
+
+`form-capture` validates again and writes `DSV-HUMANIZER-AUDIT.json` with the
+three captured file hashes. Partial DSV capture fails without changing dossier
+or registry state. Any later edit makes the audit stale and blocks package,
+including `package --force`. Capture a rubric separately with `rubric-capture`
+or add `--rubric-file` to the same command.
+
+This gate is only for DSV prose. Never run Humanizer over instructions,
+rubrics, code, tests, schemas, configuration, identifiers, commands, paths, or
+evidence.
+
 ## Packaging
 
 Build the shipping zip for Step 4 using the same exclusion list as preflight

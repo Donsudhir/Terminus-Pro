@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Both fixes built. Now let me run the audit again and verify equivalences.",
+  "plan": "Run audit and inspect. Then verify equivalent pairs match, and that fresh ingest produces faithful markers.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && python3 -m json.tool /app/output/audit.json\n", "duration": 1.0}
+  ]
+}
+```

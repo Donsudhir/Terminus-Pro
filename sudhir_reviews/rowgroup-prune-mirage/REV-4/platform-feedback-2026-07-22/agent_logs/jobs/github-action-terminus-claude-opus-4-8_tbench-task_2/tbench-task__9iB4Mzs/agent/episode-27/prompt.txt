@@ -1,0 +1,14 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# mkdir -p /tmp/fc; printf 'f_row|/tmp/s_a/data.store|range|10|130|row|1|x\nf_batch|/tmp/s_a/data.store|range|10|1
+30|batch|1|x\nf_null_r|/tmp/s_a/data.store|isnull|0|0|row|1|x\nf_null_b|/tmp/s_a/data.store|isnull|0|0|batch|1|x\n' > /tmp/fc/f.case
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam audit /tmp/fc /tmp/fc/out.json; cat /tmp/fc/out.json
+{"status":"complete","cases":[{"case_id":"f_row","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"f_batch
+","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","skipping":true},{"case_id":"f_null_r","row_count":2,"sum_amount":0,"pages_total"
+:2,"pages_read":2,"path":"row","skipping":true},{"case_id":"f_null_b","row_count":2,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"batch","skipping":true
+}],"digest":"9a87c08e2182b58f"}
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app#

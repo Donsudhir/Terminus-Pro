@@ -1,0 +1,181 @@
+New Terminal Output:
+
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# cat /app/cpp/src/row.cpp
+#include "loam/exec.hpp"
+
+namespace loam {
+namespace {
+
+bool is_live(const Cell& cell) {
+    if (cell.origin == Origin::Retired) {
+        return false;
+    }
+    if (cell.origin == Origin::Inherited) {
+        return true;
+    }
+    return cell.present != 0;
+}
+
+bool matches(const Cell& cell, const Probe& probe) {
+    switch (probe.op) {
+        case Op::All:
+            return true;
+        case Op::Equal:
+            return cell.amount == probe.x;
+        case Op::Range:
+            return cell.amount >= probe.x && cell.amount <= probe.y;
+        case Op::IsNull:
+            return false;
+        case Op::RegionEqual:
+            return cell.region == probe.text;
+    }
+    return false;
+}
+
+}  // namespace
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+    for (const auto& cell : a.cells) {
+        const bool live = is_live(cell);
+        if (b.op == Op::IsNull) {
+            if (!live) {
+                ++tally.row_count;
+            }
+            continue;
+        }
+        if (live && matches(cell, b)) {
+            ++tally.row_count;
+            tally.sum_amount += cell.amount;
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('/app/cpp/src/lattice/rill.cpp')
+> s=p.read_text()
+> s=s.replace('''#include <cstddef>\n#include <vector>\n''','''#include <cstddef>\n#include <vector>\n''')
+> s=s.replace('''    const std::size_t count = a.amount_lane.size();\n    std::vector<unsigned char> admit(count, 0);\n    for (std::size_t i = 0; i < count; ++
+i) {\n        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;\n    }\n''','''    const std::size_t count = a.amount_lane.size();\n    std::vector<unsigned char> adm
+it(count, 0);\n    for (std::size_t i = 0; i < count; ++i) {\n        const auto origin = static_cast<Origin>(a.origin_lane[i]);\n        if (origin == Origin::
+Retired) {\n            admit[i] = 0;\n        } else if (origin == Origin::Inherited) {\n            admit[i] = 1;\n        } else {\n            admit[i] = a.
+presence_lane[i] != 0 ? 1 : 0;\n        }\n    }\n''')
+> p.write_text(s)
+> PY
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app#
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# grep -n . /app/cpp/src/lattice/rill.cpp | sed -n '1,120p'
+1:#include "loam/exec.hpp"
+3:#include <cstddef>
+4:#include <vector>
+6:namespace loam {
+8:Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+9:    Tally tally;
+10:    if (!c.read) {
+11:        return tally;
+12:    }
+13:    tally.pages_read = 1;
+15:    const std::size_t count = a.amount_lane.size();
+16:    std::vector<unsigned char> admit(count, 0);
+17:    for (std::size_t i = 0; i < count; ++i) {
+18:        const auto origin = static_cast<Origin>(a.origin_lane[i]);
+19:        if (origin == Origin::Retired) {
+20:            admit[i] = 0;
+21:        } else if (origin == Origin::Inherited) {
+22:            admit[i] = 1;
+23:        } else {
+24:            admit[i] = a.presence_lane[i] != 0 ? 1 : 0;
+25:        }
+26:    }
+28:    if (b.op == Op::IsNull) {
+29:        for (std::size_t i = 0; i < count; ++i) {
+30:            if (admit[i] == 0) {
+31:                ++tally.row_count;
+32:            }
+33:        }
+34:        return tally;
+35:    }
+37:    for (std::size_t i = 0; i < count; ++i) {
+38:        if (admit[i] == 0) {
+39:            continue;
+40:        }
+41:        bool keep = false;
+42:        switch (b.op) {
+43:            case Op::All:
+44:                keep = true;
+45:                break;
+46:            case Op::Equal:
+47:                keep = a.amount_lane[i] == b.x;
+48:                break;
+49:            case Op::Range:
+50:                keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+51:                break;
+52:            case Op::IsNull:
+53:                keep = false;
+54:                break;
+55:            case Op::RegionEqual:
+56:                keep = a.region_lane[i] == b.text;
+57:                break;
+58:        }
+59:        if (keep) {
+60:            ++tally.row_count;
+61:            tally.sum_amount += a.amount_lane[i];
+62:        }
+63:    }
+64:    return tally;
+65:}
+67:}  // namespace loam
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('/app/cpp/src/harbor/veil.cpp')
+> s=p.read_text()
+> s=s.replace('''    if (b.op == Op::RegionEqual) {\n        const bool read = b.text >= a.region_low && b.text <= a.region_high;\n        return {read, read ?
+"text-hit" : "text-away"};\n    }\n\n    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;\n    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+\n    const bool read = !(right < a.low || left > a.high);\n    return {read, read ? "range-hit" : "range-away"};\n''','''    if (b.op == Op::RegionEqual) {\n
+      const bool read = b.text >= a.region_low && b.text <= a.region_high;\n        return {read, read ? "text-hit" : "text-away"};\n    }\n\n    // Generation
+3 stores carry faithful live-value numeric markers.  Some\n    // archived generation 2 slabs were written with incomplete mixed-origin\n    // markers; if a sl
+ab also records absent/non-live entries, its low/high\n    // cannot safely exclude a numeric probe.  Keep selective reads fast on\n    // healthy slabs, but op
+en these legacy mixed slabs conservatively.\n    if (a.generation < 3 && a.has_absent) {\n        return {true, "legacy-open"};\n    }\n\n    const std::int64_t
+ left = b.x;\n    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;\n    const bool read = !(right < a.low || left > a.high);\n    return {read, read ?
+"range-hit" : "range-away"};\n''')
+> p.write_text(s)
+> PY
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app#
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# grep -n . /app/cpp/src/harbor/veil.cpp | sed -n '1,120p'
+1:#include "loam/plan.hpp"
+3:namespace loam {
+5:Gate turn_b(const Slab& a, const Probe& b) {
+6:    if (!b.skipping) {
+7:        return {true, "full"};
+8:    }
+9:    if (b.op == Op::All) {
+10:        return {true, "all"};
+11:    }
+12:    if (b.op == Op::IsNull) {
+13:        return {a.has_absent, a.has_absent ? "possible" : "empty"};
+14:    }
+15:    if (b.op == Op::RegionEqual) {
+16:        const bool read = b.text >= a.region_low && b.text <= a.region_high;
+17:        return {read, read ? "text-hit" : "text-away"};
+18:    }
+20:    // Generation 3 stores carry faithful live-value numeric markers.  Some
+21:    // archived generation 2 slabs were written with incomplete mixed-origin
+22:    // markers; if a slab also records absent/non-live entries, its low/high
+23:    // cannot safely exclude a numeric probe.  Keep selective reads fast on
+24:    // healthy slabs, but open these legacy mixed slabs conservatively.
+25:    if (a.generation < 3 && a.has_absent) {
+26:        return {true, "legacy-open"};
+27:    }
+29:    const std::int64_t left = b.x;
+30:    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+31:    const bool read = !(right < a.low || left > a.high);
+32:    return {read, read ? "range-hit" : "range-away"};
+33:}
+35:}  // namespace loam
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app#

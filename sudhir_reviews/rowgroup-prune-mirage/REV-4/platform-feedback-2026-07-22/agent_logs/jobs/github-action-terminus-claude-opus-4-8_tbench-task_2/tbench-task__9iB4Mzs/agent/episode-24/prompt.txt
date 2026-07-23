@@ -1,0 +1,30 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# mkdir -p /tmp/s_a /tmp/s_b /tmp/s_c
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/s_a
+jobs=1 cells=8 bytes=182
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam ingest /app/data/fresh/orders_b.csv /tmp/s_b
+jobs=1 cells=8 bytes=185
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# /app/bin/loam ingest /app/data/fresh/orders_c.csv /tmp/s_c
+jobs=1 cells=8 bytes=179
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# echo '--- a ---'; cat /tmp/s_a/data.store; echo '--- inspect a ---'; /app/bin/loam inspect /tmp/s_a/data.store
+--- a ---
+H|3
+P|0|3|10|30|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|1|north|south|4
+R|1|2|100|north
+R|0|2|555|north
+R|1|2|120|south
+R|1|2|130|south
+--- inspect a ---
+0|3|10|30|1|4
+1|3|100|130|1|4
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app#

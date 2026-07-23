@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "Let me do a final review before confirming. All three fixes are verified: batch reader liveness (rill.cpp), harbor generation-gated skipping (veil.cpp), and faithful ingest markers (fold.rs). Equivalent modes agree across all cases, healthy selective controls still prune (pages_read < pages_total), both fast paths remain in use, archived stores are unmodified (md5sums intact), fresh markers are faithful, and output is byte-identical across repeated runs. The audit JSON has the correct structure with status=complete, cases, and digest, and all required per-case keys.",
+  "plan": "Everything is verified and correct. Confirming task completion.",
+  "commands": [],
+  "task_complete": true
+}
+```

@@ -20,6 +20,7 @@ Promote durable wins here when a revision or acceptance proves a pattern.
 | WW-013 | active | Generate the four Task Idea Proposal fields first, stop for platform Check feedback, then gate uniqueness/Step 2a on captured PASS | Every newly selected task candidate | Snorkel proposal-form screenshots 2026-07-21; `idea proposal`; proposal board column |
 | WW-014 | active | Resolve all current writes through one canonical root adapter; keep historical corpora independently indexed and read-only; update generated views with one digest and rollback | Repository root migrations, package/index transactions, generated status | ADR-0019; Slice 7; CM-023 prevented |
 | WW-015 | active | Give every official CI check one explicit disposition; enforce deterministic checks locally and name unpublished semantic checks as delegated instead of inventing PASS | CI parity, approval gates, future policy changes | ADR-0020; Slice 8; official coverage matrix |
+| WW-017 | active | Document exact digest/hash payload boundaries (closed object vs open prefix) in a cited normative env doc; keep verifier identical to the shipped renderer | Any report digest / checksum contract; especially after instruction-sufficiency near-misses | CM-024; SJCC REV-8 |
 
 ## Start-of-chat recall
 
@@ -35,6 +36,7 @@ Promote durable wins here when a revision or acceptance proves a pattern.
 - [ ] New task work starts with the four-field proposal check and consults the inspiration source ladder before uniqueness or Step 2a (WW-013).
 - [ ] Current writes use `root_adapter.py`; historical roots are read-only; current/historical indexes and generated-view digests are independently current (WW-014 / CM-023).
 - [ ] Every official CI check has one coverage disposition; approval exposes delegated `typos` and `check_task_sizes` rather than fabricating local PASS (WW-015).
+- [ ] DSV fields use acceptance-safe Humanizer precedence and one current atomic hash audit (WW-016 / ADR-0021/0022).
 
 ## RPSP REV-7 (CM-008) — anti-TRIVIAL series contract
 

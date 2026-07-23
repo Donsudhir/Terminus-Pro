@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Everything verified. Let me do one final cross-check: audit a fresh-ingested store in both row and batch skipping modes to prove equivalent modes agree on freshly ingested data too. I'll build a temporary case dir.",
+  "plan": "Create a case file with row and batch skipping range probes on the fresh store /tmp/s_a and audit it, confirming row_count/sum_amount agree between the two lanes.",
+  "commands": [
+    {"keystrokes": "mkdir -p /tmp/fc; printf 'f_row|/tmp/s_a/data.store|range|10|130|row|1|x\\nf_batch|/tmp/s_a/data.store|range|10|130|batch|1|x\\nf_null_r|/tmp/s_a/data.store|isnull|0|0|row|1|x\\nf_null_b|/tmp/s_a/data.store|isnull|0|0|batch|1|x\\n' > /tmp/fc/f.case\n", "duration": 0.1},
+    {"keystrokes": "/app/bin/loam audit /tmp/fc /tmp/fc/out.json; cat /tmp/fc/out.json\n", "duration": 0.5}
+  ]
+}
+```

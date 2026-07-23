@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "orders_c page1 (rows 5-8): (0,1,301)retired->not live; (2,0,317)absent->not live; (0,0,329)retired->not live; (0,1,343)retired->not live. ALL non-live! So this page should record low=0,high=0,has_absent=true per the contract edge case. My tilt_a handles that. orders_b page0: (2,1,-999)current present LEGIT live; (2,1,5)live; (2,0,777)absent not live; (2,1,15)live. Live: -999,5,15 -> low=-999,high=15,has_absent=true. page1: (0,1,-999)retired not live; (2,1,200)live;(2,1,210)live;(2,1,220)live -> low=200,high=220,has_absent=true. Let me ingest b and c and verify.",
+  "plan": "Ingest orders_b and orders_c, inspect markers, especially the all-non-live page in c.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam ingest /app/data/fresh/orders_b.csv /tmp/store_b; cat -A /tmp/store_b/data.store\n", "duration": 1.5},
+    {"keystrokes": "/app/bin/loam ingest /app/data/fresh/orders_c.csv /tmp/store_c; cat -A /tmp/store_c/data.store\n", "duration": 1.5}
+  ]
+}
+```

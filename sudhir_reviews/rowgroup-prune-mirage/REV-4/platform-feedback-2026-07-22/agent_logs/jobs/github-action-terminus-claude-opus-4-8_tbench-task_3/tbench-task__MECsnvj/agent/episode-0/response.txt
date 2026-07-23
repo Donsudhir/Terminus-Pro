@@ -1,0 +1,83 @@
+I'll start by exploring the application structure to understand what we're working with.
+
+```json
+{
+  "analysis": "I'm at the /app directory. I need to explore the structure to understand the codebase and identify the bug that causes different totals between selective reads and batch execution.",
+  "plan": "First, explore the directory structure, read documentation, and understand the code layout.",
+  "commands": [
+    {"keystrokes": "ls -la /app\n", "duration": 0.1},
+    {"keystrokes": "cat /app/docs/report-schema.md\n", "duration": 0.1},
+    {"keystrokes": "ls -la /app/tools /app/bin /app/data /app/docs\n", "duration": 0.1}
+  ]
+}
+```
+
+user Current Terminal Screen:
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app# ls -la /app
+total 4
+drwxr-xr-x 1 root root  117 Nov  1 02:24 .
+drwxr-xr-x 1 root root  173 Nov  7 20:47 ..
+drwxr-xr-x 1 root root   26 Nov  1 02:24 bin
+drwxr-xr-x 1 root root  103 Nov  1 02:24 data
+drwxr-xr-x 1 root root   30 Nov  1 02:24 docs
+drwxr-xr-x 1 root root   65 Nov  1 02:24 src
+drwxr-xr-x 1 root root   34 Nov  1 02:24 tools
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app# cat /app/docs/report-schema.md
+# Audit Report Schema
+
+The audit report is UTF-8 JSON with a trailing newline. Top-level keys:
+
+- `status`: always the string `complete`.
+- `cases`: array of per-case objects (sorted by `case_id`).
+- `digest`: SHA-256 over the canonical serialization of `cases` (see below).
+
+Each case object has exactly these keys:
+
+- `case_id` (string): directory name of the case.
+- `row_count` (integer): number of live rows contributing to the sum.
+- `sum_amount` (integer): sum of live amounts.
+- `pages_total` (integer): number of pages in the store.
+- `pages_read` (integer): number of pages actually read during the audit.
+- `path` (string): absolute path to the case's `data.store`.
+- `skipping` (boolean): whether the fast path skipped any pages.
+
+Canonical serialization for the digest:
+
+- Serialize `cases` as compact JSON (no spaces), keys in the order above.
+- Encode as UTF-8 and hash with SHA-256; store the hex digest.
+
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app# ls -la /app/tools /app/bin /app/data /app/docs
+/app/bin:
+total 0
+drwxr-xr-x 1 root root 26 Nov  1 02:24 .
+drwxr-xr-x 1 root root 117 Nov  1 02:24 ..
+drwxr-xr-x 1 root root  8 Nov  1 02:24 loam -> ../src/*
+
+<... omitted 15 of 25 lines ...>
+drwxr-xr-x 1 root root 65 Nov  1 02:24 src
+-rwxr-xr-x 1 root root 65 Nov  1 02:24 tools
+
+/app/data:
+total 20
+drwxr-xr-x 1 root root 103 Nov  1 02:24 .
+drwxr-xr-x 1 root root  56 Nov  1 02:24 ..
+drwxr-xr-x 1 root root  32 Nov  1 02:24 cases
+drwxr-xr-x 1 root root 4096 Nov  1 02:24 case_new_expected
+drwxr-xr-x 1 root root   34 Nov  1 02:24 tools
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app# ls -la /app/src /app/tools\n"
+```
+
+Let me explore the source code structure.
+
+```json
+{
+  "analysis": "I see the general structure. The bin/loam is a symlink to ../src/*. I need to look at the source code and tools.",
+  "plan": "Explore src, tools directories, and the data cases.",
+  "commands": [
+    {"keystrokes": "C-c", "duration": 0.1},
+    {"keystrokes": "ls -la /app/src\n", "duration": 0.1},
+    {"keystrokes": "ls -la /app/tools\n", "duration": 0.1},
+    {"keystrokes": "cat /app/tools/build-all\n", "duration": 0.1}
+  ]
+}
+```

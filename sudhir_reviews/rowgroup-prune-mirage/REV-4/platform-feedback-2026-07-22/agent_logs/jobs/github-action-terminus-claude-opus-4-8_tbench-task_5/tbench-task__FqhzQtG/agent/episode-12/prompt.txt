@@ -1,0 +1,152 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/tools/build-all
+#!/bin/bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+mkdir -p "$ROOT/bin"
+
+cargo build --manifest-path "$ROOT/rust/Cargo.toml" --release --offline
+make -C "$ROOT/cpp" clean all
+install -m 0755 "$ROOT/rust/target/release/loam-ingest" "$ROOT/bin/loam-ingest"
+install -m 0755 "$ROOT/cpp/build/loam" "$ROOT/bin/loam"
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/bin/loam
+@ @@@@@@@@((00@0@QQAA??*A*Ah
+-A-88@8@ XX@X@  Std88@8@ PtdAAQtdRtd*A*App/lib64/ld-linux-x86-64.so.2GNUGNUCa/1:78J@E% HP^G0UL,X
+                                                                                                SKC"    DB26Z$.N5>TA9'\=?Q3#]OF
+                                                                                                                               WY
+R;V[`(M0$aB(
+            P(  @RFIJKMORTWZ\]`Zĕ.w(3ջHZdT
+_%m
+   Ck-"pyIkSMЪ<~c]/r:rL/DRLt
+                            C"DYl       r
+AT
+
+k&      [
+L
+
+x       x       !8
+cP
+
+!
+ :
+  $a_
+n
+
+
+         ~
+
+          "S@!R"`@C! -A]
+0@!*A~3@2@!-A u!,A !,AP" @R! ,A!,AYA1!+AP3!8-Ac
+!*A &"M@!`+AP!@+A
+                  3@
+P0@                 A>
+  A]"p@X__gmon_start___ZNSt6localeD1Ev_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_c_ZSt20__throw_length_errorPKc_ZTTNSt7__cxx1119basic_ostringstreamIcSt
+11char_traitsIcESaIcEEE_ZTVNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEE_ZNSt9basic_iosIcSt11char_traitsIcEE5clearESt12_Ios_Iostate_ZTVSt14basic_i
+fstreamIcSt11char_traitsIcEE_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE7replaceEmmPKcm_ZNSt8ios_baseD2Ev_ZTISt9exception_ZNSo9_M_insertIlEERSoT__ZdlPv
+m_ZNSolsEi_ZTTSt14basic_ifstreamIcSt11char_traitsIcEE_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC2EPKcmRKS3__ZNSt13runtime_errorC1ERKNSt7__cxx1112basi
+c_stringIcSt11char_traitsIcESaIcEEE_ZNKSt10filesystem7__cxx114path7compareERKS1__ZNSo9_M_insertImEERSoT__ZNSt13basic_filebufIcSt11char_traitsIcEE5closeEv_ZNKSt5
+ctypeIcE8do_widenEc_ZSt24__throw_invalid_argumentPKc_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE15_M_replace_coldEPcmPKcmm_ZNSt10filesystem7__cxx114pat
+h5_ListC1Ev_ZNSt13runtime_errorC1EPKc_ZTVSt15basic_streambufIcSt11char_traitsIcEE_ZNSt13basic_filebufIcSt11char_traitsIcEED1Ev_ZNSt7__cxx1112basic_stringIcSt11c
+har_traitsIcESaIcEE10_M_replaceEmmPKcm_ZTVSt14basic_ofstreamIcSt11char_traitsIcEE_ZSt7getlineIcSt11char_traitsIcESaIcEERSt13basic_istreamIT_T0_ES7_RNSt7__cxx111
+2basic_stringIS4_S5_T1_EES4__ZTVNSt7__cxx1115basic_stringbufIcSt11char_traitsIcESaIcEEE_ZNSt10filesystem6statusERKNS_7__cxx114pathE_ZNSt6localeC1Ev__cxa_throw_Z
+NKSt10filesystem7__cxx1118directory_iteratordeEv_ZSt17__throw_bad_allocv__cxa_begin_catch_ZTTSt14basic_ofstreamIcSt11char_traitsIcEE_ZTISt13runtime_error_ZSt4ce
+rr_ZNSt10filesystem7__cxx1118directory_iteratorppEv_ZNKSt10filesystem7__cxx114path5_List13_Impl_deleterclEPNS2_5_ImplE_ZSt16__throw_bad_castv_ZNSt8ios_baseC2Ev_
+_cxa_allocate_exception_ZNSt13basic_filebufIcSt11char_traitsIcEE4openEPKcSt13_Ios_Openmode_ZSt21ios_base_library_initv__gxx_personality_v0_ZNSt13runtime_errorD1
+Ev_ZNSt10filesystem18create_directoriesERKNS_7__cxx114pathE_ZNKSt10filesystem7__cxx114path17_M_find_extensionEv_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESa
+IcEEC1EPKcmRKS3__ZNKSt10filesystem7__cxx114path15has_parent_pathEv_ZNSt10filesystem7__cxx1118directory_iteratorC1ERKNS0_4pathENS_17directory_optionsEPSt10error_
+code_ZTVSt13basic_filebufIcSt11char_traitsIcEE_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l_ZNSo3putEc_ZNKSt5ctypeIcE13_M_widen_
+initEv_ZNSt10filesystem7__cxx114path14_M_split_cmptsEv_ZNSt12__basic_fileIcED1Ev_ZNSt14basic_ifstreamIcSt11char_traitsIcEED1Ev_ZStlsISt11char_traitsIcEERSt13bas
+ic_ostreamIcT_ES5_PKc_Znwm_ZTVSt9basic_iosIcSt11char_traitsIcEE_ZNSt9basic_iosIcSt11char_traitsIcEE4initEPSt15basic_streambufIcS1_E_ZNSt13basic_filebufIcSt11cha
+r_traitsIcEEC1Ev__cxa_rethrow_ZNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEED1Ev_ZSt24__throw_out_of_range_fmtPKcz_ZNSt7__cxx1112basic_stringIcSt11
+char_traitsIcESaIcEE9_M_mutateEmmPKcm_ZNKSt10filesystem7__cxx114path11parent_pathEv_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE10_M_disposeEv_ZSt4cout_
+ZNSt14basic_ofstreamIcSt11char_traitsIcEED1Ev_ZSt20__throw_out_of_rangePKc__cxa_end_catch_ZNSt10filesystem7__cxx114path5_ListC1ERKS2__ZSt19__throw_logic_errorPK
+c__cxa_free_exception_Unwind_Resumestrtoullmemmove__libc_single_threadedforkstrlen_exit__libc_start_mainexeclstrtollmemchrmemcmpmemsetwaitpidstrtoulmemcpy__errn
+o_locationlibstdc++.so.6libm.so.6libgcc_s.so.1libc.so.6GCC_3.0GLIBC_2.32GLIBC_2.14GLIBC_2.34GLIBC_2.2.5GLIBCXX_3.4.32GLIBCXX_3.4.20GLIBCXX_3.4.31GLIBCXX_3.4.11C
+XXABI_1.3.9GLIBCXX_3.4.9CXXABI_1.3GLIBCXX_3.4.26GLIBCXX_3.4.21GLIBCXX_3.4
+
+
+ P&y
+P
+ui
+a
+ yѯ
+
+%)2ӯk@vKqZti/A/AB*AW*AP@+AZ`+AY+AM,AT ,AJ,AU,AK-AS -AH8-AN2A_2A\3AL00A0A]0A 0A(0A00A80A@0H0A    P0AOX0A
+`0A
+   h0A
+x0A0A0A0A0A0A0A0A0A0
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+VPHǅpƅxIFhHEHEIFpHEHEIFxHEHEIHEHEIHEHEIHEHEIHEHEIHEHEIHEHEIHEHEIHEH
+EIHEHEIHEHEIHEHEIHE6
+                    IH9IHEIN8oMIANAE IN(HU(AF HE8H9)HU0H@@T0fT1HU0fHUPH@z
+1҉M0fT1HUPfL^IMtHD$@LH@HHD$L)KHD$@L8LL`tFJuHIHH|H|I~@HH)I)ȃ
+ L
+  9rHIHH|H|I~`HH)I)1҉M
+                    L
+                     9rIH$@H.$H@s8FftH$`H$h@sXfftHH$I$IH9HGL$I)IL.JIILH$hL$hHsXH4`H|2Hs`HH)I)A1҉M
+                                                                                                8L
+                                                                                                  >9r&H$HL$HHs8H4@H|2Hs@HH)I)1҉M
+                                                                                                                               8L
+                                                                                                                                 >9rkGGHH9HGL$#IH<$H@u8(Fft@HsYX
+$h@uXDfft0$ɉ~ A||
+H$hL$hHuXH4`H|1Hu`HH)I)1ɉM
+                          8L
+                            >9rH$HL$HHu8H4@H|1Hu@HH)I)1ɉM
+                                                         8L
+                                                           >9rT0T1HU0[T0T1HUP$hsXdtH$I$IH9HGL$I)I-G$Hs8DtE$Hu8DtN2A<F2A2Ff$huXdt}2A
+H$CH$L9tH$HpEHD$0Lt$8fHD$`)D$PMg@HDHL9@LHt$PH|$AlHD$ oL$H$HD$`H$)L$PH9tH$Hp&EH$H$H9tH$HpEHI9t\LHH6hLHH$S`Ll$pAxHLHL?k:HLA@H$IHxH8I/H9HEH
+                                                                                                                                        $AH
+                                                                                                                                           $HtHm۶m۶mHHHD$`foT$PH
+HEXHp@H}(HE8H9tHu8[]A\H@D[]A\AWIAVEAUATIUHSH(Ht>DHt$HD(HAHT$H9t3Hx<HHx BHH$H8HX@@AAAbAAHQHQHH$QHQHQHQATUHSLHI9t/fDH;HCH9t
+                                                                "t"MtH)I$uD+H([]A\A]A^A_H|@H|+?Hǃ;uD+Af.AWIAVEAUATIUHSH(Ht|=DHt$HD(HAHT$H9t3
+                                                                                                                                            "t"MtH)I$uD+H([]A\A]
+A^A_H|5@H|>Hǃ;uD+@f.AWAVIHAUATUSH(H/LH)HH9IIHI)L9H<H|$H9HTHDHDIIMI}I}HD$I|IMMB7H9HTHELC#H
+HJH HH I9teHrHxH2HHH9uHst8@>|HxfHHT$=HD fHDII)II L9HCIL#H
+HJH LH H9tMHHHrL@H2H9uI|tDtDfDLLH)IHtIt$HH):=HD$H\MlHI$HID$H([]A\A]A^A_@LANNTLJIIL)I 1O4O49rf.H8IH>LL8LL>LJIL)IgM:M99rL@HFHH9HFHHT$H3@MLHx}     <IEHMuHt$L;I}MB7
+L\<Ht$H|H!;Hg<H<f.DAWAVAUATIHUSHHL/HL)HHHH9HIL)I9+HH9HK01E1I7A4$MD$LH I|$f0ItLHHIt$ I9L@MD$ L@ HxIt$ID$AD$ L9LL%HrHp Hr L@H0LBH0H90Hz L@ f2HHzHHpL9uL@MHA;EtDDAt
+EBtfBtL@DHHHtH
+              $e9H
+                  $HtIHP0HDHCL)HIT`H9HH$H~Hx H~ H0LFH0H9tc8LV LH L@LVf>HHHxL9uMHA;EtDEAtEB|fC|
+덐H
+H)H0HHHH!HD@HHMt!IvLHLH$L)a8HLH$M>IINH[]A\A]A^A_fDLMENdOdLf(IM)EL)AH$AE1EJKE9rH$fDLLENTNTLB(IL)AH)AA1NOD9rtHHH9HGH
+                                                                                                                  @HLGs>AEET$ DP AEFTfGTMT$ LP EN\O\LP(IIM)EM)AH
+TAID$E1DII$A9rHTLPDEEB|C|
+]DEDBtBtL@UET$ EDP FTGTHH9HGH
+                             RH2A25fAWHHAVHAUATUSH(LL)L9MIH7LI)LGHMILwM9N$LIL)H9syHt$H9tI4I<,HH
+                                                                                               $6H
+HL$LLL$4LLL$HL$IMt4H3IRLHHL$LDL                                                                   $Ht*HtLHH5L#f.A$L#LHC<H([]A\A]A^A_LH9{ILIHH5L#MLMHD$I)M9LMH
+                               $14HL$LDL
+                                        $Ht6Ht1K<
+                                                 HHHLLL$3LLL$fDH
+                                                                Mu(I9tHCHHp+4L#LsHt$LI<,HILHLL$3HLL$I~MN2fDIMxwLHD$I)IA@H$D.fDfDA$AR2AH2basic_string::_M_replace
+basic_string::_M_createx+A*AH-Abatchrowclosed:open:basic_string::appendemptypossibletext-hittext-awayrange-hitrange-awaycannot create std::vector larger than ma
+x_size()basic_string: construction from null is not validvector::reservevector::_M_realloc_insertauditfork failed/app/bin/loam-ingestwaitpid failedinspect
+ loam inspect <store>
+loam: usage: loam audit <case-directory> <report-path>
+       loam ingest <csv> <store-directory>
+basic_string::substrcannot open case file: bad case row in allrangeisnullregion_equnknown operation: stollunknown path: %s: __pos (which is %zu) > this->size()
+(which is %zu)truefalse{"case_id":"","row_count":,"sum_amount":,"pages_total":,"pages_read":,"path":"","skipping":cannot write report: {"status":"complete","cas
+es":,"digest":""}
+basic_string::replacex+A*AH-A0,Acannot open store: stoullbad page record in stoulshort page in bad row record in ;,@0I1182      B3      ;4l
+                                                                                                                                           .84
+:$2>>PDD,@EIhIxOP,QPUhpUpWW0X XX YYp[]h]bks                                                                                                   :
+P{
+  `t<h` 0     0
+
+P
+
+ `
+  X
+H  Pp
+
+p8PzRx
+     B"zRx
+         B$0)FJ
+               ?;*3$"XpGzPLRx3@
+

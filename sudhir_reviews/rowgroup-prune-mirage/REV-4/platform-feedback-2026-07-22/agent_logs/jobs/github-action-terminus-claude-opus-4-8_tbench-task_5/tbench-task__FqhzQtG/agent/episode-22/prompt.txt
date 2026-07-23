@@ -1,0 +1,22 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/store_a; echo EXIT:$?
+jobs=1 cells=8 bytes=182
+EXIT:0
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat -A /tmp/store_a/data.store
+H|3$
+P|0|3|10|30|1|east|west|4$
+R|1|0|-999|east$
+R|1|2|10|east$
+R|1|2|20|west$
+R|1|2|30|west$
+P|1|3|100|130|1|north|south|4$
+R|1|2|100|north$
+R|0|2|555|north$
+R|1|2|120|south$
+R|1|2|130|south$
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app#

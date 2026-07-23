@@ -1,0 +1,11 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# rm -f /app/output/audit2.json; /app/bin/loam audit /app/data/cases /app/output/audit.json && echo OK; head -c 60
+ /app/output/audit.json; echo
+OK
+{"status":"complete","cases":[{"case_id":"c_legit","row_coun
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app#

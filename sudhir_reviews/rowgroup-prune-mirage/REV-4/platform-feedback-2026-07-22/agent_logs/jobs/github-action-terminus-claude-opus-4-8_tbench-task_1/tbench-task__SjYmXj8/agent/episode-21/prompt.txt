@@ -1,0 +1,82 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# cat > /app/cpp/src/lattice/rill.cpp << 'EOF'
+> #include "loam/exec.hpp"
+>
+> #include <cstddef>
+> #include <vector>
+>
+> namespace loam {
+> namespace {
+>
+> bool lane_is_live(std::uint8_t origin, std::uint8_t present) {
+>     if (origin == static_cast<std::uint8_t>(Origin::Retired)) {
+>         return false;
+>     }
+>     if (origin == static_cast<std::uint8_t>(Origin::Inherited)) {
+>         return true;
+>     }
+>     return present != 0;
+> }
+>
+> }  // namespace
+>
+> Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+>     Tally tally;
+>     if (!c.read) {
+>         return tally;
+>     }
+>     tally.pages_read = 1;
+>
+>     const std::size_t count = a.amount_lane.size();
+>     std::vector<unsigned char> admit(count, 0);
+>     for (std::size_t i = 0; i < count; ++i) {
+>         admit[i] = lane_is_live(a.origin_lane[i], a.presence_lane[i]) ? 1 : 0;
+>     }
+>
+>     if (b.op == Op::IsNull) {
+>         for (std::size_t i = 0; i < count; ++i) {
+>             if (admit[i] == 0) {
+>                 ++tally.row_count;
+>             }
+>         }
+>         return tally;
+>     }
+>
+>     for (std::size_t i = 0; i < count; ++i) {
+>         if (admit[i] == 0) {
+>             continue;
+>         }
+>         bool keep = false;
+>         switch (b.op) {
+>             case Op::All:
+>                 keep = true;
+>                 break;
+>             case Op::Equal:
+>                 keep = a.amount_lane[i] == b.x;
+>                 break;
+>             case Op::Range:
+>                 keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+>                 break;
+>             case Op::IsNull:
+>                 keep = false;
+>                 break;
+>             case Op::RegionEqual:
+>                 keep = a.region_lane[i] == b.text;
+>                 break;
+>         }
+>         if (keep) {
+>             ++tally.row_count;
+>             tally.sum_amount += a.amount_lane[i];
+>         }
+>     }
+>     return tally;
+> }
+>
+> }  // namespace loam
+> EOF
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app#

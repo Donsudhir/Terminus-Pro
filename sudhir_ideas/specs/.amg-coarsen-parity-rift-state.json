@@ -1,0 +1,727 @@
+{
+  "task_name": "amg-coarsen-parity-rift",
+  "attempt": 1,
+  "best_score": [
+    0,
+    0
+  ],
+  "best_attempt": 1,
+  "plateau_count": 0,
+  "candidates": [],
+  "history": [
+    {
+      "attempt": 1,
+      "fails": 0,
+      "warns": 0,
+      "evidence_path": "/home/sudhir/Projects/TERMINUS/sudhir_ideas/specs/amg-coarsen-parity-rift-attempt-1-evidence.json",
+      "evidence": {
+        "hardness_axes": [
+          {
+            "id": "discover",
+            "name": "Discover",
+            "verdict": "PASS",
+            "reasoning": "Public symptoms describe dual-reordering residual/digest divergence with smoothness and coarse-size bait beside a healthy ordering control, but they do not identify order-indexed strength selection, transfer inheritance of that set, or apply-path identity mixing. Those facts must be recovered from Fortran, C++, Rust, logs, and control/failing runs."
+          },
+          {
+            "id": "synthesize",
+            "name": "Synthesize",
+            "verdict": "PASS",
+            "reasoning": "Dual-ordering parity requires coordinated strength/coarse selection, transfer-operator construction, and V-cycle apply across three language roots. No single module owns the complete invariant."
+          },
+          {
+            "id": "diagnose",
+            "name": "Diagnose",
+            "verdict": "PASS",
+            "reasoning": "The instruction reports convergence and fine-grid digest disagreement under equivalent reorderings, with smoothness/coarse-size looking acceptable, without naming causes, algorithms, or fix sites."
+          },
+          {
+            "id": "navigate_coupling",
+            "name": "Navigate coupling",
+            "verdict": "PASS",
+            "reasoning": "Correcting strength selection alone still fails if transfers inherit a broken coarse set; correcting transfers alone fails if apply mixes identity conventions; apply-only repairs leave residual/digest contracts red when hierarchy construction remains order-dependent."
+          },
+          {
+            "id": "reason_beyond_training",
+            "name": "Reason beyond training",
+            "verdict": "PASS",
+            "reasoning": "A textbook classical-AMG recipe or 'sort the matrix once' shortcut cannot reconcile project-specific strength, transfer, and apply coupling under metamorphic reorderings while preserving a healthy ordering control and rejecting permutation hard-coding."
+          }
+        ],
+        "anti_trivialization_checks": [
+          {
+            "id": "disclosure_collapse",
+            "name": "Disclosure-collapse",
+            "verdict": "PASS",
+            "reasoning": "Honest dual-ordering residual and solution-digest parity plus healthy-control stability does not reveal which of the three hierarchy authorities is order-inconsistent."
+          },
+          {
+            "id": "hidden_instance",
+            "name": "Hidden-instance",
+            "verdict": "PASS",
+            "reasoning": "The design covers multiple reordered families and a healthy ordering control regenerated from bundled inputs rather than hiding one corrupted fixture."
+          },
+          {
+            "id": "single_artifact_repair",
+            "name": "Single-artifact repair",
+            "verdict": "PASS",
+            "reasoning": "Three coordinated locations across distinct lattice/, bridge/, and orbit/ roots are required; rewriting one report or one permutation table cannot satisfy regenerated checks."
+          },
+          {
+            "id": "generalization",
+            "name": "Generalization",
+            "verdict": "PASS",
+            "reasoning": "The verifier regenerates equivalent-reordering pairs and healthy controls from bundled families, so fixes must generalize beyond named cases."
+          },
+          {
+            "id": "prompt_honesty",
+            "name": "Prompt-honesty",
+            "verdict": "PASS",
+            "reasoning": "The instruction names observable parity failures, invocation, normative report schema path, and completion conditions while withholding only implementation causes and fix sites."
+          },
+          {
+            "id": "cheating_vs_difficulty",
+            "name": "Cheating-vs-difficulty",
+            "verdict": "PASS",
+            "reasoning": "Regeneration and control matrices prevent hardcoding, but residual difficulty is cross-language hierarchy diagnosis rather than those anti-cheating mechanisms."
+          },
+          {
+            "id": "mechanical_fix_filter",
+            "name": "Mechanical-fix filter",
+            "verdict": "PASS",
+            "reasoning": "The core work is not dependency placement, timeouts, reward formatting, or metadata repair."
+          },
+          {
+            "id": "localized_fix",
+            "name": "Localized-fix",
+            "verdict": "PASS",
+            "reasoning": "The selected topology places one location in lattice/, one in bridge/, and one in orbit/, each controlling 4 of 12 tests under a 0.5 concentration cap."
+          },
+          {
+            "id": "oracle_locality",
+            "name": "Oracle-locality",
+            "verdict": "PASS",
+            "reasoning": "The planned oracle performs substantive strength-selection, transfer-construction, and apply-coupling changes rather than replacing one short file or toggling one compiler option."
+          },
+          {
+            "id": "small_declarative_cluster",
+            "name": "Small declarative-cluster",
+            "verdict": "PASS",
+            "reasoning": "No finite table, threshold list, schema block, or configuration cluster contains the solution; the cited schema only documents report keys."
+          },
+          {
+            "id": "grep_collapse",
+            "name": "Grep-collapse",
+            "verdict": "PASS",
+            "reasoning": "Selected fix paths and symbols use opaque knurl/splice/whorl vocabulary that does not contain any noun extracted from the public instruction."
+          },
+          {
+            "id": "pre_factored_helper",
+            "name": "Pre-factored-helper",
+            "verdict": "PASS",
+            "reasoning": "The selected functions do not mirror public terms such as coarsen, prolong, residual, digest, reordering, or smoothness."
+          },
+          {
+            "id": "recipe_discount",
+            "name": "Recipe-discount",
+            "verdict": "PASS",
+            "reasoning": "A known classical-AMG or single-permutation-normalization recipe cannot repair strength selection, transfer inheritance, and apply identity coupling together under regenerated controls."
+          },
+          {
+            "id": "security_aura_discount",
+            "name": "Security-aura discount",
+            "verdict": "PASS",
+            "reasoning": "This is a scientific-computing task and does not rely on security language or exploit framing for difficulty."
+          },
+          {
+            "id": "orthogonal_checklist",
+            "name": "Orthogonal-checklist",
+            "verdict": "PASS",
+            "reasoning": "Dual-ordering residual/digest parity, smoothness bait rejection, and healthy-control stability are one coupled hierarchy invariant spanning three language authorities, not independent checklist bullets."
+          },
+          {
+            "id": "harness_discount",
+            "name": "Harness-discount",
+            "verdict": "PASS",
+            "reasoning": "Docker and mixed-language compilation provide realism, while residual hardness comes from algebraic hierarchy decisions under reordering."
+          },
+          {
+            "id": "one_pass_solvability",
+            "name": "One-pass solvability",
+            "verdict": "PASS",
+            "reasoning": "Opening the obvious entrypoint does not reveal the three locations, and a naive global reorder-to-canonical shortcut fails regenerated controls that forbid hard-coding one permutation."
+          },
+          {
+            "id": "hard_only_gate",
+            "name": "Hard-only gate",
+            "verdict": "PASS",
+            "reasoning": "The bounded task requires professional AMG hierarchy reasoning, mixed-language numerics, and metamorphic scientific verification within an expert-hours scope."
+          },
+          {
+            "id": "discovery_budget_test",
+            "name": "Discovery budget test",
+            "verdict": "PASS",
+            "reasoning": "Three non-trivial discoveries are committed below, each with a distinct planned location and a reason it must remain absent from the public instruction."
+          },
+          {
+            "id": "instruction_specificity_test",
+            "name": "Instruction specificity test",
+            "verdict": "PASS",
+            "reasoning": "The drafted instruction stays at symptoms-only: no algorithm names, thresholds, cause phrases such as strength-of-connection or prolongation, or named fix sites."
+          },
+          {
+            "id": "topology_distribution_test",
+            "name": "Topology distribution test",
+            "verdict": "PASS",
+            "reasoning": "Three distinct candidate topologies are enumerated below, each requiring at least three coordinating locations; the selected topology distributes tests across three locations at 4/12 each."
+          }
+        ],
+        "rubric_axes": [
+          {
+            "id": "verifiable",
+            "name": "Verifiable",
+            "verdict": "PASS",
+            "reasoning": "Dual-ordering residual and solution-digest contracts, healthy ordering control, and regenerated parity_report.json checks are all programmatic."
+          },
+          {
+            "id": "well_specified",
+            "name": "Well-specified",
+            "verdict": "PASS",
+            "reasoning": "The symptoms-only instruction clearly identifies invocation, normative schema path, dual-ordering outcomes, and prohibited hardcoding without revealing implementation causes."
+          },
+          {
+            "id": "solvable",
+            "name": "Solvable",
+            "verdict": "PASS",
+            "reasoning": "The design bounds the defect to a small existing mixed-language AMG lab; an expert familiar with hierarchy construction can complete the coordinated changes in roughly three to eight hours."
+          },
+          {
+            "id": "difficult",
+            "name": "Difficult",
+            "verdict": "PASS",
+            "reasoning": "The task stays hard after honest disclosure because smoothness-green dual-ordering disagreement does not identify which strength, transfer, or apply authority is inconsistent."
+          },
+          {
+            "id": "interesting",
+            "name": "Interesting",
+            "verdict": "PASS",
+            "reasoning": "Reliable algebraic multigrid hierarchy construction under reordering is paid production work in sparse iterative solvers."
+          },
+          {
+            "id": "outcome_verified",
+            "name": "Outcome-verified",
+            "verdict": "PASS",
+            "reasoning": "The tests accept any implementation producing correct dual-ordering and control numerical outcomes and do not require the oracle's exact code shape."
+          }
+        ],
+        "instruction_completeness_test": {
+          "verdict": "PASS",
+          "reasoning": "The instruction is sufficient to judge the final parity report and dual-ordering/control outcomes but insufficient to locate or derive the three fixes without deeply reading and running the codebase."
+        },
+        "discovery_budget": [
+          {
+            "discovery": "Strength/coarse-set selection walks the presentation order of matrix rows rather than a graph-stable identity, so equivalent reorderings change the selected set while smoothness heuristics still look plausible.",
+            "planned_location": "environment/lattice/knurl.f90::knurl_p",
+            "why_instruction_must_not_reveal": "Naming order-indexed strength selection or coarse-set dependence would collapse the Fortran diagnosis into a disclosed indexing edit."
+          },
+          {
+            "discovery": "Transfer (prolongation/restriction) construction inherits the order-dependent coarse set without remapping under reordering, so the hierarchy operators disagree across equivalent presentations.",
+            "planned_location": "environment/bridge/splice.cpp::splice_q",
+            "why_instruction_must_not_reveal": "Naming prolongation, restriction, or inheritance of the coarse set would directly expose the C++ repair and convert the task into a recipe."
+          },
+          {
+            "discovery": "Apply/V-cycle coupling mixes identity conventions across ordered and unordered paths, so fine-grid solution digests diverge even when smoothness and coarse-size summaries look acceptable.",
+            "planned_location": "environment/orbit/whorl.rs::whorl_r",
+            "why_instruction_must_not_reveal": "Naming mixed identity conventions or V-cycle apply keying would reduce the Rust work to a disclosed remap."
+          }
+        ],
+        "instruction_specificity": {
+          "level": "symptoms-only",
+          "reasoning": "The public draft describes dual-reordering residual/digest divergence, smoothness/coarse-size bait, and a healthy ordering control with a cited report schema without naming algorithms, thresholds, strength selection, transfers, apply keying, or causes."
+        },
+        "investigation_profile": {
+          "weakness_areas": [
+            "long_horizon_debugging",
+            "multi_component_reasoning",
+            "partial_failures",
+            "ambiguous_bug_report"
+          ],
+          "causal_chain": [
+            {
+              "stage": 1,
+              "evidence": "Run the bundled dual-reordering case beside the fixed healthy ordering control; compare convergence curves, residual norms, fine-grid solution digests, smoothness indicators, and coarse-size summaries.",
+              "finding": "Convergence and fine-grid digests diverge under equivalent reorderings while smoothness and coarse-size can look acceptable; the healthy ordering control stays green.",
+              "unlocks_next": "The conditional matrix justifies treating residual/digest-red with smoothness bait as one hierarchy incident rather than a general residual bug."
+            },
+            {
+              "stage": 2,
+              "evidence": "Inspect run logs, metrics counters, and parity_report.json fields for both reorderings versus the healthy control.",
+              "finding": "Disagreement concentrates on residual and solution-digest fields after hierarchy construction, not on healthy-control runs.",
+              "unlocks_next": "Investigation can focus on state that differs across equivalent presentations of the same matrix graph."
+            },
+            {
+              "stage": 3,
+              "evidence": "Trace Fortran lattice selection intermediates and coarse-set membership across reorderings for matched cases.",
+              "finding": "Strength/coarse selection follows presentation order rather than graph-stable identity.",
+              "unlocks_next": "Order-stable selection becomes a necessary but not sufficient stage before transfers and apply are trusted."
+            },
+            {
+              "stage": 4,
+              "evidence": "Compare C++ bridge transfer-operator construction against the selected coarse sets under both reorderings.",
+              "finding": "Transfers inherit the order-dependent coarse set without remapping, explaining hierarchy disagreement across presentations.",
+              "unlocks_next": "Transfer construction must be repaired in concert with selection; apply identity mixing still remains unchecked."
+            },
+            {
+              "stage": 5,
+              "evidence": "Inspect Rust orbit apply/V-cycle intermediates and identity metadata for both reorderings versus the healthy control.",
+              "finding": "Apply coupling mixes identity conventions, so digests diverge even when smoothness/coarse-size bait stays green.",
+              "unlocks_next": "The three authorities can now be repaired as one coupled invariant and verified end-to-end."
+            },
+            {
+              "stage": 6,
+              "evidence": "Apply coordinated repairs at lattice, bridge, and orbit locations; rebuild; rerun dual-reordering and healthy-control matrices.",
+              "finding": "Both reorderings meet residual and solution-digest contracts; the healthy ordering control remains green; smoothness bait is not treated as success.",
+              "unlocks_next": "This closes the incident with deterministic outcome evidence."
+            }
+          ],
+          "evidence_surfaces": [
+            {
+              "surface": "code",
+              "planned_location": "environment/lattice/, environment/bridge/, and environment/orbit/",
+              "question_answered": "Which language roots own strength selection, transfer construction, and apply coupling?"
+            },
+            {
+              "surface": "runtime-state",
+              "planned_location": "Deterministic observations from /app/bin/amglab dual-reordering and control runs",
+              "question_answered": "Where do residuals and digests diverge while smoothness and coarse-size look acceptable?"
+            },
+            {
+              "surface": "logs",
+              "planned_location": "environment/fixtures/logs/run_trace.ndjson",
+              "question_answered": "Which hierarchy phases correlate with dual-reordering disagreement?"
+            },
+            {
+              "surface": "metrics",
+              "planned_location": "Emitted residual and digest fields in /app/output/parity_report.json",
+              "question_answered": "Do smoothness/coarse-size metrics mask the residual/digest failure mode?"
+            },
+            {
+              "surface": "filesystem",
+              "planned_location": "environment/fixtures/cases/ and hierarchy scratch under /app/var/hier/",
+              "question_answered": "What durable hierarchy state exists for reordered trajectories versus the healthy control?"
+            }
+          ],
+          "competing_hypotheses": [
+            {
+              "hypothesis": "The smoother kernel itself is numerically wrong under reordering.",
+              "why_plausible": "Convergence curves diverge across presentations.",
+              "falsifier": "Healthy ordering control runs remain correct, and smoothness indicators on failing reorderings can still look acceptable while digests disagree."
+            },
+            {
+              "hypothesis": "Solution digests use an unstable floating reduction that changes with row presentation.",
+              "why_plausible": "Only digests appear red while some residual norms look ordinary.",
+              "falsifier": "Digest disagreement tracks hierarchy membership and apply identity boundaries rather than pure reduction order; residual contracts also fail under the same reorderings."
+            },
+            {
+              "hypothesis": "The two reorderings are not algebraically equivalent (fixture mismatch).",
+              "why_plausible": "Dual-presentation disagreement can look like different matrices.",
+              "falsifier": "Case identity keys and nonzero pattern cardinality in parity_report.json match across reorderings; only hierarchy-dependent residual/digest fields diverge."
+            }
+          ],
+          "conditional_failures": [
+            {
+              "scenario": "Same matrix under two equivalent reorderings on a bundled case",
+              "role": "failing",
+              "expected_behavior": "After repair, residual and fine-grid solution-digest contracts agree across both reorderings."
+            },
+            {
+              "scenario": "Generated reordering families with the same public contract",
+              "role": "failing",
+              "expected_behavior": "Dual-ordering parity generalizes beyond the bundled incident case without hard-coding one permutation."
+            },
+            {
+              "scenario": "Fixed healthy ordering control on the same families",
+              "role": "healthy-control",
+              "expected_behavior": "Remains correct and green across clean rebuilds before and after repair."
+            },
+            {
+              "scenario": "Smoothness indicator and coarse-size summary bait on failing reorderings",
+              "role": "failing",
+              "expected_behavior": "Must not be treated as success; residual/digest contracts still govern."
+            }
+          ],
+          "estimated_meaningful_actions": 52,
+          "determinism_strategy": "Ship fixed Fortran/C++/Rust sources, bundled cases, hierarchy fixtures, and logs in one offline container. Reset from immutable inputs before each scenario, avoid clocks and runtime entropy, sort filesystem traversal, pin reduction order for digests, and derive expected dual-ordering/control properties from verifier-owned regeneration.",
+          "domain_reasoning": {
+            "domain": "Scientific computing for algebraic multigrid hierarchy construction under sparse matrix reordering with residual and solution-digest contracts.",
+            "why_not_trivia": "The solver does not need an obscure standard clause. They must reconcile strength selection, transfer construction, and apply coupling across three languages while proving dual-ordering parity and preserving a healthy ordering control."
+          }
+        },
+        "attack_path": {
+          "summary": "Reproduce dual-reordering residual/digest disagreement beside a healthy ordering control, falsify smoother-only and unstable-digest hypotheses, then reconcile strength selection, transfer inheritance, and apply identity coupling across three roots.",
+          "reasoning": "The path requires experiments and cross-language model building; no prompt noun, file name, or single failed assertion reveals all three locations."
+        },
+        "smallest_plausible_patch": {
+          "summary": "Coordinated substantive edits to one Fortran selection function, one C++ transfer function, and one Rust apply function, together exceeding a trivial patch.",
+          "reasoning": "Any strict subset leaves at least one dual-ordering residual, solution-digest, or healthy-control property failing."
+        },
+        "collapse_audit": {
+          "verdict": "PASS",
+          "reasoning": "The editable frontier spans three non-obvious locations across three language roots, the instruction remains symptoms-only, no declarative cluster or reference digest exists, and the planned oracle adds substantive logic rather than deleting or toggling one feature.",
+          "residual_hardness": "After the complete file tree is visible, the solver must still identify why equivalent reorderings cross different strength, transfer, and apply authorities and then preserve one dual-ordering/control invariant through three locations.",
+          "red_flags": []
+        },
+        "topology_enumeration": [
+          {
+            "id": "topology_a_selected",
+            "summary": "Strength/coarse selection, transfer construction, and apply coupling disagree across lattice, bridge, and orbit roots under equivalent reorderings.",
+            "locations": [
+              "lattice/knurl.f90::knurl_p",
+              "bridge/splice.cpp::splice_q",
+              "orbit/whorl.rs::whorl_r"
+            ],
+            "why_no_single_location_suffices": "Correct selection can still be consumed by broken transfers, correct transfers can still emit wrong digests under mixed apply identity, and apply-only repairs leave residual contracts red when hierarchy construction remains order-dependent."
+          },
+          {
+            "id": "topology_b_hierarchy_chain",
+            "summary": "Selection writeout, transfer assembly, apply rebind, and digest emission form a four-stage hierarchy chain.",
+            "locations": [
+              "lattice/knurl.f90::knurl_p",
+              "bridge/splice.cpp::splice_q",
+              "orbit/whorl.rs::whorl_r",
+              "bridge/relay.cpp::rebind_u"
+            ],
+            "why_no_single_location_suffices": "Correct selection is useless if transfers assemble the wrong operators, correct transfers are useless if apply rebinds the wrong identity, and correct upstream state is useless if digests fold the wrong presentation."
+          },
+          {
+            "id": "topology_c_identity_convention",
+            "summary": "Fortran membership maps, C++ transfer keys, and Rust apply identity use incompatible conventions under reordering.",
+            "locations": [
+              "lattice/index.f90::map_v",
+              "bridge/splice.cpp::splice_q",
+              "orbit/whorl.rs::whorl_r"
+            ],
+            "why_no_single_location_suffices": "Changing one convention only moves the disagreement to another boundary; producers and consumers must represent the same graph-stable identity-to-digest map."
+          }
+        ],
+        "construction_manifest": {
+          "symbol_table": [
+            {
+              "path": "lattice/knurl.f90",
+              "symbol": "knurl_p",
+              "kind": "function",
+              "signature": "integer(c_int) function knurl_p(a, b, c) bind(C)",
+              "purpose": "Builds strength membership for the active presentation without depending on raw row order."
+            },
+            {
+              "path": "bridge/splice.cpp",
+              "symbol": "splice_q",
+              "kind": "function",
+              "signature": "int32_t splice_q(const int32_t* a, int32_t b, uint64_t* c);",
+              "purpose": "Assembles transfer operators from membership under the active presentation."
+            },
+            {
+              "path": "orbit/whorl.rs",
+              "symbol": "whorl_r",
+              "kind": "function",
+              "signature": "pub(crate) fn whorl_r(a: u64, b: &mut Orbit) -> i8",
+              "purpose": "Applies hierarchy steps with a stable identity binding for digest emission."
+            }
+          ],
+          "flipping_point_contract": {
+            "locations": [
+              {
+                "id": "A",
+                "path": "lattice/knurl.f90",
+                "controls_tests": [
+                  "test_m01",
+                  "test_m02",
+                  "test_m06",
+                  "test_m10"
+                ]
+              },
+              {
+                "id": "B",
+                "path": "bridge/splice.cpp",
+                "controls_tests": [
+                  "test_m03",
+                  "test_m05",
+                  "test_m07",
+                  "test_m11"
+                ]
+              },
+              {
+                "id": "C",
+                "path": "orbit/whorl.rs",
+                "controls_tests": [
+                  "test_m04",
+                  "test_m08",
+                  "test_m09",
+                  "test_m12"
+                ]
+              }
+            ],
+            "no_single_location_flips_majority": true,
+            "concentration_cap": 0.5
+          },
+          "decoy_manifest": [
+            {
+              "path": "lattice/ledge.f90",
+              "kind": "helper",
+              "rhymes_with": "knurl_p",
+              "non_fix_purpose": "Computes ordinary smoothness-style diagnostic banners without affecting membership."
+            },
+            {
+              "path": "bridge/cable.cpp",
+              "kind": "helper",
+              "rhymes_with": "splice_q",
+              "non_fix_purpose": "Maps display codes for status lines without affecting transfer assembly."
+            },
+            {
+              "path": "orbit/braid.rs",
+              "kind": "helper",
+              "rhymes_with": "whorl_r",
+              "non_fix_purpose": "Folds scalar diagnostic marks into aggregate counters."
+            }
+          ],
+          "code_forbidden_tokens": [
+            "algebraic",
+            "multigrid",
+            "lab",
+            "app",
+            "sparse",
+            "linear",
+            "system",
+            "hierarchy",
+            "preconditioner",
+            "matrix",
+            "reorderings",
+            "reordering",
+            "convergence",
+            "curves",
+            "fine-grid",
+            "solution",
+            "digests",
+            "digest",
+            "tolerance",
+            "healthy",
+            "ordering",
+            "control",
+            "smoothness",
+            "indicators",
+            "coarse-size",
+            "summaries",
+            "pipeline",
+            "residual",
+            "residuals",
+            "solution-digest",
+            "contracts",
+            "bin",
+            "amglab",
+            "output",
+            "parity_report",
+            "json",
+            "keys",
+            "layout",
+            "schema",
+            "docs",
+            "parity-report-schema",
+            "permutation",
+            "inputs",
+            "report",
+            "checks",
+            "compiled",
+            "bundled",
+            "equivalent",
+            "green",
+            "rebuild",
+            "invoke",
+            "emit",
+            "hand",
+            "hard-code",
+            "regenerate",
+            "presented",
+            "fixed",
+            "past",
+            "look",
+            "acceptable",
+            "both",
+            "meet",
+            "stays",
+            "whose",
+            "follow",
+            "normative",
+            "documented",
+            "one",
+            "write",
+            "through"
+          ]
+        },
+        "naming_pass": {
+          "instruction_nouns_extracted": [
+            "algebraic",
+            "multigrid",
+            "lab",
+            "app",
+            "sparse",
+            "linear",
+            "system",
+            "hierarchy",
+            "preconditioner",
+            "matrix",
+            "reorderings",
+            "reordering",
+            "convergence",
+            "curves",
+            "fine-grid",
+            "solution",
+            "digests",
+            "digest",
+            "tolerance",
+            "healthy",
+            "ordering",
+            "control",
+            "smoothness",
+            "indicators",
+            "coarse-size",
+            "summaries",
+            "pipeline",
+            "residual",
+            "residuals",
+            "solution-digest",
+            "contracts",
+            "bin",
+            "amglab",
+            "output",
+            "parity_report",
+            "json",
+            "keys",
+            "layout",
+            "schema",
+            "docs",
+            "parity-report-schema",
+            "permutation",
+            "inputs",
+            "report",
+            "checks",
+            "compiled",
+            "bundled",
+            "equivalent",
+            "green",
+            "rebuild",
+            "invoke",
+            "emit",
+            "hand",
+            "hard-code",
+            "regenerate",
+            "presented",
+            "fixed",
+            "past",
+            "look",
+            "acceptable",
+            "both",
+            "meet",
+            "stays",
+            "whose",
+            "follow",
+            "normative",
+            "documented",
+            "one",
+            "write",
+            "through"
+          ],
+          "renames_during_drafting": [
+            {
+              "original": "lattice/strength.f90",
+              "renamed_to": "lattice/knurl.f90",
+              "reason": "Removed cause-revealing strength vocabulary from a selected fix path."
+            },
+            {
+              "original": "bridge/prolong.cpp",
+              "renamed_to": "bridge/splice.cpp",
+              "reason": "Removed cause-revealing prolongation vocabulary from a selected fix path."
+            },
+            {
+              "original": "orbit/apply.rs",
+              "renamed_to": "orbit/whorl.rs",
+              "reason": "Removed instruction noun app as a substring of apply from a selected fix path."
+            },
+            {
+              "original": "select_coarse_set",
+              "renamed_to": "knurl_p",
+              "reason": "Avoided coarse/selection vocabulary adjacent to the public contract."
+            },
+            {
+              "original": "build_transfer",
+              "renamed_to": "splice_q",
+              "reason": "Avoided transfer vocabulary on the fix path."
+            },
+            {
+              "original": "apply_vcycle",
+              "renamed_to": "whorl_r",
+              "reason": "Avoided apply vocabulary and app substring on the fix path."
+            }
+          ],
+          "test_names_audited": [
+            "test_m01",
+            "test_m02",
+            "test_m03",
+            "test_m04",
+            "test_m05",
+            "test_m06",
+            "test_m07",
+            "test_m08",
+            "test_m09",
+            "test_m10",
+            "test_m11",
+            "test_m12"
+          ],
+          "concentration_math": {
+            "total_tests": 12,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "B",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "C",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              }
+            ]
+          },
+          "recomputed_concentration": {
+            "total_tests": 12,
+            "concentration_cap": 0.5,
+            "per_location": [
+              {
+                "location_id": "A",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "B",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              },
+              {
+                "location_id": "C",
+                "test_count": 4,
+                "ratio": 0.3333333333333333
+              }
+            ]
+          }
+        }
+      },
+      "evidence_errors": [],
+      "blocking_failures": []
+    }
+  ],
+  "schema_path": "/home/sudhir/Projects/TERMINUS/specs/validation_schema.json",
+  "evidence_contract_version": 3
+}

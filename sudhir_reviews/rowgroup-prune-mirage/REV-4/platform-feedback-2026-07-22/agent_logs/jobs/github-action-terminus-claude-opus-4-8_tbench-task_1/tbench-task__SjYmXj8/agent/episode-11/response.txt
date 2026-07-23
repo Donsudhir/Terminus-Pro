@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Now I understand the full picture. Key observations:\n\n**current.store (gen 3):** slab0: R|1|2|-999|east is present=1,Current,amount=-999. This is a LEGITIMATE overlap value (case c_legit does eq -999 expecting to find it). R|0|2|777 is present=0 -> not live. So -999 is live here. The case c_legit uses batch with skipping, expecting to count the -999 as a legitimate value.\n\n**vault.store (gen 2/3):** slab0: R|1|0|12|east present=1,origin=0(Retired) -> not live. slab2: R|0|2|90 present=0 -> not live. So retired origin means not live even though present=1.\n\n**The core liveness rule** (from row.cpp is_live): Retired->false, Inherited->true, Current->present!=0. This is the CORRECT reference. The batch reader must match this.\n\n**The v2 note** said old producers reserved amount -999 to mark missing. But the newer writer uses origin/presence lanes and -999 can be legitimate. So liveness must NOT depend on amount==-999; it must use origin+presence lanes. The row reader does this correctly. The batch reader (rill.cpp) ignores origin_lane - that's the bug.\n\nNow I must fix rill.cpp to compute admit using the same is_live logic: admit = (origin==Retired ? 0 : origin==Inherited ? 1 : presence!=0). Let me also verify the Rust ingest side markers. Let me check the Rust code.",
+  "plan": "Examine the Rust ingest code to understand marker generation, since fresh stores need faithful markers. Read model.rs, codec.rs, and the ember modules.",
+  "commands": [
+    {"keystrokes": "cat /app/rust/src/main.rs\n", "duration": 0.1},
+    {"keystrokes": "cat /app/rust/src/model.rs\n", "duration": 0.1}
+  ]
+}
+```

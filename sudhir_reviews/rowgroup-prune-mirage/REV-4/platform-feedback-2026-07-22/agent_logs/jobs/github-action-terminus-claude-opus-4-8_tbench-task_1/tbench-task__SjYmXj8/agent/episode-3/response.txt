@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "The C++ side has row reader, lattice reader, and harbor (slab selection). The store.cpp likely contains logic for interpreting slabs. Let me read the key files to understand how liveness/presence is determined.",
+  "plan": "Read the store types, store.cpp, and the reader files to understand the liveness detection.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/include/loam/types.hpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/include/loam/store.hpp\n", "duration": 0.1}
+  ]
+}
+```

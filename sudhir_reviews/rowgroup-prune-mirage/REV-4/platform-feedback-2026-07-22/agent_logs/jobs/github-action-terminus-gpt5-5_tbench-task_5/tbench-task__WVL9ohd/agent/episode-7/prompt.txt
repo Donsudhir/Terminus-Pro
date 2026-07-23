@@ -1,0 +1,87 @@
+New Terminal Output:
+
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('/app/cpp/src/lattice/rill.cpp')
+> s=p.read_text()
+> s=s.replace('namespace loam {\n\nTally sweep_c', 'namespace loam {\nnamespace {\n\nbool is_live_at(const Slab& slab, const std::size_t i) {\n    const auto or
+igin = static_cast<Origin>(slab.origin_lane[i]);\n    if (origin == Origin::Retired) {\n        return false;\n    }\n    if (origin == Origin::Inherited) {\n
+      return true;\n    }\n    return slab.presence_lane[i] != 0;\n}\n\n}  // namespace\n\nTally sweep_c')
+> s=s.replace('''    for (std::size_t i = 0; i < count; ++i) {\n        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;\n    }\n''', '''    for (std::size_t i = 0;
+i < count; ++i) {\n        admit[i] = is_live_at(a, i) ? 1 : 0;\n    }\n''')
+> p.write_text(s)
+> PY
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app#
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('/app/cpp/src/harbor/veil.cpp')
+> s=p.read_text()
+> s=s.replace('#include "loam/plan.hpp"\n\nnamespace loam {\n\nGate turn_b', '''#include "loam/plan.hpp"\n\n#include <cstdint>\n\nnamespace loam {\nnamespace {\
+n\nstruct EffectiveMark {\n    std::int64_t low{};\n    std::int64_t high{};\n    bool has_absent{};\n};\n\nbool is_live(const Cell& cell) {\n    if (cell.origi
+n == Origin::Retired) {\n        return false;\n    }\n    if (cell.origin == Origin::Inherited) {\n        return true;\n    }\n    return cell.present != 0;\n
+}\n\nEffectiveMark live_mark_for_gate(const Slab& slab) {\n    if (slab.generation >= 3) {\n        return {slab.low, slab.high, slab.has_absent};\n    }\n\n
+ EffectiveMark mark;\n    bool saw_live = false;\n    for (const auto& cell : slab.cells) {\n        if (is_live(cell)) {\n            if (!saw_live) {\n
+         mark.low = cell.amount;\n                mark.high = cell.amount;\n                saw_live = true;\n            } else {\n                if (cell.amo
+unt < mark.low) mark.low = cell.amount;\n                if (cell.amount > mark.high) mark.high = cell.amount;\n            }\n        } else {\n            mar
+k.has_absent = true;\n        }\n    }\n    if (!saw_live) {\n        mark.low = 0;\n        mark.high = 0;\n        mark.has_absent = true;\n    }\n    return
+mark;\n}\n\n}  // namespace\n\nGate turn_b''')
+> s=s.replace('''    if (b.op == Op::IsNull) {\n        return {a.has_absent, a.has_absent ? "possible" : "empty"};\n    }\n''', '''    if (b.op == Op::IsNull)
+{\n        const auto mark = live_mark_for_gate(a);\n        return {mark.has_absent, mark.has_absent ? "possible" : "empty"};\n    }\n''')
+> s=s.replace('''    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;\n    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;\n    const bool rea
+d = !(right < a.low || left > a.high);\n''', '''    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;\n    const std::int64_t right = b.op == Op::Equal ?
+ b.x : b.y;\n    const auto mark = live_mark_for_gate(a);\n    const bool read = !(right < mark.low || left > mark.high);\n''')
+> p.write_text(s)
+> PY
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app#
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('/app/rust/src/ember/fold.rs')
+> s=p.read_text()
+> s=s.replace('''use crate::model::{FoldErr, Mark};\n\npub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {\n    if a.is_empty() {\n
+      return Err(FoldErr::Empty);\n    }\n    if a.len() != b.len() || a.len() != c.len() {\n        return Err(FoldErr::Shape);\n    }\n\n    let mut low = a[0
+];\n    let mut high = a[0];\n    let mut has_absent = false;\n    for (value, present) in a.iter().zip(b.iter()) {\n        low = low.min(*value);\n        hig
+h = high.max(*value);\n        has_absent |= *present == 0;\n    }\n\n    Ok(Mark {\n        low,\n        high,\n        has_absent,\n    })\n}\n''', '''use cr
+ate::model::{FoldErr, Mark};\n\nfn is_live(present: u8, origin: u8) -> bool {\n    match origin {\n        0 => false,\n        1 => true,\n        _ => present
+ != 0,\n    }\n}\n\npub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {\n    if a.is_empty() {\n        return Err(FoldErr::Empty);\n
+    }\n    if a.len() != b.len() || a.len() != c.len() {\n        return Err(FoldErr::Shape);\n    }\n\n    let mut low = 0;\n    let mut high = 0;\n    let mut
+ saw_live = false;\n    let mut has_absent = false;\n\n    for ((value, present), origin) in a.iter().zip(b.iter()).zip(c.iter()) {\n        if is_live(*present
+, *origin) {\n            if !saw_live {\n                low = *value;\n                high = *value;\n                saw_live = true;\n            } else {\
+n                low = low.min(*value);\n                high = high.max(*value);\n            }\n        } else {\n            has_absent = true;\n        }\n
+   }\n\n    if !saw_live {\n        has_absent = true;\n    }\n\n    Ok(Mark {\n        low,\n        high,\n        has_absent,\n    })\n}\n''')
+> p.write_text(s)
+> PY
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app#
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# /app/tools/build-all
+   Compiling loam-ingest v0.8.0 (/app/rust)
+warning: constant `RUNE_VOID` is never used
+ --> src/model.rs:1:1
+  |
+1 | pub(crate) const RUNE_VOID: u8 = 0;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: constant `RUNE_FIXED` is never used
+ --> src/model.rs:2:1
+  |
+2 | pub(crate) const RUNE_FIXED: u8 = 1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `loam-ingest` (bin "loam-ingest") generated 2 warnings
+    Finished release [optimized] target(s) in 1.58s
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o bu
+ild/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app#

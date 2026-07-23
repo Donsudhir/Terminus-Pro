@@ -1,0 +1,115 @@
+New Terminal Output:
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# ls -la
+total 4
+drwxr-xr-x 1 root root 90 Jul 21 02:06 .
+drwxr-xr-x 1 root root 71 Jul 21 02:08 ..
+-rw-r--r-- 1 root root 97 Jan  1  1970 Makefile
+drwxr-xr-x 2 root root 37 Jul 21 02:06 bin
+drwxr-xr-x 2 root root 30 Jul 21 02:06 config
+drwxr-xr-x 1 root root  6 Jul 21 02:06 cpp
+drwxr-xr-x 5 root root 63 Jul 21 02:06 data
+drwxr-xr-x 2 root root 92 Jul 21 02:06 docs
+drwxr-xr-x 2 root root  6 Jul 21 02:06 output
+drwxr-xr-x 1 root root 32 Jul 21 02:06 rust
+drwxr-xr-x 2 root root 52 Jul 21 02:06 tools
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# find . -maxdepth 3 -type f | sed 's#^./##' | sort | head -200
+Makefile
+bin/loam
+bin/loam-ingest
+config/lab.conf
+cpp/Makefile
+cpp/src/digest.cpp
+cpp/src/main.cpp
+cpp/src/parse.cpp
+cpp/src/report.cpp
+cpp/src/row.cpp
+cpp/src/store.cpp
+data/archive/current.store
+data/archive/healthy.store
+data/archive/mixed.store
+data/archive/vault.store
+data/cases/control.case
+data/cases/incident.case
+data/fresh/orders_a.csv
+data/fresh/orders_b.csv
+data/fresh/orders_c.csv
+docs/architecture.md
+docs/format-notes.md
+docs/report-schema.md
+rust/Cargo.lock
+rust/Cargo.toml
+rust/src/codec.rs
+rust/src/main.rs
+rust/src/model.rs
+rust/src/report.rs
+tools/build-all
+tools/reset-lab
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# cat /app/docs/report-schema.md
+# Loam audit report contract
+
+This document is the normative grading reference for `/app/bin/loam audit`
+JSON output and for fresh ingest artifacts. Architecture and rollout notes are
+background only; when they disagree with this file, this file wins.
+
+## Audit JSON
+
+UTF-8 JSON object written to the report path passed to `audit`.
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `status` | string | Always the literal `complete` when the run finishes successfully. |
+| `cases` | array | One object per `.case` file, in bytewise filename order. |
+| `digest` | string | Non-empty hex digest of the serialized `cases` body. |
+
+### Each element of `cases`
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `case_id` | string | Identifier from the case line. |
+| `row_count` | integer | Number of qualifying live rows included in the answer. |
+| `sum_amount` | integer | Sum of amounts for those qualifying live rows. |
+| `pages_total` | integer | Number of slabs present in the store for the case. |
+| `pages_read` | integer | Number of slabs actually opened for the case. |
+| `path` | string | Execution lane used: `row` or `batch`. |
+| `skipping` | boolean | Whether selective admission was requested for the case. |
+
+`row_count`, `sum_amount`, `pages_total`, and `pages_read` are the per-case
+answer and work counters. Equivalent modes on the same store and probe must
+agree on `row_count` and `sum_amount`. Selective healthy controls must keep
+`pages_read` strictly below `pages_total` while still returning the correct
+answer. Repeated identical audits must emit byte-identical report files.
+
+## Fresh ingest artifact
+
+`/app/bin/loam ingest <CSV> <store-directory>` writes exactly:
+
+`<store-directory>/data.store`
+
+No other store filename is accepted for grading.
+
+## Faithful live-value markers
+
+Each slab in a store carries numeric markers `low`, `high`, and `has_absent`.
+
+- `low` and `high` span only live amounts in that slab.
+- `has_absent` is true when the slab contains any non-live entry.
+- A slab whose entries are all non-live records `low` 0, `high` 0, and
+  `has_absent` true.
+- Fresh ingest must keep those markers faithful to the live-value domain of the
+  CSV it wrote. Archived mixed-generation stores keep their on-disk markers;
+  readers must interpret them without rewriting the artifact.
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json; echo EXIT:$?
+EXIT:0
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# cat /app/output/audit.json 2>/dev/null | head -80
+{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_
+skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_to
+tal":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping"
+:true},{"case_id":"m_range","row_count":2,"sum_amount":70,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":0,"sum_
+amount":0,"pages_total":4,"pages_read":0,"path":"row","skipping":true},{"case_id":"m_null","row_count":1,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"b
+atch","skipping":false},{"case_id":"m_interact","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":1,"path":"batch","skipping":true},{"case_id":"m_neg",
+"row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":11,"sum_amount":1096,"pages_total":
+4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":tr
+ue},{"case_id":"v_missing","row_count":1,"sum_amount":0,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"v_check","row_count":1,"sum_a
+mount":0,"pages_total":3,"pages_read":1,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"ro
+w","skipping":false}],"digest":"386f5d5d6e94d3e9"}
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app#

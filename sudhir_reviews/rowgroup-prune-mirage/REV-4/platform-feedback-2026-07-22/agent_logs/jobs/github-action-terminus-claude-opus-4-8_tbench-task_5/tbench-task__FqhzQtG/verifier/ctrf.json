@@ -1,0 +1,176 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 15,
+            "passed": 8,
+            "failed": 7,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1784600046.0459173,
+            "stop": 1784600051.6331778
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_p01",
+                "status": "passed",
+                "duration": 5.457912547513843,
+                "start": 1784600046.0623777,
+                "stop": 1784600051.5205233,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p02",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0034652650356292725,
+                "start": 1784600051.5207074,
+                "stop": 1784600051.536681,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p020')\n\n    def test_p02(tmp_path: Path) -> None:\n        \"\"\"Archived selective row execution returns the complete invoice window.\"\"\"\n        row = _run_case(tmp_path, \"p02\", MIXED, \"range\", 10, 40, \"row\", True)\n>       _assert_tally(row, 4, 100)\n\ntest_outputs.py:150: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p02', 'pages_read': 1, 'pages_total': 4, 'path': 'row', ...}\ncount = 4, total = 100\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 2 == 4\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p03",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.004899309948086739,
+                "start": 1784600051.5368307,
+                "stop": 1784600051.5476205,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p030')\n\n    def test_p03(tmp_path: Path) -> None:\n        \"\"\"Fresh artifact evidence and archived selective answers agree together.\"\"\"\n        source = _write_csv(tmp_path, \"alpha-03\", True)\n        produced = _ingest(tmp_path, source, \"a3\")\n        _assert_markers(produced, [(17, 43, 1), (107, 151, 1)])\n        row = _run_case(tmp_path, \"p03\", MIXED, \"range\", 10, 40, \"row\", True)\n>       _assert_tally(row, 4, 100)\n\ntest_outputs.py:160: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p03', 'pages_read': 1, 'pages_total': 4, 'path': 'row', ...}\ncount = 4, total = 100\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 2 == 4\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p04",
+                "status": "passed",
+                "duration": 0.002543080598115921,
+                "start": 1784600051.5477593,
+                "stop": 1784600051.5504162,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p05",
+                "status": "passed",
+                "duration": 0.007488694041967392,
+                "start": 1784600051.5505412,
+                "stop": 1784600051.5581753,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p06",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.002775276079773903,
+                "start": 1784600051.558364,
+                "stop": 1784600051.568171,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p060')\n\n    def test_p06(tmp_path: Path) -> None:\n        \"\"\"The mixed selective-batch window preserves all qualifying values.\"\"\"\n        row = _run_case(tmp_path, \"p06\", MIXED, \"range\", -1000, 25, \"batch\", True)\n>       _assert_tally(row, 3, 25)\n\ntest_outputs.py:181: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p06', 'pages_read': 1, 'pages_total': 4, 'path': 'batch', ...}\ncount = 3, total = 25\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 1 == 3\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p07",
+                "status": "passed",
+                "duration": 0.004527447745203972,
+                "start": 1784600051.5683105,
+                "stop": 1784600051.5729585,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p08",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0020221900194883347,
+                "start": 1784600051.5730925,
+                "stop": 1784600051.5797527,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p080')\n\n    def test_p08(tmp_path: Path) -> None:\n        \"\"\"Selective archived and healthy controls retain correct work avoidance.\"\"\"\n        row = _run_case(tmp_path, \"p08\", MIXED, \"range\", 10, 20, \"row\", True)\n>       _assert_tally(row, 2, 30)\n\ntest_outputs.py:197: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p08', 'pages_read': 0, 'pages_total': 4, 'path': 'row', ...}\ncount = 2, total = 30\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 0 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p09",
+                "status": "passed",
+                "duration": 0.002254702150821686,
+                "start": 1784600051.5798776,
+                "stop": 1784600051.5822403,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p10",
+                "status": "passed",
+                "duration": 0.010565480217337608,
+                "start": 1784600051.5823538,
+                "stop": 1784600051.5930424,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p11",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.001934833824634552,
+                "start": 1784600051.593175,
+                "stop": 1784600051.5997639,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p110')\n\n    def test_p11(tmp_path: Path) -> None:\n        \"\"\"Neighboring generations preserve the same selective numeric answer.\"\"\"\n        row = _run_case(tmp_path, \"p11\", MIXED, \"range\", 10, 20, \"row\", True)\n>       _assert_tally(row, 2, 30)\n\ntest_outputs.py:227: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p11', 'pages_read': 0, 'pages_total': 4, 'path': 'row', ...}\ncount = 2, total = 30\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 0 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p12",
+                "status": "passed",
+                "duration": 0.005135724321007729,
+                "start": 1784600051.5998867,
+                "stop": 1784600051.6053216,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_p13",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0033165663480758667,
+                "start": 1784600051.6056046,
+                "stop": 1784600051.6142466,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p130')\n\n    def test_p13(tmp_path: Path) -> None:\n        \"\"\"Selective absence probes agree across lanes on neighboring generations.\"\"\"\n        row = _run_case(tmp_path, \"p13\", VAULT, \"isnull\", 0, 0, \"row\", True)\n>       _assert_tally(row, 2, 0)\n\ntest_outputs.py:245: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p13', 'pages_read': 1, 'pages_total': 3, 'path': 'row', ...}\ncount = 2, total = 0\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 1 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p14",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0022103823721408844,
+                "start": 1784600051.6143785,
+                "stop": 1784600051.6214888,
+                "retries": 0,
+                "file_path": "test_outputs.py",
+                "trace": "tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p140')\n\n    def test_p14(tmp_path: Path) -> None:\n        \"\"\"Selective text-code probes stay complete on neighboring generations.\"\"\"\n        row = _run_case(tmp_path, \"p14\", VAULT, \"region_eq\", \"east\", 0, \"row\", True)\n>       _assert_tally(row, 2, 49)\n\ntest_outputs.py:255: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nrow = {'case_id': 'p14', 'pages_read': 1, 'pages_total': 3, 'path': 'row', ...}\ncount = 2, total = 49\n\n    def _assert_tally(row: dict, count: int, total: int) -> None:\n>       assert row[\"row_count\"] == count\nE       assert 1 == 2\n\ntest_outputs.py:136: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_outputs.py::test_p15",
+                "status": "passed",
+                "duration": 0.011296814307570457,
+                "start": 1784600051.6216278,
+                "stop": 1784600051.633046,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            }
+        ]
+    }
+}

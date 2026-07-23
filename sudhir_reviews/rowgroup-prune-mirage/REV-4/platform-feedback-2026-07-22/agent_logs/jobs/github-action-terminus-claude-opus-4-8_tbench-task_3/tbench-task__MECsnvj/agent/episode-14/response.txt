@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "reed.rs calls tilt_a(&values, &present, &origins). tilt_a currently ignores origins (c) entirely for markers. I now have full understanding. Fresh ingest sets generation=3, width 4. The live rule: origin 0(Retired)=>not live; origin 1(Inherited)=>live; origin 2(Current)=>present!=0. I need tilt_a to:\n- low/high span only live amounts\n- has_absent = any non-live entry present\n- all non-live => low=0, high=0, has_absent=true\n\nLet me check codec.rs to understand the presence/origin constants and CSV mapping.",
+  "plan": "Read codec.rs and report.rs.",
+  "commands": [
+    {"keystrokes": "cat /app/rust/src/codec.rs\n", "duration": 0.1}
+  ]
+}
+```

@@ -1,0 +1,11 @@
+```json
+{
+  "analysis": "Fresh store results are all consistent and correct:\n- f_row=f_batch=f_rskip=f_bskip: all 6,410 (equivalent modes agree). Live in [10,130]: slab0:10,20,30; slab1:100,120,130 =6 rows, sum=410 ✓\n- f_null_r=f_null_b: both 2 (non-live: -999 retired, 555 present0). Equivalent modes agree ✓\n- f_narrow (range10-30,batch,skip): slab0 markers 10-30 read, slab1 markers 100-130: 30<100 skip. Live in[10,30]:10,20,30=3,sum60, pages_read=1<2. Selective pruning works on fresh gen3 store ✓\n\nEverything works: equivalent modes agree, healthy selective controls prune correctly, fresh markers are faithful, archived mixed stores are read correctly without rewriting, output is deterministic. \n\nLet me do a final cleanup and confirm the canonical audit still produces the expected result, and run reset-lab consideration. Actually reset-lab would wipe /app/data - I should NOT run it. Let me verify the final canonical audit once more and confirm the bundled data is intact.",
+  "plan": "Run the canonical audit command one final time to confirm, and verify data files unchanged (archived stores not rewritten).",
+  "commands": [
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && echo OK\n", "duration": 1.0},
+    {"keystrokes": "md5sum /app/data/archive/*.store\n", "duration": 0.1},
+    {"keystrokes": "head -c 200 /app/output/audit.json; echo\n", "duration": 0.1}
+  ]
+}
+```

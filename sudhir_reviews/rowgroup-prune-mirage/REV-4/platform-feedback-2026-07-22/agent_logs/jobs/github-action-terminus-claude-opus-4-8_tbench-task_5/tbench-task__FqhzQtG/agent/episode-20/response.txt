@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Now m_all=10/2095 (correct live count), and m_null=2 (was 1). Let me verify m_null. m_null: isnull, batch, skipping=false. Counts non-live entries across all slabs. Non-live in mixed: slab0 has retired -999 and absent 777 = 2 non-live. slabs 1,2,3 all live = 0. Total = 2. Previously batch (presence-only) counted only present==0 (just 777) =1. Now with is_live, retired -999 is also non-live -> 2. This is correct and now matches what a row-reader isnull would produce.\n\nLet me verify consistency: is m_null's row-reader equivalent also 2? Row reader isnull counts !is_live cells: slab0: -999(retired, not live) and 777(absent, not live) = 2. Yes. Good, agreement.\n\nNow let me verify healthy cases unchanged: h_skip=4/460, h_full=4/460 agree ✓ (batch vs row both 4/460). h_region=3/430. v cases unchanged. c_legit=1/-999 ✓.\n\nNow important: verify selective controls keep pages_read < pages_total. h_skip: pages_read=1 < 3 ✓. Good.\n\nNow let me verify determinism (byte-identical repeated runs) and check that equivalent-mode pairs agree. The cases file has some pairs but not all combos. The grading may run same store+probe in both modes. Since gate (turn_b) is shared and both readers now use is_live, they should agree. Let me verify byte-identical repeated runs.",
+  "plan": "Run audit twice to two files and diff. Then test ingest markers on fresh CSVs.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/a1.json; /app/bin/loam audit /app/data/cases /app/output/a2.json; diff /app/output/a1.json /app/output/a2.json && echo IDENTICAL\n", "duration": 2.0},
+    {"keystrokes": "cat /app/data/fresh/orders_a.csv\n", "duration": 0.1}
+  ]
+}
+```

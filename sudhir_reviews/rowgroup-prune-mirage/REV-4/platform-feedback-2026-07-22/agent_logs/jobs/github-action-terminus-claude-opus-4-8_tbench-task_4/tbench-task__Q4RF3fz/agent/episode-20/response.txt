@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Excellent! All equivalent modes now agree:\n- vault range: 4/132 all modes\n- vault isnull: 2/0 all modes (fixed! was 1 before with skipping)\n- current eq -999: 1/-999 all modes (legitimate overlap correctly counted - R|1|2|-999 is live Current present)\n- healthy range: 4/460 all modes, and selective (hs_bs/hs_rs) skip properly pages_read=1<3 (healthy control still fast)\n\nvn_rs pages_read=2: gen2 slabs are slab0 and slab2 (both read via legacy), slab1 gen3 absent0 skipped. slab0 retired 12=1 nonlive, slab2 present0 90=1 nonlive = 2. Correct.\n\ncurrent.store both slabs gen3. cl_bs eq -999 skipping: slab0 low=-999,high=20 includes -999 -> read; slab1 100-130 no -> skip. pages_read=1<2. Good selective behavior preserved on gen3.\n\nAll disagreements resolved. Now I need to handle the ingest side (fresh stores must record faithful markers). Let me examine the Rust ingest code.",
+  "plan": "Read the rust ingest source to verify/fix faithful marker computation.",
+  "commands": [
+    {"keystrokes": "cat /app/rust/src/main.rs /app/rust/src/model.rs\n", "duration": 0.1}
+  ]
+}
+```

@@ -1,0 +1,64 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# ls -la /app
+total 4
+drwxr-xr-x 1 root root 90 Jul 21 02:06 .
+drwxr-xr-x 1 root root 71 Jul 21 02:08 ..
+-rw-r--r-- 1 root root 97 Jan  1  1970 Makefile
+drwxr-xr-x 2 root root 49 Jul 21 02:07 bin
+drwxr-xr-x 2 root root 30 Jul 21 02:06 config
+drwxr-xr-x 1 root root 10 Jul 21 02:07 cpp
+drwxr-xr-x 5 root root 63 Jul 21 02:06 data
+drwxr-xr-x 2 root root 92 Jul 21 02:06 docs
+drwxr-xr-x 2 root root 10 Jul 21 02:06 output
+drwxr-xr-x 1 root root 32 Jul 21 02:07 rust
+drwxr-xr-x 2 root root 52 Jul 21 02:06 tools
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# find /app -type f | head -100
+/app/bin/loam-ingest
+/app/bin/loam
+/app/data/fresh/orders_a.csv
+/app/data/fresh/orders_b.csv
+/app/data/fresh/orders_c.csv
+/app/data/archive/current.store
+/app/data/archive/healthy.store
+/app/data/archive/mixed.store
+/app/data/archive/vault.store
+/app/data/cases/control.case
+/app/data/cases/incident.case
+/app/rust/Cargo.toml
+/app/rust/src/codec.rs
+/app/rust/src/ember/fold.rs
+/app/rust/src/ember/mod.rs
+/app/rust/src/ember/pale.rs
+/app/rust/src/ember/reed.rs
+/app/rust/src/main.rs
+/app/rust/src/model.rs
+/app/rust/src/report.rs
+/app/rust/Cargo.lock
+/app/cpp/Makefile
+/app/cpp/include/loam/exec.hpp
+/app/cpp/include/loam/plan.hpp
+/app/cpp/include/loam/report.hpp
+/app/cpp/include/loam/store.hpp
+/app/cpp/include/loam/types.hpp
+/app/cpp/src/digest.cpp
+/app/cpp/src/harbor/pale.cpp
+/app/cpp/src/harbor/veil.cpp
+/app/cpp/src/lattice/bay.cpp
+/app/cpp/src/lattice/rill.cpp
+/app/cpp/src/main.cpp
+/app/cpp/src/parse.cpp
+/app/cpp/src/report.cpp
+/app/cpp/src/row.cpp
+/app/cpp/src/store.cpp
+/app/tools/build-all
+/app/tools/reset-lab
+/app/docs/architecture.md
+/app/docs/format-notes.md
+/app/docs/report-schema.md
+/app/config/lab.conf
+/app/Makefile
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app#

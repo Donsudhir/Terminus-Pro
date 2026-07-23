@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Rust side is clear. The ingest width is 4 (matches page_rows=4). Now let me review the cpp main/parse/report/digest to understand the probe default path (batch) and skipping, and how the two 'fast paths' are chosen. Then I'll craft fixes.",
+  "plan": "Read cpp main.cpp, parse.cpp, report.cpp, digest.cpp.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/main.cpp /app/cpp/src/parse.cpp\n", "duration": 0.1}
+  ]
+}
+```

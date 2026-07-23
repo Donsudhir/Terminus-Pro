@@ -4,31 +4,35 @@ use crate::model::{
 
 pub(crate) fn turn_sill(a: Vane, b: &PolicyFrame) -> Result<Admitted, RejectCode> {
     let priority = match a.kind {
-        VaneKind::HeldPin if matches!(b.mode, PolicyMode::Alpha) => 0,
-        VaneKind::HeldLane
-            if matches!(b.mode, PolicyMode::Beta) && b.exact =>
+        VaneKind::Alpha
+            if matches!(b.mode, PolicyMode::Alpha | PolicyMode::Mixed)
+                && !a.withdrawn =>
         {
             0
         }
-        VaneKind::Alpha
-            if matches!(b.mode, PolicyMode::Alpha | PolicyMode::Mixed) =>
+        VaneKind::Beta
+            if matches!(b.mode, PolicyMode::Beta | PolicyMode::Mixed)
+                && a.withdrawn
+                && b.exact =>
         {
             0
         }
         VaneKind::Normal if !a.withdrawn => {
             if b.stable_available {
                 10
-            } else {
+            } else if b.root {
                 20
+            } else {
+                30
             }
         }
-        VaneKind::Beta => return Err(RejectCode::Held),
         VaneKind::HeldPin | VaneKind::HeldLane => {
             return Err(RejectCode::Context);
         }
-        VaneKind::Alpha | VaneKind::Normal => {
-            return Err(RejectCode::Withdrawn);
+        VaneKind::Alpha | VaneKind::Beta => {
+            return Err(RejectCode::Context);
         }
+        VaneKind::Normal => return Err(RejectCode::Withdrawn),
     };
     Ok(Admitted {
         key: a.key,

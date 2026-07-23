@@ -1,13 +1,15 @@
 # Report format
 
 The driver emits compact JSON at the configured output path.
+Normative layout for `/app/output/sensitivity_report.json` (and any
+`SENSLAB_OUTPUT` override) is defined here.
 
 Top-level fields:
 
 - `schema_version` — integer, currently `1`.
 - `runs` — array sorted lexicographically by `label.family` then `label.tag`.
   Reordering input families must not change this array or the digest.
-- `digest` — sixteen lowercase hex characters covering all bytes before the digest field.
+- `digest` — sixteen lowercase hex characters from the FNV-1a contract below.
 
 Each run object contains:
 
@@ -32,8 +34,26 @@ Each run object contains:
   - `step` — `max(max(ref * 1e-6, step_floor) * step_gain, step_floor)` from
     `/app/conf/runtime.conf` (defaults `step_floor=1e-8`, `step_gain=0.5`);
     must not inherit magnitude from a prior batch and must not invent
-    power-of-two quantization
+    power-of-two quantization. Changing `step_floor` / `step_gain` in
+    `runtime.conf` must change the emitted `step` accordingly.
 
-The digest covers canonical JSON bytes with the digest field omitted, then appends the
-field as the final key. Repeated clean rebuilds must be byte-identical for the same input.
+## Digest (exact FNV-1a contract)
+
+The reproducibility digest uses **FNV-1a 64-bit** over a precisely bounded
+payload:
+
+1. Serialize the report as compact JSON with only `schema_version` and `runs`
+   (no `digest` key yet). That serialization is a **complete JSON object**, so
+   the hashed payload **includes the final closing `}`** of that object. It is
+   not an open prefix that stops before the brace.
+2. Hash those payload bytes with FNV-1a-64:
+   - offset basis `0xCBF29CE484222325`
+   - prime `0x100000001B3`
+   - for each byte: `hash ^= byte`, then `hash = (hash * prime) mod 2^64`
+3. Format the 64-bit result as **sixteen lowercase hexadecimal digits**
+   (`%016x`).
+4. Append `,"digest":"<hex>"}` and a trailing newline so `digest` is the final
+   top-level key on disk.
+
+Repeated clean rebuilds must be byte-identical for the same input.
 Malformed input must exit nonzero without writing a partial report.

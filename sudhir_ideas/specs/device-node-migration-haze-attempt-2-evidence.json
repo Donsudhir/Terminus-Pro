@@ -1,0 +1,706 @@
+{
+  "hardness_axes": [
+    {
+      "id": "discover",
+      "name": "Discover",
+      "verdict": "PASS",
+      "reasoning": "Public symptoms describe count-green cutover with post-cutover open/identity/path failures, a healthy file-only control, and rejected broken fixtures, but they do not identify the packed special-file materialization encoding, the special-entry mode/owner fidelity pass, or the post-cutover relative-anchor rebinding. Those facts must be recovered from C/Rust code, ledger fixtures, probes, and control/fail matrices."
+    },
+    {
+      "id": "synthesize",
+      "name": "Synthesize",
+      "verdict": "PASS",
+      "reasoning": "Passing outcomes require coordinated behavior across C materialization, Rust mode/owner fidelity, and Rust path rebinding. No single module owns the complete pre-cutover contract for device-backed fixtures while preserving the file-only control and rejected broken fixtures."
+    },
+    {
+      "id": "diagnose",
+      "name": "Diagnose",
+      "verdict": "PASS",
+      "reasoning": "The instruction reports count-green success with open/identity/path failures and a healthy control without naming materialization encodings, mode stripping, alias anchors, mknod recipes, or fix sites."
+    },
+    {
+      "id": "navigate_coupling",
+      "name": "Navigate coupling",
+      "verdict": "PASS",
+      "reasoning": "Correct special-file materialization still fails if mode/owner fidelity treats specials as ordinary files; correct fidelity still fails if post-cutover path rebinding uses the wrong relative anchor; path-only repairs leave identity and permission contracts red while count-green copy still looks successful."
+    },
+    {
+      "id": "reason_beyond_training",
+      "name": "Reason beyond training",
+      "verdict": "PASS",
+      "reasoning": "A textbook cp -a / rsync -a / mknod recipe cannot reconcile the project-specific packed ledger encoding, roster fidelity policy for specials, and staging-relative open-path rebinding while keeping the file-only control green and broken fixtures rejected."
+    }
+  ],
+  "anti_trivialization_checks": [
+    {
+      "id": "disclosure_collapse",
+      "name": "Disclosure-collapse",
+      "verdict": "PASS",
+      "reasoning": "An honest statement of post-cutover open/identity/path contracts, healthy file-only control migration, and rejected broken fixtures does not reveal which of the three C/Rust authorities is inconsistent."
+    },
+    {
+      "id": "hidden_instance",
+      "name": "Hidden-instance",
+      "verdict": "PASS",
+      "reasoning": "The design covers multiple failing device-backed fixtures, generated cutover variants, a file-only healthy control, and deliberately broken fixtures rather than hiding one corrupted path."
+    },
+    {
+      "id": "single_artifact_repair",
+      "name": "Single-artifact repair",
+      "verdict": "PASS",
+      "reasoning": "Three coordinated locations across distinct crate/ roots are required; rewriting one staging tree blob or report cannot satisfy regenerated probe/control checks."
+    },
+    {
+      "id": "generalization",
+      "name": "Generalization",
+      "verdict": "PASS",
+      "reasoning": "The verifier regenerates cutover cases and control/broken matrices from bundled families, so fixes must generalize beyond named fixtures."
+    },
+    {
+      "id": "prompt_honesty",
+      "name": "Prompt-honesty",
+      "verdict": "PASS",
+      "reasoning": "The instruction names observable cutover failures, invocation, normative report schema path, and completion conditions while withholding only implementation causes and fix sites."
+    },
+    {
+      "id": "cheating_vs_difficulty",
+      "name": "Cheating-vs-difficulty",
+      "verdict": "PASS",
+      "reasoning": "Regeneration and control/broken matrices prevent hardcoding, but residual difficulty is cross-language cutover diagnosis rather than those anti-cheating mechanisms."
+    },
+    {
+      "id": "mechanical_fix_filter",
+      "name": "Mechanical-fix filter",
+      "verdict": "PASS",
+      "reasoning": "The core work is not dependency placement, timeouts, reward formatting, or metadata repair."
+    },
+    {
+      "id": "localized_fix",
+      "name": "Localized-fix",
+      "verdict": "PASS",
+      "reasoning": "The selected topology places one location in crate/loom.c and two in distinct Rust modules under crate/, each controlling 4 of 12 tests under a 0.5 concentration cap."
+    },
+    {
+      "id": "oracle_locality",
+      "name": "Oracle-locality",
+      "verdict": "PASS",
+      "reasoning": "The planned oracle performs substantive materialization, fidelity, and rebinding changes rather than replacing one short file or toggling one compiler option."
+    },
+    {
+      "id": "small_declarative_cluster",
+      "name": "Small declarative-cluster",
+      "verdict": "PASS",
+      "reasoning": "No finite table, threshold list, schema block, or configuration cluster contains the solution; the cited schema only documents report keys."
+    },
+    {
+      "id": "grep_collapse",
+      "name": "Grep-collapse",
+      "verdict": "PASS",
+      "reasoning": "Selected fix paths and symbols use opaque loom/veil/tether and knit_p/hinge_q/moor_r vocabulary that does not contain any noun extracted from the public instruction."
+    },
+    {
+      "id": "pre_factored_helper",
+      "name": "Pre-factored-helper",
+      "verdict": "PASS",
+      "reasoning": "The selected functions do not mirror public terms such as cutover, device, node, migrate, bind, path, or identity."
+    },
+    {
+      "id": "recipe_discount",
+      "name": "Recipe-discount",
+      "verdict": "PASS",
+      "reasoning": "A known archive-preserving copy or mknod recipe cannot repair the packed ledger materialization, special-entry fidelity policy, and staging-relative rebinding together while preserving control and reject contracts."
+    },
+    {
+      "id": "security_aura_discount",
+      "name": "Security-aura discount",
+      "verdict": "PASS",
+      "reasoning": "This is a system-administration cutover fidelity task and does not rely on exploit framing for difficulty."
+    },
+    {
+      "id": "orthogonal_checklist",
+      "name": "Orthogonal-checklist",
+      "verdict": "PASS",
+      "reasoning": "Open success, major/minor identity, path binding, healthy control, and rejected broken fixtures are one coupled cutover invariant spanning three authorities, not independent checklist bullets."
+    },
+    {
+      "id": "harness_discount",
+      "name": "Harness-discount",
+      "verdict": "PASS",
+      "reasoning": "Docker and C/Rust compilation provide realism, while residual hardness comes from ledger materialization, fidelity policy, and rebinding decisions."
+    },
+    {
+      "id": "one_pass_solvability",
+      "name": "One-pass solvability",
+      "verdict": "PASS",
+      "reasoning": "Opening the obvious entrypoint does not reveal the three locations, and a naive archive-preserving copy leaves identity and rebinding failures."
+    },
+    {
+      "id": "hard_only_gate",
+      "name": "Hard-only gate",
+      "verdict": "PASS",
+      "reasoning": "The bounded task requires professional device-node cutover diagnosis and three-boundary coordination within an expert-hours scope, not undergrad recipe completion."
+    },
+    {
+      "id": "discovery_budget_test",
+      "name": "Discovery budget test",
+      "verdict": "PASS",
+      "reasoning": "Three non-trivial discoveries are committed below, each with a distinct planned location and a reason it must remain absent from the public instruction."
+    },
+    {
+      "id": "instruction_specificity_test",
+      "name": "Instruction specificity test",
+      "verdict": "PASS",
+      "reasoning": "The drafted instruction stays at symptoms-only: no algorithms, thresholds, cause phrases such as mknod encoding or mode stripping, or named fix sites."
+    },
+    {
+      "id": "topology_distribution_test",
+      "name": "Topology distribution test",
+      "verdict": "PASS",
+      "reasoning": "Three distinct candidate topologies are enumerated below, each requiring at least three coordinating locations; the selected topology distributes tests across three locations at 4/12 each."
+    }
+  ],
+  "rubric_axes": [
+    {
+      "id": "verifiable",
+      "name": "Verifiable",
+      "verdict": "PASS",
+      "reasoning": "Post-cutover open/identity/path probes, file-only control migration, rejected broken fixtures, and regenerated cutover_report.json checks are all programmatic."
+    },
+    {
+      "id": "well_specified",
+      "name": "Well-specified",
+      "verdict": "PASS",
+      "reasoning": "The symptoms-only instruction clearly identifies invocation, normative schema path, failing/control/broken outcomes, and prohibited hardcoding without revealing implementation causes."
+    },
+    {
+      "id": "solvable",
+      "name": "Solvable",
+      "verdict": "PASS",
+      "reasoning": "The design bounds the defect to a small existing C/Rust cutover toolkit; an expert familiar with device nodes and service cutover can complete the coordinated changes in roughly three to eight hours."
+    },
+    {
+      "id": "difficult",
+      "name": "Difficult",
+      "verdict": "PASS",
+      "reasoning": "The task stays hard after honest disclosure because count-green / open-red disagreement does not identify which materialization, fidelity, or rebinding authority is inconsistent."
+    },
+    {
+      "id": "interesting",
+      "name": "Interesting",
+      "verdict": "PASS",
+      "reasoning": "Reliable service-root cutover that preserves device identity and open paths is paid production work in systems and platform operations."
+    },
+    {
+      "id": "outcome_verified",
+      "name": "Outcome-verified",
+      "verdict": "PASS",
+      "reasoning": "The tests accept any implementation producing correct probe/control/broken outcomes and do not require the oracle's exact code shape."
+    }
+  ],
+  "instruction_completeness_test": {
+    "verdict": "PASS",
+    "reasoning": "The instruction is sufficient to judge the final cutover report and failing/control/broken outcomes but insufficient to locate or derive the three fixes without deeply reading and running the codebase."
+  },
+  "discovery_budget": [
+    {
+      "discovery": "Special-file entries are rematerialized from a packed ledger encoding whose type/identity decode disagrees with the pre-cutover contract, so count-green copies still yield wrong major/minor or node kind.",
+      "planned_location": "environment/loom/loom.c::knit_p",
+      "why_instruction_must_not_reveal": "Naming packed ledger decode or special-file rematerialization would collapse the C diagnosis into a disclosed mknod recipe."
+    },
+    {
+      "discovery": "The mode/owner fidelity pass applies ordinary-file roster rules to special entries, so permissions and ownership diverge from the pre-cutover contract even when node kind looks plausible.",
+      "planned_location": "environment/veil/veil.rs::hinge_q",
+      "why_instruction_must_not_reveal": "Naming mode stripping or roster fidelity for specials would directly expose the Rust repair and convert the task into a recipe."
+    },
+    {
+      "discovery": "Post-cutover service open-path rebinding uses a wrong staging-relative anchor or alias, so opens miss required nodes even when identity metadata is restored.",
+      "planned_location": "environment/tether/tether.rs::moor_r",
+      "why_instruction_must_not_reveal": "Naming relative-anchor rebinding or alias tables would reduce the third repair to a disclosed path rewrite."
+    }
+  ],
+  "instruction_specificity": {
+    "level": "symptoms-only",
+    "reasoning": "The public draft describes count-green cutover with open/identity/path failures, healthy file-only control migration, rejected broken fixtures, and a cited report schema without naming algorithms, thresholds, mknod encodings, mode stripping, alias anchors, or causes."
+  },
+  "investigation_profile": {
+    "weakness_areas": [
+      "infrastructure_debugging",
+      "multi_component_reasoning",
+      "partial_failures",
+      "hidden_terminal_state"
+    ],
+    "causal_chain": [
+      {
+        "stage": 1,
+        "evidence": "Run the bundled cutover case beside the file-only healthy control and deliberately broken fixtures; compare exit codes, file counts, open probes, and identity fields.",
+        "finding": "Counts and exit codes look successful while device-backed opens/identity/path probes fail; the file-only control stays green and broken fixtures stay rejected.",
+        "unlocks_next": "The conditional matrix justifies treating count-green / open-red as one cutover incident rather than a general copy bug."
+      },
+      {
+        "stage": 2,
+        "evidence": "Inspect run logs, metrics counters, and cutover_report.json fields for failing versus control trajectories.",
+        "finding": "Disagreement concentrates on special-file identity and open-path fields after staging swap, not on ordinary file bytes or the file-only control.",
+        "unlocks_next": "Investigation can focus on state that crosses the staging cutover boundary across C and Rust roots."
+      },
+      {
+        "stage": 3,
+        "evidence": "Trace packed ledger records and C rematerialization against pre-cutover probe baselines.",
+        "finding": "Special-file type/identity decode from the packed ledger disagrees with the pre-cutover contract after rematerialization.",
+        "unlocks_next": "Materialization repair becomes a necessary but not sufficient stage before fidelity and rebinding are trusted."
+      },
+      {
+        "stage": 4,
+        "evidence": "Compare mode/owner fidelity decisions for ordinary versus special entries using deterministic probes and roster samples.",
+        "finding": "Ordinary-file roster rules are applied to specials, explaining permission/ownership divergence after cutover.",
+        "unlocks_next": "Fidelity must be repaired in concert with materialization; path rebinding still remains unchecked."
+      },
+      {
+        "stage": 5,
+        "evidence": "Inspect post-cutover open-path rebinding intermediates and staging-relative alias metadata.",
+        "finding": "Rebinding uses a wrong relative anchor, so opens miss required nodes even when upstream identity looks repaired.",
+        "unlocks_next": "The three authorities can now be repaired as one coupled invariant and verified end-to-end."
+      },
+      {
+        "stage": 6,
+        "evidence": "Apply coordinated repairs at loom, veil, and tether locations; rebuild; rerun failing, control, and broken matrices.",
+        "finding": "Failing fixtures recover open/identity/path contracts; the healthy file-only control remains green; broken fixtures stay rejected.",
+        "unlocks_next": "This closes the incident with deterministic outcome evidence."
+      }
+    ],
+    "evidence_surfaces": [
+      {
+        "surface": "code",
+        "planned_location": "environment/crate/ (C and Rust modules) and environment/probe/",
+        "question_answered": "Which roots own special-file materialization, fidelity, and open-path rebinding?"
+      },
+      {
+        "surface": "runtime-state",
+        "planned_location": "Deterministic observations from /app/bin/haze cutover, control, and broken runs",
+        "question_answered": "Where do file counts stay green while opens and identities diverge?"
+      },
+      {
+        "surface": "logs",
+        "planned_location": "environment/fixtures/logs/run_trace.ndjson",
+        "question_answered": "Which staging-swap phases correlate with open/identity failures?"
+      },
+      {
+        "surface": "filesystem",
+        "planned_location": "environment/fixtures/trees/ and staging artifacts under /app/var/stage/",
+        "question_answered": "What durable pre/post cutover state exists for failing fixtures versus the file-only control?"
+      },
+      {
+        "surface": "metrics",
+        "planned_location": "Emitted count and probe counters in /app/output/cutover_report.json",
+        "question_answered": "Do count/exit metrics mask the open/identity failure mode?"
+      }
+    ],
+    "competing_hypotheses": [
+      {
+        "hypothesis": "Ordinary file bytes are truncated or incompletely copied during staging.",
+        "why_plausible": "Services fail after cutover while the tool still reports success.",
+        "falsifier": "Ordinary file digests match pre-cutover baselines and the file-only healthy control migrates cleanly with intact bytes."
+      },
+      {
+        "hypothesis": "Kernel or udev randomly reallocates device numbers on each run.",
+        "why_plausible": "Major/minor identity looks wrong after cutover.",
+        "falsifier": "The offline container has no udev dependence; packed ledger fixtures and regenerated probes are deterministic across clean rebuilds."
+      },
+      {
+        "hypothesis": "The harness compares the wrong fixture inventory or report slots.",
+        "why_plausible": "Open/identity disagreement can look like a case mismatch.",
+        "falsifier": "Case identity keys and input cardinality in cutover_report.json match across failing and control runs; only special-file identity and open-path fields diverge on failing fixtures."
+      }
+    ],
+    "conditional_failures": [
+      {
+        "scenario": "Cutover of device-backed service roots on bundled failing fixtures",
+        "role": "failing",
+        "expected_behavior": "After repair, opens, major/minor identity, and paths match the pre-cutover contract."
+      },
+      {
+        "scenario": "Generated cutover variants with the same public contract",
+        "role": "failing",
+        "expected_behavior": "Open/identity/path fidelity generalizes beyond the bundled incident fixtures."
+      },
+      {
+        "scenario": "File-only healthy control tree migration",
+        "role": "healthy-control",
+        "expected_behavior": "Remains successful and byte-stable across clean rebuilds before and after repair."
+      },
+      {
+        "scenario": "Deliberately broken device fixtures",
+        "role": "healthy-control",
+        "expected_behavior": "Remain rejected; repairs must not loosen reject contracts to pass."
+      }
+    ],
+    "estimated_meaningful_actions": 44,
+    "determinism_strategy": "Ship fixed C/Rust sources, packed ledger fixtures, staging trees, and logs in one offline container. Reset from immutable inputs before each scenario, avoid clocks and runtime entropy, sort filesystem traversal, pin packed-ledger decode order, and derive expected probe/control properties from verifier-owned regeneration.",
+    "domain_reasoning": {
+      "domain": "System administration for service-root cutover with device-node identity and open-path fidelity.",
+      "why_not_trivia": "The solver does not need an obscure man-page flag. They must reconcile packed special-file materialization, special-entry fidelity policy, and staging-relative rebinding across C and Rust while proving failing/control/broken outcomes."
+    }
+  },
+  "attack_path": {
+    "summary": "Reproduce count-green / open-red cutover beside a healthy file-only control and rejected broken fixtures, falsify ordinary-copy and random-udev hypotheses, then reconcile packed materialization, special-entry fidelity, and staging-relative rebinding across three roots.",
+    "reasoning": "The path requires experiments and cross-language model building; no prompt noun, file name, or single failed assertion reveals all three locations."
+  },
+  "smallest_plausible_patch": {
+    "summary": "Coordinated substantive edits to one C materialization function and two Rust fidelity/rebinding functions, together exceeding a trivial patch.",
+    "reasoning": "Any strict subset leaves at least one open/identity, path, control, or reject property failing."
+  },
+  "collapse_audit": {
+    "verdict": "PASS",
+    "reasoning": "The editable frontier spans three non-obvious locations across C and Rust modules, the instruction remains symptoms-only, no declarative cluster or reference digest exists, and the planned oracle adds substantive logic rather than deleting or toggling one feature.",
+    "residual_hardness": "After the complete file tree is visible, the solver must still identify why cutover trajectories cross different materialization, fidelity, and rebinding authorities and then preserve one failing/control/broken invariant through three locations.",
+    "red_flags": []
+  },
+  "topology_enumeration": [
+    {
+      "id": "topology_a_selected",
+      "summary": "Packed special-file materialization, special-entry mode/owner fidelity, and staging-relative open-path rebinding disagree across loom, veil, and tether.",
+      "locations": [
+        "loom/loom.c::knit_p",
+        "veil/veil.rs::hinge_q",
+        "tether/tether.rs::moor_r"
+      ],
+      "why_no_single_location_suffices": "Correct materialization can still be undone by ordinary-file fidelity rules, correct fidelity can still miss opens under wrong relative anchors, and path-only repairs leave identity/permission contracts red when materialization disagrees."
+    },
+    {
+      "id": "topology_b_lifecycle_chain",
+      "summary": "Ledger decode, rematerialization, fidelity pass, and open-path rebind form a four-stage cutover lifecycle chain.",
+      "locations": [
+        "loom/loom.c::knit_p",
+        "veil/veil.rs::hinge_q",
+        "tether/tether.rs::moor_r",
+        "crate/relay.rs::swing_u"
+      ],
+      "why_no_single_location_suffices": "Correct ledger decode is useless if rematerialization writes the wrong kind, correct nodes are useless if fidelity strips ownership, and correct metadata is useless if opens rebind to the wrong staging anchor."
+    },
+    {
+      "id": "topology_c_authority_map",
+      "summary": "C identity packing, Rust roster fidelity keys, and Rust alias anchors use incompatible conventions after staging swap.",
+      "locations": [
+        "loom/loom.c::knit_p",
+        "veil/veil.rs::hinge_q",
+        "tether/tether.rs::moor_r"
+      ],
+      "why_no_single_location_suffices": "Changing one convention only moves the disagreement to another boundary; producers and consumers must represent the same post-cutover identity-to-open map."
+    }
+  ],
+  "construction_manifest": {
+    "symbol_table": [
+      {
+        "path": "loom/loom.c",
+        "symbol": "knit_p",
+        "kind": "function",
+        "signature": "int32_t knit_p(const uint8_t* a, size_t b, uint64_t* c);",
+        "purpose": "Decodes packed ledger records and rematerializes special entries into the destination staging tree."
+      },
+      {
+        "path": "veil/veil.rs",
+        "symbol": "hinge_q",
+        "kind": "function",
+        "signature": "pub(crate) fn hinge_q(a: u64, b: &mut Roster) -> i8",
+        "purpose": "Applies mode and owner fidelity for entries during cutover using the active roster context."
+      },
+      {
+        "path": "tether/tether.rs",
+        "symbol": "moor_r",
+        "kind": "function",
+        "signature": "pub(crate) fn moor_r(a: u64, b: &mut Anchor) -> i8",
+        "purpose": "Rebinds open targets after staging swap under the active relative-anchor context."
+      }
+    ],
+    "flipping_point_contract": {
+      "locations": [
+        {
+          "id": "A",
+          "path": "loom/loom.c",
+          "controls_tests": [
+            "test_h01",
+            "test_h02",
+            "test_h06",
+            "test_h10"
+          ]
+        },
+        {
+          "id": "B",
+          "path": "veil/veil.rs",
+          "controls_tests": [
+            "test_h03",
+            "test_h05",
+            "test_h07",
+            "test_h11"
+          ]
+        },
+        {
+          "id": "C",
+          "path": "tether/tether.rs",
+          "controls_tests": [
+            "test_h04",
+            "test_h08",
+            "test_h09",
+            "test_h12"
+          ]
+        }
+      ],
+      "no_single_location_flips_majority": true,
+      "concentration_cap": 0.5
+    },
+    "decoy_manifest": [
+      {
+        "path": "loom/ledge.c",
+        "kind": "helper",
+        "rhymes_with": "knit_p",
+        "non_fix_purpose": "Counts ordinary entries for diagnostic banners without rematerializing specials."
+      },
+      {
+        "path": "veil/cloak.rs",
+        "kind": "helper",
+        "rhymes_with": "hinge_q",
+        "non_fix_purpose": "Maps display codes for status lines without changing roster fidelity."
+      },
+      {
+        "path": "tether/berth.rs",
+        "kind": "helper",
+        "rhymes_with": "moor_r",
+        "non_fix_purpose": "Formats alias labels for logs without rebinding open targets."
+      }
+    ],
+    "code_forbidden_tokens": [
+      "app",
+      "bin",
+      "bind",
+      "broken",
+      "bundled",
+      "bytes",
+      "checks",
+      "code",
+      "codes",
+      "compiled",
+      "contract",
+      "control",
+      "counts",
+      "cutover",
+      "cutover-report-schema",
+      "cutover_report",
+      "device",
+      "device-backed",
+      "docs",
+      "emit",
+      "exit",
+      "expected",
+      "failing",
+      "file",
+      "file-only",
+      "fixture",
+      "fixtures",
+      "green",
+      "hand",
+      "haze",
+      "healthy",
+      "identities",
+      "identity",
+      "intact",
+      "invoke",
+      "json",
+      "keys",
+      "lab",
+      "layout",
+      "major",
+      "major/minor",
+      "migrates",
+      "minor",
+      "node",
+      "nodes",
+      "non-device",
+      "normative",
+      "opens",
+      "ordinary",
+      "output",
+      "path",
+      "paths",
+      "pipeline",
+      "pre-cutover",
+      "rebuild",
+      "regenerate",
+      "rejected",
+      "remain",
+      "replace",
+      "report",
+      "required",
+      "root",
+      "schema",
+      "service",
+      "services",
+      "staging",
+      "success",
+      "tool",
+      "tree",
+      "trees",
+      "write"
+    ]
+  },
+  "naming_pass": {
+    "instruction_nouns_extracted": [
+      "app",
+      "bin",
+      "bind",
+      "broken",
+      "bundled",
+      "bytes",
+      "checks",
+      "code",
+      "codes",
+      "compiled",
+      "contract",
+      "control",
+      "counts",
+      "cutover",
+      "cutover-report-schema",
+      "cutover_report",
+      "device",
+      "device-backed",
+      "docs",
+      "emit",
+      "exit",
+      "expected",
+      "failing",
+      "file",
+      "file-only",
+      "fixture",
+      "fixtures",
+      "green",
+      "hand",
+      "haze",
+      "healthy",
+      "identities",
+      "identity",
+      "intact",
+      "invoke",
+      "json",
+      "keys",
+      "lab",
+      "layout",
+      "major",
+      "major/minor",
+      "migrates",
+      "minor",
+      "node",
+      "nodes",
+      "non-device",
+      "normative",
+      "opens",
+      "ordinary",
+      "output",
+      "path",
+      "paths",
+      "pipeline",
+      "pre-cutover",
+      "rebuild",
+      "regenerate",
+      "rejected",
+      "remain",
+      "replace",
+      "report",
+      "required",
+      "root",
+      "schema",
+      "service",
+      "services",
+      "staging",
+      "success",
+      "tool",
+      "tree",
+      "trees",
+      "write"
+    ],
+    "renames_during_drafting": [
+      {
+        "original": "crate/device_materialize.c",
+        "renamed_to": "crate/loom.c",
+        "reason": "Removed instruction noun device from a selected fix path."
+      },
+      {
+        "original": "crate/migrate_perm.rs",
+        "renamed_to": "crate/veil.rs",
+        "reason": "Removed cause-revealing migrate/perm naming from the Rust frontier."
+      },
+      {
+        "original": "crate/bind_path.rs",
+        "renamed_to": "crate/tether.rs",
+        "reason": "Removed instruction nouns bind and path from a selected fix path."
+      },
+      {
+        "original": "mknod_decode",
+        "renamed_to": "knit_p",
+        "reason": "Avoided cause-revealing mknod vocabulary on the fix path."
+      },
+      {
+        "original": "apply_permissions",
+        "renamed_to": "hinge_q",
+        "reason": "Avoided permission vocabulary adjacent to the public cutover contract."
+      },
+      {
+        "original": "rebind_open_path",
+        "renamed_to": "moor_r",
+        "reason": "Avoided open/path/bind vocabulary from the public instruction."
+      }
+    ],
+    "test_names_audited": [
+      "test_h01",
+      "test_h02",
+      "test_h03",
+      "test_h04",
+      "test_h05",
+      "test_h06",
+      "test_h07",
+      "test_h08",
+      "test_h09",
+      "test_h10",
+      "test_h11",
+      "test_h12"
+    ],
+    "concentration_math": {
+      "total_tests": 12,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    },
+    "recomputed_concentration": {
+      "total_tests": 12,
+      "concentration_cap": 0.5,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# mkdir -p /tmp/t
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# cat > /tmp/t/probe.case << 'EOF'
+> mr_rs|/app/data/archive/mixed.store|range|10|40|row|1|x
+> mr_rn|/app/data/archive/mixed.store|range|10|40|row|0|x
+> mr_bs|/app/data/archive/mixed.store|range|10|40|batch|1|x
+> mr_bn|/app/data/archive/mixed.store|range|10|40|batch|0|x
+> mn_rs|/app/data/archive/mixed.store|isnull|0|0|row|1|x
+> mn_rn|/app/data/archive/mixed.store|isnull|0|0|row|0|x
+> mn_bs|/app/data/archive/mixed.store|isnull|0|0|batch|1|x
+> mn_bn|/app/data/archive/mixed.store|isnull|0|0|batch|0|x
+> EOF
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# /app/bin/loam audit /tmp/t /tmp/t/out.json; echo; cat /tmp/t/out.json
+
+{"status":"complete","cases":[{"case_id":"mr_rs","row_count":2,"sum_amount":70,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"mr_rn","
+row_count":4,"sum_amount":100,"pages_total":4,"pages_read":4,"path":"row","skipping":false},{"case_id":"mr_bs","row_count":2,"sum_amount":70,"pages_total":4,"pa
+ges_read":1,"path":"batch","skipping":true},{"case_id":"mr_bn","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"
+case_id":"mn_rs","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"mn_rn","row_count":2,"sum_amount":0,"page
+s_total":4,"pages_read":4,"path":"row","skipping":false},{"case_id":"mn_bs","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":1,"path":"batch","skipping
+":true},{"case_id":"mn_bn","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"batch","skipping":false}],"digest":"672d2333973baa05"}
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app#

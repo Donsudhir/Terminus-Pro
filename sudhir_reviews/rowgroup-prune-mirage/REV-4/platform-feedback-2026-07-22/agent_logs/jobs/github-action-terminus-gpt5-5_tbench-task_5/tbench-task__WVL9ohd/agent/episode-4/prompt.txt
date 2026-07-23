@@ -1,0 +1,293 @@
+New Terminal Output:
+
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# for f in /app/cpp/include/loam/*.hpp /app/cpp/src/harbor/*.cpp /app/cpp/src/lattice/*.cpp /app/cpp/src/parse.cpp
+ /app/cpp/src/report.cpp; do echo "### $f"; nl -ba "$f" | sed -n '1,240p'; done
+### /app/cpp/include/loam/exec.hpp
+     1  #pragma once
+     2
+     3  #include "loam/types.hpp"
+     4
+     5  namespace loam {
+     6
+     7  Tally walk_row(const Slab& a, const Probe& b, const Gate& c);
+     8  Tally sweep_c(const Slab& a, const Probe& b, const Gate& c);
+     9  Tally sweep_e(const Tally& a, const Tally& b);
+    10
+    11  }  // namespace loam
+### /app/cpp/include/loam/plan.hpp
+     1  #pragma once
+     2
+     3  #include "loam/types.hpp"
+     4
+     5  namespace loam {
+     6
+     7  Gate turn_b(const Slab& a, const Probe& b);
+     8  std::string turn_d(const Gate& a, const Probe& b);
+     9
+    10  }  // namespace loam
+### /app/cpp/include/loam/report.hpp
+     1  #pragma once
+     2
+     3  #include "loam/types.hpp"
+     4
+     5  #include <filesystem>
+     6  #include <string>
+     7  #include <vector>
+     8
+     9  namespace loam {
+    10
+    11  void write_report(const std::filesystem::path& path, const std::vector<CaseResult>& cases);
+    12  std::string digest_hex(const std::string& text);
+    13  std::string lane_name(Lane lane);
+    14
+    15  }  // namespace loam
+### /app/cpp/include/loam/store.hpp
+     1  #pragma once
+     2
+     3  #include "loam/types.hpp"
+     4
+     5  #include <filesystem>
+     6  #include <vector>
+     7
+     8  namespace loam {
+     9
+    10  std::vector<Slab> load_store(const std::filesystem::path& path);
+    11  std::vector<CaseSpec> load_cases(const std::filesystem::path& directory);
+    12  CaseResult run_case(const CaseSpec& spec);
+    13
+    14  }  // namespace loam
+### /app/cpp/include/loam/types.hpp
+     1  #pragma once
+     2
+     3  #include <cstdint>
+     4  #include <string>
+     5  #include <vector>
+     6
+     7  namespace loam {
+     8
+     9  enum class Origin : std::uint8_t { Retired = 0, Inherited = 1, Current = 2 };
+    10
+    11  struct Cell {
+    12      std::uint8_t present{};
+    13      Origin origin{Origin::Current};
+    14      std::int64_t amount{};
+    15      std::string region;
+    16  };
+    17
+    18  struct Slab {
+    19      std::size_t id{};
+    20      std::uint8_t generation{};
+    21      std::int64_t low{};
+    22      std::int64_t high{};
+    23      bool has_absent{};
+    24      std::string region_low;
+    25      std::string region_high;
+    26      std::vector<Cell> cells;
+    27      std::vector<std::int64_t> amount_lane;
+    28      std::vector<std::uint8_t> presence_lane;
+    29      std::vector<std::uint8_t> origin_lane;
+    30      std::vector<std::string> region_lane;
+    31  };
+    32
+    33  enum class Op { All, Equal, Range, IsNull, RegionEqual };
+    34  enum class Lane { Row, Batch };
+    35
+    36  struct Probe {
+    37      Op op{Op::All};
+    38      std::int64_t x{};
+    39      std::int64_t y{};
+    40      std::string text;
+    41      Lane lane{Lane::Row};
+    42      bool skipping{};
+    43  };
+    44
+    45  struct Gate {
+    46      bool read{true};
+    47      std::string note;
+    48  };
+    49
+    50  struct Tally {
+    51      std::int64_t row_count{};
+    52      std::int64_t sum_amount{};
+    53      std::int64_t pages_read{};
+    54  };
+    55
+    56  struct CaseSpec {
+    57      std::string case_id;
+    58      std::string store_path;
+    59      Probe probe;
+    60  };
+    61
+    62  struct CaseResult {
+    63      std::string case_id;
+    64      Tally tally;
+    65      std::int64_t pages_total{};
+    66      Lane lane{Lane::Row};
+    67      bool skipping{};
+    68  };
+    69
+    70  }  // namespace loam
+### /app/cpp/src/harbor/pale.cpp
+     1  #include "loam/plan.hpp"
+     2
+     3  namespace loam {
+     4
+     5  std::string turn_d(const Gate& a, const Probe& b) {
+     6      const char* lane = b.lane == Lane::Batch ? "batch" : "row";
+     7      return std::string(lane) + ":" + (a.read ? "open:" : "closed:") + a.note;
+     8  }
+     9
+    10  }  // namespace loam
+### /app/cpp/src/harbor/veil.cpp
+     1  #include "loam/plan.hpp"
+     2
+     3  namespace loam {
+     4
+     5  Gate turn_b(const Slab& a, const Probe& b) {
+     6      if (!b.skipping) {
+     7          return {true, "full"};
+     8      }
+     9      if (b.op == Op::All) {
+    10          return {true, "all"};
+    11      }
+    12      if (b.op == Op::IsNull) {
+    13          return {a.has_absent, a.has_absent ? "possible" : "empty"};
+    14      }
+    15      if (b.op == Op::RegionEqual) {
+    16          const bool read = b.text >= a.region_low && b.text <= a.region_high;
+    17          return {read, read ? "text-hit" : "text-away"};
+    18      }
+    19
+    20      const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+    21      const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+    22      const bool read = !(right < a.low || left > a.h
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+escape_json(const std::string& value) {
+    11      std::string out;
+    12      for (const char ch : value) {
+    13          if (ch == '"' || ch == '\\') {
+    14              out.push_back('\\');
+    15          }
+    16          out.push_back(ch);
+    17      }
+    18      return out;
+    19  }
+    20
+    21  std::string cases_json(const std::vector<CaseResult>& cases) {
+    22      std::ostringstream out;
+    23      out << '[';
+    24      for (std::size_t i = 0; i < cases.size(); ++i) {
+    25          if (i != 0) out << ',';
+    26          const auto& item = cases[i];
+    27          out << "{\"case_id\":\"" << escape_json(item.case_id)
+    28              << "\",\"row_count\":" << item.tally.row_count
+    29              << ",\"sum_amount\":" << item.tally.sum_amount
+    30              << ",\"pages_total\":" << item.pages_total
+    31              << ",\"pages_read\":" << item.tally.pages_read
+    32              << ",\"path\":\"" << lane_name(item.lane)
+    33              << "\",\"skipping\":" << (item.skipping ? "true" : "false")
+    34              << '}';
+    35      }
+    36      out << ']';
+    37      return out.str();
+    38  }
+    39
+    40  }  // namespace
+    41
+    42  std::string lane_name(const Lane lane) {
+    43      return lane == Lane::Batch ? "batch" : "row";
+    44  }
+    45
+    46  void write_report(const std::filesystem::path& path, const std::vector<CaseResult>& cases) {
+    47      if (path.has_parent_path()) {
+    48          std::filesystem::create_directories(path.parent_path());
+    49      }
+    50      const std::string body = cases_json(cases);
+    51      const std::string digest = digest_hex(body);
+    52      std::ofstream output(path, std::ios::binary | std::ios::trunc);
+    53      if (!output) {
+    54          throw std::runtime_error("cannot write report: " + path.string());
+    55      }
+    56      output << "{\"status\":\"complete\",\"cases\":" << body
+    57             << ",\"digest\":\"" << digest << "\"}\n";
+    58  }
+    59
+    60  }  // namespace loam
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# for f in /app/rust/src/ember/*.rs /app/rust/src/report.rs; do echo "### $f"; nl -ba "$f" | sed -n '1,260p'; done
+### /app/rust/src/ember/fold.rs
+     1  use crate::model::{FoldErr, Mark};
+     2
+     3  pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+     4      if a.is_empty() {
+     5          return Err(FoldErr::Empty);
+     6      }
+     7      if a.len() != b.len() || a.len() != c.len() {
+     8          return Err(FoldErr::Shape);
+     9      }
+    10
+    11      let mut low = a[0];
+    12      let mut high = a[0];
+    13      let mut has_absent = false;
+    14      for (value, present) in a.iter().zip(b.iter()) {
+    15          low = low.min(*value);
+    16          high = high.max(*value);
+    17          has_absent |= *present == 0;
+    18      }
+    19
+    20      Ok(Mark {
+    21          low,
+    22          high,
+    23          has_absent,
+    24      })
+    25  }
+### /app/rust/src/ember/mod.rs
+     1  pub(crate) mod fold;
+     2  pub(crate) mod pale;
+     3  pub(crate) mod reed;
+### /app/rust/src/ember/pale.rs
+     1  #[derive(Clone, Debug, Default)]
+     2  pub(crate) struct Dial {
+     3      pub jobs: usize,
+     4      pub cells: usize,
+     5      pub bytes: usize,
+     6  }
+     7
+     8  pub(crate) fn tilt_d(a: &mut Dial, b: usize, c: usize) {
+     9      a.jobs += 1;
+    10      a.cells += b;
+    11      a.bytes += c;
+    12  }
+### /app/rust/src/ember/reed.rs
+     1  use crate::ember::fold::tilt_a;
+     2  use crate::model::{Cell, FoldErr, Page};
+     3
+     4  pub(crate) fn gather(cells: Vec<Cell>, width: usize) -> Result<Vec<Page>, FoldErr> {
+     5      let mut pages = Vec::new();
+     6      for (id, chunk) in cells.chunks(width).enumerate() {
+     7          let values: Vec<i64> = chunk.iter().map(|cell| cell.amount).collect();
+     8          let present: Vec<u8> = chunk.iter().map(|cell| cell.present).collect();
+     9          let origins: Vec<u8> = chunk.iter().map(|cell| cell.origin).collect();
+    10          let mark = tilt_a(&values, &present, &origins)?;
+    11
+    12          let mut regions: Vec<String> = chunk.iter().map(|cell| cell.region.clone()).collect();
+    13          regions.sort();
+    14          let region_low = regions.first().cloned().unwrap_or_default();
+    15          let region_high = regions.last().cloned().unwrap_or_default();
+    16          pages.push(Page {
+    17              id,
+    18              generation: 3,
+    19              mark,
+    20              region_low,
+    21              region_high,
+    22              cells: chunk.to_vec(),
+    23          });
+    24      }
+    25      Ok(pages)
+    26  }
+### /app/rust/src/report.rs
+     1  use crate::ember::pale::Dial;
+     2
+     3  pub(crate) fn line(a: &Dial) -> String {
+     4      format!("jobs={} cells={} bytes={}", a.jobs, a.cells, a.bytes)
+     5  }
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app#

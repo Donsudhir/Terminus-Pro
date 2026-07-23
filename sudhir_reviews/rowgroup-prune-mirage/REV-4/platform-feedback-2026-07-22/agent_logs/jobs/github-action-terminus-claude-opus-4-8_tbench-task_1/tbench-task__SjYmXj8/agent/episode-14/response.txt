@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Now I fully understand both bugs. The CSV columns are origin,present,amount,region. \n\nLiveness rule (canonical, from row.cpp): \n- origin==0 (Retired) -> not live\n- origin==1 (Inherited) -> live\n- origin==2 (Current) -> live iff present!=0\n\n**Bug 1 (batch reader rill.cpp):** admit only uses presence_lane, ignoring origin_lane. Must use full liveness.\n\n**Bug 2 (ingest fold.rs tilt_a):** low/high span all amounts (should span only live amounts); has_absent set only when present==0 (should be set when any non-live entry present). Must use origin lane `c`.\n\nLet me now look at the main.cpp, parse.cpp, report.cpp, digest.cpp to make sure I understand the full flow and how cases are parsed, then apply fixes. But the two fixes above are the core. Let me look at parse.cpp and main.cpp briefly.",
+  "plan": "Read main.cpp and parse.cpp to confirm nothing else needs changing, then apply the two fixes.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/parse.cpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/src/main.cpp\n", "duration": 0.1}
+  ]
+}
+```

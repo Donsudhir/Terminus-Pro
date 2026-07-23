@@ -68,3 +68,25 @@ PLACEHOLDER10:21:11Z — Revision 2
 - `task.toml`: build/verifier timeout 1200s, memory 8192MB (agent stays at platform cap 1800)
 - `tests/test.sh`: CM-016 early `reward.txt=0`
 - Harbor: oracle 1x / NOP / oracle 10x clean; zip sha256 `50ba0424…`
+
+## 2026-07-23T00:48:00Z — Revision 8
+
+- Reviewer: document FNV-1a digest (closing `}`), hash-lock verifier deps,
+  test `schema_version` + `runtime.conf` step overrides
+- Spec: report-format FNV-1a-64 contract explicit; instruction cites it;
+  digest renderer/tests keep closed-object hashing (no relax / no rewrite)
+- Verifier: transitive `--hash=sha256` requirements + `pip --require-hashes`
+- Tests: `test_k14` schema_version + step_gain/step_floor overrides
+- Harbor: oracle 1x mean 1.0 (`jobs/2026-07-23__00-46-04`); NOP 0.0
+  (`jobs/2026-07-23__00-46-35`); oracle 10x mean 1.0 10/10
+  (`jobs/2026-07-23__00-56-36`)
+- Package: `sudhir_tasks_ready_to_submit/sparse-jacobian-color-contract.zip`
+  sha256 `4343b5da35ba3096f35b50f043c2fabe1c7ef4d47af202d30c035b4bedf9efb2`
+
+## 2026-07-22T19:03:39Z — Revision 8
+
+- Platform: document FNV-1a digest; hash-lock verifier deps; test schema_version + runtime.conf step overrides
+
+## 2026-07-22T22:11:18Z — Revision 9
+
+- CM-019 AutoEval CodeExecution FAILED again (tb_check + difficulty_check empty logs); no human content feedback

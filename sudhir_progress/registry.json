@@ -1,5 +1,351 @@
 {
   "ideas": {
+    "aead-epoch-bound-drift": {
+      "category": "security",
+      "created": "2026-07-22T21:16:45Z",
+      "eligibility_verdict": {
+        "action": "capture",
+        "evaluated_at": "2026-07-22T21:16:45Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-22T21:16:45Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-22T21:16:45Z",
+          "event": "proposal failed",
+          "reason": "Similarity PASS. Idea quality FAIL (Decision: Reject; Verifiable: Accept; Well-specified: Reject; Solvable: Uncertain; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (suggested debugging). Metadata similarity PASS."
+        }
+      ],
+      "id": "IDEA-0039",
+      "in_flight_exemptions": [],
+      "languages": [
+        "c",
+        "rust",
+        "go"
+      ],
+      "next_action": "Revise the proposal fields and rerun Check feedback, or reject the idea.",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "AEAD cryptography",
+          "key epoch rotation",
+          "associated-data binding",
+          "sealed storage design",
+          "cryptographic protocol debugging",
+          "systems programming in C/Rust/Go",
+          "fail-closed verification"
+        ],
+        "category_label": "Security / Cryptography / Vulnerability Demonstration",
+        "category_slug": "security",
+        "checked_at": "2026-07-22T21:16:45Z",
+        "evidence": [
+          "chat-2026-07-23 Snorkel Task Idea Proposal Check feedback pasted by Sudhir"
+        ],
+        "feedback": "Similarity PASS. Idea quality FAIL (Decision: Reject; Verifiable: Accept; Well-specified: Reject; Solvable: Uncertain; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (suggested debugging). Metadata similarity PASS.",
+        "inspiration": {
+          "reuse_boundary": "Platform Idea quality Reject; retained as failed so family is not silently recycled.",
+          "source_reference": "AEAD epoch AAD binding drift (inspiration only; 2026-07-23)",
+          "source_type": "cryptography / sealed-storage incident pattern"
+        },
+        "status": "failed",
+        "summary": "A local sealed-object store rewraps records across key epochs and verifies tags before open. After a routine epoch advance, some historical records open with the wrong binding, some valid records fail verification, and a shallow tag-valid counter stays mostly green. Freshly written current-epoch records must keep working, and deliberately corrupted controls must stay rejected. Restore open/rewrap behavior so epoch lineage, associated data binding, and reject/accept controls all agree.",
+        "task_tags": [
+          "aead",
+          "key-rotation",
+          "associated-data",
+          "sealed-storage",
+          "cryptography"
+        ]
+      },
+      "record": "sudhir_ideas/records/aead-epoch-bound-drift.md",
+      "slug": "aead-epoch-bound-drift",
+      "status": "captured",
+      "subcategories": [],
+      "summary": "A local sealed-object store rewraps records across key epochs and verifies tags before open. After a routine epoch advance, some historical records open with the wrong binding, some valid records fail verification, and a shallow tag-valid counter stays mostly green. Freshly written current-epoch records must keep working, and deliberately corrupted controls must stay rejected. Restore open/rewrap behavior so epoch lineage, associated data binding, and reject/accept controls all agree.",
+      "task_slug": null,
+      "title": "AEAD Epoch Bound Drift",
+      "uniqueness": {
+        "checked_at": null,
+        "closest_analogue": "",
+        "differentiator": "",
+        "evidence": [],
+        "fingerprint": {
+          "domain": "",
+          "mechanism": "",
+          "topology": "",
+          "verification": ""
+        },
+        "reason": "",
+        "scope": [],
+        "status": "pending"
+      },
+      "updated": "2026-07-22T21:16:45Z",
+      "validation": {
+        "attempt": 0,
+        "evidence": [],
+        "reason": "",
+        "status": "not-started"
+      }
+    },
+    "airspace-conflict-sim-deterministic-replay": {
+      "category": "games",
+      "created": "2026-07-23T12:44:21Z",
+      "eligibility_verdict": {
+        "action": "capture",
+        "evaluated_at": "2026-07-23T12:44:21Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-23T12:44:21Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-23T12:44:29Z",
+          "event": "proposal pending",
+          "reason": "Task Idea Proposal fields captured."
+        }
+      ],
+      "id": "IDEA-0040",
+      "in_flight_exemptions": [],
+      "languages": [],
+      "next_action": "Paste the proposal fields into Snorkel and run Check feedback.",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "state-space exploration",
+          "priority-queue reasoning",
+          "deterministic replay design",
+          "terminal simulation control",
+          "go runtime comprehension",
+          "rust systems behavior",
+          "tradeoff optimization",
+          "scenario planning"
+        ],
+        "category_label": "Interactive / Simulation Tasks / Games",
+        "category_slug": "games",
+        "checked_at": null,
+        "evidence": [],
+        "feedback": "",
+        "inspiration": {
+          "reuse_boundary": "",
+          "source_reference": "",
+          "source_type": ""
+        },
+        "status": "pending",
+        "summary": "A terminal airspace simulation challenge where the solver must produce control directives that maximize safe throughput while guaranteeing deterministic official replay. The runtime is split across Go orchestration and Rust conflict-resolution kernels, with hidden contention windows and priority interactions that force careful exploration. Validation checks not only safety and completion metrics but trajectory reproducibility under replay permutations. The task emphasizes operations-grade auditability inside a game-like simulation, not scripted walkthrough execution.",
+        "task_tags": [
+          "games",
+          "simulation",
+          "replay-determinism",
+          "go",
+          "rust",
+          "throughput"
+        ]
+      },
+      "record": "sudhir_ideas/records/airspace-conflict-sim-deterministic-replay.md",
+      "slug": "airspace-conflict-sim-deterministic-replay",
+      "status": "captured",
+      "subcategories": [],
+      "summary": "A terminal airspace simulation challenge where the solver must produce control directives that maximize safe throughput while guaranteeing deterministic official replay. The runtime is split across Go orchestration and Rust conflict-resolution kernels, with hidden contention windows and priority interactions that force careful exploration. Validation checks not only safety and completion metrics but trajectory reproducibility under replay permutations. The task emphasizes operations-grade auditability inside a game-like simulation, not scripted walkthrough execution.",
+      "task_slug": null,
+      "title": "Airspace Conflict Sim Deterministic Replay",
+      "uniqueness": {
+        "checked_at": null,
+        "closest_analogue": "",
+        "differentiator": "",
+        "evidence": [],
+        "fingerprint": {
+          "domain": "",
+          "mechanism": "",
+          "topology": "",
+          "verification": ""
+        },
+        "reason": "",
+        "scope": [],
+        "status": "pending"
+      },
+      "updated": "2026-07-23T12:44:29Z",
+      "validation": {
+        "attempt": 0,
+        "evidence": [],
+        "reason": "",
+        "status": "not-started"
+      }
+    },
+    "amg-coarsen-parity-rift": {
+      "category": "scientific-computing",
+      "created": "2026-07-22T21:16:44Z",
+      "eligibility_verdict": {
+        "action": "step2a-go",
+        "evaluated_at": "2026-07-22T22:25:04Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-22T21:16:44Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-22T21:16:45Z",
+          "event": "proposal passed",
+          "reason": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (selected scientific; suggested debugging) \u2014 non-blocking. Metadata similarity PASS."
+        },
+        {
+          "at": "2026-07-22T21:26:13Z",
+          "event": "uniqueness passed",
+          "reason": "Six-scope dossier found no semantic collision"
+        },
+        {
+          "at": "2026-07-22T22:25:04Z",
+          "event": "Step 2a go",
+          "reason": "validate_loop attempt 1 PERFECT 0F/0W; finalize lint OK; three-root Fortran/C++/Rust AMG dual-reordering topology"
+        }
+      ],
+      "id": "IDEA-0036",
+      "in_flight_exemptions": [],
+      "languages": [
+        "fortran",
+        "c++",
+        "rust"
+      ],
+      "next_action": "Approved for construction; create/link the task and execute it.",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "algebraic multigrid",
+          "sparse matrix reordering",
+          "smoother/coarse-grid coupling",
+          "iterative solver diagnostics",
+          "Fortran/C++/Rust numerics",
+          "residual-based verification",
+          "deterministic linear-algebra pipelines"
+        ],
+        "category_label": "Scientific Computing",
+        "category_slug": "scientific-computing",
+        "checked_at": "2026-07-22T21:16:45Z",
+        "evidence": [
+          "chat-2026-07-23 Snorkel Task Idea Proposal Check feedback pasted by Sudhir"
+        ],
+        "feedback": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (selected scientific; suggested debugging) \u2014 non-blocking. Metadata similarity PASS.",
+        "inspiration": {
+          "reuse_boundary": "Inspired by order-dependent AMG drift with healthy smoothness bait; no PETSc/Hypre patches or tests copied.",
+          "source_reference": "AMG coarsening parity under equivalent reorderings (inspiration only; distinct from sparse-jacobian-color-contract; 2026-07-23)",
+          "source_type": "scientific computing / solver incident pattern"
+        },
+        "status": "passed",
+        "summary": "An algebraic multigrid preconditioner produces different convergence curves and fine-grid solution digests when the same matrix is presented under two equivalent reorderings. Smoothness indicators and coarse-size summaries can look fine while the solution drifts past tolerance versus a fixed healthy ordering control. Repair hierarchy construction and apply so both orderings meet the same residual and solution-digest contracts without hard-coding one permutation.",
+        "task_tags": [
+          "amg",
+          "multigrid",
+          "sparse-matrix",
+          "reordering",
+          "iterative-solvers"
+        ]
+      },
+      "record": "sudhir_ideas/records/amg-coarsen-parity-rift.md",
+      "slug": "amg-coarsen-parity-rift",
+      "status": "approved",
+      "subcategories": [],
+      "summary": "An algebraic multigrid preconditioner produces different convergence curves and fine-grid solution digests when the same matrix is presented under two equivalent reorderings. Smoothness indicators and coarse-size summaries can look fine while the solution drifts past tolerance versus a fixed healthy ordering control. Repair hierarchy construction and apply so both orderings meet the same residual and solution-digest contracts without hard-coding one permutation.",
+      "task_slug": null,
+      "title": "AMG Coarsen Parity Rift",
+      "uniqueness": {
+        "checked_at": "2026-07-22T21:26:13Z",
+        "closest_analogue": "sparse-jacobian-color-contract (coloring/unpack) and krylov-orthogonality-loss (subspace); mesh-checkpoint is different remesh/resume mechanism",
+        "differentiator": "AMG coarsen/apply parity under equivalent reorderings \u2014 not Jacobian coloring, Krylov restart storage, or remesh-checkpoint operator reuse",
+        "evidence": [
+          "sudhir_research/TASK-ACPR-001-RESEARCH.md"
+        ],
+        "fingerprint": {
+          "domain": "algebraic multigrid preconditioner with coarsening hierarchy, smoother/coarse coupling, and reordered sparse matrices",
+          "mechanism": "equivalent reorderings change convergence and fine-grid solution digests while smoothness and coarse-size summaries look fine",
+          "topology": "strength/coarsening selection, prolongation/restriction construction, and V-cycle apply must stay algebraically consistent under reordering",
+          "verification": "both orderings meet residual and solution-digest contracts; healthy ordering control stays green; smoothness bait is not success"
+        },
+        "reason": "Six-scope dossier found no semantic collision",
+        "scope": [
+          "active-tasks",
+          "archived-tasks",
+          "external-research",
+          "idea-registry",
+          "submission-archives",
+          "upstream-corpus"
+        ],
+        "status": "passed"
+      },
+      "updated": "2026-07-22T22:25:04Z",
+      "validation": {
+        "attempt": 1,
+        "evidence": [
+          "sudhir_ideas/specs/amg-coarsen-parity-rift-attempt-1-evidence.json",
+          "sudhir_ideas/specs/amg-coarsen-parity-rift.md",
+          "sudhir_ideas/specs/amg-coarsen-parity-rift-reviewer.md"
+        ],
+        "reason": "validate_loop attempt 1 PERFECT 0F/0W; finalize lint OK; three-root Fortran/C++/Rust AMG dual-reordering topology",
+        "status": "go"
+      }
+    },
     "bitwise-rebuild-drift": {
       "category": "build-and-dependency-management",
       "created": "2026-07-19T10:58:40Z",
@@ -178,6 +524,115 @@
         "status": "pending"
       },
       "updated": "2026-07-18T20:56:16Z",
+      "validation": {
+        "attempt": 0,
+        "evidence": [],
+        "reason": "",
+        "status": "not-started"
+      }
+    },
+    "cgroup-freeze-resume-rift": {
+      "category": "system-administration",
+      "created": "2026-07-22T21:16:45Z",
+      "eligibility_verdict": {
+        "action": "capture",
+        "evaluated_at": "2026-07-22T21:16:45Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-22T21:16:45Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-22T21:16:45Z",
+          "event": "proposal failed",
+          "reason": "Similarity PASS. Idea quality PASS but Decision: Uncertain (Verifiable: Uncertain; Well-specified: Reject; Solvable: Uncertain; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (suggested debugging). Metadata similarity PASS. Parked as failed/uncertain \u2014 not advancing without rewrite."
+        }
+      ],
+      "id": "IDEA-0037",
+      "in_flight_exemptions": [],
+      "languages": [
+        "c",
+        "rust"
+      ],
+      "next_action": "Revise the proposal fields and rerun Check feedback, or reject the idea.",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "Linux cgroups",
+          "process lifecycle management",
+          "file-descriptor inheritance",
+          "lock and socket state diagnosis",
+          "checkpoint/resume debugging",
+          "namespace and mount inspection",
+          "systems programming in C or Rust",
+          "deterministic offline reproduction"
+        ],
+        "category_label": "System / Environment Setup & Configuration",
+        "category_slug": "system-administration",
+        "checked_at": "2026-07-22T21:16:45Z",
+        "evidence": [
+          "chat-2026-07-23 Snorkel Task Idea Proposal Check feedback pasted by Sudhir"
+        ],
+        "feedback": "Similarity PASS. Idea quality PASS but Decision: Uncertain (Verifiable: Uncertain; Well-specified: Reject; Solvable: Uncertain; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (suggested debugging). Metadata similarity PASS. Parked as failed/uncertain \u2014 not advancing without rewrite.",
+        "inspiration": {
+          "reuse_boundary": "Proposal Decision Uncertain + Well-specified Reject; retained as failed so slug/family is not recycled.",
+          "source_reference": "cgroup freeze/thaw resume lock/socket loss (inspiration only; 2026-07-23)",
+          "source_type": "Linux systems incident pattern"
+        },
+        "status": "failed",
+        "summary": "A single-host process supervisor freezes worker trees before maintenance and thaws them afterward. After thaw, status tools report running counts and healthy cgroup membership, but long-lived workers lose held locks, reopen sockets on the wrong path, and fail the next checkpoint. Nearby healthy control jobs that never freeze still complete. Restore the freeze/thaw path so frozen workers resume with the same observable runtime contract as the never-frozen controls, including lock ownership, socket endpoints, and checkpoint success.",
+        "task_tags": [
+          "cgroups",
+          "freeze-thaw",
+          "process-resume",
+          "linux",
+          "checkpointing"
+        ]
+      },
+      "record": "sudhir_ideas/records/cgroup-freeze-resume-rift.md",
+      "slug": "cgroup-freeze-resume-rift",
+      "status": "captured",
+      "subcategories": [],
+      "summary": "A single-host process supervisor freezes worker trees before maintenance and thaws them afterward. After thaw, status tools report running counts and healthy cgroup membership, but long-lived workers lose held locks, reopen sockets on the wrong path, and fail the next checkpoint. Nearby healthy control jobs that never freeze still complete. Restore the freeze/thaw path so frozen workers resume with the same observable runtime contract as the never-frozen controls, including lock ownership, socket endpoints, and checkpoint success.",
+      "task_slug": null,
+      "title": "Cgroup Freeze Resume Rift",
+      "uniqueness": {
+        "checked_at": null,
+        "closest_analogue": "",
+        "differentiator": "",
+        "evidence": [],
+        "fingerprint": {
+          "domain": "",
+          "mechanism": "",
+          "topology": "",
+          "verification": ""
+        },
+        "reason": "",
+        "scope": [],
+        "status": "pending"
+      },
+      "updated": "2026-07-22T21:16:45Z",
       "validation": {
         "attempt": 0,
         "evidence": [],
@@ -568,6 +1023,289 @@
         "evidence": [],
         "reason": "",
         "status": "not-started"
+      }
+    },
+    "device-node-migration-haze": {
+      "category": "system-administration",
+      "created": "2026-07-22T21:16:44Z",
+      "eligibility_verdict": {
+        "action": "approval",
+        "evaluated_at": "2026-07-22T22:48:47Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-22T21:16:44Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-22T21:16:44Z",
+          "event": "proposal passed",
+          "reason": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (selected sys_env_setup; suggested debugging) \u2014 non-blocking. Metadata similarity PASS."
+        },
+        {
+          "at": "2026-07-22T21:26:13Z",
+          "event": "uniqueness passed",
+          "reason": "Six-scope dossier found no semantic collision"
+        },
+        {
+          "at": "2026-07-22T22:20:23Z",
+          "event": "Step 2a go",
+          "reason": "Step 2a GO: 0F/0W attempt 2; authoring+reviewer specs finalized"
+        },
+        {
+          "at": "2026-07-22T22:20:33Z",
+          "event": "Step 2a go",
+          "reason": "Step 2a GO: attempt 2 scored 0F/0W; finalize lint OK; construction blocked pending Sudhir review"
+        },
+        {
+          "at": "2026-07-22T22:23:30Z",
+          "event": "task linked",
+          "reason": "Linked task registry entry device-node-migration-haze."
+        },
+        {
+          "at": "2026-07-22T22:23:56Z",
+          "event": "Step 2a go",
+          "reason": "Step 2a GO retained after task registration"
+        }
+      ],
+      "id": "IDEA-0033",
+      "in_flight_exemptions": [],
+      "languages": [
+        "c",
+        "rust"
+      ],
+      "next_action": "Approved for construction; create/link the task and execute it.",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "Unix device nodes",
+          "mknod and permissions",
+          "rootfs migration",
+          "bind-mount diagnosis",
+          "service startup debugging",
+          "filesystem metadata fidelity",
+          "systems programming in C or Rust",
+          "offline deterministic fixtures"
+        ],
+        "category_label": "System / Environment Setup & Configuration",
+        "category_slug": "system-administration",
+        "checked_at": "2026-07-22T21:16:44Z",
+        "evidence": [
+          "chat-2026-07-23 Snorkel Task Idea Proposal Check feedback pasted by Sudhir"
+        ],
+        "feedback": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (selected sys_env_setup; suggested debugging) \u2014 non-blocking. Metadata similarity PASS.",
+        "inspiration": {
+          "reuse_boundary": "Inspired by count-green migration that loses device identity; no upstream scripts or tests copied.",
+          "source_reference": "device-node and rootfs migration fidelity incidents (inspiration only; 2026-07-23)",
+          "source_type": "Unix programming / DevOps incident"
+        },
+        "status": "passed",
+        "summary": "A host migration tool copies a service root between staging trees and reports success from file counts and exit codes. After cutover, device-backed services fail to open required nodes, lose expected major/minor identity, or bind the wrong path, while ordinary file bytes look intact. A non-device healthy control tree still migrates cleanly. Make device nodes, permissions, and service open paths match the pre-migration contract, keep the file-only control green, and leave deliberately broken device fixtures rejected.",
+        "task_tags": [
+          "device-nodes",
+          "rootfs-migration",
+          "permissions",
+          "linux",
+          "service-restore"
+        ]
+      },
+      "record": "sudhir_ideas/records/device-node-migration-haze.md",
+      "slug": "device-node-migration-haze",
+      "status": "approved",
+      "subcategories": [],
+      "summary": "A host migration tool copies a service root between staging trees and reports success from file counts and exit codes. After cutover, device-backed services fail to open required nodes, lose expected major/minor identity, or bind the wrong path, while ordinary file bytes look intact. A non-device healthy control tree still migrates cleanly. Make device nodes, permissions, and service open paths match the pre-migration contract, keep the file-only control green, and leave deliberately broken device fixtures rejected.",
+      "task_slug": "device-node-migration-haze",
+      "title": "Device Node Migration Haze",
+      "uniqueness": {
+        "checked_at": "2026-07-22T21:26:13Z",
+        "closest_analogue": "dedup-restore-fidelity (IDEA-0027) \u2014 backup/restore fidelity for hardlinks/sparse/xattrs",
+        "differentiator": "grades device special-file identity and service open paths after count-green migration, not dedup chunk-store round-trips",
+        "evidence": [
+          "sudhir_research/TASK-DNMH-001-RESEARCH.md"
+        ],
+        "fingerprint": {
+          "domain": "host migration / cutover of a service root with device-backed nodes and a file-only healthy control",
+          "mechanism": "count-green copy loses device major/minor identity, mode, or open-path binding while ordinary file bytes stay intact",
+          "topology": "device-node materialization, permission/ownership fidelity, and service open-path/bind wiring must agree",
+          "verification": "pre-migration device identity and open-path contracts; green file-only control; broken-device fixtures stay rejected"
+        },
+        "reason": "Six-scope dossier found no semantic collision",
+        "scope": [
+          "active-tasks",
+          "archived-tasks",
+          "external-research",
+          "idea-registry",
+          "submission-archives",
+          "upstream-corpus"
+        ],
+        "status": "passed"
+      },
+      "updated": "2026-07-22T22:23:56Z",
+      "validation": {
+        "attempt": 2,
+        "evidence": [
+          "sudhir_ideas/specs/device-node-migration-haze-attempt-2-evidence.json"
+        ],
+        "reason": "Step 2a GO retained after task registration",
+        "status": "go"
+      }
+    },
+    "domain-halo-digest-rift": {
+      "category": "scientific-computing",
+      "created": "2026-07-23T13:10:08Z",
+      "eligibility_verdict": {
+        "action": "approval",
+        "evaluated_at": "2026-07-23T13:29:07Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-23T13:10:08Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-23T13:10:14Z",
+          "event": "proposal passed",
+          "reason": "User-reported Check feedback PASS (chat-2026-07-23). Detailed platform rubric axes not pasted; treating as proposal=passed per Sudhir confirmation."
+        },
+        {
+          "at": "2026-07-23T13:11:25Z",
+          "event": "uniqueness passed",
+          "reason": "Six-scope dossier found no semantic collision; see TASK-DHDR-001-RESEARCH.md"
+        },
+        {
+          "at": "2026-07-23T13:14:52Z",
+          "event": "Step 2a go",
+          "reason": "Step 2a attempt 1: 0 FAIL / 0 WARN; validate_loop GO + finalize PASS"
+        },
+        {
+          "at": "2026-07-23T13:15:40Z",
+          "event": "task linked",
+          "reason": "Linked task registry entry domain-halo-digest-rift."
+        }
+      ],
+      "id": "IDEA-0041",
+      "in_flight_exemptions": [],
+      "languages": [
+        "rust",
+        "c"
+      ],
+      "next_action": "Complete uniqueness research, then run Step 2a validation.",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "domain decomposition",
+          "halo exchange / ghost layers",
+          "parallel reduction ordering",
+          "mixed-language numerics (Rust + C)",
+          "partitioned PDE solvers",
+          "floating-point checksum / field digests",
+          "deterministic scientific verification",
+          "partition ownership contracts"
+        ],
+        "category_label": "Scientific Computing",
+        "category_slug": "scientific-computing",
+        "checked_at": "2026-07-23T13:10:14Z",
+        "evidence": [
+          "chat-2026-07-23 Sudhir confirmed Snorkel Task Idea Proposal Check feedback PASS"
+        ],
+        "feedback": "User-reported Check feedback PASS (chat-2026-07-23). Detailed platform rubric axes not pasted; treating as proposal=passed per Sudhir confirmation.",
+        "inspiration": {
+          "reuse_boundary": "Inspired by post-repartition local-green / global-digest-wrong failure shape; no PETSc/Trilinos/deal.II patches or tests copied; distinct from AMG coarsening, sparse Jacobian coloring, and mesh-checkpoint operator reuse.",
+          "source_reference": "Domain halo exchange + global reduce digest drift after repartition (inspiration only; 2026-07-23)",
+          "source_type": "scientific computing / partitioned solver incident pattern"
+        },
+        "status": "passed",
+        "summary": "A partitioned PDE-like solver (C numerical kernels with a Rust partition orchestrator) looks healthy after a domain repartition: local residuals and per-rank norms stay within tolerance, and the orchestrator marks halo exchange synced. Global field digests and cross-rank checksums still diverge from a never-repartitioned twin on the same case, while fresh non-repartition runs must remain stable and byte-stable. Restore correct ghost-layer packing, shared-face ownership, and reduction ordering so repartitioned and twin trajectories agree on global digests and reduction contracts without hard-coding one partition map.",
+        "task_tags": [
+          "halo-exchange",
+          "domain-decomposition",
+          "repartition",
+          "scientific-computing",
+          "field-digests",
+          "rust-c"
+        ]
+      },
+      "record": "sudhir_ideas/records/domain-halo-digest-rift.md",
+      "slug": "domain-halo-digest-rift",
+      "status": "approved",
+      "subcategories": [],
+      "summary": "A partitioned PDE-like solver (C numerical kernels with a Rust partition orchestrator) looks healthy after a domain repartition: local residuals and per-rank norms stay within tolerance, and the orchestrator marks halo exchange synced. Global field digests and cross-rank checksums still diverge from a never-repartitioned twin on the same case, while fresh non-repartition runs must remain stable and byte-stable. Restore correct ghost-layer packing, shared-face ownership, and reduction ordering so repartitioned and twin trajectories agree on global digests and reduction contracts without hard-coding one partition map.",
+      "task_slug": "domain-halo-digest-rift",
+      "title": "Domain Halo Digest Rift",
+      "uniqueness": {
+        "checked_at": "2026-07-23T13:11:25Z",
+        "closest_analogue": "mesh-checkpoint-operator-skew (twin field-digest parity) and reserved reproducible-reduction-parity (reduction-order sensitivity)",
+        "differentiator": "Core is domain repartition halo/ghost packing + shared-face ownership + reduce-order coupling vs never-repartitioned twin digests, not remesh/operator reuse or cross-implementation reduction parity alone",
+        "evidence": [
+          "sudhir_research/TASK-DHDR-001-RESEARCH.md",
+          "sudhir_ideas/proposals/domain-halo-digest-rift.md"
+        ],
+        "fingerprint": {
+          "domain": "Partitioned PDE-like solver with C kernels, Rust partition/halo orchestrator, ghost exchange, shared-face ownership, and never-repartitioned twin control",
+          "mechanism": "After domain repartition, local residuals and orchestrator synced marks stay green while global field digests and cross-rank checksums diverge from the twin because ghost packing, shared-face ownership, and reduction ordering interact",
+          "topology": "Halo pack/unpack, face-ownership authority, reduction-tree/fold order, and Rust\u2194C sync-stage metadata must coordinate; no single-module widen-halo or force-allreduce fix",
+          "verification": "Repartitioned vs never-repartitioned field-digest parity, cross-rank checksum/reduce contracts, byte-stable non-repartition healthy control, deterministic reports"
+        },
+        "reason": "Six-scope dossier found no semantic collision; see TASK-DHDR-001-RESEARCH.md",
+        "scope": [
+          "active-tasks",
+          "archived-tasks",
+          "external-research",
+          "idea-registry",
+          "submission-archives",
+          "upstream-corpus"
+        ],
+        "status": "passed"
+      },
+      "updated": "2026-07-23T13:15:40Z",
+      "validation": {
+        "attempt": 1,
+        "evidence": [
+          "sudhir_ideas/specs/domain-halo-digest-rift-attempt-1-evidence.json",
+          "sudhir_ideas/specs/domain-halo-digest-rift.md"
+        ],
+        "reason": "Step 2a attempt 1: 0 FAIL / 0 WARN; validate_loop GO + finalize PASS",
+        "status": "go"
       }
     },
     "envelope-rotation-shear": {
@@ -1014,6 +1752,137 @@
         "status": "not-recorded"
       }
     },
+    "input-ring-physics-desync": {
+      "category": "games",
+      "created": "2026-07-22T21:16:44Z",
+      "eligibility_verdict": {
+        "action": "step2a-go",
+        "evaluated_at": "2026-07-22T22:24:47Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-22T21:16:44Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-22T21:16:44Z",
+          "event": "proposal passed",
+          "reason": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (selected sim_games; suggested debugging) \u2014 non-blocking. Metadata similarity PASS."
+        },
+        {
+          "at": "2026-07-22T21:26:13Z",
+          "event": "uniqueness passed",
+          "reason": "Six-scope dossier found no semantic collision"
+        },
+        {
+          "at": "2026-07-22T22:24:47Z",
+          "event": "Step 2a go",
+          "reason": "validate_loop Attempt 2 PERFECT 0F/0W; finalize exit 0; construction blocked pending Sudhir OK"
+        }
+      ],
+      "id": "IDEA-0034",
+      "in_flight_exemptions": [],
+      "languages": [
+        "c++",
+        "rust"
+      ],
+      "next_action": "Approved for construction; create/link the task and execute it.",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "fixed-timestep simulation",
+          "input buffering",
+          "deterministic replay",
+          "state hashing",
+          "engine systems programming in C++ or Rust",
+          "floating-point determinism hygiene",
+          "headless test harnesses"
+        ],
+        "category_label": "Interactive / Simulation Tasks / Games",
+        "category_slug": "games",
+        "checked_at": "2026-07-22T21:16:44Z",
+        "evidence": [
+          "chat-2026-07-23 Snorkel Task Idea Proposal Check feedback pasted by Sudhir"
+        ],
+        "feedback": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (selected sim_games; suggested debugging) \u2014 non-blocking. Metadata similarity PASS.",
+        "inspiration": {
+          "reuse_boundary": "Inspired by tick-count-green / digest-wrong replay; no engine source or tests copied; structurally distinct from IDEA-0020 lockstep replay.",
+          "source_reference": "fixed-timestep input-ring replay desync (inspiration only; distinct from lockstep-replay-fray; 2026-07-23)",
+          "source_type": "game engine determinism incident pattern"
+        },
+        "status": "passed",
+        "summary": "A headless game simulation records inputs and claims deterministic replay. Fresh live sessions look fine, but replays of the same seed diverge in entity state digests after a few hundred ticks, while a short healthy-control replay stays bit-stable. Tick-count overlays remain green. Restore determinism so failing replays match the recorded outcome digests without breaking the short healthy controls or accepting approximate physics.",
+        "task_tags": [
+          "deterministic-replay",
+          "game-simulation",
+          "input-buffer",
+          "fixed-timestep",
+          "state-digest"
+        ]
+      },
+      "record": "sudhir_ideas/records/input-ring-physics-desync.md",
+      "slug": "input-ring-physics-desync",
+      "status": "approved",
+      "subcategories": [],
+      "summary": "A headless game simulation records inputs and claims deterministic replay. Fresh live sessions look fine, but replays of the same seed diverge in entity state digests after a few hundred ticks, while a short healthy-control replay stays bit-stable. Tick-count overlays remain green. Restore determinism so failing replays match the recorded outcome digests without breaking the short healthy controls or accepting approximate physics.",
+      "task_slug": null,
+      "title": "Input Ring Physics Desync",
+      "uniqueness": {
+        "checked_at": "2026-07-22T21:26:13Z",
+        "closest_analogue": "lockstep-replay-fray (IDEA-0020); rejected procgen-seed-shear (IDEA-0029) is the same lockstep archetype",
+        "differentiator": "input-ring vs physics consumption with duration-gated healthy control \u2014 not lockstep entity/RNG/event ordering or procgen regeneration",
+        "evidence": [
+          "sudhir_research/TASK-IRPD-001-RESEARCH.md"
+        ],
+        "fingerprint": {
+          "domain": "headless fixed-timestep game sim with input ring, physics integration, and entity state digests",
+          "mechanism": "same-seed long replays diverge on entity digests while tick-count overlays stay green and short healthy-control replays stay bit-stable",
+          "topology": "input-ring enqueue/dequeue vs tick authority, physics consumption of buffered inputs, and digest sampling must coordinate",
+          "verification": "long failing replays match recorded digests; short healthy controls remain bit-stable; tick-count bait is not success"
+        },
+        "reason": "Six-scope dossier found no semantic collision",
+        "scope": [
+          "active-tasks",
+          "archived-tasks",
+          "external-research",
+          "idea-registry",
+          "submission-archives",
+          "upstream-corpus"
+        ],
+        "status": "passed"
+      },
+      "updated": "2026-07-22T22:24:47Z",
+      "validation": {
+        "attempt": 2,
+        "evidence": [
+          "sudhir_ideas/specs/input-ring-physics-desync-attempt-2-evidence.json",
+          "sudhir_ideas/specs/input-ring-physics-desync.md",
+          "sudhir_ideas/specs/input-ring-physics-desync-reviewer.md"
+        ],
+        "reason": "validate_loop Attempt 2 PERFECT 0F/0W; finalize exit 0; construction blocked pending Sudhir OK",
+        "status": "go"
+      }
+    },
     "krylov-orthogonality-loss": {
       "category": "scientific-computing",
       "created": "2026-07-18T20:56:16Z",
@@ -1104,6 +1973,141 @@
         "evidence": [],
         "reason": "",
         "status": "not-started"
+      }
+    },
+    "kv-cache-layout-serve-rift": {
+      "category": "machine-learning",
+      "created": "2026-07-22T21:16:44Z",
+      "eligibility_verdict": {
+        "action": "step2a-go",
+        "evaluated_at": "2026-07-22T22:23:53Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-22T21:16:44Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-22T21:16:44Z",
+          "event": "proposal passed",
+          "reason": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (selected machine_learning; suggested debugging) \u2014 non-blocking. Metadata similarity PASS."
+        },
+        {
+          "at": "2026-07-22T21:26:13Z",
+          "event": "uniqueness passed",
+          "reason": "Six-scope dossier found no semantic collision"
+        },
+        {
+          "at": "2026-07-22T22:23:21Z",
+          "event": "Step 2a in-progress",
+          "reason": "Step 2a attempt 1 drafting"
+        },
+        {
+          "at": "2026-07-22T22:23:53Z",
+          "event": "Step 2a go",
+          "reason": "Step 2a GO attempt 3: 0 FAIL / 0 WARN; distributed C++/Rust short/long serve topology; symptoms-only"
+        }
+      ],
+      "id": "IDEA-0035",
+      "in_flight_exemptions": [],
+      "languages": [
+        "c++",
+        "rust"
+      ],
+      "next_action": "Approved for construction; create/link the task and execute it.",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "transformer inference",
+          "KV cache layout",
+          "positional encoding at serve time",
+          "weight export/load contracts",
+          "C++ or Rust runtime debugging",
+          "token-sequence verification",
+          "numerical layout diagnosis"
+        ],
+        "category_label": "Machine Learning / Model Training / Inference",
+        "category_slug": "machine-learning",
+        "checked_at": "2026-07-22T21:16:44Z",
+        "evidence": [
+          "chat-2026-07-23 Snorkel Task Idea Proposal Check feedback pasted by Sudhir"
+        ],
+        "feedback": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Accept; Outcome-verified: Accept). Category alignment FAIL (selected machine_learning; suggested debugging) \u2014 non-blocking. Metadata similarity PASS.",
+        "inspiration": {
+          "reuse_boundary": "Inspired by short-prompt-green / long-prompt-wrong serve behavior; no model weights, papers, or benchmark harnesses copied.",
+          "source_reference": "long-prompt KV/layout serve divergence vs short-prompt control (inspiration only; distinct from train-serve token rift; 2026-07-23)",
+          "source_type": "ML serving incident pattern"
+        },
+        "status": "passed",
+        "summary": "An offline inference stack loads exported weights and serves greedy decode for fixed prompts. Training-side export checks pass and short prompts match golden token sequences, but longer prompts diverge while cache-hit counters and latency summaries still look healthy. Short-prompt controls must remain unchanged. Make long-prompt decode match the golden sequences without breaking short controls or inventing a new model architecture.",
+        "task_tags": [
+          "inference",
+          "kv-cache",
+          "positional-encoding",
+          "token-decode",
+          "model-serving"
+        ]
+      },
+      "record": "sudhir_ideas/records/kv-cache-layout-serve-rift.md",
+      "slug": "kv-cache-layout-serve-rift",
+      "status": "approved",
+      "subcategories": [],
+      "summary": "An offline inference stack loads exported weights and serves greedy decode for fixed prompts. Training-side export checks pass and short prompts match golden token sequences, but longer prompts diverge while cache-hit counters and latency summaries still look healthy. Short-prompt controls must remain unchanged. Make long-prompt decode match the golden sequences without breaking short controls or inventing a new model architecture.",
+      "task_slug": null,
+      "title": "KV Cache Layout Serve Rift",
+      "uniqueness": {
+        "checked_at": "2026-07-22T21:26:13Z",
+        "closest_analogue": "tokenizer-serving-rift / train-serve token rift (IDEA-0016); archive transformer-inference-latency is SLO-only",
+        "differentiator": "KV/positional layout correctness under short-green/long-wrong length metamorphic, not tokenizer documentation falsification or latency SLO",
+        "evidence": [
+          "sudhir_research/TASK-KCLS-001-RESEARCH.md"
+        ],
+        "fingerprint": {
+          "domain": "offline transformer serve stack with exported weights, KV cache, and greedy decode for fixed prompts",
+          "mechanism": "short prompts and cache-hit/latency summaries stay healthy while long-prompt greedy sequences diverge from goldens",
+          "topology": "weight load/layout binding, KV-cache index write/read, and serve-time positional encoding must agree",
+          "verification": "long-prompt golden token sequences; unchanged short-prompt controls; cache-hit bait is not success"
+        },
+        "reason": "Six-scope dossier found no semantic collision",
+        "scope": [
+          "active-tasks",
+          "archived-tasks",
+          "external-research",
+          "idea-registry",
+          "submission-archives",
+          "upstream-corpus"
+        ],
+        "status": "passed"
+      },
+      "updated": "2026-07-22T22:23:53Z",
+      "validation": {
+        "attempt": 3,
+        "evidence": [
+          "sudhir_ideas/specs/kv-cache-layout-serve-rift-attempt-3-evidence.json",
+          "sudhir_ideas/specs/kv-cache-layout-serve-rift-validation-log.md"
+        ],
+        "reason": "Step 2a GO attempt 3: 0 FAIL / 0 WARN; distributed C++/Rust short/long serve topology; symptoms-only",
+        "status": "go"
       }
     },
     "legacy-plc-wire-restore": {
@@ -1501,6 +2505,148 @@
         "evidence": [],
         "reason": "Historical Step 2a evidence was not recorded.",
         "status": "not-recorded"
+      }
+    },
+    "mesh-checkpoint-operator-skew": {
+      "category": "scientific-computing",
+      "created": "2026-07-22T21:16:43Z",
+      "eligibility_verdict": {
+        "action": "approval",
+        "evaluated_at": "2026-07-22T22:04:31Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-22T21:16:43Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-22T21:16:43Z",
+          "event": "proposal passed",
+          "reason": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Strong Accept; Outcome-verified: Accept). Category alignment FAIL (selected scientific; suggested debugging) \u2014 treated as non-blocking per author policy. Metadata similarity PASS."
+        },
+        {
+          "at": "2026-07-22T21:18:35Z",
+          "event": "uniqueness passed",
+          "reason": "Six-scope dossier found no semantic collision; see TASK-MCOS-001-RESEARCH.md"
+        },
+        {
+          "at": "2026-07-22T21:18:46Z",
+          "event": "Step 2a in-progress",
+          "reason": "Uniqueness PASS; starting Step 2a validate_loop for primary slate idea"
+        },
+        {
+          "at": "2026-07-22T21:22:48Z",
+          "event": "Step 2a go",
+          "reason": "Step 2a attempt 1: 0 FAIL / 0 WARN; validate_loop GO + finalize PASS"
+        },
+        {
+          "at": "2026-07-22T21:23:01Z",
+          "event": "task linked",
+          "reason": "Linked task registry entry mesh-checkpoint-operator-skew."
+        }
+      ],
+      "id": "IDEA-0032",
+      "in_flight_exemptions": [],
+      "languages": [
+        "c++",
+        "fortran",
+        "rust"
+      ],
+      "next_action": "Step 2b construction under sudhir_tasks/active/mesh-checkpoint-operator-skew (take over if background author stalled).",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "finite-element or mesh-based solvers",
+          "checkpoint/restart semantics",
+          "operator reuse under geometry change",
+          "numerical residual diagnosis",
+          "mixed-language numerics",
+          "floating-point reduction discipline",
+          "deterministic scientific verification"
+        ],
+        "category_label": "Scientific Computing",
+        "category_slug": "scientific-computing",
+        "checked_at": "2026-07-22T21:16:43Z",
+        "evidence": [
+          "chat-2026-07-23 Snorkel Task Idea Proposal Check feedback pasted by Sudhir"
+        ],
+        "feedback": "Similarity PASS. Idea quality PASS (Decision: Accept; Verifiable: Accept; Well-specified: Uncertain; Solvable: Accept; Difficult: Accept; Interesting: Strong Accept; Outcome-verified: Accept). Category alignment FAIL (selected scientific; suggested debugging) \u2014 treated as non-blocking per author policy. Metadata similarity PASS.",
+        "inspiration": {
+          "reuse_boundary": "Inspired by remesh+resume residual green / solution wrong failure shape; no upstream patch, issue prose, or benchmark tests copied.",
+          "source_reference": "checkpoint/restart after remesh operator-reuse failures (inspiration only; Terminal-Bench / HPC incident patterns 2026-07-23)",
+          "source_type": "real DevOps/scientific incident pattern"
+        },
+        "status": "passed",
+        "summary": "A mixed-language scientific solver checkpoints mid-run, remeshes, then resumes. After resume, residual norms and iteration counts can look plausible, but solution-field digests and pointwise residuals disagree with a never-interrupted twin run on the same case. Fresh runs without checkpoint remain correct and must stay byte-stable. Bring interrupted and uninterrupted trajectories into agreement on field digests, residual contracts, and the healthy no-checkpoint control.",
+        "task_tags": [
+          "checkpoint-restart",
+          "mesh",
+          "operator-cache",
+          "scientific-computing",
+          "residuals"
+        ]
+      },
+      "record": "sudhir_ideas/records/mesh-checkpoint-operator-skew.md",
+      "slug": "mesh-checkpoint-operator-skew",
+      "status": "approved",
+      "subcategories": [],
+      "summary": "A mixed-language scientific solver checkpoints mid-run, remeshes, then resumes. After resume, residual norms and iteration counts can look plausible, but solution-field digests and pointwise residuals disagree with a never-interrupted twin run on the same case. Fresh runs without checkpoint remain correct and must stay byte-stable. Bring interrupted and uninterrupted trajectories into agreement on field digests, residual contracts, and the healthy no-checkpoint control.",
+      "task_slug": "mesh-checkpoint-operator-skew",
+      "title": "Mesh Checkpoint Operator Skew",
+      "uniqueness": {
+        "checked_at": "2026-07-22T21:18:35Z",
+        "closest_analogue": "Reserved krylov-orthogonality-loss (restart-coupled iterative invariants) and active sparse-jacobian-color-contract (residual metamorphic parity)",
+        "differentiator": "Core is geometry-changing remesh+resume with operator reuse judged by twin-run field digests, not Krylov subspace storage or sparse Jacobian coloring/unpack",
+        "evidence": [
+          "sudhir_research/TASK-MCOS-001-RESEARCH.md",
+          "sudhir_ideas/proposals/mesh-checkpoint-operator-skew.md"
+        ],
+        "fingerprint": {
+          "domain": "Mixed-language scientific mesh solver with mid-run checkpoint, remesh, resume, and twin uninterrupted controls",
+          "mechanism": "After remesh+resume, residual/iteration bait stays green while solution-field digests disagree with a never-interrupted twin because geometry-bound operator/assembly state is reused across a changed mesh authority",
+          "topology": "Checkpoint serialization, remesh/geometry authority, operator/assembly cache invalidation, and mixed-language field packing/reduction must coordinate; no single-module clear-cache fix",
+          "verification": "Interrupted vs uninterrupted field-digest parity, residual contracts, byte-stable no-checkpoint healthy control, deterministic reports"
+        },
+        "reason": "Six-scope dossier found no semantic collision; see TASK-MCOS-001-RESEARCH.md",
+        "scope": [
+          "active-tasks",
+          "archived-tasks",
+          "external-research",
+          "idea-registry",
+          "submission-archives",
+          "upstream-corpus"
+        ],
+        "status": "passed"
+      },
+      "updated": "2026-07-22T21:27:13Z",
+      "validation": {
+        "attempt": 1,
+        "evidence": [
+          "sudhir_ideas/specs/mesh-checkpoint-operator-skew-attempt-1-evidence.json",
+          "sudhir_ideas/specs/mesh-checkpoint-operator-skew.md"
+        ],
+        "reason": "Step 2a attempt 1: 0 FAIL / 0 WARN; validate_loop GO + finalize PASS",
+        "status": "go"
       }
     },
     "musl-sysroot-splice": {
@@ -1972,27 +3118,23 @@
       "category": "build-and-dependency-management",
       "created": "2026-07-19T10:58:41Z",
       "eligibility_verdict": {
-        "action": "migration-default",
-        "evaluated_at": null,
+        "action": "approval",
+        "evaluated_at": "2026-07-22T19:48:15Z",
         "house": {
           "blocking": false,
           "exemption_ids": [],
-          "reasons": [
-            "Record predates ADR-0016 eligibility fields."
-          ],
+          "reasons": [],
           "rule_ids": [],
-          "status": "grandfathered-pending-review"
+          "status": "eligible"
         },
         "official": {
           "blocking": false,
           "exemption_ids": [],
-          "reasons": [
-            "Record predates ADR-0016 eligibility fields."
-          ],
+          "reasons": [],
           "rule_ids": [],
-          "status": "grandfathered-pending-review"
+          "status": "eligible"
         },
-        "policy_snapshot_id": "pre-ADR-0016"
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
       },
       "first_submitted_at": null,
       "first_submitted_evidence": [],
@@ -2697,12 +3839,121 @@
         "status": "not-started"
       }
     },
+    "sealed-policy-ambient-leak": {
+      "category": "security",
+      "created": "2026-07-22T21:16:45Z",
+      "eligibility_verdict": {
+        "action": "capture",
+        "evaluated_at": "2026-07-22T21:16:45Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "history": [
+        {
+          "at": "2026-07-22T21:16:45Z",
+          "event": "idea captured",
+          "reason": "Idea captured."
+        },
+        {
+          "at": "2026-07-22T21:16:45Z",
+          "event": "proposal failed",
+          "reason": "Similarity PASS. Idea quality FAIL (Decision: Reject; Verifiable: Uncertain; Well-specified: Reject; Solvable: Uncertain; Difficult: Accept; Interesting: Reject; Outcome-verified: Uncertain). Category alignment FAIL (suggested debugging). Metadata similarity PASS."
+        }
+      ],
+      "id": "IDEA-0038",
+      "in_flight_exemptions": [],
+      "languages": [
+        "c",
+        "rust"
+      ],
+      "next_action": "Revise the proposal fields and rerun Check feedback, or reject the idea.",
+      "number_of_milestones": 0,
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "proposal_check": {
+        "associated_skills": [
+          "Linux capabilities",
+          "privilege dropping",
+          "policy reload semantics",
+          "ambient authority analysis",
+          "setuid helper hardening",
+          "path confinement",
+          "systems programming in C or Rust",
+          "adversarial scenario testing"
+        ],
+        "category_label": "Security / Cryptography / Vulnerability Demonstration",
+        "category_slug": "security",
+        "checked_at": "2026-07-22T21:16:45Z",
+        "evidence": [
+          "chat-2026-07-23 Snorkel Task Idea Proposal Check feedback pasted by Sudhir"
+        ],
+        "feedback": "Similarity PASS. Idea quality FAIL (Decision: Reject; Verifiable: Uncertain; Well-specified: Reject; Solvable: Uncertain; Difficult: Accept; Interesting: Reject; Outcome-verified: Uncertain). Category alignment FAIL (suggested debugging). Metadata similarity PASS.",
+        "inspiration": {
+          "reuse_boundary": "Platform Idea quality Reject; retained as failed so family is not silently recycled.",
+          "source_reference": "sealed policy ambient authority after reload (inspiration only; 2026-07-23)",
+          "source_type": "security / capability incident pattern"
+        },
+        "status": "failed",
+        "summary": "An offline privilege helper applies a sealed local policy, drops privileges, then performs sealed-path file operations for callers. After a policy reload and session restore, some callers still succeed on paths the sealed policy should deny, while others are denied incorrectly even though the policy text looks current. Surface health checks only count allow/deny totals and stay green. Make sealed-path enforcement and restored sessions agree so denied and allowed controls match the intended policy outcomes without weakening healthy allow cases.",
+        "task_tags": [
+          "capabilities",
+          "policy-reload",
+          "path-confinement",
+          "privilege-drop",
+          "security"
+        ]
+      },
+      "record": "sudhir_ideas/records/sealed-policy-ambient-leak.md",
+      "slug": "sealed-policy-ambient-leak",
+      "status": "captured",
+      "subcategories": [],
+      "summary": "An offline privilege helper applies a sealed local policy, drops privileges, then performs sealed-path file operations for callers. After a policy reload and session restore, some callers still succeed on paths the sealed policy should deny, while others are denied incorrectly even though the policy text looks current. Surface health checks only count allow/deny totals and stay green. Make sealed-path enforcement and restored sessions agree so denied and allowed controls match the intended policy outcomes without weakening healthy allow cases.",
+      "task_slug": null,
+      "title": "Sealed Policy Ambient Leak",
+      "uniqueness": {
+        "checked_at": null,
+        "closest_analogue": "",
+        "differentiator": "",
+        "evidence": [],
+        "fingerprint": {
+          "domain": "",
+          "mechanism": "",
+          "topology": "",
+          "verification": ""
+        },
+        "reason": "",
+        "scope": [],
+        "status": "pending"
+      },
+      "updated": "2026-07-22T21:16:45Z",
+      "validation": {
+        "attempt": 0,
+        "evidence": [],
+        "reason": "",
+        "status": "not-started"
+      }
+    },
     "sparse-jacobian-color-contract": {
       "category": "scientific-computing",
       "created": "2026-07-18T21:00:32Z",
       "eligibility_verdict": {
         "action": "approval",
-        "evaluated_at": "2026-07-21T01:33:42Z",
+        "evaluated_at": "2026-07-22T22:11:28Z",
         "house": {
           "blocking": false,
           "exemption_ids": [],
@@ -3368,6 +4619,324 @@
       "subcategories": [],
       "title": "Cluster Green Tail Red",
       "updated": "2026-07-18T21:33:43Z"
+    },
+    "device-node-migration-haze": {
+      "category": "system-administration",
+      "created": "2026-07-22T22:23:30Z",
+      "eligibility_verdict": {
+        "action": "source-refresh",
+        "evaluated_at": "2026-07-22T22:48:47Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "evidence": {
+        "nop": {
+          "at": "2026-07-22T22:50:08Z",
+          "job": "2026-07-23__04-19-29",
+          "mean": 0.0,
+          "path": "jobs/2026-07-23__04-19-29"
+        },
+        "oracle_10x": {
+          "at": "2026-07-22T22:50:08Z",
+          "job": "2026-07-23__04-13-43",
+          "mean": 1.0,
+          "path": "jobs/2026-07-23__04-13-43"
+        },
+        "oracle_1x": {
+          "at": "2026-07-22T22:50:08Z",
+          "job": "2026-07-23__04-18-54",
+          "mean": 1.0,
+          "path": "jobs/2026-07-23__04-18-54"
+        }
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "gates": {},
+      "idea_slug": "device-node-migration-haze",
+      "in_flight_exemptions": [],
+      "languages": [
+        "c",
+        "rust"
+      ],
+      "learning": {
+        "cm_hits": [],
+        "form_refs": {
+          "difficulty": "sudhir_reviews/device-node-migration-haze/REV-2/DIFFICULTY.md",
+          "dsv_audit": "sudhir_reviews/device-node-migration-haze/REV-2/DSV-HUMANIZER-AUDIT.json",
+          "rubric": "sudhir_reviews/device-node-migration-haze/REV-2/RUBRIC.md",
+          "solution": "sudhir_reviews/device-node-migration-haze/REV-2/SOLUTION.md",
+          "verification": "sudhir_reviews/device-node-migration-haze/REV-2/VERIFICATION.md"
+        },
+        "patterns_applied": []
+      },
+      "next_action": "Upload zip to Snorkel; paste REV-2 DSV+RUBRIC.",
+      "notes": [
+        {
+          "at": "2026-07-22T22:23:41Z",
+          "text": "phase -> construct"
+        },
+        {
+          "at": "2026-07-22T22:42:26Z",
+          "text": "phase -> gates"
+        },
+        {
+          "at": "2026-07-22T22:42:31Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop"
+        },
+        {
+          "at": "2026-07-22T22:42:32Z",
+          "text": "revision 2: REV-1 Step 3b paper review after Step 2b PASS"
+        },
+        {
+          "at": "2026-07-22T22:43:12Z",
+          "text": "phase -> review"
+        },
+        {
+          "at": "2026-07-22T22:46:20Z",
+          "text": "recorded Harbor evidence: oracle_10x"
+        },
+        {
+          "at": "2026-07-22T22:47:34Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop, oracle_10x"
+        },
+        {
+          "at": "2026-07-22T22:47:48Z",
+          "text": "form-capture: DIFFICULTY.md, SOLUTION.md, VERIFICATION.md, RUBRIC.md, DSV-HUMANIZER-AUDIT.json"
+        },
+        {
+          "at": "2026-07-22T22:48:47Z",
+          "text": "phase -> package"
+        },
+        {
+          "at": "2026-07-22T22:50:08Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop, oracle_10x"
+        }
+      ],
+      "number_of_milestones": 0,
+      "package": {
+        "approved": true,
+        "at": "2026-07-22T22:48:21Z",
+        "index": "sudhir_progress/CANONICAL_SUBMISSION_INDEX.json",
+        "index_archive_count": 7,
+        "member_count": 60,
+        "sha256": "3d78909e8835a75c1b4f0c7f55e53b7c0712065dc0f526e22bbcd6827fd47e24",
+        "validated": true,
+        "zip": "sudhir_tasks_ready_to_submit/device-node-migration-haze.zip"
+      },
+      "phase": "package",
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "revision": 2,
+      "revisions": [
+        {
+          "cm_ids": [],
+          "feedback_ref": "sudhir_reviews/device-node-migration-haze/REV-1/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/device-node-migration-haze/REV-1/DIFFICULTY.md",
+            "rubric": "sudhir_reviews/device-node-migration-haze/REV-1/RUBRIC.md",
+            "solution": "sudhir_reviews/device-node-migration-haze/REV-1/SOLUTION.md",
+            "verification": "sudhir_reviews/device-node-migration-haze/REV-1/VERIFICATION.md"
+          },
+          "n": 1,
+          "opened_at": "2026-07-22T22:42:31Z",
+          "reason": "evidence capture",
+          "rubric_ref": "sudhir_reviews/device-node-migration-haze/REV-1/RUBRIC.md",
+          "zip_sha": null
+        },
+        {
+          "cm_ids": [],
+          "feedback_ref": "sudhir_reviews/device-node-migration-haze/REV-2/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/device-node-migration-haze/REV-2/DIFFICULTY.md",
+            "dsv_audit": "sudhir_reviews/device-node-migration-haze/REV-2/DSV-HUMANIZER-AUDIT.json",
+            "rubric": "sudhir_reviews/device-node-migration-haze/REV-2/RUBRIC.md",
+            "solution": "sudhir_reviews/device-node-migration-haze/REV-2/SOLUTION.md",
+            "verification": "sudhir_reviews/device-node-migration-haze/REV-2/VERIFICATION.md"
+          },
+          "n": 2,
+          "opened_at": "2026-07-22T22:42:32Z",
+          "reason": "REV-1 Step 3b paper review after Step 2b PASS",
+          "rubric_ref": "sudhir_reviews/device-node-migration-haze/REV-2/RUBRIC.md",
+          "zip_sha": "3d78909e8835a75c1b4f0c7f55e53b7c0712065dc0f526e22bbcd6827fd47e24"
+        }
+      ],
+      "slug": "device-node-migration-haze",
+      "snorkel": {},
+      "source_dir": "sudhir_tasks/active/device-node-migration-haze",
+      "subcategories": [],
+      "title": "Device Node Migration Haze",
+      "updated": "2026-07-22T22:50:08Z"
+    },
+    "domain-halo-digest-rift": {
+      "category": "scientific-computing",
+      "created": "2026-07-23T13:15:40Z",
+      "eligibility_verdict": {
+        "action": "source-refresh",
+        "evaluated_at": "2026-07-23T13:29:07Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "evidence": {
+        "nop": {
+          "at": "2026-07-23T13:28:25Z",
+          "job": "2026-07-23__18-54-43",
+          "mean": 0.0,
+          "path": "jobs/2026-07-23__18-54-43"
+        },
+        "oracle_10x": {
+          "at": "2026-07-23T13:28:25Z",
+          "job": "2026-07-23__18-56-03",
+          "mean": 1.0,
+          "path": "jobs/2026-07-23__18-56-03"
+        },
+        "oracle_1x": {
+          "at": "2026-07-23T13:28:25Z",
+          "job": "2026-07-23__18-53-55",
+          "mean": 1.0,
+          "path": "jobs/2026-07-23__18-53-55"
+        }
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "gates": {
+        "collapse": {
+          "at": "2026-07-23T13:29:02Z",
+          "cmd": "python3 collapse_check.py /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/domain-halo-digest-rift",
+          "exit_code": 2,
+          "result": "WARN"
+        },
+        "dockerfile": {
+          "at": "2026-07-23T13:29:01Z",
+          "cmd": "python3 dockerfile_check.py /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/domain-halo-digest-rift",
+          "exit_code": 0,
+          "result": "PASS"
+        },
+        "integrity": {
+          "at": "2026-07-23T13:29:02Z",
+          "cmd": "python3 task_integrity.py verify /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/domain-halo-digest-rift",
+          "exit_code": 0,
+          "result": "PASS"
+        },
+        "static": {
+          "at": "2026-07-23T13:29:01Z",
+          "cmd": "python3 run_static_checks.py --task-dir /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/domain-halo-digest-rift --version edition_2",
+          "exit_code": 0,
+          "result": "PASS"
+        }
+      },
+      "idea_slug": "domain-halo-digest-rift",
+      "in_flight_exemptions": [],
+      "languages": [
+        "rust",
+        "c"
+      ],
+      "learning": {
+        "cm_hits": [],
+        "form_refs": {
+          "difficulty": "sudhir_reviews/domain-halo-digest-rift/REV-1/DIFFICULTY.md",
+          "dsv_audit": "sudhir_reviews/domain-halo-digest-rift/REV-1/DSV-HUMANIZER-AUDIT.json",
+          "rubric": "sudhir_reviews/domain-halo-digest-rift/REV-1/RUBRIC.md",
+          "solution": "sudhir_reviews/domain-halo-digest-rift/REV-1/SOLUTION.md",
+          "verification": "sudhir_reviews/domain-halo-digest-rift/REV-1/VERIFICATION.md"
+        },
+        "patterns_applied": []
+      },
+      "next_action": "Upload zip to Snorkel; paste REV-1 DSV+RUBRIC",
+      "notes": [
+        {
+          "at": "2026-07-23T13:22:25Z",
+          "text": "phase -> construct"
+        },
+        {
+          "at": "2026-07-23T13:22:25Z",
+          "text": "revision 1: Initial construction REV-1 for gates, DSV, package"
+        },
+        {
+          "at": "2026-07-23T13:25:41Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop"
+        },
+        {
+          "at": "2026-07-23T13:25:41Z",
+          "text": "form-capture: DIFFICULTY.md, SOLUTION.md, VERIFICATION.md, RUBRIC.md, DSV-HUMANIZER-AUDIT.json"
+        },
+        {
+          "at": "2026-07-23T13:28:25Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop, oracle_10x"
+        },
+        {
+          "at": "2026-07-23T13:28:26Z",
+          "text": "phase -> package"
+        },
+        {
+          "at": "2026-07-23T13:29:07Z",
+          "text": "phase -> package"
+        }
+      ],
+      "number_of_milestones": 0,
+      "package": {
+        "approved": true,
+        "at": "2026-07-23T13:28:25Z",
+        "index": "sudhir_progress/CANONICAL_SUBMISSION_INDEX.json",
+        "index_archive_count": 9,
+        "member_count": 33,
+        "sha256": "5bd556eed8d59611d1bcff9010064d4a5c1f8b29cd370b1e71973863a48b7a21",
+        "validated": true,
+        "zip": "sudhir_tasks_ready_to_submit/domain-halo-digest-rift.zip"
+      },
+      "phase": "package",
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "revision": 1,
+      "revisions": [
+        {
+          "cm_ids": [],
+          "feedback_ref": "sudhir_reviews/domain-halo-digest-rift/REV-1/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/domain-halo-digest-rift/REV-1/DIFFICULTY.md",
+            "dsv_audit": "sudhir_reviews/domain-halo-digest-rift/REV-1/DSV-HUMANIZER-AUDIT.json",
+            "rubric": "sudhir_reviews/domain-halo-digest-rift/REV-1/RUBRIC.md",
+            "solution": "sudhir_reviews/domain-halo-digest-rift/REV-1/SOLUTION.md",
+            "verification": "sudhir_reviews/domain-halo-digest-rift/REV-1/VERIFICATION.md"
+          },
+          "n": 1,
+          "opened_at": "2026-07-23T13:22:25Z",
+          "reason": "Initial construction REV-1 for gates, DSV, package",
+          "rubric_ref": "sudhir_reviews/domain-halo-digest-rift/REV-1/RUBRIC.md",
+          "zip_sha": "5bd556eed8d59611d1bcff9010064d4a5c1f8b29cd370b1e71973863a48b7a21"
+        }
+      ],
+      "slug": "domain-halo-digest-rift",
+      "snorkel": {},
+      "source_dir": "sudhir_tasks/active/domain-halo-digest-rift",
+      "subcategories": [],
+      "title": "Domain Halo Digest Rift",
+      "updated": "2026-07-23T13:29:07Z"
     },
     "envelope-rotation-shear": {
       "category": "security",
@@ -4304,50 +5873,216 @@
       "title": "Maritime Lane Weather Weave",
       "updated": "2026-07-18T21:33:43Z"
     },
-    "musl-sysroot-splice": {
-      "category": "build-and-dependency-management",
-      "created": "2026-07-18T18:34:34Z",
+    "mesh-checkpoint-operator-skew": {
+      "category": "scientific-computing",
+      "created": "2026-07-22T21:23:01Z",
       "eligibility_verdict": {
-        "action": "migration-default",
-        "evaluated_at": null,
+        "action": "package",
+        "evaluated_at": "2026-07-22T22:04:31Z",
         "house": {
           "blocking": false,
           "exemption_ids": [],
-          "reasons": [
-            "Record predates ADR-0016 eligibility fields."
-          ],
+          "reasons": [],
           "rule_ids": [],
-          "status": "grandfathered-pending-review"
+          "status": "eligible"
         },
         "official": {
           "blocking": false,
           "exemption_ids": [],
-          "reasons": [
-            "Record predates ADR-0016 eligibility fields."
-          ],
+          "reasons": [],
           "rule_ids": [],
-          "status": "grandfathered-pending-review"
+          "status": "eligible"
         },
-        "policy_snapshot_id": "pre-ADR-0016"
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
       },
       "evidence": {
         "nop": {
-          "at": "2026-07-19T09:33:40Z",
-          "job": "2026-07-19__15-03-08",
+          "at": "2026-07-22T22:04:16Z",
+          "job": "2026-07-23__03-31-28",
           "mean": 0.0,
-          "path": "jobs/2026-07-19__15-03-08"
+          "path": "jobs/2026-07-23__03-31-28"
         },
         "oracle_10x": {
-          "at": "2026-07-19T09:33:40Z",
-          "job": "2026-07-19__14-58-38",
+          "at": "2026-07-22T22:04:16Z",
+          "job": "2026-07-23__03-32-02",
           "mean": 1.0,
-          "path": "jobs/2026-07-19__14-58-38"
+          "path": "jobs/2026-07-23__03-32-02"
         },
         "oracle_1x": {
-          "at": "2026-07-19T09:24:33Z",
-          "job": "2026-07-19__14-50-19",
+          "at": "2026-07-22T22:04:16Z",
+          "job": "2026-07-23__03-30-47",
           "mean": 1.0,
-          "path": "jobs/2026-07-19__14-50-19"
+          "path": "jobs/2026-07-23__03-30-47"
+        }
+      },
+      "first_submitted_at": null,
+      "first_submitted_evidence": [],
+      "gates": {},
+      "idea_slug": "mesh-checkpoint-operator-skew",
+      "in_flight_exemptions": [],
+      "languages": [
+        "c++",
+        "rust",
+        "fortran"
+      ],
+      "learning": {
+        "cm_hits": [],
+        "form_refs": {
+          "difficulty": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/DIFFICULTY.md",
+          "dsv_audit": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/DSV-HUMANIZER-AUDIT.json",
+          "rubric": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/RUBRIC.md",
+          "solution": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/SOLUTION.md",
+          "verification": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/VERIFICATION.md"
+        },
+        "patterns_applied": []
+      },
+      "next_action": "Upload the zip to the Snorkel platform, then `sudhir_task.py phase <slug> submitted`. Store form paste fields with `form-capture` if not already in the REV dossier.",
+      "notes": [
+        {
+          "at": "2026-07-22T21:23:11Z",
+          "text": "phase -> construct"
+        },
+        {
+          "at": "2026-07-22T21:39:21Z",
+          "text": "phase -> construct"
+        },
+        {
+          "at": "2026-07-22T21:39:56Z",
+          "text": "phase -> gates"
+        },
+        {
+          "at": "2026-07-22T21:39:56Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop"
+        },
+        {
+          "at": "2026-07-22T21:43:04Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop"
+        },
+        {
+          "at": "2026-07-22T21:43:04Z",
+          "text": "phase -> review"
+        },
+        {
+          "at": "2026-07-22T21:49:42Z",
+          "text": "recorded Harbor evidence: nop, oracle_10x"
+        },
+        {
+          "at": "2026-07-22T21:50:29Z",
+          "text": "form-capture: DIFFICULTY.md, SOLUTION.md, VERIFICATION.md, RUBRIC.md, DSV-HUMANIZER-AUDIT.json"
+        },
+        {
+          "at": "2026-07-22T21:51:08Z",
+          "text": "phase -> package"
+        },
+        {
+          "at": "2026-07-22T22:00:04Z",
+          "text": "revision 2: Platform Fast Static: ruff F841 unused buf in test_outputs.py; add requirements.txt alias for hash-lock probe"
+        },
+        {
+          "at": "2026-07-22T22:03:50Z",
+          "text": "form-capture: DIFFICULTY.md, SOLUTION.md, VERIFICATION.md, RUBRIC.md, DSV-HUMANIZER-AUDIT.json"
+        },
+        {
+          "at": "2026-07-22T22:04:16Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop, oracle_10x"
+        }
+      ],
+      "number_of_milestones": 0,
+      "package": {
+        "approved": true,
+        "at": "2026-07-22T22:04:31Z",
+        "index": "sudhir_progress/CANONICAL_SUBMISSION_INDEX.json",
+        "index_archive_count": 7,
+        "member_count": 36,
+        "sha256": "7869765502289073a1b02563da0656339d26295fd3d4ca49ab62a3735df43075",
+        "validated": true,
+        "zip": "sudhir_tasks_ready_to_submit/mesh-checkpoint-operator-skew.zip"
+      },
+      "phase": "package",
+      "policy_snapshot_id": "terminus-ec-2026-07-21",
+      "portfolio_scope": "active",
+      "revision": 2,
+      "revisions": [
+        {
+          "cm_ids": [],
+          "feedback_ref": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-1/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-1/DIFFICULTY.md",
+            "dsv_audit": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-1/DSV-HUMANIZER-AUDIT.json",
+            "rubric": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-1/RUBRIC.md",
+            "solution": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-1/SOLUTION.md",
+            "verification": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-1/VERIFICATION.md"
+          },
+          "n": 1,
+          "opened_at": "2026-07-22T21:39:56Z",
+          "reason": "evidence capture",
+          "rubric_ref": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-1/RUBRIC.md",
+          "zip_sha": "41b5091649dac12143f2b2cc3d25f0ad953c09f972972dba59b33de1dee6052d"
+        },
+        {
+          "cm_ids": [],
+          "feedback_ref": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/DIFFICULTY.md",
+            "dsv_audit": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/DSV-HUMANIZER-AUDIT.json",
+            "rubric": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/RUBRIC.md",
+            "solution": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/SOLUTION.md",
+            "verification": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/VERIFICATION.md"
+          },
+          "n": 2,
+          "opened_at": "2026-07-22T22:00:04Z",
+          "reason": "Platform Fast Static: ruff F841 unused buf in test_outputs.py; add requirements.txt alias for hash-lock probe",
+          "rubric_ref": "sudhir_reviews/mesh-checkpoint-operator-skew/REV-2/RUBRIC.md",
+          "zip_sha": "7869765502289073a1b02563da0656339d26295fd3d4ca49ab62a3735df43075"
+        }
+      ],
+      "slug": "mesh-checkpoint-operator-skew",
+      "snorkel": {},
+      "source_dir": "sudhir_tasks/active/mesh-checkpoint-operator-skew",
+      "subcategories": [],
+      "title": "Mesh Checkpoint Operator Skew",
+      "updated": "2026-07-22T22:04:32Z"
+    },
+    "musl-sysroot-splice": {
+      "category": "build-and-dependency-management",
+      "created": "2026-07-18T18:34:34Z",
+      "eligibility_verdict": {
+        "action": "package",
+        "evaluated_at": "2026-07-22T19:38:33Z",
+        "house": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "official": {
+          "blocking": false,
+          "exemption_ids": [],
+          "reasons": [],
+          "rule_ids": [],
+          "status": "eligible"
+        },
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
+      },
+      "evidence": {
+        "nop": {
+          "at": "2026-07-22T19:37:52Z",
+          "job": "2026-07-23__00-49-51",
+          "mean": 0.0,
+          "path": "jobs/2026-07-23__00-49-51"
+        },
+        "oracle_10x": {
+          "at": "2026-07-22T19:37:52Z",
+          "job": "2026-07-23__01-03-41",
+          "mean": 1.0,
+          "path": "jobs/2026-07-23__01-03-41"
+        },
+        "oracle_1x": {
+          "at": "2026-07-22T19:37:52Z",
+          "job": "2026-07-23__00-49-18",
+          "mean": 1.0,
+          "path": "jobs/2026-07-23__00-49-18"
         }
       },
       "first_submitted_at": null,
@@ -4364,14 +6099,15 @@
           "CM-006"
         ],
         "form_refs": {
-          "difficulty": "sudhir_reviews/musl-sysroot-splice/REV-2/DIFFICULTY.md",
-          "rubric": "sudhir_reviews/musl-sysroot-splice/REV-2/RUBRIC.md",
-          "solution": "sudhir_reviews/musl-sysroot-splice/REV-2/SOLUTION.md",
-          "verification": "sudhir_reviews/musl-sysroot-splice/REV-2/VERIFICATION.md"
+          "difficulty": "sudhir_reviews/musl-sysroot-splice/REV-3/DIFFICULTY.md",
+          "dsv_audit": "sudhir_reviews/musl-sysroot-splice/REV-3/DSV-HUMANIZER-AUDIT.json",
+          "rubric": "sudhir_reviews/musl-sysroot-splice/REV-3/RUBRIC.md",
+          "solution": "sudhir_reviews/musl-sysroot-splice/REV-3/SOLUTION.md",
+          "verification": "sudhir_reviews/musl-sysroot-splice/REV-3/VERIFICATION.md"
         },
         "patterns_applied": []
       },
-      "next_action": "Wait for human review outcome",
+      "next_action": "Re-upload sudhir_tasks_ready_to_submit/musl-sysroot-splice.zip to submission 29a821f1; paste REV-3 DSV+RUBRIC",
       "notes": [
         "2026-07-19: Root cause of platform rejection found \u2014 Dockerfile repointed /usr/bin/python3 to python3.13, breaking the Debian asciinema package (ModuleNotFoundError at runtime). Terminus agent setup then tried apt-get asciinema offline and hit AgentSetupTimeoutError (360s) per trial, so AutoEval failed. Fixed by dropping the ln -sf lines (PATH already resolves python3 to 3.13) and adding an asciinema --version build check. Regated: oracle 1x/10x PASS, NOP 0.0, approve_task exit 0. Re-upload the new zip via stb submissions update 29a821f1-da07-442d-986a-1e681631abdc.",
         {
@@ -4421,29 +6157,52 @@
         {
           "at": "2026-07-20T12:41:06Z",
           "text": "platform outcome -> in-review: Platform Assignment State REVIEW_PENDING (submission 29a821f1-da07-442d-986a-1e681631abdc)"
+        },
+        {
+          "at": "2026-07-22T18:55:51Z",
+          "text": "revision 3: CM-002: clarify LANE_TAG is stdout-only; ledger is exactly marker/thread/errno (platform Needs Revision)"
+        },
+        {
+          "at": "2026-07-22T18:56:19Z",
+          "text": "feedback-capture -> REV-3/FEEDBACK.md"
+        },
+        {
+          "at": "2026-07-22T18:57:25Z",
+          "text": "form-capture: DIFFICULTY.md, SOLUTION.md, VERIFICATION.md, RUBRIC.md, DSV-HUMANIZER-AUDIT.json"
+        },
+        {
+          "at": "2026-07-22T19:37:52Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop, oracle_10x"
+        },
+        {
+          "at": "2026-07-22T19:38:40Z",
+          "text": "platform outcome -> needs-revision: REV-3 ready: CM-002 ledger vs LANE_TAG stdout clarified; re-upload zip e42ffbc6\u2026"
         }
       ],
       "number_of_milestones": 0,
       "package": {
         "approved": true,
-        "at": "2026-07-19T09:33:41Z",
+        "at": "2026-07-22T19:38:33Z",
+        "index": "sudhir_progress/CANONICAL_SUBMISSION_INDEX.json",
+        "index_archive_count": 5,
         "member_count": 46,
-        "sha256": "5739b009e19f822817ceb48fa98f7142b9f41928a0b14d68016a02450ecc9ee6",
+        "sha256": "e42ffbc62fed3ee8c0288dcb00e4acdae6e7b758473fe3c8df28b21daef4ab47",
         "validated": true,
         "zip": "sudhir_tasks_ready_to_submit/musl-sysroot-splice.zip"
       },
       "phase": "package",
       "platform_status": {
-        "at": "2026-07-20T12:41:06Z",
+        "at": "2026-07-22T19:38:40Z",
         "evidence": [
-          "stb submissions list 2026-07-20; uid=29a821f1-da07-442d-986a-1e681631abdc"
+          "sudhir_reviews/musl-sysroot-splice/REV-3/FEEDBACK.md",
+          "sudhir_reviews/musl-sysroot-splice/REV-3/EVIDENCE.md"
         ],
-        "reason": "Platform Assignment State REVIEW_PENDING (submission 29a821f1-da07-442d-986a-1e681631abdc)",
+        "reason": "REV-3 ready: CM-002 ledger vs LANE_TAG stdout clarified; re-upload zip e42ffbc6\u2026",
         "source": "explicit",
-        "status": "in-review"
+        "status": "needs-revision"
       },
       "policy_snapshot_id": "pre-ADR-0016",
-      "revision": 2,
+      "revision": 3,
       "revisions": [
         {
           "cm_ids": [
@@ -4478,6 +6237,22 @@
           "reason": "CM-006: behavioral checks for staged musl + live knit/pack/seal pipeline",
           "rubric_ref": "sudhir_reviews/musl-sysroot-splice/REV-2/RUBRIC.md",
           "zip_sha": "5739b009e19f822817ceb48fa98f7142b9f41928a0b14d68016a02450ecc9ee6"
+        },
+        {
+          "cm_ids": [],
+          "feedback_ref": "sudhir_reviews/musl-sysroot-splice/REV-3/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/musl-sysroot-splice/REV-3/DIFFICULTY.md",
+            "dsv_audit": "sudhir_reviews/musl-sysroot-splice/REV-3/DSV-HUMANIZER-AUDIT.json",
+            "rubric": "sudhir_reviews/musl-sysroot-splice/REV-3/RUBRIC.md",
+            "solution": "sudhir_reviews/musl-sysroot-splice/REV-3/SOLUTION.md",
+            "verification": "sudhir_reviews/musl-sysroot-splice/REV-3/VERIFICATION.md"
+          },
+          "n": 3,
+          "opened_at": "2026-07-22T18:55:51Z",
+          "reason": "CM-002: clarify LANE_TAG is stdout-only; ledger is exactly marker/thread/errno (platform Needs Revision)",
+          "rubric_ref": "sudhir_reviews/musl-sysroot-splice/REV-3/RUBRIC.md",
+          "zip_sha": "e42ffbc62fed3ee8c0288dcb00e4acdae6e7b758473fe3c8df28b21daef4ab47"
         }
       ],
       "slug": "musl-sysroot-splice",
@@ -4488,9 +6263,11 @@
         "summary": "This task is not tested with any agents as the Oracle solution failed."
       },
       "source_dir": "sudhir_tasks/active/musl-sysroot-splice",
-      "subcategories": [],
+      "subcategories": [
+        "tool_specific"
+      ],
       "title": "Musl sysroot splice",
-      "updated": "2026-07-20T12:41:06Z"
+      "updated": "2026-07-22T19:38:40Z"
     },
     "reproducible-reduction-parity": {
       "category": "scientific-computing",
@@ -4551,71 +6328,67 @@
       "category": "build-and-dependency-management",
       "created": "2026-07-19T12:12:21Z",
       "eligibility_verdict": {
-        "action": "migration-default",
-        "evaluated_at": null,
+        "action": "source-refresh",
+        "evaluated_at": "2026-07-22T19:48:15Z",
         "house": {
           "blocking": false,
           "exemption_ids": [],
-          "reasons": [
-            "Record predates ADR-0016 eligibility fields."
-          ],
+          "reasons": [],
           "rule_ids": [],
-          "status": "grandfathered-pending-review"
+          "status": "eligible"
         },
         "official": {
           "blocking": false,
           "exemption_ids": [],
-          "reasons": [
-            "Record predates ADR-0016 eligibility fields."
-          ],
+          "reasons": [],
           "rule_ids": [],
-          "status": "grandfathered-pending-review"
+          "status": "eligible"
         },
-        "policy_snapshot_id": "pre-ADR-0016"
+        "policy_snapshot_id": "terminus-ec-2026-07-21"
       },
       "evidence": {
         "nop": {
-          "at": "2026-07-20T11:50:08Z",
-          "job": "2026-07-19__22-02-26",
+          "at": "2026-07-22T18:58:10Z",
+          "job": "2026-07-23__00-23-53",
           "mean": 0.0,
-          "path": "jobs/2026-07-19__22-02-26"
+          "path": "jobs/2026-07-23__00-23-53"
         },
         "oracle_10x": {
-          "at": "2026-07-20T11:50:08Z",
-          "job": "2026-07-19__21-53-40",
+          "at": "2026-07-22T19:47:43Z",
+          "job": "2026-07-23__01-11-53",
           "mean": 1.0,
-          "path": "jobs/2026-07-19__21-53-40"
+          "path": "jobs/2026-07-23__01-11-53"
         },
         "oracle_1x": {
-          "at": "2026-07-20T11:50:08Z",
-          "job": "2026-07-19__21-41-45",
+          "at": "2026-07-22T18:58:10Z",
+          "job": "2026-07-23__00-23-05",
           "mean": 1.0,
-          "path": "jobs/2026-07-19__21-41-45"
+          "path": "jobs/2026-07-23__00-23-05"
         }
       },
       "first_submitted_at": null,
       "first_submitted_evidence": [],
       "gates": {
         "collapse": {
-          "at": "2026-07-20T11:50:57Z",
+          "at": "2026-07-22T19:47:44Z",
           "cmd": "python3 collapse_check.py /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/resolver-closure-drift",
           "exit_code": 0,
           "result": "PASS"
         },
         "dockerfile": {
-          "at": "2026-07-20T11:50:56Z",
+          "at": "2026-07-22T19:47:44Z",
           "cmd": "python3 dockerfile_check.py /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/resolver-closure-drift",
           "exit_code": 0,
           "result": "PASS"
         },
         "integrity": {
-          "at": "2026-07-20T11:50:57Z",
+          "at": "2026-07-22T19:47:44Z",
           "cmd": "python3 task_integrity.py verify /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/resolver-closure-drift",
           "exit_code": 0,
           "result": "PASS"
         },
         "static": {
-          "at": "2026-07-20T11:50:56Z",
+          "at": "2026-07-22T19:47:43Z",
           "cmd": "python3 run_static_checks.py --task-dir /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/resolver-closure-drift --version edition_2",
           "exit_code": 0,
           "result": "PASS"
@@ -4632,10 +6405,11 @@
           "CM-007"
         ],
         "form_refs": {
-          "difficulty": "sudhir_reviews/resolver-closure-drift/REV-3/DIFFICULTY.md",
-          "rubric": "sudhir_reviews/resolver-closure-drift/REV-3/RUBRIC.md",
-          "solution": "sudhir_reviews/resolver-closure-drift/REV-3/SOLUTION.md",
-          "verification": "sudhir_reviews/resolver-closure-drift/REV-3/VERIFICATION.md"
+          "difficulty": "sudhir_reviews/resolver-closure-drift/REV-5/DIFFICULTY.md",
+          "dsv_audit": "sudhir_reviews/resolver-closure-drift/REV-5/DSV-HUMANIZER-AUDIT.json",
+          "rubric": "sudhir_reviews/resolver-closure-drift/REV-5/RUBRIC.md",
+          "solution": "sudhir_reviews/resolver-closure-drift/REV-5/SOLUTION.md",
+          "verification": "sudhir_reviews/resolver-closure-drift/REV-5/VERIFICATION.md"
         },
         "patterns_applied": []
       },
@@ -4752,31 +6526,88 @@
         {
           "at": "2026-07-20T22:12:20Z",
           "text": "ingested Snorkel feedback from submission_4d74fca0.json"
+        },
+        {
+          "at": "2026-07-22T03:14:50Z",
+          "text": "revision 4: QC behavior_in_task_description: disclose profile/preview/withdrawn/constraint contracts"
+        },
+        {
+          "at": "2026-07-22T03:15:44Z",
+          "text": "feedback-capture -> REV-4/FEEDBACK.md"
+        },
+        {
+          "at": "2026-07-22T03:18:55Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop"
+        },
+        {
+          "at": "2026-07-22T03:19:11Z",
+          "text": "form-capture: DIFFICULTY.md, SOLUTION.md, VERIFICATION.md, RUBRIC.md"
+        },
+        {
+          "at": "2026-07-22T15:57:15Z",
+          "text": "form-capture: VERIFICATION.md"
+        },
+        {
+          "at": "2026-07-22T15:57:15Z",
+          "text": "recorded Harbor evidence: oracle_10x"
+        },
+        {
+          "at": "2026-07-22T15:57:50Z",
+          "text": "phase -> package"
+        },
+        {
+          "at": "2026-07-22T18:51:42Z",
+          "text": "revision 5: CM-008 EASY opus80/gpt5100; harden veil+quay so sill-only cannot pass; keep QC contracts"
+        },
+        {
+          "at": "2026-07-22T18:52:19Z",
+          "text": "feedback-capture -> REV-5/FEEDBACK.md"
+        },
+        {
+          "at": "2026-07-22T18:58:10Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop"
+        },
+        {
+          "at": "2026-07-22T18:58:18Z",
+          "text": "phase -> review"
+        },
+        {
+          "at": "2026-07-22T18:58:45Z",
+          "text": "form-capture: DIFFICULTY.md, SOLUTION.md, VERIFICATION.md, RUBRIC.md, DSV-HUMANIZER-AUDIT.json"
+        },
+        {
+          "at": "2026-07-22T19:47:43Z",
+          "text": "recorded Harbor evidence: oracle_10x"
+        },
+        {
+          "at": "2026-07-22T19:48:15Z",
+          "text": "phase -> package"
         }
       ],
       "number_of_milestones": 0,
       "package": {
         "approved": true,
-        "at": "2026-07-20T11:51:17Z",
+        "at": "2026-07-22T19:47:50Z",
+        "index": "sudhir_progress/CANONICAL_SUBMISSION_INDEX.json",
+        "index_archive_count": 6,
         "member_count": 77,
-        "sha256": "6d1f0ec9db7d97a6cdff940332133775a298bb9d6ada24d074d6e427abcac48f",
+        "sha256": "5e11eda67223cb733c3e4437c6b57db744fb5e484f848b2b5de2e0dbd6ef4b48",
         "validated": true,
         "zip": "sudhir_tasks_ready_to_submit/resolver-closure-drift.zip"
       },
       "phase": "feedback",
       "platform_status": {
-        "at": "2026-07-20T13:20:36Z",
+        "at": "2026-07-22T18:52:19Z",
         "evidence": [
-          "sudhir_reviews/resolver-closure-drift/REV-3/PLATFORM_EVAL_2026-07-20.md",
-          "sudhir_snorkel/inbox/submission_4d74fca0.json"
+          "sudhir_reviews/resolver-closure-drift/REV-5/FEEDBACK.md"
         ],
-        "reason": "CM-019: difficulty_check ThrottlingException BatchGetBuilds Rate exceeded; agents never ran. Rubric already fixed in form. Do not rewrite instruction.",
+        "reason": "Reviewer feedback captured into dossier",
         "source": "explicit",
         "status": "needs-revision"
       },
       "policy_snapshot_id": "pre-ADR-0016",
       "portfolio_scope": "active",
-      "revision": 3,
+      "revision": 5,
       "revisions": [
         {
           "cm_ids": [
@@ -4827,6 +6658,43 @@
           "reason": "Rubric CM-015: Agent format + third negative; optional branch nudge in instruction",
           "rubric_ref": "sudhir_reviews/resolver-closure-drift/REV-3/RUBRIC.md",
           "zip_sha": "6d1f0ec9db7d97a6cdff940332133775a298bb9d6ada24d074d6e427abcac48f"
+        },
+        {
+          "cm_ids": [
+            "CM-002",
+            "CM-007"
+          ],
+          "feedback_ref": "sudhir_reviews/resolver-closure-drift/REV-4/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/resolver-closure-drift/REV-4/DIFFICULTY.md",
+            "rubric": "sudhir_reviews/resolver-closure-drift/REV-4/RUBRIC.md",
+            "solution": "sudhir_reviews/resolver-closure-drift/REV-4/SOLUTION.md",
+            "verification": "sudhir_reviews/resolver-closure-drift/REV-4/VERIFICATION.md"
+          },
+          "n": 4,
+          "opened_at": "2026-07-22T03:14:50Z",
+          "reason": "QC behavior_in_task_description: disclose profile/preview/withdrawn/constraint contracts",
+          "rubric_ref": "sudhir_reviews/resolver-closure-drift/REV-4/RUBRIC.md",
+          "zip_sha": "9693fcdbbf78f2bfe48c8f51c17e4650a6c0442f95af35c4a3ce0bea61fc5e98"
+        },
+        {
+          "cm_ids": [
+            "CM-002",
+            "CM-007"
+          ],
+          "feedback_ref": "sudhir_reviews/resolver-closure-drift/REV-5/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/resolver-closure-drift/REV-5/DIFFICULTY.md",
+            "dsv_audit": "sudhir_reviews/resolver-closure-drift/REV-5/DSV-HUMANIZER-AUDIT.json",
+            "rubric": "sudhir_reviews/resolver-closure-drift/REV-5/RUBRIC.md",
+            "solution": "sudhir_reviews/resolver-closure-drift/REV-5/SOLUTION.md",
+            "verification": "sudhir_reviews/resolver-closure-drift/REV-5/VERIFICATION.md"
+          },
+          "n": 5,
+          "opened_at": "2026-07-22T18:51:42Z",
+          "reason": "CM-008 EASY opus80/gpt5100; harden veil+quay so sill-only cannot pass; keep QC contracts",
+          "rubric_ref": "sudhir_reviews/resolver-closure-drift/REV-5/RUBRIC.md",
+          "zip_sha": "5e11eda67223cb733c3e4437c6b57db744fb5e484f848b2b5de2e0dbd6ef4b48"
         }
       ],
       "slug": "resolver-closure-drift",
@@ -4847,7 +6715,7 @@
       "source_dir": "sudhir_tasks/active/resolver-closure-drift",
       "subcategories": [],
       "title": "Resolver Closure Drift",
-      "updated": "2026-07-20T22:12:20Z"
+      "updated": "2026-07-22T19:48:15Z"
     },
     "robust-predicate-scale-parity": {
       "category": "scientific-computing",
@@ -5199,7 +7067,7 @@
         },
         "patterns_applied": []
       },
-      "next_action": "Re-upload REV-4 zip + form pastes; wait for difficulty remeasure (\u2265MEDIUM)",
+      "next_action": "Decide: redesign under allowed category with neutral stub + domain-invariant verifier, or archive and start a new idea. Do not spend another harden-only revision.",
       "notes": [
         {
           "at": "2026-07-19T16:29:45Z",
@@ -5304,6 +7172,18 @@
         {
           "at": "2026-07-21T01:58:07Z",
           "text": "phase -> package"
+        },
+        {
+          "at": "2026-07-22T19:05:23Z",
+          "text": "feedback-capture -> REV-4/FEEDBACK.md"
+        },
+        {
+          "at": "2026-07-22T19:05:32Z",
+          "text": "platform outcome -> needs-revision: Banned shape: planted identical ternary in veil.cpp:20; SE/query-engine construction; data-processing; functional grading. Difficulty now MEDIUM; QC PASS. Redesign demanded."
+        },
+        {
+          "at": "2026-07-22T19:05:37Z",
+          "text": "platform outcome -> needs-revision: Banned shape rejection after MEDIUM remeasure; light patch will not clear acceptance."
         }
       ],
       "number_of_milestones": 0,
@@ -5315,13 +7195,13 @@
         "validated": true,
         "zip": "sudhir_tasks_ready_to_submit/rowgroup-prune-mirage.zip"
       },
-      "phase": "package",
+      "phase": "feedback",
       "platform_status": {
-        "at": "2026-07-21T00:54:38Z",
+        "at": "2026-07-22T19:05:37Z",
         "evidence": [
           "sudhir_reviews/rowgroup-prune-mirage/REV-4/FEEDBACK.md"
         ],
-        "reason": "Reviewer feedback captured into dossier",
+        "reason": "Banned shape rejection after MEDIUM remeasure; light patch will not clear acceptance.",
         "source": "explicit",
         "status": "needs-revision"
       },
@@ -5399,14 +7279,14 @@
         "tool_specific"
       ],
       "title": "Columnar Prune Mirage",
-      "updated": "2026-07-21T01:58:07Z"
+      "updated": "2026-07-22T19:05:37Z"
     },
     "sparse-jacobian-color-contract": {
       "category": "scientific-computing",
       "created": "2026-07-18T21:00:32Z",
       "eligibility_verdict": {
         "action": "source-refresh",
-        "evaluated_at": "2026-07-21T01:33:43Z",
+        "evaluated_at": "2026-07-22T22:11:28Z",
         "house": {
           "blocking": false,
           "exemption_ids": [],
@@ -5425,52 +7305,27 @@
       },
       "evidence": {
         "nop": {
-          "at": "2026-07-21T01:32:27Z",
-          "job": "2026-07-21__07-00-10",
+          "at": "2026-07-22T19:17:30Z",
+          "job": "2026-07-23__00-46-35",
           "mean": 0.0,
-          "path": "jobs/2026-07-21__07-00-10"
+          "path": "jobs/2026-07-23__00-46-35"
         },
         "oracle_10x": {
-          "at": "2026-07-21T01:32:27Z",
-          "job": "2026-07-21__07-00-53",
+          "at": "2026-07-22T19:31:16Z",
+          "job": "2026-07-23__00-56-36",
           "mean": 1.0,
-          "path": "jobs/2026-07-21__07-00-53"
+          "path": "jobs/2026-07-23__00-56-36"
         },
         "oracle_1x": {
-          "at": "2026-07-21T01:32:27Z",
-          "job": "2026-07-21__06-59-26",
+          "at": "2026-07-22T19:17:30Z",
+          "job": "2026-07-23__00-46-04",
           "mean": 1.0,
-          "path": "jobs/2026-07-21__06-59-26"
+          "path": "jobs/2026-07-23__00-46-04"
         }
       },
       "first_submitted_at": null,
       "first_submitted_evidence": [],
-      "gates": {
-        "collapse": {
-          "at": "2026-07-21T01:33:43Z",
-          "cmd": "python3 collapse_check.py /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/sparse-jacobian-color-contract",
-          "exit_code": 2,
-          "result": "WARN"
-        },
-        "dockerfile": {
-          "at": "2026-07-21T01:33:43Z",
-          "cmd": "python3 dockerfile_check.py /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/sparse-jacobian-color-contract",
-          "exit_code": 0,
-          "result": "PASS"
-        },
-        "integrity": {
-          "at": "2026-07-21T01:33:43Z",
-          "cmd": "python3 task_integrity.py verify /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/sparse-jacobian-color-contract",
-          "exit_code": 0,
-          "result": "PASS"
-        },
-        "static": {
-          "at": "2026-07-21T01:33:43Z",
-          "cmd": "python3 run_static_checks.py --task-dir /home/sudhir/Projects/TERMINUS/sudhir_tasks/active/sparse-jacobian-color-contract --version edition_2",
-          "exit_code": 0,
-          "result": "PASS"
-        }
-      },
+      "gates": {},
       "idea_slug": "sparse-jacobian-color-contract",
       "in_flight_exemptions": [],
       "languages": [
@@ -5483,14 +7338,15 @@
           "CM-006"
         ],
         "form_refs": {
-          "difficulty": "sudhir_reviews/sparse-jacobian-color-contract/REV-7/DIFFICULTY.md",
-          "rubric": "sudhir_reviews/sparse-jacobian-color-contract/REV-7/RUBRIC.md",
-          "solution": "sudhir_reviews/sparse-jacobian-color-contract/REV-7/SOLUTION.md",
-          "verification": "sudhir_reviews/sparse-jacobian-color-contract/REV-7/VERIFICATION.md"
+          "difficulty": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/DIFFICULTY.md",
+          "dsv_audit": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/DSV-HUMANIZER-AUDIT.json",
+          "rubric": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/RUBRIC.md",
+          "solution": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/SOLUTION.md",
+          "verification": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/VERIFICATION.md"
         },
         "patterns_applied": []
       },
-      "next_action": "Run oracle 1x + NOP (needs Docker), then review.",
+      "next_action": "Platform rated difficulty TRIVIAL; increase hardness or accept and resubmit.",
       "notes": [
         {
           "at": "2026-07-18T21:02:27Z",
@@ -5651,29 +7507,78 @@
         {
           "at": "2026-07-21T01:33:24Z",
           "text": "phase -> package"
+        },
+        {
+          "at": "2026-07-22T19:03:39Z",
+          "text": "revision 8: Platform: document FNV-1a digest; hash-lock verifier deps; test schema_version + runtime.conf step overrides"
+        },
+        {
+          "at": "2026-07-22T19:07:55Z",
+          "text": "feedback-capture -> REV-8/FEEDBACK.md"
+        },
+        {
+          "at": "2026-07-22T19:17:30Z",
+          "text": "recorded Harbor evidence: oracle_1x, nop"
+        },
+        {
+          "at": "2026-07-22T19:18:05Z",
+          "text": "phase -> gates"
+        },
+        {
+          "at": "2026-07-22T19:31:16Z",
+          "text": "recorded Harbor evidence: oracle_10x"
+        },
+        {
+          "at": "2026-07-22T19:31:16Z",
+          "text": "form-capture: DIFFICULTY.md, SOLUTION.md, VERIFICATION.md, RUBRIC.md, DSV-HUMANIZER-AUDIT.json"
+        },
+        {
+          "at": "2026-07-22T19:31:40Z",
+          "text": "form-capture: RUBRIC.md"
+        },
+        {
+          "at": "2026-07-22T19:31:40Z",
+          "text": "phase -> package"
+        },
+        {
+          "at": "2026-07-22T22:11:18Z",
+          "text": "revision 9: CM-019 AutoEval CodeExecution FAILED again (tb_check + difficulty_check empty logs); no human content feedback"
+        },
+        {
+          "at": "2026-07-22T22:11:18Z",
+          "text": "feedback-capture -> REV-9/FEEDBACK.md"
+        },
+        {
+          "at": "2026-07-22T22:11:18Z",
+          "text": "phase -> feedback"
+        },
+        {
+          "at": "2026-07-22T22:11:28Z",
+          "text": "platform outcome -> needs-revision: CM-019: AutoEval CodeExecution FAILED (tb_check + difficulty_check empty logs); siblings SUCCEEDED; no human content feedback"
+        },
+        {
+          "at": "2026-07-22T22:11:28Z",
+          "text": "phase -> feedback"
+        },
+        {
+          "at": "2026-07-22T22:17:39Z",
+          "text": "ingested Snorkel feedback from submission_d9082cd8.json"
         }
       ],
       "number_of_milestones": 0,
-      "package": {
-        "approved": true,
-        "at": "2026-07-21T01:33:07Z",
-        "member_count": 43,
-        "sha256": "50ba04249f0a0a8b8ec798ce1159f67ee39015683a7df6d25d78d6f24b1a65d5",
-        "validated": true,
-        "zip": "sudhir_tasks_ready_to_submit/sparse-jacobian-color-contract.zip"
-      },
-      "phase": "package",
+      "package": {},
+      "phase": "feedback",
       "platform_status": {
-        "at": "2026-07-20T12:41:07Z",
+        "at": "2026-07-22T22:11:28Z",
         "evidence": [
-          "stb submissions list 2026-07-20; uid=d9082cd8-c0ad-4174-a34f-4731f0b63907"
+          "stb feedback 2026-07-22 CodeExecution 18aa29d0 + 1ecdf6d7; fetch-task eval16"
         ],
-        "reason": "Platform Assignment State NEEDS_REVISION (submission d9082cd8-c0ad-4174-a34f-4731f0b63907)",
+        "reason": "CM-019: AutoEval CodeExecution FAILED (tb_check + difficulty_check empty logs); siblings SUCCEEDED; no human content feedback",
         "source": "explicit",
         "status": "needs-revision"
       },
       "policy_snapshot_id": "pre-ADR-0016",
-      "revision": 7,
+      "revision": 9,
       "revisions": [
         {
           "cm_ids": [
@@ -5783,14 +7688,67 @@
           "reason": "CM-019: difficulty/tb_check CodeExecution FAILED + BatchGetBuilds ThrottlingException; hedge build_timeout and re-package for remeasure",
           "rubric_ref": "sudhir_reviews/sparse-jacobian-color-contract/REV-7/RUBRIC.md",
           "zip_sha": "50ba04249f0a0a8b8ec798ce1159f67ee39015683a7df6d25d78d6f24b1a65d5"
+        },
+        {
+          "cm_ids": [],
+          "feedback_ref": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/DIFFICULTY.md",
+            "dsv_audit": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/DSV-HUMANIZER-AUDIT.json",
+            "rubric": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/RUBRIC.md",
+            "solution": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/SOLUTION.md",
+            "verification": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/VERIFICATION.md"
+          },
+          "n": 8,
+          "opened_at": "2026-07-22T19:03:39Z",
+          "reason": "Platform: document FNV-1a digest; hash-lock verifier deps; test schema_version + runtime.conf step overrides",
+          "rubric_ref": "sudhir_reviews/sparse-jacobian-color-contract/REV-8/RUBRIC.md",
+          "zip_sha": "4343b5da35ba3096f35b50f043c2fabe1c7ef4d47af202d30c035b4bedf9efb2"
+        },
+        {
+          "cm_ids": [
+            "CM-006"
+          ],
+          "feedback_ref": "sudhir_reviews/sparse-jacobian-color-contract/REV-9/FEEDBACK.md",
+          "form_refs": {
+            "difficulty": "sudhir_reviews/sparse-jacobian-color-contract/REV-9/DIFFICULTY.md",
+            "rubric": "sudhir_reviews/sparse-jacobian-color-contract/REV-9/RUBRIC.md",
+            "solution": "sudhir_reviews/sparse-jacobian-color-contract/REV-9/SOLUTION.md",
+            "verification": "sudhir_reviews/sparse-jacobian-color-contract/REV-9/VERIFICATION.md"
+          },
+          "n": 9,
+          "opened_at": "2026-07-22T22:11:18Z",
+          "reason": "CM-019 AutoEval CodeExecution FAILED again (tb_check + difficulty_check empty logs); no human content feedback",
+          "rubric_ref": "sudhir_reviews/sparse-jacobian-color-contract/REV-9/RUBRIC.md",
+          "zip_sha": null
         }
       ],
       "slug": "sparse-jacobian-color-contract",
-      "snorkel": {},
+      "snorkel": {
+        "agent_performance": {
+          "terminus-claude-opus-4-8": "100.0%",
+          "terminus-gpt5-5": "100.0%"
+        },
+        "assignment_id": "cf3be779-a7a8-4abc-a0ed-207018ed175b",
+        "difficulty": "TRIVIAL",
+        "ingested_at": "2026-07-22T22:17:39Z",
+        "project": "Terminus-2nd-Edition",
+        "project_id": "bfe79c33-8ab0-4061-9849-08d3207c9927",
+        "quality_summary_present": false,
+        "solvable": true,
+        "source_file": "submission_d9082cd8.json",
+        "source_sha256": "1cfc2d21c69e9aa1dbe1691f8ba6649e9e6663d2bb0edff937ec199bfb4f592b",
+        "static_outcome": "PASS",
+        "status_line": "\u2705 Solvable (all tests passed by at least one agent run)",
+        "submission_id": "d9082cd8-c0ad-4174-a34f-4731f0b63907",
+        "task_id": "d9082cd8-c0ad-4174-a34f-4731f0b63907",
+        "uploaded_at": "2026-07-22T19:35:52.263Z",
+        "zip_filename": "sparse-jacobian-color-contract.zip"
+      },
       "source_dir": "sudhir_tasks/active/sparse-jacobian-color-contract",
       "subcategories": [],
       "title": "Sparse Jacobian Color Contract",
-      "updated": "2026-07-21T01:33:43Z"
+      "updated": "2026-07-22T22:17:39Z"
     }
   }
 }

@@ -23,7 +23,7 @@ Subcommands:
     package <slug>   Build the submission zip, validate, and approve it.
     evidence <slug>  Record Harbor oracle/NOP/10x job evidence into the registry.
     feedback-capture Capture reviewer feedback into the current REV dossier.
-    form-capture     Store difficulty/solution/verification/rubric paste fields.
+    form-capture     Strictly validate and atomically store DSV/rubric paste fields.
     rubric-capture   Capture UI rubric paste into the current REV dossier.
     learn-check      Print applicable CM preventions; check PREUPLOAD checklist.
     ingest [paths]   Parse Snorkel submission_*.json exports into the registry.
@@ -52,6 +52,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import dsv_humanizer
 import eligibility_policy
 import idea_proposal
 import root_adapter
@@ -2195,6 +2196,13 @@ def cmd_package(args: argparse.Namespace) -> int:
         rev = 1
     rev_dir = sudhir_dossier.revision_dir(REVIEWS_DIR, args.slug, rev)
     preupload = rev_dir / "PREUPLOAD.md"
+    if preupload.is_file() and dsv_humanizer.REQUIRED_MARKER in preupload.read_text(
+        encoding="utf-8"
+    ):
+        dsv_ok, dsv_detail = sudhir_dossier.strict_dsv_complete(rev_dir)
+        if not dsv_ok:
+            print(f"Strict DSV Humanizer gate failed ({dsv_detail}).")
+            return 1
     if not args.force:
         ok, detail = sudhir_dossier.preupload_complete(preupload)
         if not ok:
@@ -2456,6 +2464,47 @@ def cmd_form_capture(args: argparse.Namespace) -> int:
         print(f"No task '{args.slug}' in registry.")
         return 1
     sudhir_dossier.ensure_task_learning_fields(entry)
+    mapping = {
+        "difficulty": args.difficulty_file,
+        "solution": args.solution_file,
+        "verification": args.verification_file,
+        "rubric": args.rubric_file,
+    }
+    provided_dsv = [field for field in dsv_humanizer.FIELD_ORDER if mapping[field]]
+    if provided_dsv and len(provided_dsv) != len(dsv_humanizer.FIELD_ORDER):
+        missing = [field for field in dsv_humanizer.FIELD_ORDER if not mapping[field]]
+        print(
+            "Strict DSV capture is atomic. Provide difficulty, solution, and "
+            "verification together. Missing: " + ", ".join(missing)
+        )
+        return 1
+    bodies: dict[str, str] = {}
+    try:
+        for key, file_arg in mapping.items():
+            if file_arg:
+                bodies[key] = Path(file_arg).read_text(encoding="utf-8")
+    except OSError as exc:
+        print(f"Unable to read form field: {exc}")
+        return 1
+    if not bodies:
+        print(
+            "Provide all three DSV files, --rubric-file, or both. "
+            "DSV fields cannot be captured separately."
+        )
+        return 1
+
+    dsv_report: dsv_humanizer.ValidationReport | None = None
+    if provided_dsv:
+        dsv_report = dsv_humanizer.validate_texts(
+            difficulty=bodies["difficulty"],
+            solution=bodies["solution"],
+            verification=bodies["verification"],
+        )
+        if not dsv_report.ok:
+            print(dsv_humanizer.format_findings(dsv_report))
+            print("No form files or registry state were changed.")
+            return 1
+
     rev = int(entry.get("revision") or 0)
     if rev < 1:
         entry["revision"] = 1
@@ -2464,17 +2513,11 @@ def cmd_form_capture(args: argparse.Namespace) -> int:
         )
         rev = 1
     rev_dir = sudhir_dossier.revision_dir(REVIEWS_DIR, args.slug, rev)
-    mapping = {
-        "difficulty": args.difficulty_file,
-        "solution": args.solution_file,
-        "verification": args.verification_file,
-        "rubric": args.rubric_file,
-    }
     written = []
     for key, file_arg in mapping.items():
         if not file_arg:
             continue
-        body = Path(file_arg).read_text(encoding="utf-8")
+        body = bodies[key]
         filename = sudhir_dossier.FORM_FILES[key]
         sudhir_dossier.write_capture_file(
             rev_dir / filename,
@@ -2489,12 +2532,21 @@ def cmd_form_capture(args: argparse.Namespace) -> int:
                 row.setdefault("form_refs", {})[key] = rel
                 if key == "rubric":
                     row["rubric_ref"] = rel
-    if not written:
-        print(
-            "Provide at least one of --difficulty-file / --solution-file / "
-            "--verification-file / --rubric-file"
+    if dsv_report is not None:
+        audit_path = rev_dir / sudhir_dossier.DSV_AUDIT_FILE
+        dsv_humanizer.write_audit(
+            audit_path,
+            dsv_report,
+            sudhir_dossier.dsv_form_paths(rev_dir),
         )
-        return 1
+        preupload = rev_dir / "PREUPLOAD.md"
+        sudhir_dossier.require_strict_dsv(preupload)
+        audit_rel = f"sudhir_reviews/{args.slug}/REV-{rev}/{audit_path.name}"
+        entry["learning"].setdefault("form_refs", {})["dsv_audit"] = audit_rel
+        for row in entry.get("revisions") or []:
+            if int(row.get("n", -1)) == rev:
+                row.setdefault("form_refs", {})["dsv_audit"] = audit_rel
+        written.append(audit_path.name)
     touch(entry)
     add_note(entry, "form-capture: " + ", ".join(written))
     save_registry(reg)
@@ -2896,7 +2948,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser(
         "form-capture",
-        help="Store difficulty/solution/verification/rubric paste fields in the REV dossier.",
+        help="Strictly validate and atomically store DSV/rubric fields in the REV dossier.",
     )
     sp.add_argument("slug")
     sp.add_argument("--difficulty-file", help="DIFFICULTY explanation paste")

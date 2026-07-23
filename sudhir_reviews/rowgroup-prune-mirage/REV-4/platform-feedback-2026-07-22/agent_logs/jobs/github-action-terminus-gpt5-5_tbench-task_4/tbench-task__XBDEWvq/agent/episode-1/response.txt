@@ -1,0 +1,23 @@
+{
+  "analysis": "The existing audit completes but likely contains incorrect mixed-generation archived results: e.g. c_legit returns -999 despite live markers needing exclude non-live, and mixed selective reads may skip/read wrong slabs. Need inspect source and store/case format to identify marker/skipping logic and ingest marker generation.",
+  "plan": "Open architecture/format notes, case files, and source files for store parsing, row filtering, report audit, and Rust ingest. Also inspect store data bytes/text to understand slab markers and origin lanes.",
+  "commands": [
+    {
+      "keystrokes": "cat /app/docs/architecture.md\nprintf '\\n--- format ---\\n'\ncat /app/docs/format-notes.md\nprintf '\\n--- cases ---\\n'\nfor f in /app/data/cases/*.case; do echo \"### $f\"; cat \"$f\"; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,240p' /app/cpp/src/store.cpp\nprintf '\\n--- row.cpp ---\\n'\nsed -n '1,240p' /app/cpp/src/row.cpp\nprintf '\\n--- parse.cpp ---\\n'\nsed -n '1,220p' /app/cpp/src/parse.cpp\nprintf '\\n--- report.cpp ---\\n'\nsed -n '1,260p' /app/cpp/src/report.cpp\nprintf '\\n--- main.cpp ---\\n'\nsed -n '1,220p' /app/cpp/src/main.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,260p' /app/rust/src/main.rs\nprintf '\\n--- codec ---\\n'\nsed -n '1,260p' /app/rust/src/codec.rs\nprintf '\\n--- model ---\\n'\nsed -n '1,220p' /app/rust/src/model.rs\nprintf '\\n--- report ---\\n'\nsed -n '1,220p' /app/rust/src/report.rs\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "for f in /app/data/archive/*.store; do echo \"### $f\"; xxd -g1 -l 512 \"$f\"; strings \"$f\" | head -80; done\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

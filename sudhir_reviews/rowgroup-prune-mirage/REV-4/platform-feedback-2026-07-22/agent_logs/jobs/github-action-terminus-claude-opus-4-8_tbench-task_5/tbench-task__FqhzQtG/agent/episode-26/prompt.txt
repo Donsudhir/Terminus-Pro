@@ -1,0 +1,11 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/s1 2>/dev/null; /app/bin/loam ingest /app/data/fresh/orde
+rs_a.csv /tmp/s2 2>/dev/null; diff /tmp/s1/data.store /tmp/s2/data.store && echo INGEST_IDENTICAL
+INGEST_IDENTICAL
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# rm -rf /tmp/store_a /tmp/store_b /tmp/store_c /tmp/tc /tmp/s1 /tmp/s2 /app/output/a1.json /app/output/a2.json
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app#

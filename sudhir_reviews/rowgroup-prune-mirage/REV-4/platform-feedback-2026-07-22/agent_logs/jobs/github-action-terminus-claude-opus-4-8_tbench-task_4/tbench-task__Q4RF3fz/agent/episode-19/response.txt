@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Now all modes agree: range gives 4/100 in all 4 combinations, isnull gives 2/0 in all combinations. mn_rs pages_read=1 - only one gen2 slab has has_absent? Wait mixed slabs: slab0 gen2(read,legacy), slab1 gen3 absent0(skip), slab2 gen3 absent0(skip), slab3 gen3 absent0(skip). So only slab0 read -> found retired -999 (R|1|0|-999) = 1 non-live and R|0|2|777 = 1 non-live = 2. pages_read=1 correct, answer 2 matches full. \n\nNow let me verify vault and current stores, and confirm healthy selective still skips (pages_read<pages_total).",
+  "plan": "Test vault and current stores in all modes, plus healthy selective.",
+  "commands": [
+    {"keystrokes": "cat > /tmp/t/probe.case << 'EOF'\nvr_rs|/app/data/archive/vault.store|range|10|50|row|1|x\nvr_rn|/app/data/archive/vault.store|range|10|50|row|0|x\nvr_bs|/app/data/archive/vault.store|range|10|50|batch|1|x\nvr_bn|/app/data/archive/vault.store|range|10|50|batch|0|x\nvn_rs|/app/data/archive/vault.store|isnull|0|0|row|1|x\nvn_rn|/app/data/archive/vault.store|isnull|0|0|row|0|x\nvn_bs|/app/data/archive/vault.store|isnull|0|0|batch|1|x\nvn_bn|/app/data/archive/vault.store|isnull|0|0|batch|0|x\ncl_bs|/app/data/archive/current.store|eq|-999|0|batch|1|x\ncl_bn|/app/data/archive/current.store|eq|-999|0|batch|0|x\ncl_rs|/app/data/archive/current.store|eq|-999|0|row|1|x\ncl_rn|/app/data/archive/current.store|eq|-999|0|row|0|x\nhs_bs|/app/data/archive/healthy.store|range|100|130|batch|1|x\nhs_bn|/app/data/archive/healthy.store|range|100|130|batch|0|x\nhs_rs|/app/data/archive/healthy.store|range|100|130|row|1|x\nhs_rn|/app/data/archive/healthy.store|range|100|130|row|0|x\nEOF\n/app/bin/loam audit /tmp/t /tmp/t/out.json; echo; python3 -c \"import json;d=json.load(open('/tmp/t/out.json'));[print(c['case_id'],c['row_count'],c['sum_amount'],c['pages_read'],c['pages_total']) for c in d['cases']]\"\n", "duration": 1.0}
+  ]
+}
+```

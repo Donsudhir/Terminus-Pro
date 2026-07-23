@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Found the bug! The lattice (batch) reader `sweep_c` computes admission as `presence_lane[i] != 0`. But the row reader `is_live` uses: Retired=false, Inherited=true (regardless of present), Current=present!=0. The batch reader ignores the origin lane entirely. This causes disagreement on mixed-generation stores with varied origin lanes. For Inherited entries with present==0, row reader treats them as live but batch treats as not live. The batch admit must match is_live: Retired->0, Inherited->1, Current->present!=0.",
+  "plan": "First examine the data to confirm, then fix sweep_c to use origin_lane. Let me look at the data files and rust ingest too.",
+  "commands": [
+    {"keystrokes": "ls -la /app/data/archive /app/data/cases /app/data/fresh\n", "duration": 0.1},
+    {"keystrokes": "cat /app/data/cases/*.case 2>/dev/null | head -50\n", "duration": 0.1}
+  ]
+}
+```

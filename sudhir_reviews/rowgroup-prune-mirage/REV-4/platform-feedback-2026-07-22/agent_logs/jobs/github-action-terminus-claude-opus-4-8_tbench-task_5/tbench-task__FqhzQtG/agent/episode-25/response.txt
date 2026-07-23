@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Row and batch modes now agree on fresh stores for all probes:\n- fb_row/fb_bat: 6 rows, -349 (live: -999,5,15,200,210,220 = 6 rows sum -349) ✓\n- fb_rng_r/fb_rng_b range 0-300: 5,650 (5,15,200,210,220 = 5 rows sum 650) ✓ agree\n- fc_null: 4 non-live (retired -999? no, page0 all live; page1: 301,317,329,343 all non-live = 4) ✓ agree\n\nSelective range fb_rng skipping read both pages (page0 [-999,15] overlaps 0-300, page1 [200,220] overlaps) = correct, pages_read=2.\n\nAll works. Now let me confirm ingest determinism (byte-identical repeated runs) and clean up test artifacts. Also verify the reset-lab restores data. Let me test ingest repeatability.",
+  "plan": "Run ingest twice and diff the store bytes. Clean up temp dirs. Verify main audit output digest stable.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/s1 2>/dev/null; /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/s2 2>/dev/null; diff /tmp/s1/data.store /tmp/s2/data.store && echo INGEST_IDENTICAL\n", "duration": 1.5},
+    {"keystrokes": "rm -rf /tmp/store_a /tmp/store_b /tmp/store_c /tmp/tc /tmp/s1 /tmp/s2 /app/output/a1.json /app/output/a2.json\n", "duration": 0.1}
+  ]
+}
+```

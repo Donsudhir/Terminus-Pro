@@ -1,0 +1,6 @@
+{
+  "analysis": "The system has been repaired and rebuilt successfully. The C++ batch execution path now uses the same live-row semantics as the row path, so Retired rows are excluded, Inherited rows are treated as live, and Current rows depend on presence. Selective gates now avoid trusting incomplete generation-2 archived markers for amount, null, and region probes, while generation-3 healthy/fresh fast-path skipping remains active. Rust ingest now writes faithful live-value markers: low/high cover only live amounts, all-non-live slabs write 0/0, and has_absent is set for any non-live entry. Bundled audit was rerun successfully, repeated audit output was byte-identical, fresh ingest artifacts were inspected, and extra row/batch equivalence checks passed.",
+  "plan": "No further commands are needed. The build and audit validations have completed successfully.",
+  "commands": [],
+  "task_complete": true
+}

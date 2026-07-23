@@ -1,0 +1,31 @@
+user_visible_outputs = [
+  "/app/output/conflict_windows.json",
+  "/app/output/replay_manifest.tsv",
+]
+
+internal_harness_files = []
+
+[structured_outputs.conflict_windows]
+target = "/app/output/conflict_windows.json"
+format = "json"
+instruction_checks = [
+  "schema_version",
+  "scenarios",
+  "totals",
+  "deterministic_hash",
+]
+
+[structured_outputs.replay_manifest]
+target = "/app/output/replay_manifest.tsv"
+format = "text"
+instruction_checks = [
+  "scenario",
+  "tick",
+  "sector",
+  "window_id",
+  "flight_id",
+  "effective_priority",
+  "eta_tick",
+  "rank",
+  "decision",
+]

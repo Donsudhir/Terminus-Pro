@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "The gate turn_b uses low/high/has_absent markers for skip decisions. This works IF markers are faithful. The bug: the batch reader (sweep_c) determines liveness only by presence_lane, ignoring origin. For an Inherited (origin=1) cell with present=0, row reader counts it live but batch reader excludes it. Also markers low/high must span live amounts. If an Inherited present=0 cell has an amount within a range, the range gate should still find it. Let me now check the rust side to understand marker generation and how archived data is structured. Let me look at the case files and data first.",
+  "plan": "Examine data cases, archive, and fresh directories, and the config to understand what probes/cases exist.",
+  "commands": [
+    {"keystrokes": "cat /app/config/lab.conf; ls -la /app/data/cases /app/data/archive /app/data/fresh\n", "duration": 0.1},
+    {"keystrokes": "cat /app/data/cases/*.case 2>/dev/null | head -50\n", "duration": 0.1}
+  ]
+}
+```

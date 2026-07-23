@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "The system has been fully repaired and verified. Both bugs were fixed: the C++ batch reader (rill.cpp) now uses the same liveness logic (origin + presence) as the row reader, and the Rust ingest marker computation (fold.rs) now produces faithful live-value markers. All verifications passed: equivalent modes agree on archived and fresh stores, healthy cases and fast-path behavior are preserved, selective controls still skip pages, ingest markers are faithful including the all-non-live edge case, and both audit and ingest outputs are byte-identical across runs.",
+  "plan": "The task is complete. No further action needed.",
+  "commands": [],
+  "task_complete": true
+}
+```

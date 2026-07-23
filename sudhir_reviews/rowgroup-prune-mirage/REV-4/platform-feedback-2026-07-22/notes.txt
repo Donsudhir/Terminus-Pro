@@ -1,0 +1,118 @@
+Feedback for Submission: fac356b4-6394-4023-b296-30308827b30e
+Assignment ID: 358e352c-0d8b-42e4-8f44-f0150bdebd1c
+Project ID: bfe79c33-8ab0-4061-9849-08d3207c9927
+Project: Terminus-2nd-Edition
+
+================================================================================
+
+Revision Notes
+--------------------------------------------------------------------------------
+This task is a banned shape under every honest reading, so it cannot be accepted as is. The instruction says to repair the system, and environment/cpp/src/harbor/veil.cpp line 20 carries a clear planted bug, the ternary reads b.op == Op::Equal ? b.x : b.x with both branches identical, which is debugging. Beyond that seeded defect the three supplied modules are missing the real mixed-generation logic, so the oracle rewrites environment/rust/src/ember/fold.rs, veil.cpp and environment/cpp/src/lattice/rill.cpp to add generation, origin-lane and liveness-marker handling. Building out a query operator and storage engine graded by functional behavior is software-engineering, and the category field is data-processing, all three of which are banned and blocked for net-new submissions. The reward comes from the loam audit output matching expected rows and totals, that is candidate code behavior, not a domain invariant recomputed by an independent oracle. Please redesign this around a genuine reasoning or derivation task with a neutral stub and a domain-invariant verifier, under an active non-banned category. Instruction length, rubric structure, writeups and determinism are otherwise fine.
+
+Rebuttal Notes
+--------------------------------------------------------------------------------
+this is hard... i don't understand how every time it flag new mistake in task.
+this agentic review is not that good to determine weather what the mistake is. it just learn some pre hardcoded pattern and give similar review everytime.
+
+Summary (difficulty check)
+--------------------------------------------------------------------------------
+Difficulty: ✅ MEDIUM
+
+Status: ✅ Solvable (all tests passed by at least one agent run)
+
+Agent Performance:
+  • terminus-claude-opus-4-8: 80.0% (4/5 runs)
+  • terminus-gpt5-5: 40.0% (2/5 runs)
+
+Reference Agents:
+  • nop: 0.0% (0/1 runs)
+  • oracle: 100.0% (3/3 runs)
+
+Failure Breakdown:
+  • nop: 1 other
+  • terminus-claude-opus-4-8: 1 other
+  • terminus-gpt5-5: 3 other
+
+Unit Tests Results:
+  • test_p01: 10 passed / 10 runs
+  • test_p02: 9 passed / 10 runs
+  • test_p03: 9 passed / 10 runs
+  • test_p04: 10 passed / 10 runs
+  • test_p05: 10 passed / 10 runs
+  • test_p06: 9 passed / 10 runs
+  • test_p07: 10 passed / 10 runs
+  • test_p08: 9 passed / 10 runs
+  • test_p09: 10 passed / 10 runs
+  • test_p10: 10 passed / 10 runs
+  • test_p11: 9 passed / 10 runs
+  • test_p12: 10 passed / 10 runs
+  • test_p13: 9 passed / 10 runs
+  • test_p14: 6 passed / 10 runs
+  • test_p15: 10 passed / 10 runs
+
+Analysis on Agent Failures:
+  • Task Instruction Sufficiency: ❌ FAIL, ## Job Summary
+
+### 1. Overall Results
+- **4 trials total, 0 passed (0%), 4 failed** — all received reward 0.0 under all-or-nothing scoring
+- All trials were run on the same task (mixed-language Rust/C++ data-store bug-fix)
+- No model/agent differentiation was noted across trials
+
+### 2. Common Failure Patterns
+
+All four failures share a nearly identical pattern — agents got **14/15 tests** (trials `XBDEWvq`, `WVL9ohd`, `e9FgsLq`) or **8/15** (`FqhzQtG`), with the same root cause:
+
+**The `veil.cpp` region_eq branch was not patched.** Every agent correctly identified and fixed:
+- ✅ `rill.cpp` — batch path liveness check (origin_lane ignored)
+- ✅ `fold.rs` — Rust ingest marker computation over all rows instead of live-only rows
+- ✅ `veil.cpp` numeric/isnull branches — legacy slab marker conservatism
+
+But all three 14/15 trials (`XBDEWvq`, `WVL9ohd`, `e9FgsLq`) **missed the `RegionEqual` branch in `veil.cpp`**, which still trusted stale archived `region_low`/`region_high` markers for generation-2 slabs. Test `test_p14` (a `region_eq` probe on `vault.store`) failed universally, returning `row_count=1` instead of the expected `row_count=2, sum=49`.
+
+Trial `FqhzQtG` was an earlier-stage failure — it never addressed `veil.cpp` at all, failing 7 tests rather than 1.
+
+### 3. Hack Check
+
+**No cheating detected.** All four trials passed `reward_hacking` checks. Agents only modified legitimate source files (`rill.cpp`, `veil.cpp`, `fold.rs`), rebuilt via the provided toolchain (`/app/tools/build-all`), and validated via the bundled audit. No trial accessed `solution/` directories, modified test files, or touched grading mechanisms.
+
+### 4. Systematic Instruction Issues
+
+One trial flagged a **task specification failure**: `FqhzQtG` received `task_specification: fail`. The instructions describe "archived mixed-generation stores with incomplete markers" but do not explicitly specify what the gate should do when on-disk markers are stale/wrong (e.g., `mixed.store` slab0 has `low=100, high=100` but contains live values 10 and 20). The architecture docs say to "interpret without rewriting" but don't define gate-skipping behavior for incorrect markers — this caused `FqhzQtG` to miss the `veil.cpp` fix entirely.
+
+The other three trials passed `task_specification`, with reviewers judging the fix for the `region_eq` branch to be *derivable* from the stated contract ("equivalent modes must agree"), making it an agent limitation rather than a spec gap. **However, this is a borderline call** — the fact that all three independent agents missed the same branch suggests the instructions may not make the `region_eq` case sufficiently salient.
+
+### 5. Progress on Failed Trials
+
+| Trial | Tests Passed | Gap |
+|---|---|---|
+| `XBDEWvq` | 14/15 (93%) | One branch missed in `veil.cpp` |
+| `WVL9ohd` | 14/15 (93%) | One branch missed in `veil.cpp` |
+| `e9FgsLq` | 14/15 (93%) | One branch missed in `veil.cpp` |
+| `FqhzQtG` | 8/15 (53%) | Entire `veil.cpp` fix missing |
+
+Three agents were extremely close to a complete solution. The mean pass rate is ~83%, with the all-or-nothing scoring converting strong partial progress to zero reward.
+
+### 6. Key Differences Between Agents
+
+The three 14/15 trials appear to have followed a similar diagnosis path and reached the same incomplete fix, suggesting convergent reasoning. `FqhzQtG` is the outlier — it diagnosed two of the three root causes but missed the `veil.cpp` gating problem entirely, likely due to the weaker task specification it encountered. No model-level differentiation is available from the provided data.
+
+---
+
+**Recommended Actions:**
+1. **Fix the task spec** — explicitly document that *all* predicate paths (including `region_eq`) in the selective-read gate must apply the legacy-slab conservatism, or add a concrete example with the `region_eq` case
+2. **Consider partial credit** — 14/15 agents are very close; all-or-nothing scoring may under-represent progress for debugging/iteration purposes
+3. **Targeted hint** — if retrying, prompt agents to audit *every* predicate branch in `veil.cpp`, not just numeric/isnull
+
+Quality check summary
+--------------------------------------------------------------------------------
+## Quality Check Results
+✅ pass - behavior_in_task_description: The instruction.md covers the key behaviors: the audit command and its exact invocation (`/app/bin/loam audit /app/data/cases /app/output/audit.json`), ingest command (`/app/bin/loam ingest <CSV> <store-directory>`) and its output (`<store-directory>/data.store`), build command (`/app/tools/build-all`), JSON top-level keys (status=complete, cases, digest), per-case keys (case_id, row_count, sum_amount, pages_total, pages_read, path, skipping), marker semantics (low/high over live amounts, has_absent for non-live entries, all-absent slab records low=0/high=0/has_absent=true), and refers to the normative schema file `/app/docs/report-schema.md`. The grading reference for schema keys is explicitly pointed to. The fresh-store and archived mixed-store requirements are clearly spelled out.
+✅ pass - behavior_in_tests: Tests cover the main described behaviors: ingest marker faithfulness (p01, p03, p05, p07, p10, p15), row vs batch agreement on mixed stores (p02, p04, p06, p08, p09, p11, p12, p13, p14, p15), selective skip behavior (pages_read < pages_total) on appropriate cases, byte-stable repeated audit output (p10), all-absent page markers (p15 uses gamma CSV with page 2 fully absent verifying low=0/high=0/has_absent=1). Healthy cases are verified to maintain correct answers and fast-path (p08, p12). The tests thoroughly validate both the archived-store bug fixes and fresh-ingest marker correctness.
+✅ pass - informative_test_structure: Each test has a docstring that clearly names what is being checked (e.g., 'Fresh numeric ingestion keeps its recorded value domain faithful', 'Batch execution counts every absent archived entry exactly once'). Helper functions (_run_case, _ingest, _assert_markers, _assert_tally, _parse_store) are well-named and clearly structured. Tests are numbered p01-p15 and individually focused. The code is readable and maintainable.
+✅ pass - anti_cheating_measures: The solution is not visible to the agent at runtime: tests/ and solution/ are not copied into the Docker image. The test helper functions write custom CSV data (not from environment/data/fresh/) with different values, ingest them, then check computed markers — so the agent cannot shortcut by reading existing store files. The expected marker tuples in tests (e.g., [(17,43,1),(107,151,1)]) are derived values that require correct implementation. Tests invoke the actual binary rather than checking file contents directly. The bugs are in the logic of the C++ and Rust source code which must be correctly fixed. No ground-truth answer files are embedded in the image path accessible to the agent.
+✅ pass - structured_data_schema: The instruction.md explicitly references `/app/docs/report-schema.md` as 'the grading reference for those keys'. The report-schema.md file defines the normative schema with all required keys (status, cases, digest; per-case: case_id, row_count, sum_amount, pages_total, pages_read, path, skipping) and marker semantics. The store format is described in format-notes.md and architecture.md. The instruction also explicitly states the ingest output filename (`<store-directory>/data.store`) and marker semantics inline.
+✅ pass - pinned_dependencies: Python pip packages are pinned: pytest==8.4.1, pytest-json-ctrf==0.3.5. Apt packages are version-pinned (cargo=0.66.0+ds1-1, rustc=1.63.0+dfsg1-2, python3=3.11.2-1+b1, etc.) and the base image is pinned by digest (gcc:13-bookworm@sha256:930f2...). Rust's Cargo.toml for loam-ingest is v0.8.0 and builds offline (--offline flag in build-all, no external Cargo dependencies beyond std). Pinning is adequate.
+✅ pass - typos: No typos found in filenames, paths, commands, variable names, or key names. The instruction.md, test file, case files, schema docs, and Dockerfile all use consistent naming. The JSON schema key names in instruction.md match those checked in the test (`status`, `cases`, `digest`, `case_id`, `row_count`, `sum_amount`, `pages_total`, `pages_read`, `path`, `skipping`).
+✅ pass - tests_or_solution_in_image: The Dockerfile does not COPY tests/ or solution/ into the image. It only copies Makefile, config/, docs/, tools/, rust/, cpp/, and data/ (to /opt/loam-seed/). The tests are run from outside the container by the verifier, and the solution is never included in the built image.
+✅ pass - hardcoded_solution: The solve.sh writes corrected source files for fold.rs, veil.cpp, and rill.cpp with proper algorithmic fixes (origin-lane liveness logic, generation-aware gate handling, correct marker computation), then runs build-all and the audit pipeline to produce derived output. The solution does not echo or cat any precomputed answer — it implements the actual bug fixes and derives results by running the fixed binaries.
+✅ pass - file_reference_mentioned: The instruction.md explicitly states the output file for the audit command: `/app/output/audit.json` (in the example invocation), and for ingest: `<store-directory>/data.store`. Both are also verified in the tests (the audit JSON is read by the tests, and data.store is checked with `assert target.is_file()`). The instruction clearly names both output files.

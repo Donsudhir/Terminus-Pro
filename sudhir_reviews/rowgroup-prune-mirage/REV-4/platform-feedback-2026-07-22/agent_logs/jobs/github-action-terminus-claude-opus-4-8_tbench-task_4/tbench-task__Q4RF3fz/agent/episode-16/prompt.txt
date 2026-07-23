@@ -1,0 +1,24 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# /app/bin/loam inspect /app/data/archive/mixed.store; echo ---; /app/bin/loam inspect /app/data/archive/vault.sto
+re; echo ---; /app/bin/loam inspect /app/data/archive/current.store; echo ---; /app/bin/loam inspect /app/data/archive/healthy.store
+0|2|100|100|1|4
+1|3|30|600|0|4
+2|3|-5|-5|0|1
+3|3|200|400|0|3
+---
+0|2|5|30|0|4
+1|3|40|70|0|4
+2|2|-20|90|1|3
+---
+0|3|-999|20|1|4
+1|3|100|130|0|4
+---
+0|3|0|30|0|4
+1|3|100|130|0|4
+2|3|200|230|0|4
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app#

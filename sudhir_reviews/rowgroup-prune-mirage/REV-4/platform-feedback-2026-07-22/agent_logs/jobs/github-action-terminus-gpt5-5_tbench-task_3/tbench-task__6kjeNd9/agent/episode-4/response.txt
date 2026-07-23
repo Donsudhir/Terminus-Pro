@@ -1,0 +1,23 @@
+{
+  "analysis": "The batch path currently admits rows only by presence, while row path treats Retired as non-live and Inherited as live regardless of presence. That explains path disagreements on varied origin lanes. Fresh ingest marker builder also includes all amounts and only treats present=0 as absent, violating live-value marker contract for origin Retired/Inherited. Need inspect complete CSV parsing to confirm origin encoding, and inspect archived store contents to reason about gate safety for old incomplete markers.",
+  "plan": "Display complete parse/codec files and archived store files. This will show generations, markers, origins/presence combinations, and whether selective gates need generation-aware conservative behavior beyond fixing batch live logic and ingest marker computation.",
+  "commands": [
+    {
+      "keystrokes": "cat /app/rust/src/codec.rs\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/cpp/src/parse.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "for f in /app/data/archive/*.store; do echo \"### $f\"; nl -ba \"$f\"; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "for f in /app/data/fresh/*.csv; do echo \"### $f\"; cat \"$f\"; done\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+} 

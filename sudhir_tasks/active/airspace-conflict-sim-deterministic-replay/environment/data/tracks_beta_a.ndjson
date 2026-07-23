@@ -1,0 +1,5 @@
+{"event_id":"b1","flight_id":"B201","scenario":"beta","tick":20,"sector":"M1","state":"in","revision":1}
+{"event_id":"b2","flight_id":"B202","scenario":"beta","tick":20,"sector":"M1","state":"in","revision":1}
+{"event_id":"b3","flight_id":"B203","scenario":"beta","tick":20,"sector":"M1","state":"in","revision":1}
+{"event_id":"b4","flight_id":"B204","scenario":"beta","tick":21,"sector":"M1","state":"in","revision":1}
+{"event_id":"b5","flight_id":"B202","scenario":"beta","tick":21,"sector":"M1","state":"in","revision":1}

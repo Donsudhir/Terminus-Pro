@@ -1,0 +1,311 @@
+New Terminal Output:
+
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# cat /app/docs/architecture.md
+# Loam architecture
+
+Loam is a small offline columnar lab used by release engineering before storage
+changes reach the billing warehouse. `rust/` owns import and compaction. It emits
+self-describing slabs with value lanes, presence lanes, origin lanes, text codes,
+and compact markers. `cpp/` owns reads. The harbor stage decides which slabs are
+needed, then either the row reader or lattice reader computes a tally. The row
+reader walks record structs; the lattice reader consumes per-slab column lanes.
+
+The command front end reads every `.case` file in bytewise filename order and
+every record in source order. Structured counters come from the selected reader,
+not from estimates. Artifact files are append-free after creation; a reader must
+not repair them in place.
+
+`/app/tools/reset-lab` restores the bundled drill data before a clean replay.
+
+Older slabs are supported because disaster-recovery snapshots outlive the writer
+that created them. Newer writers can add header generations, but readers remain
+responsible for interpreting each slab according to its own header and local
+markers.
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# cat /app/docs/format-notes.md
+# Format notes from the v2 rollout
+
+These notes were copied from the rollout ticket and may lag the current reader.
+They are useful background only. The operational grading contract for audit JSON,
+per-case counters, ingest output naming, and live-value markers is
+`/app/docs/report-schema.md`.
+
+A file begins with `H|generation`. Each `P` record describes one slab, followed
+by the declared number of `R` records. The row record carries presence, origin,
+amount, and region. Marker fields let readers avoid opening slabs for predicates
+that cannot match.
+
+The v2 rollout assumed the amount lane remained sufficient to recognize missing
+historical values because old producers reserved one amount. The later writer
+kept origin and presence lanes to support mixed compaction and legitimate values
+that overlap old conventions. If these assumptions conflict, the artifact and a
+full reader are stronger evidence than this note.
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# printf '\n--- cases ---\n'; for f in /app/data/cases/*.case; do echo '###' $f; cat $f; done
+
+--- cases ---
+### /app/data/cases/control.case
+# id|store|operation|x|y|path|skipping|operator note
+c_legit|/app/data/archive/current.store|eq|-999|0|batch|1|legitimate overlap
+h_skip|/app/data/archive/healthy.store|range|100|130|batch|1|selective control
+h_full|/app/data/archive/healthy.store|range|100|130|row|0|full control
+h_region|/app/data/archive/healthy.store|region_eq|north|0|row|1|text control
+### /app/data/cases/incident.case
+# id|store|operation|x|y|path|skipping|operator note
+m_range|/app/data/archive/mixed.store|range|10|40|row|1|invoice window
+m_narrow|/app/data/archive/mixed.store|range|10|20|row|1|narrow window
+m_null|/app/data/archive/mixed.store|isnull|0|0|batch|0|missing count
+m_interact|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed window
+m_neg|/app/data/archive/mixed.store|range|-100|-1|batch|0|negative window
+m_all|/app/data/archive/mixed.store|all|0|0|batch|0|full tally
+v_window|/app/data/archive/vault.store|range|10|50|row|1|vault window
+v_missing|/app/data/archive/vault.store|isnull|0|0|batch|1|vault absent probe
+v_check|/app/data/archive/vault.store|isnull|0|0|row|1|vault absent recheck
+v_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault full control
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# printf '\n--- archive strings/head ---\n'; for f in /app/data/archive/*.store; do echo '###' $f; file $f; sed -n
+ '1,80p' $f 2>/dev/null || true; done
+
+--- archive strings/head ---
+### /app/data/archive/current.store
+/app/data/archive/current.store: ASCII text
+H|3
+P|0|3|-999|20|1|east|west|4
+R|1|2|-999|east
+R|0|2|777|west
+R|1|2|10|east
+R|1|2|20|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+### /app/data/archive/healthy.store
+/app/data/archive/healthy.store: ASCII text
+H|3
+P|0|3|0|30|0|east|west|4
+R|1|2|0|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+P|2|3|200|230|0|central|west|4
+R|1|2|200|central
+R|1|2|210|east
+R|1|2|220|north
+R|1|2|230|west
+### /app/data/archive/mixed.store
+/app/data/archive/mixed.store: ASCII text
+H|2
+P|0|2|100|100|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|0|2|777|west
+P|1|3|30|600|0|north|south|4
+R|1|2|30|north
+R|1|2|40|north
+R|1|2|500|south
+R|1|2|600|south
+P|2|3|-5|-5|0|central|central|1
+R|1|2|-5|central
+P|3|3|200|400|0|east|west|3
+R|1|2|200|east
+R|1|2|300|north
+R|1|2|400|west
+### /app/data/archive/vault.store
+/app/data/archive/vault.store: ASCII text
+H|2
+P|0|2|5|30|0|north|west|4
+R|1|2|5|east
+R|1|0|12|east
+R|1|2|18|west
+R|1|2|30|west
+P|1|3|40|70|0|north|south|4
+R|1|2|40|north
+R|1|2|55
+[... output limited to 10000 bytes; 71 interior bytes omitted ...]
+    }
+    tally.pages_read = 1;
+    for (const auto& cell : a.cells) {
+        const bool live = is_live(cell);
+        if (b.op == Op::IsNull) {
+            if (!live) {
+                ++tally.row_count;
+            }
+            continue;
+        }
+        if (live && matches(cell, b)) {
+            ++tally.row_count;
+            tally.sum_amount += cell.amount;
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# sed -n '1,200p' /app/cpp/src/digest.cpp
+#include "loam/report.hpp"
+
+#include <cstdint>
+#include <iomanip>
+#include <sstream>
+
+namespace loam {
+
+std::string digest_hex(const std::string& text) {
+    std::uint64_t value = 1469598103934665603ULL;
+    for (const unsigned char byte : text) {
+        value ^= byte;
+        value *= 1099511628211ULL;
+    }
+    std::ostringstream out;
+    out << std::hex << std::setfill('0') << std::setw(16) << value;
+    return out.str();
+}
+
+}  // namespace loam
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# sed -n '1,260p' /app/rust/src/main.rs
+mod codec;
+mod ember;
+mod model;
+mod report;
+
+use ember::pale::{tilt_d, Dial};
+use std::path::{Path, PathBuf};
+
+fn main() {
+    if let Err(error) = run() {
+        eprintln!("loam-ingest: {error}");
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() != 3 {
+        return Err("usage: loam-ingest <csv> <store>".into());
+    }
+    let cells = codec::read_csv(Path::new(&args[1]))?;
+    let pages = ember::reed::gather(cells, 4)?;
+    let directory = PathBuf::from(&args[2]);
+    std::fs::create_dir_all(&directory)?;
+    let target = directory.join("data.store");
+    codec::write_pages(&target, &pages)?;
+
+    let size = std::fs::metadata(&target)?.len() as usize;
+    let mut dial = Dial::default();
+    let cell_count = pages.iter().map(|page| page.cells.len()).sum();
+    tilt_d(&mut dial, cell_count, size);
+    eprintln!("{}", report::line(&dial));
+    Ok(())
+}
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# sed -n '1,260p' /app/rust/src/codec.rs
+use crate::model::{Cell, Page};
+use std::fs::File;
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::path::Path;
+
+pub(crate) fn read_csv(path: &Path) -> Result<Vec<Cell>, Box<dyn std::error::Error>> {
+    let file = File::open(path)?;
+    let mut rows = Vec::new();
+    for (line_no, line) in BufReader::new(file).lines().enumerate() {
+        let line = line?;
+        if line_no == 0 && line.starts_with("origin,") {
+            continue;
+        }
+        if line.trim().is_empty() {
+            continue;
+        }
+        let fields: Vec<&str> = line.split(',').collect();
+        if fields.len() != 4 {
+            return Err(format!("{}:{}: expected four columns", path.display(), line_no + 1).into());
+        }
+        rows.push(Cell {
+            origin: fields[0].parse()?,
+            present: fields[1].parse()?,
+            amount: fields[2].parse()?,
+            region: fields[3].trim().to_owned(),
+        });
+    }
+    Ok(rows)
+}
+
+pub(crate) fn write_pages(path: &Path, pages: &[Page]) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let file = File::create(path)?;
+    let mut out = BufWriter::new(file);
+    writeln!(out, "H|3")?;
+    for page in pages {
+        writeln!(
+            out,
+            "P|{}|{}|{}|{}|{}|{}|{}|{}",
+            page.id,
+            page.generation,
+            page.mark.low,
+            page.mark.high,
+            u8::from(page.mark.has_absent),
+            page.region_low,
+            page.region_high,
+            page.cells.len()
+        )?;
+        for cell in &page.cells {
+            writeln!(
+                out,
+                "R|{}|{}|{}|{}",
+                cell.present, cell.origin, cell.amount, cell.region
+            )?;
+        }
+    }
+    out.flush()?;
+    Ok(())
+}
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# sed -n '1,220p' /app/rust/src/model.rs
+pub(crate) const RUNE_VOID: u8 = 0;
+pub(crate) const RUNE_FIXED: u8 = 1;
+
+#[derive(Clone, Debug)]
+pub(crate) struct Cell {
+    pub origin: u8,
+    pub present: u8,
+    pub amount: i64,
+    pub region: String,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct Mark {
+    pub low: i64,
+    pub high: i64,
+    pub has_absent: bool,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct Page {
+    pub id: usize,
+    pub generation: u8,
+    pub mark: Mark,
+    pub region_low: String,
+    pub region_high: String,
+    pub cells: Vec<Cell>,
+}
+
+#[derive(Debug)]
+pub(crate) enum FoldErr {
+    Empty,
+    Shape,
+}
+
+impl std::fmt::Display for FoldErr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Empty => write!(f, "empty lane set"),
+            Self::Shape => write!(f, "lane lengths differ"),
+        }
+    }
+}
+
+impl std::error::Error for FoldErr {}
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app#

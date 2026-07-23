@@ -1,0 +1,3 @@
+# VERIFICATION — mesh-checkpoint-operator-skew REV-1
+
+The tests checks rebuild and execute /app/bin/meshlab on bundled families and regenerated remesh resume variants instead of planted report bytes. Twin interrupted pairs must equal on field digests, geometry tokens, residual samples, and residual norms under the schema in /app/docs/parity-report-schema.md. Fold order digests must equal an independent fold of samples. No checkpoint controls must stay byte identical with clear reuse marks. Reordered family inputs and clean rebuilds must keep identical report digests, and NOP stays at zero reward.

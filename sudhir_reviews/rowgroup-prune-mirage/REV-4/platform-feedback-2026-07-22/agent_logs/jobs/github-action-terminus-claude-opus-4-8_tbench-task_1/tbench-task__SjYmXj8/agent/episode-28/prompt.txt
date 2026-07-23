@@ -1,0 +1,82 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# mkdir -p /tmp/fcases; printf 'f_row|/tmp/store_a/data.store|range|10|130|row|0|full\nf_batch|/tmp/store_a/data.s
+tore|range|10|130|batch|0|full\nf_rskip|/tmp/store_a/data.store|range|10|130|row|1|skip\nf_bskip|/tmp/store_a/data.store|range|10|130|batch|1|skip\nf_null_r|/tm
+p/store_a/data.store|isnull|0|0|row|0|null\nf_null_b|/tmp/store_a/data.store|isnull|0|0|batch|1|null\nf_narrow|/tmp/store_a/data.store|range|10|30|batch|1|narro
+w\n' > /tmp/fcases/f.case
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# /app/bin/loam audit /tmp/fcases /tmp/fout.json
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# python3 -m json.tool /tmp/fout.json
+{
+    "status": "complete",
+    "cases": [
+        {
+            "case_id": "f_row",
+            "row_count": 6,
+            "sum_amount": 410,
+            "pages_total": 2,
+            "pages_read": 2,
+            "path": "row",
+            "skipping": false
+        },
+        {
+            "case_id": "f_batch",
+            "row_count": 6,
+            "sum_amount": 410,
+            "pages_total": 2,
+            "pages_read": 2,
+            "path": "batch",
+            "skipping": false
+        },
+        {
+            "case_id": "f_rskip",
+            "row_count": 6,
+            "sum_amount": 410,
+            "pages_total": 2,
+            "pages_read": 2,
+            "path": "row",
+            "skipping": true
+        },
+        {
+            "case_id": "f_bskip",
+            "row_count": 6,
+            "sum_amount": 410,
+            "pages_total": 2,
+            "pages_read": 2,
+            "path": "batch",
+            "skipping": true
+        },
+        {
+            "case_id": "f_null_r",
+            "row_count": 2,
+            "sum_amount": 0,
+            "pages_total": 2,
+            "pages_read": 2,
+            "path": "row",
+            "skipping": false
+        },
+        {
+            "case_id": "f_null_b",
+            "row_count": 2,
+            "sum_amount": 0,
+            "pages_total": 2,
+            "pages_read": 2,
+            "path": "batch",
+            "skipping": true
+        },
+        {
+            "case_id": "f_narrow",
+            "row_count": 3,
+            "sum_amount": 60,
+            "pages_total": 2,
+            "pages_read": 1,
+            "path": "batch",
+            "skipping": true
+        }
+    ],
+    "digest": "8daab049626e6252"
+}
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app#

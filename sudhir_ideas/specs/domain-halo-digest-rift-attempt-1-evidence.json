@@ -1,0 +1,669 @@
+{
+  "hardness_axes": [
+    {
+      "id": "discover",
+      "name": "Discover",
+      "verdict": "PASS",
+      "reasoning": "The public symptoms describe ordinary local norms with twin fold-checksum disagreement and a healthy steady control, but they do not identify the post-map fringe packing layout, the stage-authority lag across the language boundary, or the pre-map fold ordering. Those facts must be recovered from C, Rust, logs, and twin/control runs."
+    },
+    {
+      "id": "synthesize",
+      "name": "Synthesize",
+      "verdict": "PASS",
+      "reasoning": "Map-changed/steady parity requires coordinated behavior across native fringe pack/unpack, shared-boundary stage metadata, and fold/reduce ordering for global checksums. No single module owns the complete invariant."
+    },
+    {
+      "id": "diagnose",
+      "name": "Diagnose",
+      "verdict": "PASS",
+      "reasoning": "The instruction reports local-norm-green / fold-checksum disagreement, twin divergence, and healthy steady behavior without naming fringe packing, ownership, sync-stage lag, reduction order, or fix sites."
+    },
+    {
+      "id": "navigate_coupling",
+      "name": "Navigate coupling",
+      "verdict": "PASS",
+      "reasoning": "Correct fringe packing still fails if stage metadata marks complete early; correct stage authority still fails if folds retain pre-map order; and fold-only repairs leave twin sample contracts red when native packing and host authority disagree."
+    },
+    {
+      "id": "reason_beyond_training",
+      "name": "Reason beyond training",
+      "verdict": "PASS",
+      "reasoning": "A textbook force-full-exchange or 'flush all buffers' recipe cannot reconcile mixed-language rank-map twin checksums. The project-specific fringe-pack, stage-authority, and fold-order coupling is not a standard recipe completion."
+    }
+  ],
+  "anti_trivialization_checks": [
+    {
+      "id": "disclosure_collapse",
+      "name": "Disclosure-collapse",
+      "verdict": "PASS",
+      "reasoning": "An honest statement of twin fold-checksum parity, sample contracts, and steady byte stability does not reveal which of the three language-boundary authorities is inconsistent."
+    },
+    {
+      "id": "hidden_instance",
+      "name": "Hidden-instance",
+      "verdict": "PASS",
+      "reasoning": "The design covers map-changed cases, never-map-changed twins, and healthy steady controls across generated variants rather than hiding one corrupted fixture."
+    },
+    {
+      "id": "single_artifact_repair",
+      "name": "Single-artifact repair",
+      "verdict": "PASS",
+      "reasoning": "Three coordinated locations across distinct native/ and host/ roots are required; replacing one map blob or report cannot satisfy regenerated twin/control checks."
+    },
+    {
+      "id": "generalization",
+      "name": "Generalization",
+      "verdict": "PASS",
+      "reasoning": "The verifier regenerates map-changed/steady pairs and steady controls from bundled families, so fixes must generalize beyond named cases."
+    },
+    {
+      "id": "prompt_honesty",
+      "name": "Prompt-honesty",
+      "verdict": "PASS",
+      "reasoning": "The instruction names observable parity failures, invocation, normative report schema path, and completion conditions while withholding only implementation causes and fix sites."
+    },
+    {
+      "id": "cheating_vs_difficulty",
+      "name": "Cheating-vs-difficulty",
+      "verdict": "PASS",
+      "reasoning": "Regeneration and twin/control matrices prevent hardcoding, but residual difficulty is cross-language rank-map diagnosis rather than those anti-cheating mechanisms."
+    },
+    {
+      "id": "mechanical_fix_filter",
+      "name": "Mechanical-fix filter",
+      "verdict": "PASS",
+      "reasoning": "The core work is not dependency placement, timeouts, reward formatting, or metadata repair."
+    },
+    {
+      "id": "localized_fix",
+      "name": "Localized-fix",
+      "verdict": "PASS",
+      "reasoning": "The selected topology places two locations in native/ and one in host/, each controlling 4 of 12 tests under a 0.5 concentration cap."
+    },
+    {
+      "id": "oracle_locality",
+      "name": "Oracle-locality",
+      "verdict": "PASS",
+      "reasoning": "The planned oracle performs substantive fringe-pack, stage-authority, and fold/digest changes rather than replacing one short file or toggling one compiler option."
+    },
+    {
+      "id": "small_declarative_cluster",
+      "name": "Small declarative-cluster",
+      "verdict": "PASS",
+      "reasoning": "No finite table, threshold list, schema block, or configuration cluster contains the solution; the cited schema only documents report keys."
+    },
+    {
+      "id": "grep_collapse",
+      "name": "Grep-collapse",
+      "verdict": "PASS",
+      "reasoning": "Selected fix paths and symbols use opaque ledge/shelf/ember and braid_q/latch_r/sift_s vocabulary that does not contain any noun extracted from the public instruction."
+    },
+    {
+      "id": "pre_factored_helper",
+      "name": "Pre-factored-helper",
+      "verdict": "PASS",
+      "reasoning": "The selected functions do not mirror public terms such as rank, map, fold, checksum, twin, exchange, or parity."
+    },
+    {
+      "id": "recipe_discount",
+      "name": "Recipe-discount",
+      "verdict": "PASS",
+      "reasoning": "A known force-sync or global-buffer-flush recipe cannot repair the fringe-pack layout, stage-authority lag, and fold-order coupling together."
+    },
+    {
+      "id": "security_aura_discount",
+      "name": "Security-aura discount",
+      "verdict": "PASS",
+      "reasoning": "This is a scientific-computing task and does not rely on security language or exploit framing for difficulty."
+    },
+    {
+      "id": "orthogonal_checklist",
+      "name": "Orthogonal-checklist",
+      "verdict": "PASS",
+      "reasoning": "Twin parity, sample contracts, and steady stability are one coupled rank-map invariant spanning three authorities, not independent checklist bullets."
+    },
+    {
+      "id": "harness_discount",
+      "name": "Harness-discount",
+      "verdict": "PASS",
+      "reasoning": "Docker and mixed-language compilation provide realism, while residual hardness comes from fringe packing, stage authority, and numerical fold decisions."
+    },
+    {
+      "id": "one_pass_solvability",
+      "name": "One-pass solvability",
+      "verdict": "PASS",
+      "reasoning": "Opening the obvious entrypoint does not reveal the three locations, and a naive global flush leaves twin fold and packing failures."
+    },
+    {
+      "id": "hard_only_gate",
+      "name": "Hard-only gate",
+      "verdict": "PASS",
+      "reasoning": "The bounded task requires professional domain-decomposition numerics, mixed-language FFI diagnosis, and twin-control scientific verification within an expert-hours scope."
+    },
+    {
+      "id": "discovery_budget_test",
+      "name": "Discovery budget test",
+      "verdict": "PASS",
+      "reasoning": "Three non-trivial discoveries are committed below, each with a distinct planned location and a reason it must remain absent from the public instruction."
+    },
+    {
+      "id": "instruction_specificity_test",
+      "name": "Instruction specificity test",
+      "verdict": "PASS",
+      "reasoning": "The drafted instruction stays at symptoms-only: no algorithm names, thresholds, cause phrases such as ownership or sync-stage lag, or named fix sites."
+    },
+    {
+      "id": "topology_distribution_test",
+      "name": "Topology distribution test",
+      "verdict": "PASS",
+      "reasoning": "Three distinct candidate topologies are enumerated below, each requiring at least three coordinating locations; the selected topology distributes tests across three locations at 4/12 each."
+    }
+  ],
+  "rubric_axes": [
+    {
+      "id": "verifiable",
+      "name": "Verifiable",
+      "verdict": "PASS",
+      "reasoning": "Twin fold-checksum parity, sample contracts, steady byte stability, and regenerated parity_report.json checks are all programmatic."
+    },
+    {
+      "id": "well_specified",
+      "name": "Well-specified",
+      "verdict": "PASS",
+      "reasoning": "The symptoms-only instruction clearly identifies invocation, normative schema path, twin/control outcomes, and prohibited hardcoding without revealing implementation causes."
+    },
+    {
+      "id": "solvable",
+      "name": "Solvable",
+      "verdict": "PASS",
+      "reasoning": "The design bounds the defect to a small existing mixed-language partitioned field lab; an expert familiar with domain decomposition and FFI can complete the coordinated changes in roughly three to eight hours."
+    },
+    {
+      "id": "difficult",
+      "name": "Difficult",
+      "verdict": "PASS",
+      "reasoning": "The task stays hard after honest disclosure because local-norm-green twin disagreement does not identify which packing, stage, or fold authority is inconsistent."
+    },
+    {
+      "id": "interesting",
+      "name": "Interesting",
+      "verdict": "PASS",
+      "reasoning": "Reliable global digests after domain remapping is paid production work in partitioned PDE and multiphysics solvers."
+    },
+    {
+      "id": "outcome_verified",
+      "name": "Outcome-verified",
+      "verdict": "PASS",
+      "reasoning": "The tests accept any implementation producing correct twin/control numerical outcomes and do not require the oracle's exact code shape."
+    }
+  ],
+  "instruction_completeness_test": {
+    "verdict": "PASS",
+    "reasoning": "The instruction is sufficient to judge the final parity report and twin/control outcomes but insufficient to locate or derive the three fixes without deeply reading and running the codebase."
+  },
+  "discovery_budget": [
+    {
+      "discovery": "After a rank map change, native fringe pack/unpack still uses the pre-map neighbor layout, so boundary values look locally ordinary while twin fold checksums diverge.",
+      "planned_location": "environment/native/ledge.c::braid_q",
+      "why_instruction_must_not_reveal": "Naming fringe packing or a stale neighbor layout would collapse the native diagnosis into a disclosed buffer edit."
+    },
+    {
+      "discovery": "Host shared-boundary authority and stage metadata mark exchange complete one stage early while native buffers still lag, so status looks healthy while trajectories diverge from the twin.",
+      "planned_location": "environment/host/shelf.rs::latch_r",
+      "why_instruction_must_not_reveal": "Naming ownership, sync-stage lag, or early completion would directly expose the host repair and convert the task into a recipe."
+    },
+    {
+      "discovery": "Global fold/reduce retains pre-map ordering or scratch, so emitted fold checksums disagree even when upstream local norms look ordinary.",
+      "planned_location": "environment/native/ember.c::sift_s",
+      "why_instruction_must_not_reveal": "Naming pre-map ordering or retained scratch would reduce the fold work to a disclosed layout flip."
+    }
+  ],
+  "instruction_specificity": {
+    "level": "symptoms-only",
+    "reasoning": "The public draft describes local-norm-green twin fold-checksum disagreement, healthy steady stability, and a cited report schema without naming algorithms, thresholds, ownership, sync-stage lag, fringe packing, or causes."
+  },
+  "investigation_profile": {
+    "weakness_areas": [
+      "long_horizon_debugging",
+      "multi_component_reasoning",
+      "partial_failures",
+      "ambiguous_bug_report"
+    ],
+    "causal_chain": [
+      {
+        "stage": 1,
+        "evidence": "Run the bundled rank-map-change case beside its steady twin and the fresh steady control; compare local norms, exchange status, and global fold checksums.",
+        "finding": "Local norms and exchange status can look ordinary after the map change while fold checksums disagree with the twin; the steady control stays correct.",
+        "unlocks_next": "The conditional matrix justifies treating local-green / fold-red as one rank-map incident rather than a general residual bug."
+      },
+      {
+        "stage": 2,
+        "evidence": "Inspect run logs, metrics counters, and parity_report.json fields for map-changed versus steady trajectories.",
+        "finding": "Disagreement concentrates on fold checksums and pointwise samples after the rank-map boundary, not on fresh steady runs.",
+        "unlocks_next": "Investigation can focus on state that crosses the map-change boundary across language roots."
+      },
+      {
+        "stage": 3,
+        "evidence": "Trace native fringe pack/unpack observations across the FFI boundary for matched twins.",
+        "finding": "Boundary values follow a pre-map neighbor layout after the map change.",
+        "unlocks_next": "Fringe-pack repair becomes a necessary but not sufficient stage before stage authority and folding are trusted."
+      },
+      {
+        "stage": 4,
+        "evidence": "Compare host shared-boundary stage metadata and completion flags before and after the map change using deterministic probes.",
+        "finding": "Host marks exchange complete one stage early while native buffers lag, explaining status-plausible / fold-wrong behavior.",
+        "unlocks_next": "Stage authority must be repaired in concert with fringe packing; fold order still remains unchecked."
+      },
+      {
+        "stage": 5,
+        "evidence": "Inspect fold/reduce intermediates and ordering metadata for map-changed versus steady trajectories.",
+        "finding": "Checksum folding retains pre-map ordering or scratch, so emitted checksums disagree even after upstream norms look ordinary.",
+        "unlocks_next": "The three authorities can now be repaired as one coupled invariant and verified end-to-end."
+      },
+      {
+        "stage": 6,
+        "evidence": "Apply coordinated repairs at native pack, host stage, and native fold locations; rebuild; rerun twin, map-changed, and steady matrices.",
+        "finding": "Map-changed and steady trajectories agree on fold checksums and sample contracts; the healthy steady control remains byte-identical.",
+        "unlocks_next": "This closes the incident with deterministic outcome evidence."
+      }
+    ],
+    "evidence_surfaces": [
+      {
+        "surface": "code",
+        "planned_location": "environment/native/ and environment/host/",
+        "question_answered": "Which language roots own fringe packing, stage authority, and fold/reduce?"
+      },
+      {
+        "surface": "runtime-state",
+        "planned_location": "Deterministic observations from /app/bin/partlab twin and control runs",
+        "question_answered": "Where do local norms stay ordinary while fold checksums diverge?"
+      },
+      {
+        "surface": "logs",
+        "planned_location": "environment/fixtures/logs/run_trace.ndjson",
+        "question_answered": "Which map-change phases correlate with twin disagreement?"
+      },
+      {
+        "surface": "metrics",
+        "planned_location": "Emitted local-norm counters in /app/output/parity_report.json",
+        "question_answered": "Do local-norm metrics mask the fold failure mode?"
+      },
+      {
+        "surface": "filesystem",
+        "planned_location": "environment/fixtures/cases/, environment/fixtures/maps/, and durable map artifacts under /app/var/",
+        "question_answered": "What durable map-change state exists for failing trajectories versus fresh controls?"
+      }
+    ],
+    "competing_hypotheses": [
+      {
+        "hypothesis": "The residual evaluation kernel itself is numerically wrong after the map change.",
+        "why_plausible": "Pointwise samples disagree with the twin after the map change.",
+        "falsifier": "Fresh steady runs on the same families remain correct and byte-stable, and local norms on map-changed runs stay within ordinary bands."
+      },
+      {
+        "hypothesis": "Rank-map file I/O truncates or corrupts values randomly on disk.",
+        "why_plausible": "Only map-changed trajectories diverge, suggesting durable state damage.",
+        "falsifier": "Map byte digests for non-boundary payloads match twin snapshots while disagreement tracks neighbor-layout and stage boundaries rather than random storage geometry."
+      },
+      {
+        "hypothesis": "The twin harness compares different bundled cases or different output slots.",
+        "why_plausible": "Fold-checksum disagreement can look like a harness mismatch.",
+        "falsifier": "Case identity keys and input cardinality in parity_report.json match across map-changed and steady runs; only post-map fold checksums diverge."
+      }
+    ],
+    "conditional_failures": [
+      {
+        "scenario": "Mid-run rank map change then continue on a bundled case",
+        "role": "failing",
+        "expected_behavior": "After repair, fold checksums and sample contracts agree with the steady twin."
+      },
+      {
+        "scenario": "Generated map-change variants with the same public contract",
+        "role": "failing",
+        "expected_behavior": "Map-changed/steady parity generalizes beyond the bundled incident case."
+      },
+      {
+        "scenario": "Fresh runs that never change maps on the same families",
+        "role": "healthy-control",
+        "expected_behavior": "Remain correct and byte-identical across clean rebuilds before and after repair."
+      },
+      {
+        "scenario": "Steady twin on the same case without a mid-run map change",
+        "role": "healthy-control",
+        "expected_behavior": "Provides the fold-checksum and sample reference that map-changed trajectories must match after repair."
+      }
+    ],
+    "estimated_meaningful_actions": 52,
+    "determinism_strategy": "Ship fixed C/Rust sources, bundled cases, map fixtures, and logs in one offline container. Reset from immutable inputs before each scenario, avoid clocks and runtime entropy, sort filesystem traversal, pin reduction order for checksums, and derive expected twin/control properties from verifier-owned regeneration.",
+    "domain_reasoning": {
+      "domain": "Scientific computing for partitioned PDE-like solvers with rank-map changes and mixed-language field digests.",
+      "why_not_trivia": "The solver does not need an obscure standard clause. They must reconcile fringe packing, stage authority, and fold order across Rust and C while proving twin parity and preserving a healthy steady control."
+    }
+  },
+  "attack_path": {
+    "summary": "Reproduce twin fold disagreement beside a healthy steady control, falsify residual-kernel and random-map-IO hypotheses, then reconcile fringe packing, stage authority, and fold order across three roots.",
+    "reasoning": "The path requires experiments and cross-language model building; no prompt noun, file name, or single failed assertion reveals all three locations."
+  },
+  "smallest_plausible_patch": {
+    "summary": "Coordinated substantive edits to one C fringe-pack function, one Rust stage-authority function, and one C fold/reduce function, together exceeding a trivial patch.",
+    "reasoning": "Any strict subset leaves at least one twin-parity, sample-contract, or steady-stability property failing."
+  },
+  "collapse_audit": {
+    "verdict": "PASS",
+    "reasoning": "The editable frontier spans three non-obvious locations across C and Rust roots, the instruction remains symptoms-only, no declarative cluster or reference checksum exists, and the planned oracle adds substantive logic rather than deleting or toggling one feature.",
+    "residual_hardness": "After the complete file tree is visible, the solver must still identify why map-changed trajectories cross different packing, stage, and fold authorities and then preserve one twin/control invariant through three locations.",
+    "red_flags": []
+  },
+  "topology_enumeration": [
+    {
+      "id": "topology_a_selected",
+      "summary": "Fringe packing, stage authority, and fold/reduce disagree across native and host roots after a rank map change.",
+      "locations": [
+        "native/ledge.c::braid_q",
+        "host/shelf.rs::latch_r",
+        "native/ember.c::sift_s"
+      ],
+      "why_no_single_location_suffices": "Correct fringe packing can still be ignored by early stage completion, correct stage authority can still emit wrong checksums under pre-map fold order, and fold-only repairs leave twin sample contracts red when packing and authority disagree."
+    },
+    {
+      "id": "topology_b_lifecycle_chain",
+      "summary": "Map apply, fringe rebind, stage handoff, and checksum emission form a four-stage lifecycle chain.",
+      "locations": [
+        "host/shelf.rs::latch_r",
+        "native/ledge.c::braid_q",
+        "host/relay.rs::stage_u",
+        "native/ember.c::sift_s"
+      ],
+      "why_no_single_location_suffices": "Correct stage writes are useless if fringe packing is wrong, correct packing is useless if stage rebinds early, and correct upstream state is useless if checksums fold the wrong order."
+    },
+    {
+      "id": "topology_c_reduction_convention",
+      "summary": "Native index maps, host stage keys, and reduction order use incompatible conventions after a map change.",
+      "locations": [
+        "native/brim.c::map_v",
+        "host/shelf.rs::latch_r",
+        "native/ember.c::sift_s"
+      ],
+      "why_no_single_location_suffices": "Changing one convention only moves the disagreement to another boundary; producers and consumers must represent the same post-map identity-to-checksum map."
+    }
+  ],
+  "construction_manifest": {
+    "symbol_table": [
+      {
+        "path": "native/ledge.c",
+        "symbol": "braid_q",
+        "kind": "function",
+        "signature": "int32_t braid_q(const int32_t* a, int32_t b, uint64_t* c);",
+        "purpose": "Packs and unpacks fringe boundary values after a rank-map change across the native kernel boundary."
+      },
+      {
+        "path": "host/shelf.rs",
+        "symbol": "latch_r",
+        "kind": "function",
+        "signature": "pub(crate) fn latch_r(a: u64, b: &mut Shelf) -> i8",
+        "purpose": "Rebinds shared-boundary authority and stage metadata so host completion aligns with native buffer readiness."
+      },
+      {
+        "path": "native/ember.c",
+        "symbol": "sift_s",
+        "kind": "function",
+        "signature": "int32_t sift_s(const uint64_t* a, int32_t b, uint64_t* c);",
+        "purpose": "Folds field samples into a stable global checksum under the active post-map ordering."
+      }
+    ],
+    "flipping_point_contract": {
+      "locations": [
+        {
+          "id": "A",
+          "path": "native/ledge.c",
+          "controls_tests": [
+            "test_m01",
+            "test_m02",
+            "test_m06",
+            "test_m10"
+          ]
+        },
+        {
+          "id": "B",
+          "path": "host/shelf.rs",
+          "controls_tests": [
+            "test_m03",
+            "test_m05",
+            "test_m07",
+            "test_m11"
+          ]
+        },
+        {
+          "id": "C",
+          "path": "native/ember.c",
+          "controls_tests": [
+            "test_m04",
+            "test_m08",
+            "test_m09",
+            "test_m12"
+          ]
+        }
+      ],
+      "no_single_location_flips_majority": true,
+      "concentration_cap": 0.5
+    },
+    "decoy_manifest": [
+      {
+        "path": "native/brim.c",
+        "kind": "helper",
+        "rhymes_with": "braid_q",
+        "non_fix_purpose": "Computes ordinary local norm banners for diagnostic lines."
+      },
+      {
+        "path": "host/locker.rs",
+        "kind": "helper",
+        "rhymes_with": "latch_r",
+        "non_fix_purpose": "Maps display codes for status lines without affecting stage rebinds."
+      },
+      {
+        "path": "host/relay.rs",
+        "kind": "helper",
+        "rhymes_with": "sift_s",
+        "non_fix_purpose": "Forwards opaque FFI handles between host modules without altering fold order."
+      }
+    ],
+    "code_forbidden_tokens": [
+      "partitioned",
+      "field",
+      "lab",
+      "app",
+      "case",
+      "rank",
+      "map",
+      "change",
+      "mid-run",
+      "local",
+      "norms",
+      "ordinary",
+      "exchange",
+      "status",
+      "looks",
+      "complete",
+      "global",
+      "fold",
+      "checksums",
+      "disagree",
+      "steady",
+      "twin",
+      "never",
+      "changed",
+      "maps",
+      "pointwise",
+      "samples",
+      "numerically",
+      "fresh",
+      "runs",
+      "without",
+      "correct",
+      "byte-stable",
+      "clean",
+      "rebuilds",
+      "pipeline",
+      "map-changed",
+      "trajectories",
+      "agree",
+      "contracts",
+      "healthy",
+      "control",
+      "bin",
+      "partlab",
+      "output",
+      "parity_report",
+      "json",
+      "keys",
+      "layout",
+      "schema",
+      "docs",
+      "parity-report-schema",
+      "inputs",
+      "report",
+      "checks",
+      "regenerate",
+      "compiled",
+      "bundled"
+    ]
+  },
+  "naming_pass": {
+    "instruction_nouns_extracted": [
+      "partitioned",
+      "field",
+      "lab",
+      "app",
+      "case",
+      "rank",
+      "map",
+      "change",
+      "mid-run",
+      "local",
+      "norms",
+      "ordinary",
+      "exchange",
+      "status",
+      "looks",
+      "complete",
+      "global",
+      "fold",
+      "checksums",
+      "disagree",
+      "steady",
+      "twin",
+      "never",
+      "changed",
+      "maps",
+      "pointwise",
+      "samples",
+      "numerically",
+      "fresh",
+      "runs",
+      "without",
+      "correct",
+      "byte-stable",
+      "clean",
+      "rebuilds",
+      "pipeline",
+      "map-changed",
+      "trajectories",
+      "agree",
+      "contracts",
+      "healthy",
+      "control",
+      "bin",
+      "partlab",
+      "output",
+      "parity_report",
+      "json",
+      "keys",
+      "layout",
+      "schema",
+      "docs",
+      "parity-report-schema",
+      "inputs",
+      "report",
+      "checks",
+      "regenerate",
+      "compiled",
+      "bundled"
+    ],
+    "renames_during_drafting": [
+      {
+        "original": "native/halo_pack.c",
+        "renamed_to": "native/ledge.c",
+        "reason": "Removed cause noun halo from a selected fix path."
+      },
+      {
+        "original": "native/ghost_layer.c",
+        "renamed_to": "native/ledge.c",
+        "reason": "Removed cause noun ghost from a selected fix path."
+      },
+      {
+        "original": "host/ownership.rs",
+        "renamed_to": "host/shelf.rs",
+        "reason": "Removed cause noun ownership from a selected fix path."
+      },
+      {
+        "original": "host/synced_stage.rs",
+        "renamed_to": "host/shelf.rs",
+        "reason": "Removed cause noun synced from the host frontier."
+      },
+      {
+        "original": "native/digest_fold.c",
+        "renamed_to": "native/ember.c",
+        "reason": "Removed instruction-adjacent digest/fold tell from a selected fix path."
+      },
+      {
+        "original": "pack_halo_fringe",
+        "renamed_to": "braid_q",
+        "reason": "Avoided halo/fringe vocabulary adjacent to the public map-change contract."
+      },
+      {
+        "original": "mark_exchange_synced",
+        "renamed_to": "latch_r",
+        "reason": "Avoided exchange/synced vocabulary on the fix path."
+      },
+      {
+        "original": "fold_global_digest",
+        "renamed_to": "sift_s",
+        "reason": "Avoided fold/digest vocabulary from the public instruction."
+      }
+    ],
+    "test_names_audited": [
+      "test_m01",
+      "test_m02",
+      "test_m03",
+      "test_m04",
+      "test_m05",
+      "test_m06",
+      "test_m07",
+      "test_m08",
+      "test_m09",
+      "test_m10",
+      "test_m11",
+      "test_m12"
+    ],
+    "concentration_math": {
+      "total_tests": 12,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    }
+  }
+}

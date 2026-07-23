@@ -1,0 +1,27 @@
+{
+  "analysis": "We saw store data. Current ingest marker generation is clearly wrong per schema: it computes low/high over all amounts and has_absent only from present==0, ignoring origin/non-live. Archived stores include origin=0 rows with present=1 that appear non-live/missing (e.g. legitimate -999 overlap in current store with origin=2 should be live, while mixed/vault origin=0 rows should not be live). Need inspect untruncated execution and skip logic.",
+  "plan": "Print C++ source files one at a time/with narrower ranges, especially harbor skip gates and lattice batch path. Then patch a shared live predicate so row and batch agree, update skip logic for legacy incomplete markers, and update Rust ingest marker fold to live-value semantics.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '1,180p' cpp/src/store.cpp\nsed -n '180,360p' cpp/src/store.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,220p' cpp/src/row.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,220p' cpp/src/harbor/pale.cpp\nsed -n '1,220p' cpp/src/harbor/veil.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,260p' cpp/src/lattice/bay.cpp\nsed -n '1,260p' cpp/src/lattice/rill.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "sed -n '1,220p' cpp/src/parse.cpp\nsed -n '1,220p' cpp/src/main.cpp\nsed -n '1,180p' cpp/src/report.cpp\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+} 

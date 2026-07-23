@@ -1,0 +1,385 @@
+New Terminal Output:
+
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# find cpp -type f | sort
+cpp/Makefile
+cpp/include/loam/exec.hpp
+cpp/include/loam/plan.hpp
+cpp/include/loam/report.hpp
+cpp/include/loam/store.hpp
+cpp/include/loam/types.hpp
+cpp/src/digest.cpp
+cpp/src/harbor/pale.cpp
+cpp/src/harbor/veil.cpp
+cpp/src/lattice/bay.cpp
+cpp/src/lattice/rill.cpp
+cpp/src/main.cpp
+cpp/src/parse.cpp
+cpp/src/report.cpp
+cpp/src/row.cpp
+cpp/src/store.cpp
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# find rust/src -type f | sort
+rust/src/codec.rs
+rust/src/ember/fold.rs
+rust/src/ember/mod.rs
+rust/src/ember/pale.rs
+rust/src/ember/reed.rs
+rust/src/main.rs
+rust/src/model.rs
+rust/src/report.rs
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# for f in cpp/src/*.hpp cpp/include/loam/*.hpp; do [ -f "$f" ] && echo "--- $f" && sed -n '1,220p' "$f"; done
+--- cpp/include/loam/exec.hpp
+#pragma once
+
+#include "loam/types.hpp"
+
+namespace loam {
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c);
+Tally sweep_c(const Slab& a, const Probe& b, const Gate& c);
+Tally sweep_e(const Tally& a, const Tally& b);
+
+}  // namespace loam
+--- cpp/include/loam/plan.hpp
+#pragma once
+
+#include "loam/types.hpp"
+
+namespace loam {
+
+Gate turn_b(const Slab& a, const Probe& b);
+std::string turn_d(const Gate& a, const Probe& b);
+
+}  // namespace loam
+--- cpp/include/loam/report.hpp
+#pragma once
+
+#include "loam/types.hpp"
+
+#include <filesystem>
+#include <string>
+#include <vector>
+
+namespace loam {
+
+void write_report(const std::filesystem::path& path, const std::vector<CaseResult>& cases);
+std::string digest_hex(const std::string& text);
+std::string lane_name(Lane lane);
+
+}  // namespace loam
+--- cpp/include/loam/store.hpp
+#pragma once
+
+#include "loam/types.hpp"
+
+#include <filesystem>
+#include <vector>
+
+namespace loam {
+
+std::vector<Slab> load_store(const std::filesystem::path& path);
+std::vector<CaseSpec> load_cases(const std::filesystem::path& directory);
+CaseResult run_case(const CaseSpec& spec);
+
+}  // namespace loam
+--- cpp/include/loam/types.hpp
+#pragma once
+
+#include <cstdint>
+#include <string>
+#include <vector>
+
+namespace loam {
+
+enum class Origin : std::uint8_t { Retired = 0, Inherited = 1, Current = 2 };
+
+struct Cell {
+    std::uint8_t present{};
+    Origin origin{Origin::Current};
+    std::int64_t amount{};
+    std::string region;
+};
+
+struct Slab {
+    std::size_t id{};
+    std::uint8_t generation{};
+    std::int64_t low{};
+    std::int64_t high{};
+    bool has_absent{};
+    std::string region_low;
+    std::string region_high;
+    std::vector<Cell> cells;
+    std::vector<std::int64_t> amount_lane;
+    std::vector<std::uint8_t> presence_lane;
+    std::vector<std::uint8_t> origin_lane;
+    std::vector<std::string> region_lane;
+};
+
+enum class Op { All, Equal, Range, IsNull, RegionEqual };
+enum class Lane { Row, Batch };
+
+struct Probe {
+    Op op{Op::All};
+    std::int64_t x{};
+    std::int64_t y{};
+    std::string text;
+    Lane lane{Lane::Row};
+    bool skipping{};
+};
+
+struct Gate {
+    bool read{true};
+    std::string note;
+};
+
+struct Tally {
+    std::int64_t row_count{};
+    std::int64_t sum_amount{};
+    std::int64_t pages_read{};
+};
+
+struct CaseSpec {
+    std::string case_id;
+    std::string store_path;
+    Probe probe;
+};
+
+struct CaseResult {
+    std::string case_id;
+    Tally tally;
+    std::int64_t pages_total{};
+    Lane lane{Lane::Row};
+    bool skipping{};
+};
+
+}  // namespace loam
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# echo '--- store.cpp'; sed -n '1,220p' cpp/src/store.cpp
+--- store.cpp
+#include "loam/store.hpp"
+
+#include "loam/exec.hpp"
+#include "loam/plan.hpp"
+
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
+namespace loam {
+namespace {
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> fields;
+    std::size_t start = 0;
+    while (true) {
+        const auto end = line.find('|', start);
+        fields.push_back(line.substr(start, end - start));
+        if (end == std::string::npos) {
+            break;
+        }
+        start = end + 1;
+    }
+    return fields;
+}
+
+}  // namespace
+
+std::vector<Slab> load_store(const std::filesystem::path& path) {
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("cannot open store: " + path.string());
+    }
+
+    std::vector<Slab> slabs;
+    std::string line;
+    while (std::getline(input, line)) {
+        if (line.empty() || line.rfind("H|", 0) == 0) {
+            continue;
+        }
+        const auto page = split(line);
+        if (page.size() != 9 || page[0] != "P") {
+            throw std::runtime_error("bad page record in " + path.string());
+        }
+        Slab slab;
+        slab.id = std::stoull(page[1]);
+        slab.generation = static_cast<std::uint8_t>(std::stoul(page[2]));
+        slab.low = std::stoll(page[3]);
+        slab.high = std::stoll(page[4]);
+        slab.has_absent = page[5] == "1";
+        slab.region_low = page[6];
+        slab.region_high = page[7];
+        const auto row_count = std
+[... output limited to 10000 bytes; 70 interior bytes omitted ...]
+       if (i != 0) out << ',';
+        const auto& item = cases[i];
+        out << "{\"case_id\":\"" << escape_json(item.case_id)
+            << "\",\"row_count\":" << item.tally.row_count
+            << ",\"sum_amount\":" << item.tally.sum_amount
+            << ",\"pages_total\":" << item.pages_total
+            << ",\"pages_read\":" << item.tally.pages_read
+            << ",\"path\":\"" << lane_name(item.lane)
+            << "\",\"skipping\":" << (item.skipping ? "true" : "false")
+            << '}';
+    }
+    out << ']';
+    return out.str();
+}
+
+}  // namespace
+
+std::string lane_name(const Lane lane) {
+    return lane == Lane::Batch ? "batch" : "row";
+}
+
+void write_report(const std::filesystem::path& path, const std::vector<CaseResult>& cases) {
+    if (path.has_parent_path()) {
+        std::filesystem::create_directories(path.parent_path());
+    }
+    const std::string body = cases_json(cases);
+    const std::string digest = digest_hex(body);
+    std::ofstream output(path, std::ios::binary | std::ios::trunc);
+    if (!output) {
+        throw std::runtime_error("cannot write report: " + path.string());
+    }
+    output << "{\"status\":\"complete\",\"cases\":" << body
+           << ",\"digest\":\"" << digest << "\"}\n";
+}
+
+}  // namespace loam
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# echo '--- rust ember'; find rust/src/ember -type f -maxdepth 3 -print -exec sed -n '1,260p' {} \;
+--- rust ember
+find: warning: you have specified the global option -maxdepth after the argument -type, but global options are not positional, i.e., -maxdepth affects tests spe
+cified before it as well as those specified after it.  Please specify global options before other arguments.
+rust/src/ember/fold.rs
+use crate::model::{FoldErr, Mark};
+
+pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+    if a.is_empty() {
+        return Err(FoldErr::Empty);
+    }
+    if a.len() != b.len() || a.len() != c.len() {
+        return Err(FoldErr::Shape);
+    }
+
+    let mut low = a[0];
+    let mut high = a[0];
+    let mut has_absent = false;
+    for (value, present) in a.iter().zip(b.iter()) {
+        low = low.min(*value);
+        high = high.max(*value);
+        has_absent |= *present == 0;
+    }
+
+    Ok(Mark {
+        low,
+        high,
+        has_absent,
+    })
+}
+rust/src/ember/mod.rs
+pub(crate) mod fold;
+pub(crate) mod pale;
+pub(crate) mod reed;
+rust/src/ember/pale.rs
+#[derive(Clone, Debug, Default)]
+pub(crate) struct Dial {
+    pub jobs: usize,
+    pub cells: usize,
+    pub bytes: usize,
+}
+
+pub(crate) fn tilt_d(a: &mut Dial, b: usize, c: usize) {
+    a.jobs += 1;
+    a.cells += b;
+    a.bytes += c;
+}
+rust/src/ember/reed.rs
+use crate::ember::fold::tilt_a;
+use crate::model::{Cell, FoldErr, Page};
+
+pub(crate) fn gather(cells: Vec<Cell>, width: usize) -> Result<Vec<Page>, FoldErr> {
+    let mut pages = Vec::new();
+    for (id, chunk) in cells.chunks(width).enumerate() {
+        let values: Vec<i64> = chunk.iter().map(|cell| cell.amount).collect();
+        let present: Vec<u8> = chunk.iter().map(|cell| cell.present).collect();
+        let origins: Vec<u8> = chunk.iter().map(|cell| cell.origin).collect();
+        let mark = tilt_a(&values, &present, &origins)?;
+
+        let mut regions: Vec<String> = chunk.iter().map(|cell| cell.region.clone()).collect();
+        regions.sort();
+        let region_low = regions.first().cloned().unwrap_or_default();
+        let region_high = regions.last().cloned().unwrap_or_default();
+        pages.push(Page {
+            id,
+            generation: 3,
+            mark,
+            region_low,
+            region_high,
+            cells: chunk.to_vec(),
+        });
+    }
+    Ok(pages)
+}
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# for s in /app/data/archive/*.store; do echo "--- $s"; cat "$s"; done
+--- /app/data/archive/current.store
+H|3
+P|0|3|-999|20|1|east|west|4
+R|1|2|-999|east
+R|0|2|777|west
+R|1|2|10|east
+R|1|2|20|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+--- /app/data/archive/healthy.store
+H|3
+P|0|3|0|30|0|east|west|4
+R|1|2|0|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|0|north|south|4
+R|1|2|100|north
+R|1|2|110|north
+R|1|2|120|south
+R|1|2|130|south
+P|2|3|200|230|0|central|west|4
+R|1|2|200|central
+R|1|2|210|east
+R|1|2|220|north
+R|1|2|230|west
+--- /app/data/archive/mixed.store
+H|2
+P|0|2|100|100|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|0|2|777|west
+P|1|3|30|600|0|north|south|4
+R|1|2|30|north
+R|1|2|40|north
+R|1|2|500|south
+R|1|2|600|south
+P|2|3|-5|-5|0|central|central|1
+R|1|2|-5|central
+P|3|3|200|400|0|east|west|3
+R|1|2|200|east
+R|1|2|300|north
+R|1|2|400|west
+--- /app/data/archive/vault.store
+H|2
+P|0|2|5|30|0|north|west|4
+R|1|2|5|east
+R|1|0|12|east
+R|1|2|18|west
+R|1|2|30|west
+P|1|3|40|70|0|north|south|4
+R|1|2|40|north
+R|1|2|55|north
+R|1|2|63|south
+R|1|2|70|south
+P|2|2|-20|90|1|central|east|3
+R|1|2|-20|central
+R|0|2|90|east
+R|1|2|44|east
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app#

@@ -1,0 +1,51 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat > /app/cpp/src/harbor/veil.cpp <<'EOF'
+> #include "loam/plan.hpp"
+>
+> namespace loam {
+> namespace {
+>
+> // Markers (low/high/has_absent/region_low/region_high) are only trustworthy
+> // on faithfully written slabs. Archived mixed-generation slabs (older
+> // generations) carry incomplete markers, so selective admission must not skip
+> // them; the reader opens them and lets the exact per-cell scan decide.
+> constexpr std::uint8_t kFaithfulGeneration = 3;
+>
+> bool markers_faithful(const Slab& a) {
+>     return a.generation >= kFaithfulGeneration;
+> }
+>
+> }  // namespace
+>
+> Gate turn_b(const Slab& a, const Probe& b) {
+>     if (!b.skipping) {
+>         return {true, "full"};
+>     }
+>     if (b.op == Op::All) {
+>         return {true, "all"};
+>     }
+>     if (!markers_faithful(a)) {
+>         return {true, "unfaithful-markers"};
+>     }
+>     if (b.op == Op::IsNull) {
+>         return {a.has_absent, a.has_absent ? "possible" : "empty"};
+>     }
+>     if (b.op == Op::RegionEqual) {
+>         const bool read = b.text >= a.region_low && b.text <= a.region_high;
+>         return {read, read ? "text-hit" : "text-away"};
+>     }
+>
+>     const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+>     const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+>     const bool read = !(right < a.low || left > a.high);
+>     return {read, read ? "range-hit" : "range-away"};
+> }
+>
+> }  // namespace loam
+> EOF
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app#

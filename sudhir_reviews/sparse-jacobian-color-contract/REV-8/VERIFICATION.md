@@ -1,0 +1,3 @@
+# VERIFICATION — sparse-jacobian-color-contract REV-8
+
+The tests checks rebuild the report through compiled /app/bin/senslab and assert permutation and scale equivalence plus resume parity. They require conflict true ledger.groups with Euclidean per batch scale summaries and operator tinted packed values plus companion directional products. They also require schema_version honor changed runtime.conf step_floor and step_gain verify the closed object FNV-1a digest and enforce deterministic lex ordering. Malformed input must exit nonzero without a partial report. NOP stays red across Harbor trials while oracle stays green across the ten Harbor trials.

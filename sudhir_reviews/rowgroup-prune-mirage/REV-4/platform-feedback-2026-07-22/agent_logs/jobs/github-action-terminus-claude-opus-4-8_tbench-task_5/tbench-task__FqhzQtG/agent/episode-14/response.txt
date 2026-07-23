@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Let me analyze the current results for divergence. m_all is batch, skipping=false, row_count=11, sum=1096. This includes all 'admitted' cells across all 4 slabs where presence!=0. But some of those are Retired-origin (not live). Let me trace mixed.store fully. I have first 17 lines. Let me see the whole mixed store and vault store to fully understand.",
+  "plan": "View full mixed.store and vault.store contents.",
+  "commands": [
+    {"keystrokes": "cat -A /app/data/archive/mixed.store\n", "duration": 0.1},
+    {"keystrokes": "echo '---VAULT---'; cat -A /app/data/archive/vault.store\n", "duration": 0.1}
+  ]
+}
+```

@@ -1,0 +1,51 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app# cat > /app/rust/src/ember/fold.rs <<'EOF'
+> use crate::model::{FoldErr, Mark};
+>
+> // Liveness contract shared with the readers:
+> //   origin 0 (Retired)   -> never live
+> //   origin 1 (Inherited) -> always live
+> //   origin 2 (Current)   -> live only when present != 0
+> fn cell_is_live(origin: u8, present: u8) -> bool {
+>     match origin {
+>         0 => false,
+>         1 => true,
+>         _ => present != 0,
+>     }
+> }
+>
+> pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+>     if a.is_empty() {
+>         return Err(FoldErr::Empty);
+>     }
+>     if a.len() != b.len() || a.len() != c.len() {
+>         return Err(FoldErr::Shape);
+>     }
+>
+>     let mut low: Option<i64> = None;
+>     let mut high: Option<i64> = None;
+>     let mut has_absent = false;
+>
+>     for ((value, present), origin) in a.iter().zip(b.iter()).zip(c.iter()) {
+>         if cell_is_live(*origin, *present) {
+>             low = Some(low.map_or(*value, |cur| cur.min(*value)));
+>             high = Some(high.map_or(*value, |cur| cur.max(*value)));
+>         } else {
+>             has_absent = true;
+>         }
+>     }
+>
+>     // A slab whose entries are all non-live records low 0, high 0, has_absent true.
+>     Ok(Mark {
+>         low: low.unwrap_or(0),
+>         high: high.unwrap_or(0),
+>         has_absent,
+>     })
+> }
+> EOF
+root@6d0a6e3d-fdf7-4011-af75-3ff5a105876f:/app#

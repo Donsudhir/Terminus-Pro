@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Ingest markers are now faithful: Page0 low=10,high=30,has_absent=1 (excludes the retired -999). Page1 low=100,high=130,has_absent=1 (excludes absent 555). Correct per contract.\n\nNow let me verify the fresh store reads correctly with both modes and that a fresh-store audit works. Let me also test the all-non-live edge case and orders_b/c. Let me check orders_b and orders_c.",
+  "plan": "Inspect orders_b and orders_c, ingest them, and verify markers. Also test that a fresh store gives consistent row/batch answers via a custom case.",
+  "commands": [
+    {"keystrokes": "cat /app/data/fresh/orders_b.csv; echo '---C---'; cat /app/data/fresh/orders_c.csv\n", "duration": 0.1}
+  ]
+}
+```

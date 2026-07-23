@@ -221,7 +221,11 @@ Also persist every Snorkel form paste into the current revision dossier with
 `sudhir_task.py form-capture` (and `rubric-capture` if needed):
 `DIFFICULTY.md`, `SOLUTION.md`, `VERIFICATION.md`, `RUBRIC.md` under
 `sudhir_reviews/<slug>/REV-<n>/` (ADR-0012). Chat emission is for the UI;
-the dossier is the durable copy.
+the dossier is the durable copy. Difficulty, Solution, and Verification are one
+atomic set: load the `terminus-dsv-humanizer` skill, preserve platform
+requirements, task truth, and project rules before applying its source-locked
+33-pattern style audit, pass `dsv_humanizer.py`, then capture all three files in
+one command. Partial or direct DSV capture does not satisfy the pre-upload gate.
 
 Then emit these three paste-ready sections in chat:
 
@@ -244,10 +248,15 @@ Then emit these three paste-ready sections in chat:
 
 Writing requirements for all three:
 
-- sound like the builder explaining completed work to another engineer;
-- use simple English, varied sentence lengths, and a slightly informal voice;
-- include natural observations such as `I found` or `At first I thought` only when supported;
-- include two or three small natural grammar mistakes across the entire output;
+- follow the pinned Humanizer v2.9.1 policy in embedded mode only after locking
+    platform acceptance requirements, task facts, and project guidelines;
+- change wording and rhythm only; never change obligation strength, failure
+    modes, solution facts, verifier properties, technical terms, counts, or
+    evidence claims;
+- sound like a plain technical explanation of the completed work;
+- use simple English and varied sentence lengths;
+- use one paragraph, 4–5 sentences, and 45–140 words per field;
+- preserve the required openers but do not manufacture other grammar mistakes;
 - avoid polished transition phrases, buzzwords, academic tone, em dashes, en dashes, semicolons, and excessive commas;
 - do not repeat wording across sections;
 - do not name files, functions, paths, or repository structure unless necessary;

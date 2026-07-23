@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Build succeeded. Now run the audit and inspect the output. Let me also verify agreement between equivalent modes by examining the results.",
+  "plan": "Run the bundled audit, then cat the output. Also run twice to confirm byte-identical.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json\n", "duration": 1.0},
+    {"keystrokes": "cat /app/output/audit.json\n", "duration": 0.1}
+  ]
+}
+```

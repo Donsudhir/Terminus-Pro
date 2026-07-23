@@ -1,0 +1,20 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam audit /app/data/cases /app/output/a1.json; /app/bin/loam audit /app/data/cases /app/output/a2.json
+; diff /app/output/a1.json /app/output/a2.json && echo IDENTICAL
+IDENTICAL
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/data/fresh/orders_a.csv
+origin,presence,amount,region
+0,1,-999,east
+2,1,10,east
+2,1,20,west
+2,1,30,west
+2,1,100,north
+2,0,555,north
+2,1,120,south
+2,1,130,south
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app#

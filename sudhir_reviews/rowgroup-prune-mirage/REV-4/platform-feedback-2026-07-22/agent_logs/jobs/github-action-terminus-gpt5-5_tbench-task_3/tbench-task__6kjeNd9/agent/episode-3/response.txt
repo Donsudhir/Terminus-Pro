@@ -1,0 +1,19 @@
+{
+  "analysis": "We saw row reader live logic: Retired is non-live, Inherited is always live, Current depends on present. IsNull counts non-live rows. Need inspect batch reader and gate planner; likely one or both use presence/amount sentinel incorrectly, causing archived mixed-generation path disagreements. Also need full type definitions.",
+  "plan": "Print the full types header, planner implementations, batch implementations in harbor/lattice files, parse/report, and Rust ingest marker code.",
+  "commands": [
+    {
+      "keystrokes": "cat /app/cpp/include/loam/types.hpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "for f in /app/cpp/src/harbor/*.cpp /app/cpp/src/lattice/*.cpp /app/cpp/src/parse.cpp /app/cpp/src/report.cpp /app/cpp/src/main.cpp; do echo \"### $f\"; sed -n '1,260p' \"$f\"; done\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "for f in /app/rust/src/*.rs /app/rust/src/ember/*.rs; do echo \"### $f\"; sed -n '1,260p' \"$f\"; done\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+} 

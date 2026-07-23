@@ -1,0 +1,54 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# cat > /app/cpp/src/harbor/veil.cpp << 'EOF'
+> #include "loam/plan.hpp"
+>
+> namespace loam {
+> namespace {
+>
+> // Marker-based pruning is only sound for slabs whose markers are faithful to
+> // the live-value domain. The current writer emits generation 3 with faithful
+> // low/high/has_absent markers (see docs/report-schema.md). Older mixed-
+> // generation slabs kept legacy markers that span non-live amounts and carry
+> // inconsistent absence flags, so they must always be opened rather than
+> // pruned. This keeps equivalent modes in agreement without rewriting the
+> // archived artifacts.
+> constexpr std::uint8_t kFaithfulGeneration = 3;
+>
+> bool markers_trustworthy(const Slab& slab) {
+>     return slab.generation == kFaithfulGeneration;
+> }
+>
+> }  // namespace
+>
+> Gate turn_b(const Slab& a, const Probe& b) {
+>     if (!b.skipping) {
+>         return {true, "full"};
+>     }
+>     if (b.op == Op::All) {
+>         return {true, "all"};
+>     }
+>     if (!markers_trustworthy(a)) {
+>         return {true, "legacy"};
+>     }
+>     if (b.op == Op::IsNull) {
+>         return {a.has_absent, a.has_absent ? "possible" : "empty"};
+>     }
+>     if (b.op == Op::RegionEqual) {
+>         const bool read = b.text >= a.region_low && b.text <= a.region_high;
+>         return {read, read ? "text-hit" : "text-away"};
+>     }
+>
+>     const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+>     const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+>     const bool read = !(right < a.low || left > a.high);
+>     return {read, read ? "range-hit" : "range-away"};
+> }
+>
+> }  // namespace loam
+> EOF
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app#

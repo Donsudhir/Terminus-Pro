@@ -1,0 +1,4 @@
+# sample roster lines (family-local seeds override)
+kind=1 mode=0660 uid=0 gid=5
+kind=2 mode=0660 uid=0 gid=6
+kind=0 mode=0644 uid=0 gid=0

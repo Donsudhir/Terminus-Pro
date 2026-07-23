@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "FOUND THE BUG. The batch reader (sweep_c) computes 'admit' (liveness) purely from presence_lane != 0. But the row reader (is_live) uses: Retired->not live, Inherited->LIVE (regardless of presence), Current->present!=0. So an Inherited cell with present==0 is live in row reader but NOT admitted in batch reader. This is exactly 'mixed-generation stores with incomplete markers and varied origin lanes' - the origin lane is ignored by the batch reader. I need to make sweep_c use the same liveness logic. Let me check harbor gate logic too before fixing.",
+  "plan": "Read harbor/pale.cpp and veil.cpp to understand the skip gate, then check the rust ingest side for marker faithfulness.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/harbor/pale.cpp /app/cpp/src/harbor/veil.cpp\n", "duration": 0.1}
+  ]
+}
+```

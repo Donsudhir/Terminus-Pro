@@ -1,0 +1,33 @@
+user_visible_outputs = [
+  "/app/output/parity_report.json",
+]
+
+internal_harness_files = [
+  "/app/build/libnative.a",
+  "/app/tools/build_all.sh",
+]
+
+[structured_outputs.parity_report]
+target = "/app/output/parity_report.json"
+format = "json"
+instruction_checks = [
+  "schema_version",
+  "runs",
+  "family",
+  "tag",
+  "mode",
+  "field_digest",
+  "samples",
+  "residual_samples",
+  "residual_norm",
+  "iterations",
+  "reuse_mark",
+  "layout_token",
+  "fold_order",
+  "summary",
+  "twin_agree",
+  "control_stable",
+  "digest_match",
+  "digest",
+  "parity-report-schema",
+]

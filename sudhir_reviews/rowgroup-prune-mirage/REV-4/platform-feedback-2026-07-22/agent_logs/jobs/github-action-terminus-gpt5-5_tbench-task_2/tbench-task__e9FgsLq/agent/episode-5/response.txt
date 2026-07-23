@@ -1,0 +1,27 @@
+{
+  "analysis": "C++ batch now mirrors row liveness for origins. Numeric selective gate was made conservative for legacy generation<3 pages with has_absent, but we also need account for legacy pages whose has_absent marker misses retired origin rows (e.g. vault page 0 is skipped for isnull despite v_full showing a second non-live row). Fresh Rust ingest still computes low/high over all values and has_absent only from present, so it violates faithful live-value markers.",
+  "plan": "Patch veil.cpp to identify legacy origin-varied pages and open them conservatively for numeric probes and isnull probes when markers may be incomplete. Patch Rust fold.rs to compute markers from live-value semantics (retired non-live, inherited live, current live iff present). Build with /app/tools/build-all, run audit twice and compare bytes, then ingest bundled fresh CSVs and inspect data.store markers.",
+  "commands": [
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np=Path('/app/cpp/src/harbor/veil.cpp')\ns=p.read_text()\ns=s.replace('''namespace loam {\\n\\nGate turn_b(const Slab& a, const Probe& b) {\\n''','''namespace loam {\\nnamespace {\\n\\nbool legacy_origin_varies(const Slab& slab) {\\n    if (slab.generation >= 3) {\\n        return false;\\n    }\\n    for (const auto origin : slab.origin_lane) {\\n        if (static_cast<Origin>(origin) != Origin::Current) {\\n            return true;\\n        }\\n    }\\n    return false;\\n}\\n\\n}  // namespace\\n\\nGate turn_b(const Slab& a, const Probe& b) {\\n''')\ns=s.replace('''    if (b.op == Op::IsNull) {\\n        return {a.has_absent, a.has_absent ? \"possible\" : \"empty\"};\\n    }\\n''','''    if (b.op == Op::IsNull) {\\n        const bool read = a.has_absent || legacy_origin_varies(a);\\n        return {read, read ? \"possible\" : \"empty\"};\\n    }\\n''')\ns=s.replace('''    if (a.generation < 3 && a.has_absent) {\\n        return {true, \"legacy-open\"};\\n    }\\n''','''    if (a.generation < 3 && (a.has_absent || legacy_origin_varies(a))) {\\n        return {true, \"legacy-open\"};\\n    }\\n''')\np.write_text(s)\nPY\ncat /app/cpp/src/harbor/veil.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > /app/rust/src/ember/fold.rs <<'RS'\nuse crate::model::{FoldErr, Mark, RUNE_FIXED, RUNE_VOID};\n\nfn is_live(present: u8, origin: u8) -> bool {\n    if origin == RUNE_VOID {\n        return false;\n    }\n    if origin == RUNE_FIXED {\n        return true;\n    }\n    present != 0\n}\n\npub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {\n    if a.is_empty() {\n        return Err(FoldErr::Empty);\n    }\n    if a.len() != b.len() || a.len() != c.len() {\n        return Err(FoldErr::Shape);\n    }\n\n    let mut low: Option<i64> = None;\n    let mut high: Option<i64> = None;\n    let mut has_absent = false;\n\n    for ((value, present), origin) in a.iter().zip(b.iter()).zip(c.iter()) {\n        if is_live(*present, *origin) {\n            low = Some(low.map_or(*value, |current| current.min(*value)));\n            high = Some(high.map_or(*value, |current| current.max(*value)));\n        } else {\n            has_absent = true;\n        }\n    }\n\n    Ok(Mark {\n        low: low.unwrap_or(0),\n        high: high.unwrap_or(0),\n        has_absent,\n    })\n}\nRS\ncat /app/rust/src/ember/fold.rs\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "/app/tools/build-all\n",
+      "duration": 10.0
+    },
+    {
+      "keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && cat /app/output/audit.json && cp /app/output/audit.json /app/output/audit.1.json && /app/bin/loam audit /app/data/cases /app/output/audit.2.json && cmp -s /app/output/audit.1.json /app/output/audit.2.json && echo deterministic\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "rm -rf /app/output/fresh_a /app/output/fresh_b /app/output/fresh_c; /app/bin/loam ingest /app/data/fresh/orders_a.csv /app/output/fresh_a; /app/bin/loam ingest /app/data/fresh/orders_b.csv /app/output/fresh_b; /app/bin/loam ingest /app/data/fresh/orders_c.csv /app/output/fresh_c; for s in /app/output/fresh_*/data.store; do echo \"===== $s =====\"; /app/bin/loam inspect \"$s\"; cat \"$s\"; done\n",
+      "duration": 2.0
+    }
+  ],
+  "task_complete": false
+} 

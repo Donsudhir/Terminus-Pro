@@ -1,0 +1,41 @@
+Current Terminal Screen:
+    15      if (b.op == Op::RegionEqual) {
+    16          const bool read = b.text >= a.region_low && b.text <= a.region_high;
+    17          return {read, read ? "text-hit" : "text-away"};
+    18      }
+    19
+    20      const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+    21      const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+    22      const bool read = !(right < a.low || left > a.high);
+    23      return {read, read ? "range-hit" : "range-away"};
+    24  }
+    25
+    26  }  // namespace loam
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app# echo '### rust fold'; nl -ba /app/rust/src/ember/fold.rs | sed -n '1,220p'
+### rust fold
+     1  use crate::model::{FoldErr, Mark};
+     2
+     3  pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+     4      if a.is_empty() {
+     5          return Err(FoldErr::Empty);
+     6      }
+     7      if a.len() != b.len() || a.len() != c.len() {
+     8          return Err(FoldErr::Shape);
+     9      }
+    10
+    11      let mut low = a[0];
+    12      let mut high = a[0];
+    13      let mut has_absent = false;
+    14      for (value, present) in a.iter().zip(b.iter()) {
+    15          low = low.min(*value);
+    16          high = high.max(*value);
+    17          has_absent |= *present == 0;
+    18      }
+    19
+    20      Ok(Mark {
+    21          low,
+    22          high,
+    23          has_absent,
+    24      })
+    25  }
+root@e4e73d3a-e155-4fa8-8263-b589414b053f:/app#

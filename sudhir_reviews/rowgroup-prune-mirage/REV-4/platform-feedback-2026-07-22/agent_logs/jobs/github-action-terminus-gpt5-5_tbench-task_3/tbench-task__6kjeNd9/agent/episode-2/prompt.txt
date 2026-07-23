@@ -1,0 +1,62 @@
+New Terminal Output:
+
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json && cat /app/output/audit.json
+{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_
+skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_to
+tal":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping"
+:true},{"case_id":"m_range","row_count":2,"sum_amount":70,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":0,"sum_
+amount":0,"pages_total":4,"pages_read":0,"path":"row","skipping":true},{"case_id":"m_null","row_count":1,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"b
+atch","skipping":false},{"case_id":"m_interact","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":1,"path":"batch","skipping":true},{"case_id":"m_neg",
+"row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":11,"sum_amount":1096,"pages_total":
+4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":tr
+ue},{"case_id":"v_missing","row_count":1,"sum_amount":0,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"v_check","row_count":1,"sum_a
+mount":0,"pages_total":3,"pages_read":1,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"ro
+w","skipping":false}],"digest":"386f5d5d6e94d3e9"}
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# find /app/data -maxdepth 4 -type f -printf '%p\n' | sort
+/app/data/archive/current.store
+/app/data/archive/healthy.store
+/app/data/archive/mixed.store
+/app/data/archive/vault.store
+/app/data/cases/control.case
+/app/data/cases/incident.case
+/app/data/fresh/orders_a.csv
+/app/data/fresh/orders_b.csv
+/app/data/fresh/orders_c.csv
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# find /app/cpp -maxdepth 4 -type f | sort
+/app/cpp/Makefile
+/app/cpp/build/digest.o
+/app/cpp/build/harbor/pale.o
+/app/cpp/build/harbor/veil.o
+/app/cpp/build/lattice/bay.o
+/app/cpp/build/lattice/rill.o
+/app/cpp/build/loam
+/app/cpp/build/main.o
+/app/cpp/build/parse.o
+/app/cpp/build/report.o
+/app/cpp/build/row.o
+/app/cpp/build/store.o
+/app/cpp/include/loam/exec.hpp
+/app/cpp/include/loam/plan.hpp
+/app/cpp/include/loam/report.hpp
+/app/cpp/include/loam/store.hpp
+/app/cpp/include/loam/types.hpp
+/app/cpp/src/digest.cpp
+/app/cpp/src/harbor/pale.cpp
+/app/cpp/src/harbor/veil.cpp
+/app/cpp/src/lattice/bay.cpp
+/app/cpp/src/lattice/rill.cpp
+/app/cpp/src/main.cpp
+/app/cpp/src/parse.cpp
+/app/cpp/src/report.cpp
+/app/cpp/src/row.cpp
+/app/cpp/src/store.cpp
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# find /app/rust/src -maxdepth 3 -type f | sort
+/app/rust/src/codec.rs
+/app/rust/src/ember/fold.rs
+/app/rust/src/ember/mod.rs
+/app/rust/src/ember/pale.rs
+/app/rust/src/ember/reed.rs
+/app/rust/src/main.rs
+/app/rust/src/model.rs
+/app/rust/src/report.rs
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app#

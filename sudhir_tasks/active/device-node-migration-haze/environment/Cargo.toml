@@ -1,0 +1,10 @@
+[package]
+name = "haze"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Built via Makefile + rustc (not cargo). Documents the multi-root layout:
+# loom/ (C), veil/ (Rust), tether/ (Rust), crate/ (orchestration).
+[lib]
+path = "crate/main.rs"

@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "There are archive stores (current, healthy, mixed, vault) and cases (control, incident). Let me look at the case files and store files to understand the data and the mixed-generation scenario.",
+  "plan": "Read case files and the mixed store to understand the format and where liveness/origin matters.",
+  "commands": [
+    {"keystrokes": "cat /app/data/cases/control.case /app/data/cases/incident.case\n", "duration": 0.1},
+    {"keystrokes": "cat /app/data/archive/mixed.store\n", "duration": 0.1}
+  ]
+}
+```

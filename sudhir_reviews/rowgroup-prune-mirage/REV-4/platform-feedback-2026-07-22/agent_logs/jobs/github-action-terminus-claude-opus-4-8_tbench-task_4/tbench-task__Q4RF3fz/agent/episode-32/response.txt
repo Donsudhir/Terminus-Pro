@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "All fixes are verified and persisted. The solution correctly repairs the disagreement between selective reads and batch execution on archived mixed-generation stores while preserving healthy case behavior and fast-path skipping. Clean rebuild succeeds, audit output is correct, and repeated runs are byte-identical.",
+  "plan": "Task is complete. Confirming completion.",
+  "commands": [],
+  "task_complete": true
+}
+```

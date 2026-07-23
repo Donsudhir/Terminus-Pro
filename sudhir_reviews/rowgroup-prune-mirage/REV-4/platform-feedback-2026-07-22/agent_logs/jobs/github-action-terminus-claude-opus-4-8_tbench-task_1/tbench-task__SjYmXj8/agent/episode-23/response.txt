@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "All three fixes are in place. Now rebuild and test. Note: RUNE_VOID/RUNE_FIXED are unused constants generating warnings but not errors on Rust side (Rust doesn't have -Werror here). Let me rebuild.",
+  "plan": "Rebuild everything and run the audit, then verify the output.",
+  "commands": [
+    {"keystrokes": "/app/tools/build-all 2>&1 | tail -15\n", "duration": 30.0}
+  ]
+}
+```

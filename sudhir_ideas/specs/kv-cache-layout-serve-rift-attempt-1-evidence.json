@@ -1,0 +1,667 @@
+{
+  "hardness_axes": [
+    {
+      "id": "discover",
+      "name": "Discover",
+      "verdict": "PASS",
+      "reasoning": "Public symptoms describe short-prompt-green / long-prompt-wrong greedy decode with healthy cache-hit and latency summaries, but they do not identify the exported-weight binding stride, the incremental working-set slot indexing rule, or the serve-time sequence-index offset policy. Those facts must be recovered from C++/Rust code, fixtures, logs, and short/long control matrices."
+    },
+    {
+      "id": "synthesize",
+      "name": "Synthesize",
+      "verdict": "PASS",
+      "reasoning": "Passing outcomes require coordinated behavior across native weight binding, host working-set slot indexing, and host sequence-index offsets. No single module owns correct long-prompt greedy sequences while preserving short-prompt controls and leaving cache-hit/latency bait non-decisive."
+    },
+    {
+      "id": "diagnose",
+      "name": "Diagnose",
+      "verdict": "PASS",
+      "reasoning": "The instruction reports short-green / long-wrong decode with healthy cache-hit/latency summaries without naming KV stride bugs, RoPE/phase mismatches, weight-layout packing errors, or fix sites."
+    },
+    {
+      "id": "navigate_coupling",
+      "name": "Navigate coupling",
+      "verdict": "PASS",
+      "reasoning": "Correct weight binding still fails if working-set slots are misindexed on longer sequences; correct slots still fail if sequence-index offsets diverge past a length threshold; offset-only repairs leave long-prompt goldens red while short controls and cache-hit counters still look healthy."
+    },
+    {
+      "id": "reason_beyond_training",
+      "name": "Reason beyond training",
+      "verdict": "PASS",
+      "reasoning": "A textbook 'enable prefix caching', 'fix the tokenizer', or 'retune short prompts' recipe cannot reconcile the project-specific export binding stride, incremental slot indexing, and sequence-index offset policy while keeping short controls green and rejecting cache-hit/latency as success."
+    }
+  ],
+  "anti_trivialization_checks": [
+    {
+      "id": "disclosure_collapse",
+      "name": "Disclosure-collapse",
+      "verdict": "PASS",
+      "reasoning": "An honest statement of short/long golden decode, healthy short controls, and non-decisive cache-hit/latency summaries does not reveal which of the three C++/Rust authorities is inconsistent."
+    },
+    {
+      "id": "hidden_instance",
+      "name": "Hidden-instance",
+      "verdict": "PASS",
+      "reasoning": "The design covers multiple long-prompt families, generated length variants, and short-prompt healthy controls rather than hiding one corrupted prompt file."
+    },
+    {
+      "id": "single_artifact_repair",
+      "name": "Single-artifact repair",
+      "verdict": "PASS",
+      "reasoning": "Three coordinated locations across native/ and host/ roots are required; rewriting one weight blob or golden report cannot satisfy regenerated short/long checks."
+    },
+    {
+      "id": "generalization",
+      "name": "Generalization",
+      "verdict": "PASS",
+      "reasoning": "The verifier regenerates long-prompt families and short controls from bundled generators, so fixes must generalize beyond named fixtures."
+    },
+    {
+      "id": "prompt_honesty",
+      "name": "Prompt-honesty",
+      "verdict": "PASS",
+      "reasoning": "The instruction names observable short/long decode failures, invocation, normative report schema path, and completion conditions while withholding only implementation causes and fix sites."
+    },
+    {
+      "id": "cheating_vs_difficulty",
+      "name": "Cheating-vs-difficulty",
+      "verdict": "PASS",
+      "reasoning": "Regeneration and short/long matrices prevent hardcoding, but residual difficulty is cross-language serve-layout diagnosis rather than those anti-cheating mechanisms."
+    },
+    {
+      "id": "mechanical_fix_filter",
+      "name": "Mechanical-fix filter",
+      "verdict": "PASS",
+      "reasoning": "The core work is not dependency placement, timeouts, reward formatting, or metadata repair."
+    },
+    {
+      "id": "localized_fix",
+      "name": "Localized-fix",
+      "verdict": "PASS",
+      "reasoning": "The selected topology places one location in native/reed.cpp and two in distinct Rust modules under host/, each controlling 4 of 12 tests under a 0.5 concentration cap."
+    },
+    {
+      "id": "oracle_locality",
+      "name": "Oracle-locality",
+      "verdict": "PASS",
+      "reasoning": "The planned oracle performs substantive weight-binding, slot-indexing, and sequence-offset changes rather than replacing one short file or toggling one compiler option."
+    },
+    {
+      "id": "small_declarative_cluster",
+      "name": "Small declarative-cluster",
+      "verdict": "PASS",
+      "reasoning": "No finite table, threshold list, schema block, or configuration cluster contains the solution; the cited schema only documents report keys."
+    },
+    {
+      "id": "grep_collapse",
+      "name": "Grep-collapse",
+      "verdict": "PASS",
+      "reasoning": "Selected fix paths and symbols use opaque reed/silt/weld and plait_m/latch_y/pivot_z vocabulary that does not contain any noun extracted from the public instruction."
+    },
+    {
+      "id": "pre_factored_helper",
+      "name": "Pre-factored-helper",
+      "verdict": "PASS",
+      "reasoning": "The selected functions do not mirror public terms such as decode, token, prompt, cache, weight, golden, latency, or sequence."
+    },
+    {
+      "id": "recipe_discount",
+      "name": "Recipe-discount",
+      "verdict": "PASS",
+      "reasoning": "A known tokenizer, prefix-cache, or short-prompt retune recipe cannot repair export binding stride, incremental slot indexing, and sequence-index offsets together while preserving short controls."
+    },
+    {
+      "id": "security_aura_discount",
+      "name": "Security-aura discount",
+      "verdict": "PASS",
+      "reasoning": "This is a machine-learning serve correctness task and does not rely on exploit framing for difficulty."
+    },
+    {
+      "id": "orthogonal_checklist",
+      "name": "Orthogonal-checklist",
+      "verdict": "PASS",
+      "reasoning": "Long-prompt golden sequences, short-prompt controls, and non-decisive cache-hit/latency bait are one coupled serve invariant spanning three authorities, not independent checklist bullets."
+    },
+    {
+      "id": "harness_discount",
+      "name": "Harness-discount",
+      "verdict": "PASS",
+      "reasoning": "Docker and C++/Rust compilation provide realism, while residual hardness comes from binding stride, slot indexing, and sequence-offset decisions."
+    },
+    {
+      "id": "one_pass_solvability",
+      "name": "One-pass solvability",
+      "verdict": "PASS",
+      "reasoning": "Opening the obvious entrypoint does not reveal the three locations, and a naive short-prompt-only or latency-tuning pass leaves long goldens red."
+    },
+    {
+      "id": "hard_only_gate",
+      "name": "Hard-only gate",
+      "verdict": "PASS",
+      "reasoning": "The bounded task requires professional offline inference layout diagnosis and three-boundary coordination within an expert-hours scope, not undergrad recipe completion."
+    },
+    {
+      "id": "discovery_budget_test",
+      "name": "Discovery budget test",
+      "verdict": "PASS",
+      "reasoning": "Three non-trivial discoveries are committed below, each with a distinct planned location and a reason it must remain absent from the public instruction."
+    },
+    {
+      "id": "instruction_specificity_test",
+      "name": "Instruction specificity test",
+      "verdict": "PASS",
+      "reasoning": "The drafted instruction stays at symptoms-only: no algorithms, thresholds, cause phrases such as KV stride or RoPE phase, or named fix sites."
+    },
+    {
+      "id": "topology_distribution_test",
+      "name": "Topology distribution test",
+      "verdict": "PASS",
+      "reasoning": "Three distinct candidate topologies are enumerated below, each requiring at least three coordinating locations; the selected topology distributes tests across three locations at 4/12 each."
+    }
+  ],
+  "rubric_axes": [
+    {
+      "id": "verifiable",
+      "name": "Verifiable",
+      "verdict": "PASS",
+      "reasoning": "Long-prompt greedy sequence equality to goldens, short-prompt control stability, regenerated ember_report.json checks, and non-acceptance of cache-hit/latency-only success are all programmatic."
+    },
+    {
+      "id": "well_specified",
+      "name": "Well-specified",
+      "verdict": "PASS",
+      "reasoning": "The symptoms-only instruction clearly identifies invocation, normative schema path, short/long outcomes, and prohibited hardcoding/architecture invention without revealing implementation causes."
+    },
+    {
+      "id": "solvable",
+      "name": "Solvable",
+      "verdict": "PASS",
+      "reasoning": "The design bounds the defect to a small existing C++/Rust offline serve toolkit; an expert familiar with inference runtimes can complete the coordinated changes in roughly three to eight hours."
+    },
+    {
+      "id": "difficult",
+      "name": "Difficult",
+      "verdict": "PASS",
+      "reasoning": "The task stays hard after honest disclosure because short-green / long-wrong decode with healthy cache-hit bait does not identify which binding, slot, or offset authority is inconsistent."
+    },
+    {
+      "id": "interesting",
+      "name": "Interesting",
+      "verdict": "PASS",
+      "reasoning": "Reliable offline greedy serve that keeps short and long prompt contracts aligned is paid production work in ML inference and serving engineering."
+    },
+    {
+      "id": "outcome_verified",
+      "name": "Outcome-verified",
+      "verdict": "PASS",
+      "reasoning": "The tests accept any implementation producing correct short/long outcomes and do not require the oracle's exact code shape."
+    }
+  ],
+  "instruction_completeness_test": {
+    "verdict": "PASS",
+    "reasoning": "The instruction is sufficient to judge the final ember_report and short/long outcomes but insufficient to locate or derive the three fixes without deeply reading and running the codebase."
+  },
+  "discovery_budget": [
+    {
+      "discovery": "Exported weight tensors are bound into runtime buffers with a packing stride that disagrees with the export contract, so short prompts can still match goldens while longer prompts accumulate layout-sensitive decode divergence.",
+      "planned_location": "environment/native/reed.cpp::plait_m",
+      "why_instruction_must_not_reveal": "Naming export packing stride or weight-layout binding would collapse the C++ diagnosis into a disclosed tensor-layout recipe."
+    },
+    {
+      "discovery": "Incremental generation working-set slots are written/read with a wrong index stride, so longer sequences reuse or skip slots while cache-hit counters can still look plausible.",
+      "planned_location": "environment/host/silt.rs::latch_y",
+      "why_instruction_must_not_reveal": "Naming KV-cache slot stride or write/read indexing would directly expose the Rust repair and convert the task into a recipe."
+    },
+    {
+      "discovery": "Serve-time sequence-index offsets applied during generation diverge past a length threshold, so long-prompt greedy tokens disagree even when upstream buffers look locally consistent.",
+      "planned_location": "environment/host/weld.rs::pivot_z",
+      "why_instruction_must_not_reveal": "Naming positional/RoPE phase or sequence-index offset policy would reduce the third repair to a disclosed encoding flip."
+    }
+  ],
+  "instruction_specificity": {
+    "level": "symptoms-only",
+    "reasoning": "The public draft describes short-prompt-green / long-prompt-wrong greedy decode, healthy cache-hit/latency summaries, short controls that must remain unchanged, and a cited report schema without naming algorithms, thresholds, KV strides, RoPE phases, packing bugs, or causes."
+  },
+  "investigation_profile": {
+    "weakness_areas": [
+      "long_horizon_debugging",
+      "multi_component_reasoning",
+      "partial_failures",
+      "misleading_documentation"
+    ],
+    "causal_chain": [
+      {
+        "stage": 1,
+        "evidence": "Run bundled short and long prompt families; compare golden token sequences, cache-hit counters, and latency summaries.",
+        "finding": "Short prompts match goldens and cache-hit/latency look healthy while longer prompts diverge on greedy sequences.",
+        "unlocks_next": "The conditional matrix justifies treating short-green / long-wrong as one serve incident rather than a general model failure."
+      },
+      {
+        "stage": 2,
+        "evidence": "Inspect run logs, metrics counters, and ember_report.json fields for short versus long trajectories.",
+        "finding": "Disagreement concentrates on long-prompt sequence fields after generation extends past short lengths, not on export-check banners or short controls.",
+        "unlocks_next": "Investigation can focus on state that crosses the short-to-long generation boundary across C++ and Rust roots."
+      },
+      {
+        "stage": 3,
+        "evidence": "Trace exported weight binding and native buffer packing against short/long decode baselines.",
+        "finding": "Export binding stride disagrees with the runtime contract in a way short prompts can still tolerate.",
+        "unlocks_next": "Weight-binding repair becomes a necessary but not sufficient stage before slot indexing and sequence offsets are trusted."
+      },
+      {
+        "stage": 4,
+        "evidence": "Compare incremental working-set write/read indices across length thresholds using deterministic probes.",
+        "finding": "Slot indexing uses a wrong stride, explaining long-sequence divergence while cache-hit counters remain plausible.",
+        "unlocks_next": "Slot indexing must be repaired in concert with weight binding; sequence offsets still remain unchecked."
+      },
+      {
+        "stage": 5,
+        "evidence": "Inspect serve-time sequence-index offset intermediates on long trajectories.",
+        "finding": "Offsets diverge past a length threshold, so greedy tokens disagree even when upstream buffers look locally repaired.",
+        "unlocks_next": "The three authorities can now be repaired as one coupled invariant and verified end-to-end."
+      },
+      {
+        "stage": 6,
+        "evidence": "Apply coordinated repairs at reed, silt, and weld locations; rebuild; rerun short/long matrices.",
+        "finding": "Long prompts recover golden sequences; short controls remain unchanged; cache-hit/latency alone is not treated as success.",
+        "unlocks_next": "This closes the incident with deterministic outcome evidence."
+      }
+    ],
+    "evidence_surfaces": [
+      {
+        "surface": "code",
+        "planned_location": "environment/native/ (C++) and environment/host/ (Rust)",
+        "question_answered": "Which roots own weight binding, working-set slot indexing, and sequence-index offsets?"
+      },
+      {
+        "surface": "runtime-state",
+        "planned_location": "Deterministic observations from /app/bin/kiln short/long runs",
+        "question_answered": "Where do short goldens stay green while long greedy sequences diverge?"
+      },
+      {
+        "surface": "logs",
+        "planned_location": "environment/fixtures/logs/run_trace.ndjson",
+        "question_answered": "Which generation phases correlate with long-prompt sequence failures?"
+      },
+      {
+        "surface": "metrics",
+        "planned_location": "Emitted cache-hit and latency counters in /app/output/ember_report.json",
+        "question_answered": "Do cache-hit/latency metrics mask the long-prompt sequence failure mode?"
+      },
+      {
+        "surface": "filesystem",
+        "planned_location": "environment/fixtures/prompts/ and export artifacts under /app/var/export/",
+        "question_answered": "What durable short/long fixtures and export artifacts exist for failing versus control runs?"
+      }
+    ],
+    "competing_hypotheses": [
+      {
+        "hypothesis": "The tokenizer or prompt preprocessing truncates longer inputs.",
+        "why_plausible": "Only longer prompts diverge while short prompts match goldens.",
+        "falsifier": "Prompt token-id fixtures and short/long input cardinality in ember_report.json match across runs; divergence appears in generated continuation tokens, not input truncation."
+      },
+      {
+        "hypothesis": "Cache-hit or latency SLO regressions indicate the real failure.",
+        "why_plausible": "The instruction mentions healthy-looking cache-hit and latency summaries.",
+        "falsifier": "Baseline already shows plausible cache-hit/latency while long goldens fail; tests reject treating those counters as success."
+      },
+      {
+        "hypothesis": "Random numerical noise or nondeterministic reduction order causes long-prompt drift.",
+        "why_plausible": "Longer sequences amplify small numeric differences.",
+        "falsifier": "The offline container pins reduction order; clean rebuilds are byte-stable; short controls stay identical before and after repair."
+      }
+    ],
+    "conditional_failures": [
+      {
+        "scenario": "Long-prompt greedy decode on bundled failing families",
+        "role": "failing",
+        "expected_behavior": "After repair, greedy token sequences match goldens for long prompts."
+      },
+      {
+        "scenario": "Generated longer length variants with the same public contract",
+        "role": "failing",
+        "expected_behavior": "Long-prompt golden fidelity generalizes beyond the bundled incident fixtures."
+      },
+      {
+        "scenario": "Short-prompt healthy control decode",
+        "role": "healthy-control",
+        "expected_behavior": "Remains golden and byte-stable across clean rebuilds before and after repair."
+      },
+      {
+        "scenario": "Cache-hit / latency bait summaries",
+        "role": "healthy-control",
+        "expected_behavior": "May look healthy on the broken baseline; repairs must not treat them as success criteria."
+      }
+    ],
+    "estimated_meaningful_actions": 46,
+    "determinism_strategy": "Ship fixed C++/Rust sources, export fixtures, prompt families, and logs in one offline container. Reset from immutable inputs before each scenario, avoid clocks and runtime entropy, pin reduction and slot traversal order, and derive expected short/long properties from verifier-owned regeneration.",
+    "domain_reasoning": {
+      "domain": "Machine-learning offline inference / serve correctness for greedy decode under short and long prompt contracts.",
+      "why_not_trivia": "The solver does not need an obscure API flag. They must reconcile export binding stride, incremental working-set slot indexing, and serve-time sequence-index offsets across C++ and Rust while proving short/long outcomes and rejecting cache-hit/latency bait."
+    }
+  },
+  "attack_path": {
+    "summary": "Reproduce short-green / long-wrong greedy decode beside healthy cache-hit/latency bait, falsify tokenizer-truncation and numeric-noise hypotheses, then reconcile export binding, working-set slot indexing, and sequence-index offsets across three roots.",
+    "reasoning": "The path requires experiments and cross-language model building; no prompt noun, file name, or single failed assertion reveals all three locations."
+  },
+  "smallest_plausible_patch": {
+    "summary": "Coordinated substantive edits to one C++ weight-binding function and two Rust slot/offset functions, together exceeding a trivial patch.",
+    "reasoning": "Any strict subset leaves at least one long-prompt golden, short-control, or report property failing."
+  },
+  "collapse_audit": {
+    "verdict": "PASS",
+    "reasoning": "The editable frontier spans three non-obvious locations across C++ and Rust modules, the instruction remains symptoms-only, no declarative cluster or reference digest exists, and the planned oracle adds substantive logic rather than deleting or toggling one feature.",
+    "residual_hardness": "After the complete file tree is visible, the solver must still identify why short/long trajectories cross different binding, slot, and offset authorities and then preserve one short/long invariant through three locations.",
+    "red_flags": []
+  },
+  "topology_enumeration": [
+    {
+      "id": "topology_a_selected",
+      "summary": "Exported-weight binding stride, incremental working-set slot indexing, and serve-time sequence-index offsets disagree across reed, silt, and weld.",
+      "locations": [
+        "native/reed.cpp::plait_m",
+        "host/silt.rs::latch_y",
+        "host/weld.rs::pivot_z"
+      ],
+      "why_no_single_location_suffices": "Correct weight binding can still be undone by wrong slot strides, correct slots can still miss long goldens under wrong sequence offsets, and offset-only repairs leave long sequences red when binding disagrees."
+    },
+    {
+      "id": "topology_b_lifecycle_chain",
+      "summary": "Export bind, working-set write, working-set read, and sequence-offset apply form a four-stage serve lifecycle chain.",
+      "locations": [
+        "native/reed.cpp::plait_m",
+        "host/silt.rs::latch_y",
+        "host/weld.rs::pivot_z",
+        "host/relay.rs::swing_u"
+      ],
+      "why_no_single_location_suffices": "Correct export bind is useless if writes land in the wrong slots, correct writes are useless if reads use a different stride, and correct buffers are useless if sequence offsets diverge past a length threshold."
+    },
+    {
+      "id": "topology_c_authority_map",
+      "summary": "C++ packing convention, Rust slot keys, and Rust sequence-index offsets use incompatible conventions after short-to-long generation.",
+      "locations": [
+        "native/reed.cpp::plait_m",
+        "host/silt.rs::latch_y",
+        "host/weld.rs::pivot_z"
+      ],
+      "why_no_single_location_suffices": "Changing one convention only moves the disagreement to another boundary; producers and consumers must represent the same long-prompt decode map."
+    }
+  ],
+  "construction_manifest": {
+    "symbol_table": [
+      {
+        "path": "native/reed.cpp",
+        "symbol": "plait_m",
+        "kind": "function",
+        "signature": "int32_t plait_m(const uint8_t* a, size_t b, uint64_t* c);",
+        "purpose": "Binds exported tensor bytes into runtime working buffers under the active packing context."
+      },
+      {
+        "path": "host/silt.rs",
+        "symbol": "latch_y",
+        "kind": "function",
+        "signature": "pub(crate) fn latch_y(a: u64, b: &mut Slate) -> i8",
+        "purpose": "Writes and reads incremental generation working-set slots under the active index context."
+      },
+      {
+        "path": "host/weld.rs",
+        "symbol": "pivot_z",
+        "kind": "function",
+        "signature": "pub(crate) fn pivot_z(a: u64, b: &mut Phase) -> i8",
+        "purpose": "Applies sequence-index offsets during generation under the active phase context."
+      }
+    ],
+    "flipping_point_contract": {
+      "locations": [
+        {
+          "id": "A",
+          "path": "native/reed.cpp",
+          "controls_tests": [
+            "test_e01",
+            "test_e02",
+            "test_e06",
+            "test_e10"
+          ]
+        },
+        {
+          "id": "B",
+          "path": "host/silt.rs",
+          "controls_tests": [
+            "test_e03",
+            "test_e05",
+            "test_e07",
+            "test_e11"
+          ]
+        },
+        {
+          "id": "C",
+          "path": "host/weld.rs",
+          "controls_tests": [
+            "test_e04",
+            "test_e08",
+            "test_e09",
+            "test_e12"
+          ]
+        }
+      ],
+      "no_single_location_flips_majority": true,
+      "concentration_cap": 0.5
+    },
+    "decoy_manifest": [
+      {
+        "path": "native/bract.cpp",
+        "kind": "helper",
+        "rhymes_with": "plait_m",
+        "non_fix_purpose": "Counts export banner fields for diagnostic lines without binding tensors."
+      },
+      {
+        "path": "host/loam.rs",
+        "kind": "helper",
+        "rhymes_with": "latch_y",
+        "non_fix_purpose": "Maps display codes for status lines without changing working-set slots."
+      },
+      {
+        "path": "host/seam.rs",
+        "kind": "helper",
+        "rhymes_with": "pivot_z",
+        "non_fix_purpose": "Formats phase labels for logs without applying sequence-index offsets."
+      }
+    ],
+    "code_forbidden_tokens": [
+      "app",
+      "architecture",
+      "bin",
+      "breaking",
+      "bundled",
+      "cache-hit",
+      "checks",
+      "compiled",
+      "controls",
+      "correct",
+      "counters",
+      "decode",
+      "diverge",
+      "docs",
+      "ember-report-schema",
+      "ember_report",
+      "emit",
+      "export",
+      "exported",
+      "fixed",
+      "follow",
+      "golden",
+      "greedy",
+      "hand",
+      "healthy",
+      "inventing",
+      "invoke",
+      "json",
+      "keys",
+      "kiln",
+      "lab",
+      "latency",
+      "layout",
+      "loads",
+      "long-prompt",
+      "longer",
+      "match",
+      "md",
+      "model",
+      "new",
+      "normative",
+      "offline",
+      "output",
+      "pass",
+      "pipeline",
+      "prompts",
+      "rebuild",
+      "regenerate",
+      "remain",
+      "replace",
+      "report",
+      "runs",
+      "schema",
+      "sequences",
+      "short",
+      "short-prompt",
+      "summaries",
+      "token",
+      "training-side",
+      "unchanged",
+      "weights",
+      "write"
+    ]
+  },
+  "naming_pass": {
+    "instruction_nouns_extracted": [
+      "app",
+      "architecture",
+      "bin",
+      "breaking",
+      "bundled",
+      "cache-hit",
+      "checks",
+      "compiled",
+      "controls",
+      "correct",
+      "counters",
+      "decode",
+      "diverge",
+      "docs",
+      "ember-report-schema",
+      "ember_report",
+      "emit",
+      "export",
+      "exported",
+      "fixed",
+      "follow",
+      "golden",
+      "greedy",
+      "hand",
+      "healthy",
+      "inventing",
+      "invoke",
+      "json",
+      "keys",
+      "kiln",
+      "lab",
+      "latency",
+      "layout",
+      "loads",
+      "long-prompt",
+      "longer",
+      "match",
+      "md",
+      "model",
+      "new",
+      "normative",
+      "offline",
+      "output",
+      "pass",
+      "pipeline",
+      "prompts",
+      "rebuild",
+      "regenerate",
+      "remain",
+      "replace",
+      "report",
+      "runs",
+      "schema",
+      "sequences",
+      "short",
+      "short-prompt",
+      "summaries",
+      "token",
+      "training-side",
+      "unchanged",
+      "weights",
+      "write"
+    ],
+    "renames_during_drafting": [
+      {
+        "original": "native/weight_layout.cpp",
+        "renamed_to": "native/reed.cpp",
+        "reason": "Removed instruction nouns weight and layout from a selected fix path."
+      },
+      {
+        "original": "host/kv_cache.rs",
+        "renamed_to": "host/silt.rs",
+        "reason": "Removed cause-revealing kv/cache naming from the Rust frontier."
+      },
+      {
+        "original": "host/positional.rs",
+        "renamed_to": "host/weld.rs",
+        "reason": "Removed cause-revealing positional naming from a selected fix path."
+      },
+      {
+        "original": "bind_weights",
+        "renamed_to": "plait_m",
+        "reason": "Avoided weights/bind vocabulary from the public instruction."
+      },
+      {
+        "original": "index_cache_slots",
+        "renamed_to": "latch_y",
+        "reason": "Avoided cache vocabulary adjacent to the public short/long contract."
+      },
+      {
+        "original": "apply_rope_phase",
+        "renamed_to": "pivot_z",
+        "reason": "Avoided cause-revealing RoPE/phase recipe naming on the fix path."
+      }
+    ],
+    "test_names_audited": [
+      "test_e01",
+      "test_e02",
+      "test_e03",
+      "test_e04",
+      "test_e05",
+      "test_e06",
+      "test_e07",
+      "test_e08",
+      "test_e09",
+      "test_e10",
+      "test_e11",
+      "test_e12"
+    ],
+    "concentration_math": {
+      "total_tests": 12,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    }
+  }
+}

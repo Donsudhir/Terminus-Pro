@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "Final verification complete. A clean rebuild via `make clean` + `./tools/build-all` succeeded (BUILD_OK), the bundled audit runs correctly, and repeated runs produce byte-identical output (DETERMINISTIC, same md5 fca4de189dd399b71689806dd41ee1e4). All three fixes are persisted in source and compile cleanly:\n\n1. rill.cpp (batch/lattice reader): admission now mirrors row reader's is_live using origin lane.\n2. veil.cpp (harbor gate): trusts markers only for gen>=3 slabs; older mixed-generation slabs are always opened during selective reads (no artifact rewriting).\n3. fold.rs (rust ingest): faithful live-value markers (low/high over live amounts only, has_absent for any non-live, 0/0/true for all-non-live slabs).\n\nEquivalent modes now agree on rows and totals for both archived and fresh stores, healthy selective controls still skip (pages_read < pages_total), both fast paths remain in use, work is offline, and reports are byte-identical across runs.",
+  "plan": "Task is complete.",
+  "commands": [],
+  "task_complete": true
+}
+```

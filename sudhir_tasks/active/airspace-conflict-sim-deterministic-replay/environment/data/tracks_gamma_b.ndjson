@@ -1,0 +1,3 @@
+{"event_id":"g3","flight_id":"G303","scenario":"gamma","tick":30,"sector":"C1","state":"in","revision":1}
+{"event_id":"g6","flight_id":"G301","scenario":"gamma","tick":31,"sector":"C1","state":"in","revision":1}
+{"event_id":"g7","flight_id":"G304","scenario":"gamma","tick":30,"sector":"C1","state":"in","revision":1}

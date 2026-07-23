@@ -1,0 +1,18 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# /app/bin/loam audit /tmp/t /tmp/t/out.json; echo; python3 -c "import json;d=json.load(open('/tmp/t/out.json'));[
+print(c['case_id'],c['row_count'],c['sum_amount'],c['pages_read'],c['pages_total']) for c in d['cases']]"
+
+mr_rs 4 100 2 4
+mr_rn 4 100 4 4
+mr_bs 4 100 2 4
+mr_bn 4 100 4 4
+mn_rs 2 0 1 4
+mn_rn 2 0 4 4
+mn_bs 2 0 1 4
+mn_bn 2 0 4 4
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app#

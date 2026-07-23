@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Build succeeded. Now let me run the audit and examine per-case results to identify remaining disagreements, especially for the mixed store with the skip fast path and incomplete markers.",
+  "plan": "Run the audit and inspect output. Then analyze the mixed/vault cases manually to check if selective reads with bad markers disagree.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && python3 -m json.tool /app/output/audit.json\n", "duration": 1.0}
+  ]
+}
+```

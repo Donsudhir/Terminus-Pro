@@ -1,0 +1,54 @@
+New Terminal Output:
+29448ab495"}
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# python3 - <<'PY'
+> from pathlib import Path
+> p=Path('cpp/src/harbor/veil.cpp')
+> s=p.read_text()
+> s=s.replace('''    if (b.op == Op::RegionEqual) {\n        const bool read = b.text >= a.region_low && b.text <= a.region_high;\n        return {read, read ?
+"text-hit" : "text-away"};\n    }\n''','''    if (b.op == Op::RegionEqual) {\n        if (a.generation < 3) {\n            return {true, "legacy-open"};\n
+  }\n        const bool read = b.text >= a.region_low && b.text <= a.region_high;\n        return {read, read ? "text-hit" : "text-away"};\n    }\n''')
+> p.write_text(s)
+> PY
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# /app/tools/build-all
+    Finished release [optimized] target(s) in 0.00s
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o bu
+ild/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json && cp /app/output/audit.json /tmp/audit1.json && /app
+/bin/loam audit /app/data/cases /tmp/audit2.json && cmp /tmp/audit1.json /tmp/audit2.json && cat /app/output/audit.json
+{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_
+skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_to
+tal":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping"
+:true},{"case_id":"m_range","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":2,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":2,"sum
+_amount":30,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_null","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":4,"path":
+"batch","skipping":false},{"case_id":"m_interact","row_count":3,"sum_amount":25,"pages_total":4,"pages_read":2,"path":"batch","skipping":true},{"case_id":"m_neg
+","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":10,"sum_amount":2095,"pages_total
+":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":
+true},{"case_id":"v_missing","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"batch","skipping":true},{"case_id":"v_check","row_count":2,"sum
+_amount":0,"pages_total":3,"pages_read":2,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"
+row","skipping":false}],"digest":"24f25c278c07378c"}
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# rm -rf /tmp/loam-fresh-check && mkdir -p /tmp/loam-fresh-check
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# for csv in /app/data/fresh/*.csv; do name=$(basename "$csv" .csv); /app/bin/loam ingest "$csv" "/tmp/loam-fresh-
+check/$name" >/tmp/loam-ingest-$name.out 2>/tmp/loam-ingest-$name.err; echo "--- $name"; /app/bin/loam inspect "/tmp/loam-fresh-check/$name/data.store"; done
+--- orders_a
+0|3|10|30|1|4
+1|3|100|130|1|4
+--- orders_b
+0|3|-999|15|1|4
+1|3|200|220|1|4
+--- orders_c
+0|3|-999|34|0|4
+1|3|0|0|1|4
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app#

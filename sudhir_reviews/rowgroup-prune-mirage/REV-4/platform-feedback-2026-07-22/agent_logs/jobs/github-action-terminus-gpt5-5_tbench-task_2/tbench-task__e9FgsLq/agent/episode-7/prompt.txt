@@ -1,0 +1,81 @@
+New Terminal Output:
+
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# echo '--- bundled audit ---'; cat /app/output/audit.json; echo; echo '--- deterministic cmp ---'; cmp -s /app/ou
+tput/audit.1.json /app/output/audit.2.json && echo OK || echo MISMATCH
+--- bundled audit ---
+{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_
+skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_to
+tal":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping"
+:true},{"case_id":"m_range","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":2,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":2,"sum
+_amount":30,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_null","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":4,"path":
+"batch","skipping":false},{"case_id":"m_interact","row_count":3,"sum_amount":25,"pages_total":4,"pages_read":2,"path":"batch","skipping":true},{"case_id":"m_neg
+","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":10,"sum_amount":2095,"pages_total
+":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":
+true},{"case_id":"v_missing","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"batch","skipping":true},{"case_id":"v_check","row_count":2,"sum
+_amount":0,"pages_total":3,"pages_read":2,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"
+row","skipping":false}],"digest":"24f25c278c07378c"}
+
+--- deterministic cmp ---
+OK
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# rm -rf /app/output/checkcases; mkdir -p /app/output/checkcases
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# cat > /app/output/checkcases/equiv.case <<'EOF'
+> # id|store|operation|x|y|path|skipping|operator note
+> mix_range_row_skip|/app/data/archive/mixed.store|range|10|40|row|1|mixed row selective
+> mix_range_batch_full|/app/data/archive/mixed.store|range|10|40|batch|0|mixed batch full
+> mix_interact_batch_skip|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed batch selective
+> mix_interact_row_full|/app/data/archive/mixed.store|range|-1000|25|row|0|mixed row full
+> mix_null_batch_skip|/app/data/archive/mixed.store|isnull|0|0|batch|1|mixed null selective
+> mix_null_row_full|/app/data/archive/mixed.store|isnull|0|0|row|0|mixed null full
+> mix_all_batch_full|/app/data/archive/mixed.store|all|0|0|batch|0|mixed all batch
+> mix_all_row_full|/app/data/archive/mixed.store|all|0|0|row|0|mixed all row
+> vault_null_batch_skip|/app/data/archive/vault.store|isnull|0|0|batch|1|vault null selective batch
+> vault_null_row_skip|/app/data/archive/vault.store|isnull|0|0|row|1|vault null selective row
+> vault_null_row_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault null full
+> healthy_range_batch_skip|/app/data/archive/healthy.store|range|100|130|batch|1|healthy selective
+> healthy_range_row_full|/app/data/archive/healthy.store|range|100|130|row|0|healthy full
+> fresh_a_range_row_skip|/app/output/fresh_a/data.store|range|10|130|row|1|fresh selective row
+> fresh_a_range_batch_full|/app/output/fresh_a/data.store|range|10|130|batch|0|fresh full batch
+> fresh_c_null_batch_skip|/app/output/fresh_c/data.store|isnull|0|0|batch|1|fresh null selective
+> fresh_c_null_row_full|/app/output/fresh_c/data.store|isnull|0|0|row|0|fresh null full
+> EOF
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# /app/bin/loam audit /app/output/checkcases /app/output/checkcases/report.json && cat /app/output/checkcases/repo
+rt.json
+{"status":"complete","cases":[{"case_id":"mix_range_row_skip","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":2,"path":"row","skipping":true},{"case
+_id":"mix_range_batch_full","row_count":4,"sum_amount":100,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"mix_interact_batch_skip",
+"row_count":3,"sum_amount":25,"pages_total":4,"pages_read":2,"path":"batch","skipping":true},{"case_id":"mix_interact_row_full","row_count":3,"sum_amount":25,"p
+ages_total":4,"pages_read":4,"path":"row","skipping":false},{"case_id":"mix_null_batch_skip","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":1,"path":
+"batch","skipping":true},{"case_id":"mix_null_row_full","row_count":2,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"row","skipping":false},{"case_id":"m
+ix_all_batch_full","row_count":10,"sum_amount":2095,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"mix_all_row_full","row_count":10
+,"sum_amount":2095,"pages_total":4,"pages_read":4,"path":"row","skipping":false},{"case_id":"vault_null_batch_skip","row_count":2,"sum_amount":0,"pages_total":3
+,"pages_read":2,"path":"batch","skipping":true},{"case_id":"vault_null_row_skip","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":2,"path":"row","skipp
+ing":true},{"case_id":"vault_null_row_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"healthy_range
+_batch_skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"healthy_range_row_full","row_count":4,"su
+m_amount":460,"pages_total":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"fresh_a_range_row_skip","row_count":6,"sum_amount":410,"pages_total":2,"
+pages_read":2,"path":"row","skipping":true},{"case_id":"fresh_a_range_batch_full","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","
+skipping":false},{"case_id":"fresh_c_null_batch_skip","row_count":4,"sum_amount":0,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"fr
+esh_c_null_row_full","row_count":4,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"row","skipping":false}],"digest":"77b8c7c3f7b6b5c5"}
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app# python3 - <<'PY'
+> import json
+> p='/app/output/checkcases/report.json'
+> r=json.load(open(p))
+> for c in r['cases']:
+>     print(c['case_id'], c['row_count'], c['sum_amount'], 'pages', c['pages_read'], '/', c['pages_total'], c['path'], c['skipping'])
+> PY
+mix_range_row_skip 4 100 pages 2 / 4 row True
+mix_range_batch_full 4 100 pages 4 / 4 batch False
+mix_interact_batch_skip 3 25 pages 2 / 4 batch True
+mix_interact_row_full 3 25 pages 4 / 4 row False
+mix_null_batch_skip 2 0 pages 1 / 4 batch True
+mix_null_row_full 2 0 pages 4 / 4 row False
+mix_all_batch_full 10 2095 pages 4 / 4 batch False
+mix_all_row_full 10 2095 pages 4 / 4 row False
+vault_null_batch_skip 2 0 pages 2 / 3 batch True
+vault_null_row_skip 2 0 pages 2 / 3 row True
+vault_null_row_full 2 0 pages 3 / 3 row False
+healthy_range_batch_skip 4 460 pages 1 / 3 batch True
+healthy_range_row_full 4 460 pages 3 / 3 row False
+fresh_a_range_row_skip 6 410 pages 2 / 2 row True
+fresh_a_range_batch_full 6 410 pages 2 / 2 batch False
+fresh_c_null_batch_skip 4 0 pages 1 / 2 batch True
+fresh_c_null_row_full 4 0 pages 2 / 2 row False
+root@d9a5bbe0-aedd-44fa-a7ef-3b2294bb5b51:/app#

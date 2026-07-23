@@ -1,0 +1,41 @@
+Current Terminal Screen:
+2,1,5,east
+2,0,777,west
+2,1,15,west
+0,1,-999,north
+2,1,200,north
+2,1,210,south
+2,1,220,south
+--- orders_b inspect
+0|3|-999|15|1|4
+1|3|200|220|1|4
+jobs=1 cells=8 bytes=179
+--- orders_c csv
+origin,presence,amount,region
+2,1,-999,east
+2,1,8,east
+2,1,21,west
+2,1,34,west
+0,1,301,north
+2,0,317,north
+0,0,329,south
+0,1,343,south
+--- orders_c inspect
+0|3|-999|34|0|4
+1|3|0|0|1|4
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# mkdir -p /tmp/loam-fresh-cases
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# cat > /tmp/loam-fresh-cases/fresh.case <<'EOF'
+> a_all|/tmp/loam-fresh/orders_a/data.store|all|0|0|batch|0|fresh all
+> a_null|/tmp/loam-fresh/orders_a/data.store|isnull|0|0|row|1|fresh null
+> a_range_row|/tmp/loam-fresh/orders_a/data.store|range|-1000|1000|row|1|fresh range row
+> a_range_batch|/tmp/loam-fresh/orders_a/data.store|range|-1000|1000|batch|1|fresh range batch
+> b_all|/tmp/loam-fresh/orders_b/data.store|all|0|0|batch|0|fresh all
+> c_null|/tmp/loam-fresh/orders_c/data.store|isnull|0|0|batch|1|fresh null
+> EOF
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app# /app/bin/loam audit /tmp/loam-fresh-cases /tmp/loam-fresh-audit.json && cat /tmp/loam-fresh-audit.json
+{"status":"complete","cases":[{"case_id":"a_all","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","skipping":false},{"case_id":"a_nu
+ll","row_count":2,"sum_amount":0,"pages_total":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"a_range_row","row_count":6,"sum_amount":410,"pages_tot
+al":2,"pages_read":2,"path":"row","skipping":true},{"case_id":"a_range_batch","row_count":6,"sum_amount":410,"pages_total":2,"pages_read":2,"path":"batch","skip
+ping":true},{"case_id":"b_all","row_count":6,"sum_amount":-349,"pages_total":2,"pages_read":2,"path":"batch","skipping":false},{"case_id":"c_null","row_count":4
+,"sum_amount":0,"pages_total":2,"pages_read":1,"path":"batch","skipping":true}],"digest":"7a222a29448ab495"}
+root@240bd692-4b37-48aa-9ec3-3e3a312056af:/app#

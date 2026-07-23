@@ -1,0 +1,3 @@
+{"event_id":"b7","mode":"drop"}
+{"event_id":"g5","mode":"replace","tick":30,"sector":"C1","state":"in","revision":4}
+{"event_id":"e4","mode":"replace","tick":10,"sector":"X1","state":"in","revision":3}

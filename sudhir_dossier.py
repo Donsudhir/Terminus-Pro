@@ -15,6 +15,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import dsv_humanizer
+
 # Keyword → CM id suggestions (propose only; do not invent new CM rows).
 CM_KEYWORD_MAP: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("CM-007", ("pytest.py", "sys.path", "confcutdir", "pythonsafepath", "/conftest.py", "cwd-shadow")),
@@ -30,6 +32,7 @@ FORM_FILES: dict[str, str] = {
     "verification": "VERIFICATION.md",
     "rubric": "RUBRIC.md",
 }
+DSV_AUDIT_FILE = dsv_humanizer.AUDIT_FILENAME
 
 
 def utc_now() -> str:
@@ -69,12 +72,45 @@ def preupload_complete(path: Path) -> tuple[bool, str]:
     if not path.is_file():
         return False, f"missing {path.name}"
     text = path.read_text(encoding="utf-8")
+    if dsv_humanizer.REQUIRED_MARKER in text:
+        ok, detail = strict_dsv_complete(path.parent)
+        if not ok:
+            return False, detail
     unchecked = re.findall(r"^\s*[-*]\s+\[\s+\]\s+", text, flags=re.MULTILINE)
     if unchecked:
         return False, f"{len(unchecked)} unchecked item(s) in {path.name}"
     if "READY_FOR_PACKAGE: yes" not in text and not re.search(r"^\s*[-*]\s+\[[xX]\]\s+", text, flags=re.MULTILINE):
         return False, f"{path.name} has no checked items and no READY_FOR_PACKAGE: yes"
     return True, "ok"
+
+
+def dsv_form_paths(rev_dir: Path) -> dict[str, Path]:
+    return {
+        field: rev_dir / FORM_FILES[field]
+        for field in dsv_humanizer.FIELD_ORDER
+    }
+
+
+def strict_dsv_complete(rev_dir: Path) -> tuple[bool, str]:
+    """Verify that current DSV files match a strict content-addressed audit."""
+    return dsv_humanizer.verify_audit(
+        rev_dir / DSV_AUDIT_FILE,
+        dsv_form_paths(rev_dir),
+    )
+
+
+def require_strict_dsv(preupload: Path) -> None:
+    """Activate the non-bypassable DSV gate for an existing revision."""
+    text = preupload.read_text(encoding="utf-8") if preupload.is_file() else ""
+    if dsv_humanizer.REQUIRED_MARKER in text:
+        return
+    if text and not text.endswith("\n"):
+        text += "\n"
+    text += (
+        "\n- [ ] Strict Humanizer DSV audit stored and current\n\n"
+        f"{dsv_humanizer.REQUIRED_MARKER}\n"
+    )
+    preupload.write_text(text, encoding="utf-8")
 
 
 def preupload_template(revision: int, reason: str) -> str:
@@ -92,8 +128,10 @@ or mark N/A with `[x]` and a note. `sudhir_task.py package` refuses unchecked
 - [ ] Harbor evidence recorded (`sudhir_task.py evidence …`)
 - [ ] Platform feedback captured in FEEDBACK.md when Needs Revision
 - [ ] Form paste fields stored (DIFFICULTY.md, SOLUTION.md, VERIFICATION.md, RUBRIC.md)
+- [ ] Strict Humanizer DSV audit stored and current
 - [ ] Zip SHA will be recorded by package
 
+{dsv_humanizer.REQUIRED_MARKER}
 READY_FOR_PACKAGE: no
 """
 

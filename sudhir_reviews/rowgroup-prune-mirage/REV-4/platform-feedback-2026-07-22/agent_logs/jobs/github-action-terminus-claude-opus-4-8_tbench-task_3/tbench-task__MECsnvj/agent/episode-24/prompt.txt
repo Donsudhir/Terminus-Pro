@@ -1,0 +1,25 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app# cp /app/output/audit.json /tmp/a1.json && /app/bin/loam audit /app/data/cases /app/output/audit.json && cmp /tmp
+/a1.json /app/output/audit.json && echo IDENTICAL
+IDENTICAL
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app# rm -rf /tmp/store_a && /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/store_a; echo '---'; cat /tmp/stor
+e_a/data.store
+jobs=1 cells=8 bytes=182
+---
+H|3
+P|0|3|10|30|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|1|2|30|west
+P|1|3|100|130|1|north|south|4
+R|1|2|100|north
+R|0|2|555|north
+R|1|2|120|south
+R|1|2|130|south
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app#

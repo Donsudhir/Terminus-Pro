@@ -1,0 +1,264 @@
+New Terminal Output:
+
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# find /app/cpp /app/rust/src -type f | sort
+/app/cpp/Makefile
+/app/cpp/include/loam/exec.hpp
+/app/cpp/include/loam/plan.hpp
+/app/cpp/include/loam/report.hpp
+/app/cpp/include/loam/store.hpp
+/app/cpp/include/loam/types.hpp
+/app/cpp/src/digest.cpp
+/app/cpp/src/harbor/pale.cpp
+/app/cpp/src/harbor/veil.cpp
+/app/cpp/src/lattice/bay.cpp
+/app/cpp/src/lattice/rill.cpp
+/app/cpp/src/main.cpp
+/app/cpp/src/parse.cpp
+/app/cpp/src/report.cpp
+/app/cpp/src/row.cpp
+/app/cpp/src/store.cpp
+/app/rust/src/codec.rs
+/app/rust/src/ember/fold.rs
+/app/rust/src/ember/mod.rs
+/app/rust/src/ember/pale.rs
+/app/rust/src/ember/reed.rs
+/app/rust/src/main.rs
+/app/rust/src/model.rs
+/app/rust/src/report.rs
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# nl -ba /app/cpp/src/store.cpp | sed -n '1,260p'
+     1  #include "loam/store.hpp"
+     2
+     3  #include "loam/exec.hpp"
+     4  #include "loam/plan.hpp"
+     5
+     6  #include <fstream>
+     7  #include <stdexcept>
+     8  #include <string>
+     9
+    10  namespace loam {
+    11  namespace {
+    12
+    13  std::vector<std::string> split(const std::string& line) {
+    14      std::vector<std::string> fields;
+    15      std::size_t start = 0;
+    16      while (true) {
+    17          const auto end = line.find('|', start);
+    18          fields.push_back(line.substr(start, end - start));
+    19          if (end == std::string::npos) {
+    20              break;
+    21          }
+    22          start = end + 1;
+    23      }
+    24      return fields;
+    25  }
+    26
+    27  }  // namespace
+    28
+    29  std::vector<Slab> load_store(const std::filesystem::path& path) {
+    30      std::ifstream input(path);
+    31      if (!input) {
+    32          throw std::runtime_error("cannot open store: " + path.string());
+    33      }
+    34
+    35      std::vector<Slab> slabs;
+    36      std::string line;
+    37      while (std::getline(input, line)) {
+    38          if (line.empty() || line.rfind("H|", 0) == 0) {
+    39              continue;
+    40          }
+    41          const auto page = split(line);
+    42          if (page.size() != 9 || page[0] != "P") {
+    43              throw std::runtime_error("bad page record in " + path.string());
+    44          }
+    45          Slab slab;
+    46          slab.id = std::stoull(page[1]);
+    47          slab.generation = static_cast<std::uint8_t>(std::stoul(page[2]));
+    48          slab.low = std::stoll(page[3]);
+    49          slab.high = std::stoll(page[4]);
+    50          slab.has_absent = page[5] == "1";
+    51          slab.region_low = page[6];
+    52          slab.region_high = page[7];
+    53          const auto row_count = std::stoull(page[8]);
+    54          for (std::size_t i = 0; i < row_count; ++i) {
+    55              if (!std::getline(input, line)) {
+    56                  throw std::runtime_error("short page in " + path.string());
+    57              }
+    58              const auto row = split(line);
+    59              if (row.size() != 5 || row[0] != "R") {
+    60                  throw std::runtime_error("bad row record in " + path.string());
+    61              }
+    62              const auto presence = static_cast<std::uint8_t>(std::stoul(row[1]));
+    63              const auto origin = static_cast<std::uint8_t>(std::stoul(row[2]));
+    64              const auto amount = std::stoll(row[3]);
+    65              slab.cells.push_back({presence, static_cast<Origin>(origin), amount, row[4]});
+    66              slab.presence_lane.push_back(presence);
+    67              slab.origin_lane.push_back(origin);
+    68              slab.amount_lane.push_back(amount);
+    69              slab.region_lane.push_back(row[4]);
+    70          }
+    71          slabs.push_back(std::move(slab));
+    72      }
+    73      return slabs;
+    74  }
+    75
+    76  CaseResult run_case(const CaseSpec& spec) {
+    77      const auto slabs = load_store(spec.store_path);
+    78      Tally total;
+    79      for (const auto& slab : slabs) {
+    80          const Gate gate = turn_b(slab, spec.probe);
+    81          const auto label = turn_d(gate, spec.probe);
+    82          (void)label;
+    83          const Tally part = spec.probe.lane == Lane::Batch
+    84              ? sweep_c(slab, spec.probe, gate)
+    85              : walk_row(slab, spec.probe, gate);
+    86          total = sweep_e(total, part);
+    87      }
+    88      return {
+    89          spec.case_id,
+    90          total,
+    91          static_cast<std::int64_t>(slabs.size()),
+    92          spec.probe.lane,
+    93          spec.probe.skipping,
+    94      };
+    95  }
+    96
+    97  }  // namespace loam
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# nl -ba /app/cpp/src/row.cpp | sed -n '1,260p'
+     1  #include "loam/exec.hpp"
+     2
+     3  namespace loam {
+     4  namespace {
+     5
+     6  bool is_live(const Cell& cell) {
+     7      if (cell.origin == Origin::Retired) {
+     8          return false;
+     9      }
+    10      if (cell.origin == Origin::Inherited) {
+    11          return true;
+    12      }
+    13      return cell.present != 0;
+    14  }
+    15
+    16  bool matches(const Cell& cell, const Probe& probe) {
+    17      switch (probe.op) {
+    18          case Op::All:
+    19              return true;
+    20          case Op::Equal:
+    21              return cell.amount == probe.x;
+    22          case Op::Range:
+    23              return cell.amount >= probe.x && cell.amount <= probe.y;
+    24          case Op::IsNull:
+    25              return false;
+    26          case Op::RegionEqual:
+    27              return cell.region == probe.text;
+    28      }
+    29      return false;
+    30  }
+    31
+    32  }  // namespace
+    33
+    34  Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+    35      Tally tally;
+    36      if (!c.read) {
+    37          return tally;
+    38      }
+    39      tally.pages_read = 1;
+    40      for (const auto& cell : a.cells) {
+    41          const bool live = is_live(cell);
+    42          if (b.op == Op::IsNull) {
+    43              if (!live) {
+    44                  ++tally.row_count;
+    45              }
+    46              continue;
+    47          }
+    48          if (live && matches(cell, b)) {
+    49              ++tally.row_count;
+    50              tally.sum_amount += cell.amount;
+    51          }
+    52      }
+    53      return tally;
+    54  }
+    55
+    56  }  // namespace loam
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# nl -ba /app/cpp/src/main.cpp | sed -n '1,260p'
+     1  #include "loam/report.hpp"
+     2  #include "loam/store.hpp"
+     3
+     4  #include <filesystem>
+     5  #include <iostream>
+     6  #include <stdexcept>
+     7  #include <sys/wait.h>
+     8  #include <unistd.h>
+     9  #include <vector>
+    10
+    11  namespace {
+    12
+    13  int run_ingest(const char* input, const char* output) {
+    14      const pid_t child = fork();
+    15      if (child == -1) {
+    16          throw std::runtime_error("fork failed");
+    17      }
+    18      if (child == 0) {
+    19          execl("/app/bin/loam-ingest", "loam-ingest", input, output, nullptr);
+    20          _exit(127);
+    21      }
+    22      int status = 0;
+    23      if (waitpid(child, &status, 0) == -1) {
+    24          throw std::runtime_error("waitpid failed");
+    25      }
+    26      return WIFEXITED(status) ? WEXITSTATUS(status) : 1;
+    27  }
+    28
+    29  }  // namespace
+    30
+    31  int main(int argc, char** argv) {
+    32      try {
+    33          if (argc == 4 && std::string(argv[1]) == "audit") {
+    34              const auto specs = loam::load_cases(argv[2]);
+    35              std::vector<loam::CaseResult> results;
+    36              results.reserve(specs.size());
+    37              for (const auto& spec : specs) {
+    38                  results.push_back(loam::run_case(spec));
+    39              }
+    40              loam::write_report(argv[3], results);
+    41              return 0;
+    42          }
+    43          if (argc == 4 && std::string(argv[1]) == "ingest") {
+    44              return run_ingest(argv[2], argv[3]);
+    45          }
+    46          if (argc == 3 && std::string(argv[1]) == "inspect") {
+    47              const auto slabs = loam::load_store(argv[2]);
+    48              for (const auto& slab : slabs) {
+    49                  std::cout << slab.id << '|' << static_cast<int>(slab.generation)
+    50                            << '|' << slab.low << '|' << slab.high << '|'
+    51                            << (slab.has_absent ? 1 : 0) << '|' << slab.cells.size()
+    52                            << '\n';
+    53              }
+    54              return 0;
+    55          }
+    56          std::cerr << "usage: loam audit <case-directory> <report-path>\n"
+    57                    << "       loam ingest <csv> <store-directory>\n"
+    58                    << "       loam inspect <store>\n";
+    59          return 2;
+    60      } catch (const std::exception& error) {
+    61          std::cerr << "loam: " << error.what() << '\n';
+    62          return 1;
+    63      }
+    64  }
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# find /app/cpp -type f -name '*.hpp' -o -name '*.h' | sort | xargs -r -n1 sh -c 'echo ### $0; nl -ba $0 | sed -n
+"1,220p"'
+
+
+
+
+
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app# find /app/rust/src -type f | sort | xargs -n1 sh -c 'echo ### $0; nl -ba $0 | sed -n "1,260p"'
+
+
+
+
+
+
+
+
+root@fe235c13-c054-4119-9fa0-e69d44d4c050:/app#

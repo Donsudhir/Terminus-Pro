@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "Everything is complete and verified:\n\n1. **Batch reader (rill.cpp)**: Now applies the same liveness rule as the row reader using both origin_lane and presence_lane, so equivalent modes agree.\n\n2. **Harbor skipping (veil.cpp)**: Marker-based pruning is now only applied to faithful (current generation 3) slabs. Archived mixed-generation (gen 2) slabs with unfaithful legacy markers are always opened, keeping selective reads correct and in agreement with full reads — without rewriting the artifacts.\n\n3. **Ingest markers (fold.rs)**: Fresh stores now record faithful markers: low/high span only live amounts, has_absent is set when any non-live entry is present, and an all-non-live slab records low=0, high=0, has_absent=true.\n\nVerification results:\n- Equivalent modes agree on all cases (v_missing=v_check=v_full=2; h_skip=h_full=4,460; fresh f_row=f_batch=f_rskip=f_bskip=6,410).\n- Healthy selective controls still prune (h_skip pages_read=1<3; f_narrow=1<2).\n- Both fast paths (row and batch) remain in use.\n- Archived stores unchanged (md5sums intact — not rewritten).\n- Output is byte-identical across repeated runs (deterministic).\n- Fresh ingest produces faithful markers and works through the audit contract.\n- The audit JSON has status=complete, cases, digest with all required per-case keys.\n\nThe task is complete.",
+  "plan": "The task is complete. All fixes are in place, the build succeeds, equivalent modes agree, healthy fast paths preserved, fresh markers faithful, archived stores unmodified, and output deterministic.",
+  "commands": [],
+  "task_complete": true
+}
+```

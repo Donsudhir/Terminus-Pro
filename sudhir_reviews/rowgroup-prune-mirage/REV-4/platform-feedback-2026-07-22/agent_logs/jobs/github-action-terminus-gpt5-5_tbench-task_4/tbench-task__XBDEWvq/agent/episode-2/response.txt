@@ -1,0 +1,19 @@
+{
+  "analysis": "Docs/cases/stores show text format. Store rows are R|present|origin|amount|region. Archived gen2 slabs contain origin 0 rows that likely represent absent legacy values even if present=1 (mixed compaction). Current.store has a legitimate live -999 origin=2 and an absent present=0 row; c_legit should count -999 as live. Mixed page0 has R|1|0|-999 which should likely be non-live/missing legacy sentinel. Current audit m_narrow skipped page0 because page marker low=100 high=100 from old generation is not faithful to live rows 10,20. Need adapt archived reader admission for incomplete markers. Need full source to patch.",
+  "plan": "Inspect full C++ headers/sources and Rust main to identify live predicate, selective admission, batch vs row differences, and ingest marker calculation. Then patch: live rows should require present!=0 and not legacy origin void for archived gen<3; admission for old slabs with incomplete markers should not use amount low/high blindly when has_absent/origin legacy indicates unreliable live markers, but still keep healthy selective fast-path. Fresh ingest markers should compute low/high only over live rows and has_absent for any non-live.",
+  "commands": [
+    {
+      "keystrokes": "find /app/cpp -type f -maxdepth 4 -print -exec sh -c 'echo --- $1; sed -n \"1,260p\" \"$1\"' sh {} \\;\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "printf '\\n--- rust main full ---\\n'; sed -n '1,260p' /app/rust/src/main.rs\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "grep -R \"-999\\|RUNE\\|has_absent\\|present\\|origin\\|low\\|high\\|admit\\|skipp\" -n /app/cpp /app/rust/src | head -200\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

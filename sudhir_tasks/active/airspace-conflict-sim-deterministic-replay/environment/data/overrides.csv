@@ -1,0 +1,4 @@
+scenario,flight_id,priority_delta
+alpha,A102,2
+beta,B204,3
+gamma,G302,-1

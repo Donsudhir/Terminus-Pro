@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "All markers are faithful:\n- store_b Page0: -999..15 has_absent=1 (legit -999 kept in range, 777 excluded). Page1: 200..220 has_absent=1 (retired -999 excluded).\n- store_c Page0: -999..34 has_absent=0 (all live). Page1: all non-live -> low=0,high=0,has_absent=1 ✓ (the edge case).\n\nAll fixes work correctly. Now let me verify the fresh stores produce consistent row/batch results by creating a test case directory and running audit with both modes. Let me build a small test case set to confirm mode agreement on a fresh store.",
+  "plan": "Create a test cases dir pointing at fresh stores with both row and batch on same probe, run audit, confirm agreement.",
+  "commands": [
+    {"keystrokes": "mkdir -p /tmp/tc; printf '# hdr\\nfb_row|/tmp/store_b/data.store|all|0|0|row|0|x\\nfb_bat|/tmp/store_b/data.store|all|0|0|batch|0|x\\nfb_rng_r|/tmp/store_b/data.store|range|0|300|row|1|x\\nfb_rng_b|/tmp/store_b/data.store|range|0|300|batch|1|x\\nfc_null_r|/tmp/store_c/data.store|isnull|0|0|row|0|x\\nfc_null_b|/tmp/store_c/data.store|isnull|0|0|batch|0|x\\n' > /tmp/tc/t.case\n", "duration": 0.1},
+    {"keystrokes": "/app/bin/loam audit /tmp/tc /tmp/tc/out.json; python3 -c \"import json;d=json.load(open('/tmp/tc/out.json'));[print(c['case_id'],c['row_count'],c['sum_amount'],c['pages_read'],c['pages_total'],c['path']) for c in d['cases']]\"\n", "duration": 1.0}
+  ]
+}
+```

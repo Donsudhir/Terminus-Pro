@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Full understanding. CSV columns: origin,present,amount,region. Now let me verify the fresh CSVs and the expected output to confirm the live semantics, and check exec.hpp for is_live sharing. Let me look at the CSVs and case_new_expected. Wait, there was case_new_expected in the earlier ls but not now. Let me check data/fresh CSVs and any expected.",
+  "plan": "Look at fresh CSVs and check for an expected reference.",
+  "commands": [
+    {"keystrokes": "cat /app/data/fresh/orders_a.csv; echo ---; cat /app/data/fresh/orders_b.csv; echo ---; cat /app/data/fresh/orders_c.csv\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/include/loam/exec.hpp\n", "duration": 0.1}
+  ]
+}
+```

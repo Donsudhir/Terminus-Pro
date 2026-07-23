@@ -1,0 +1,23 @@
+{
+  "analysis": "Untruncated row path shows a private is_live predicate: Retired (origin 0) is non-live; Inherited always live; Current live only when present!=0. This fixes c_legit in row but batch/skip likely use stale predicates. Rust fold ignores origin and includes non-live amounts. Need inspect omitted harbor/veil and lattice files.",
+  "plan": "Print the specific C++ fast-path files that were omitted due output truncation. Then patch them to use consistent live semantics and safe marker admission for legacy generation-2 slabs.",
+  "commands": [
+    {
+      "keystrokes": "cat cpp/src/harbor/veil.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat cpp/src/lattice/bay.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat cpp/src/lattice/rill.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat cpp/Makefile\ncat Makefile\ncat tools/build-all\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+} 

@@ -1,0 +1,76 @@
+{
+  "symbol_table": [
+    {
+      "path": "native/ledge.c",
+      "symbol": "braid_q",
+      "kind": "function",
+      "signature": "int32_t braid_q(const int32_t* a, int32_t b, uint64_t* c);",
+      "purpose": "Packs and unpacks fringe boundary values after a rank-map change across the native kernel boundary."
+    },
+    {
+      "path": "host/shelf.rs",
+      "symbol": "latch_r",
+      "kind": "function",
+      "signature": "pub(crate) fn latch_r(a: u64, b: &mut Shelf) -> i8",
+      "purpose": "Rebinds shared-boundary authority and stage metadata so host completion aligns with native buffer readiness."
+    },
+    {
+      "path": "native/ember.c",
+      "symbol": "sift_s",
+      "kind": "function",
+      "signature": "int32_t sift_s(const uint64_t* a, int32_t b, uint64_t* c);",
+      "purpose": "Folds field samples into a stable global checksum under the active post-map ordering."
+    }
+  ],
+  "flipping_point_contract": {
+    "locations": [
+      {
+        "id": "A",
+        "path": "native/ledge.c",
+        "controls_tests": ["test_m01", "test_m02", "test_m06", "test_m10"]
+      },
+      {
+        "id": "B",
+        "path": "host/shelf.rs",
+        "controls_tests": ["test_m03", "test_m05", "test_m07", "test_m11"]
+      },
+      {
+        "id": "C",
+        "path": "native/ember.c",
+        "controls_tests": ["test_m04", "test_m08", "test_m09", "test_m12"]
+      }
+    ],
+    "no_single_location_flips_majority": true,
+    "concentration_cap": 0.5
+  },
+  "decoy_manifest": [
+    {
+      "path": "native/brim.c",
+      "kind": "helper",
+      "rhymes_with": "braid_q",
+      "non_fix_purpose": "Computes ordinary local norm banners for diagnostic lines."
+    },
+    {
+      "path": "host/locker.rs",
+      "kind": "helper",
+      "rhymes_with": "latch_r",
+      "non_fix_purpose": "Maps display codes for status lines without affecting stage rebinds."
+    },
+    {
+      "path": "host/relay.rs",
+      "kind": "helper",
+      "rhymes_with": "sift_s",
+      "non_fix_purpose": "Forwards opaque FFI handles between host modules without altering fold order."
+    }
+  ],
+  "code_forbidden_tokens": [
+    "partitioned", "field", "lab", "app", "case", "rank", "map", "change", "mid-run",
+    "local", "norms", "ordinary", "exchange", "status", "looks", "complete", "global",
+    "fold", "checksums", "disagree", "steady", "twin", "never", "changed", "maps",
+    "pointwise", "samples", "numerically", "fresh", "runs", "without", "correct",
+    "byte-stable", "clean", "rebuilds", "pipeline", "map-changed", "trajectories",
+    "agree", "contracts", "healthy", "control", "bin", "partlab", "output",
+    "parity_report", "json", "keys", "layout", "schema", "docs", "parity-report-schema",
+    "inputs", "report", "checks", "regenerate", "compiled", "bundled"
+  ]
+}

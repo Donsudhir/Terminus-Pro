@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Equivalent modes on fresh store agree perfectly:\n- fa_row vs fa_bat (range 0-200 selective): both 6 rows, sum 410, pages_read=2.\n- fa_all_r vs fa_all_b: both 6/410.\n- fa_null_r vs fa_null_b: both 2/0 (the 2 non-live: -999 Retired, 555 Current-present0).\n\nLet me verify: store_a live = {10,20,30,100,120,130} (6 rows), sum = 10+20+30+100+120+130 = 410. Correct! And note the range 0-200 selective read reads both slabs (slab0 low=10..30 hit, slab1 100..130 hit) pages_read=2 = pages_total, that's fine since both slabs have matching values.\n\nNow let me verify archived stores were NOT rewritten (they must remain as-is). I already only edited source, ingest writes to new dirs. Let me confirm the archive files are unchanged and do a final full audit run to confirm the reference command works and is deterministic. Also confirm the data/cases audit still byte-identical.",
+  "plan": "Confirm archive stores untouched (compare against seed if available), run final audit twice for determinism, and verify status/digest present. Also check the /opt seed matches archive to confirm no rewrite.",
+  "commands": [
+    {"keystrokes": "ls -la /opt/loam-seed/archive 2>/dev/null; diff -r /opt/loam-seed/archive /app/data/archive 2>&1 && echo ARCHIVE_UNCHANGED\n", "duration": 0.1},
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && cp /app/output/audit.json /tmp/r1 && /app/bin/loam audit /app/data/cases /app/output/audit.json && cmp /tmp/r1 /app/output/audit.json && echo DETERMINISTIC; tail -c 120 /app/output/audit.json\n", "duration": 1.0}
+  ]
+}
+```

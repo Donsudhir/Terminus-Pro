@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "BUG 2 FOUND (Rust ingest marker faithfulness). tilt_a computes markers: initializes low/high to a[0] (first amount) regardless of liveness, then min/max over ALL amounts (ignores present and origin). has_absent only checks present==0, ignoring origin (Retired origin=0 with present=1 is non-live but wouldn't set has_absent).\n\nThe contract says: low/high span only LIVE amounts; has_absent true when any non-live entry present. And a slab with all non-live records low=0,high=0,has_absent=true.\n\nThe 'live' definition (from row reader): Retired(0)->dead, Inherited(1)->live, Current(2)->live iff present!=0. tilt_a takes args a=amounts, b=present, c=origin (c is unused!). Need to fix tilt_a to compute over live cells only, using origin too.\n\nLet me check pale.rs and reed.rs to see how tilt_a is called (arg order) and confirm.",
+  "plan": "Read pale.rs, reed.rs, main.rs.",
+  "commands": [
+    {"keystrokes": "cat /app/rust/src/ember/pale.rs /app/rust/src/ember/reed.rs\n", "duration": 0.1}
+  ]
+}
+```

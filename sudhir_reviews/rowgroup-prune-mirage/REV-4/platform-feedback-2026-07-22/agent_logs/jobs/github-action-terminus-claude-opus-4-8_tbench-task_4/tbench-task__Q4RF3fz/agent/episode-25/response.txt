@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Fresh markers now faithful:\n- a page0: live 10,20,30 (-999 is retired origin0) -> low=10,high=30,absent=1 (retired present). Correct!\n- a page1: live 100,120,130 (555 present0) -> low=100,high=130,absent=1. Correct!\n- b page0: live -999(Current present1! legit overlap),5,15 (777 present0 notlive) -> low=-999,high=15,absent=1. Correct!\n- b page1: R|1|0|-999 retired notlive, live 200,210,220 -> low=200,high=220,absent=1. Correct!\n- c page0: live -999,8,21,34 all Current present -> low=-999,high=34,absent=0 (no non-live). Correct!\n- c page1: R|1|0|301(retired), R|0|2|317(present0), R|0|0|329(retired), R|1|0|343(retired) - ALL non-live! -> low=0,high=0,absent=1. Correct per contract!\n\nAll faithful. Now verify fresh stores produce agreeing answers across modes.",
+  "plan": "Test fresh stores in all modes for agreement, then run the main audit and verify determinism (byte-identical repeated runs).",
+  "commands": [
+    {"keystrokes": "cat > /tmp/t/probe.case << 'EOF'\nfa_rs|/tmp/fresh/a/data.store|range|10|130|row|1|x\nfa_rn|/tmp/fresh/a/data.store|range|10|130|row|0|x\nfa_bs|/tmp/fresh/a/data.store|range|10|130|batch|1|x\nfa_bn|/tmp/fresh/a/data.store|range|10|130|batch|0|x\nfc_ns|/tmp/fresh/c/data.store|isnull|0|0|batch|1|x\nfc_nn|/tmp/fresh/c/data.store|isnull|0|0|batch|0|x\nfc_nrs|/tmp/fresh/c/data.store|isnull|0|0|row|1|x\nfc_nrn|/tmp/fresh/c/data.store|isnull|0|0|row|0|x\nEOF\n/app/bin/loam audit /tmp/t /tmp/t/out.json; echo; python3 -c \"import json;d=json.load(open('/tmp/t/out.json'));[print(c['case_id'],c['row_count'],c['sum_amount'],c['pages_read'],c['pages_total']) for c in d['cases']]\"\n", "duration": 1.0}
+  ]
+}
+```

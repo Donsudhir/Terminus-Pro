@@ -1,0 +1,64 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat > /app/rust/src/ember/fold.rs << 'EOF'
+> use crate::model::{FoldErr, Mark};
+>
+> // Origin lane encoding (mirrors the reader): 0 = Retired, 1 = Inherited, 2 = Current.
+> const ORIGIN_RETIRED: u8 = 0;
+> const ORIGIN_INHERITED: u8 = 1;
+>
+> fn is_live(origin: u8, present: u8) -> bool {
+>     if origin == ORIGIN_RETIRED {
+>         return false;
+>     }
+>     if origin == ORIGIN_INHERITED {
+>         return true;
+>     }
+>     present != 0
+> }
+>
+> pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+>     if a.is_empty() {
+>         return Err(FoldErr::Empty);
+>     }
+>     if a.len() != b.len() || a.len() != c.len() {
+>         return Err(FoldErr::Shape);
+>     }
+>
+>     let mut low: Option<i64> = None;
+>     let mut high: Option<i64> = None;
+>     let mut has_absent = false;
+>     for ((value, present), origin) in a.iter().zip(b.iter()).zip(c.iter()) {
+>         if is_live(*origin, *present) {
+>             low = Some(match low {
+>                 Some(current) => current.min(*value),
+>                 None => *value,
+>             });
+>             high = Some(match high {
+>                 Some(current) => current.max(*value),
+>                 None => *value,
+>             });
+>         } else {
+>             has_absent = true;
+>         }
+>     }
+>
+>     match (low, high) {
+>         (Some(low), Some(high)) => Ok(Mark {
+>             low,
+>             high,
+>             has_absent,
+>         }),
+>         _ => Ok(Mark {
+>             low: 0,
+>             high: 0,
+>             has_absent: true,
+>         }),
+>     }
+> }
+> EOF
+root@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app#

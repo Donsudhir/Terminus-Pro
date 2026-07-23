@@ -1,0 +1,6 @@
+{
+  "analysis": "The system has been repaired and rebuilt successfully with /app/tools/build-all. The bundled audit now completes deterministically and repeated runs produce byte-identical reports. Archived mixed-generation stores are read without rewriting them, batch and row live-row semantics now agree, and selective reads no longer trust incomplete generation-2 numeric/null markers. Healthy selective fast-path behavior is preserved: for example h_skip still reads 1 of 3 pages. Fresh ingest was also validated: it writes <store-directory>/data.store, produces generation-3 live-value markers, and equivalent row/batch audits over fresh stores agree.",
+  "plan": "No further commands are needed. The key validations have been run: rebuild, bundled audit twice with identical bytes, fresh ingest smoke tests, and fresh row/batch equivalence checks.",
+  "commands": [],
+  "task_complete": true
+}

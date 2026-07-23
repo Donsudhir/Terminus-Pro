@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Batch reader fixed to mirror is_live. But I also need to consider the harbor gate (turn_b) for skipping. For range/equal probes with skipping, it uses slab.low/high markers. Consider mixed.store slab 0: low=100, high=100, has_absent=1. But the live amounts are R|1|0|-999(retired, not live), R|1|2|10, R|1|2|20, R|0|2|777(not live). So live amounts are 10 and 20. But the marker says low=100,high=100! This is an archived incomplete marker. For probe m_range range 10-40 skipping: gate checks !(40<100 || 10>100) = !(true||false)=!true=false -> skip! But row reader with skipping still opens? No - turn_b is called regardless of lane. Row case m_range has skipping=1. So gate would say don't read, missing rows 10,20. Hmm.\n\nWait - the markers on archived stores are 'incomplete/wrong'. The task says archived mixed-generation stores carry incomplete markers. The gate uses markers to skip. If markers are wrong, skipping produces wrong answers. But we can't rewrite archived stores. So the gate skip logic must be safe for these stores.\n\nLet me first verify by building and running to see actual disagreements before over-fixing.",
+  "plan": "Rebuild and run the audit to see current behavior. Also compare row vs batch on same probe.",
+  "commands": [
+    {"keystrokes": "cd /app && ./tools/build-all 2>&1 | tail -20\n", "duration": 30.0}
+  ]
+}
+```

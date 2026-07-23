@@ -1,0 +1,650 @@
+{
+  "hardness_axes": [
+    {
+      "id": "discover",
+      "name": "Discover",
+      "verdict": "PASS",
+      "reasoning": "Public symptoms describe long-replay entity-state digest divergence with green tick-count overlays and a short bit-stable healthy control, but they do not identify the ring-vs-tick consume boundary, the per-step buffer draw mismatch, or the digest sample phase. Those facts must be recovered from C++/Rust code, traces, metrics, and duration-gated runs."
+    },
+    {
+      "id": "synthesize",
+      "name": "Synthesize",
+      "verdict": "PASS",
+      "reasoning": "Deterministic long-replay parity requires coordinated behavior across the input-lane authority, the fixed-step draw/apply path, and the seal-side sample/fold. No single module owns the complete invariant."
+    },
+    {
+      "id": "diagnose",
+      "name": "Diagnose",
+      "verdict": "PASS",
+      "reasoning": "The instruction reports digest-wrong / tick-count-green long replays and healthy short controls without naming ring desync, consume skew, sample-phase drift, or fix sites."
+    },
+    {
+      "id": "navigate_coupling",
+      "name": "Navigate coupling",
+      "verdict": "PASS",
+      "reasoning": "Correcting lane advancement still fails if draw applies the wrong number of buffered intents per step; correcting draw still fails if digests sample a pre-apply snapshot; seal-only repairs leave long digests red when lane and draw disagree under duration gates."
+    },
+    {
+      "id": "reason_beyond_training",
+      "name": "Reason beyond training",
+      "verdict": "PASS",
+      "reasoning": "A textbook 'use fixed timestep' or 'hash the world every frame' recipe cannot reconcile project-specific lane/draw/sample coupling judged by long-vs-short duration gates. Approximate integration shortcuts are explicitly rejected."
+    }
+  ],
+  "anti_trivialization_checks": [
+    {
+      "id": "disclosure_collapse",
+      "name": "Disclosure-collapse",
+      "verdict": "PASS",
+      "reasoning": "Honest long-replay digest parity, short healthy-control byte stability, and anti-approximate rules do not reveal which of the three authorities is inconsistent."
+    },
+    {
+      "id": "hidden_instance",
+      "name": "Hidden-instance",
+      "verdict": "PASS",
+      "reasoning": "The design covers multiple long-trace families, short controls, and regenerated seed variants rather than hiding one corrupted recording."
+    },
+    {
+      "id": "single_artifact_repair",
+      "name": "Single-artifact repair",
+      "verdict": "PASS",
+      "reasoning": "Three coordinated locations across lane/, draw/, and mark/ roots are required; rewriting one report or one recording cannot satisfy regenerated checks."
+    },
+    {
+      "id": "generalization",
+      "name": "Generalization",
+      "verdict": "PASS",
+      "reasoning": "The verifier regenerates long/short matrices from bundled families, so fixes must generalize beyond a named fixture."
+    },
+    {
+      "id": "prompt_honesty",
+      "name": "Prompt-honesty",
+      "verdict": "PASS",
+      "reasoning": "The instruction names observable outcomes, invocation, normative schema path, and prohibited approximate physics while withholding causes and fix sites."
+    },
+    {
+      "id": "cheating_vs_difficulty",
+      "name": "Cheating-vs-difficulty",
+      "verdict": "PASS",
+      "reasoning": "Regeneration and duration gates prevent hardcoding, but residual difficulty is cross-root consume/sample diagnosis rather than those anti-cheating mechanisms."
+    },
+    {
+      "id": "mechanical_fix_filter",
+      "name": "Mechanical-fix filter",
+      "verdict": "PASS",
+      "reasoning": "The core work is not dependency placement, timeouts, reward formatting, or metadata repair."
+    },
+    {
+      "id": "localized_fix",
+      "name": "Localized-fix",
+      "verdict": "PASS",
+      "reasoning": "The selected topology places one location in lane/, one in draw/, and one in mark/, each controlling 4 of 12 tests under a 0.5 concentration cap."
+    },
+    {
+      "id": "oracle_locality",
+      "name": "Oracle-locality",
+      "verdict": "PASS",
+      "reasoning": "The planned oracle performs substantive lane-boundary, draw-count, and sample-phase changes rather than replacing one short file or toggling one compiler option."
+    },
+    {
+      "id": "small_declarative_cluster",
+      "name": "Small declarative-cluster",
+      "verdict": "PASS",
+      "reasoning": "No finite table, threshold list, or config cluster contains the solution; the cited schema only documents report keys."
+    },
+    {
+      "id": "grep_collapse",
+      "name": "Grep-collapse",
+      "verdict": "PASS",
+      "reasoning": "Selected fix paths and symbols use opaque lane/draw/mark and knit_u/pull_v/fold_w vocabulary that does not contain any noun extracted from the public instruction."
+    },
+    {
+      "id": "pre_factored_helper",
+      "name": "Pre-factored-helper",
+      "verdict": "PASS",
+      "reasoning": "Selected functions do not mirror public terms such as replay, digest, tick, physics, input, or control."
+    },
+    {
+      "id": "recipe_discount",
+      "name": "Recipe-discount",
+      "verdict": "PASS",
+      "reasoning": "A known fixed-timestep or world-hash recipe cannot repair lane-vs-tick authority, per-step draw mismatch, and sample-phase coupling together."
+    },
+    {
+      "id": "security_aura_discount",
+      "name": "Security-aura discount",
+      "verdict": "PASS",
+      "reasoning": "This is a games/simulation task and does not rely on security language or exploit framing for difficulty."
+    },
+    {
+      "id": "orthogonal_checklist",
+      "name": "Orthogonal-checklist",
+      "verdict": "PASS",
+      "reasoning": "Long digest parity, short control stability, and anti-approximate outcomes are one coupled consume/sample invariant spanning three roots, not independent checklist bullets."
+    },
+    {
+      "id": "harness_discount",
+      "name": "Harness-discount",
+      "verdict": "PASS",
+      "reasoning": "Docker and mixed-language compilation provide realism, while residual hardness comes from duration-gated consume/sample decisions."
+    },
+    {
+      "id": "one_pass_solvability",
+      "name": "One-pass solvability",
+      "verdict": "PASS",
+      "reasoning": "Opening the obvious entrypoint does not reveal the three locations, and a naive global flush or timestep tweak leaves long digest and short-control failures."
+    },
+    {
+      "id": "hard_only_gate",
+      "name": "Hard-only gate",
+      "verdict": "PASS",
+      "reasoning": "The bounded task requires professional fixed-timestep replay diagnosis and multi-root coordination within an expert-hours scope, not medium recipe filling."
+    },
+    {
+      "id": "discovery_budget_test",
+      "name": "Discovery budget test",
+      "verdict": "PASS",
+      "reasoning": "Three non-trivial discoveries are committed below, each with a distinct planned location and a reason it must remain absent from the public instruction."
+    },
+    {
+      "id": "instruction_specificity_test",
+      "name": "Instruction specificity test",
+      "verdict": "PASS",
+      "reasoning": "The drafted instruction stays at symptoms-only: no algorithm names, thresholds, cause phrases such as ring desync or consume skew, or named fix sites."
+    },
+    {
+      "id": "topology_distribution_test",
+      "name": "Topology distribution test",
+      "verdict": "PASS",
+      "reasoning": "Three distinct candidate topologies are enumerated below, each requiring at least three coordinating locations; the selected topology distributes tests across three locations at 4/12 each."
+    }
+  ],
+  "rubric_axes": [
+    {
+      "id": "verifiable",
+      "name": "Verifiable",
+      "verdict": "PASS",
+      "reasoning": "Long-replay digest parity, short healthy-control byte stability, anti-approximate rejection, and regenerated replay_report.json checks are all programmatic."
+    },
+    {
+      "id": "well_specified",
+      "name": "Well-specified",
+      "verdict": "PASS",
+      "reasoning": "The symptoms-only instruction clearly identifies invocation, normative schema path, long/short outcomes, and prohibited approximate physics without revealing implementation causes."
+    },
+    {
+      "id": "solvable",
+      "name": "Solvable",
+      "verdict": "PASS",
+      "reasoning": "The design bounds the defect to a small existing C++/Rust simulation lab; an expert familiar with fixed-timestep replay can complete the coordinated changes in roughly three to eight hours."
+    },
+    {
+      "id": "difficult",
+      "name": "Difficult",
+      "verdict": "PASS",
+      "reasoning": "The task stays hard after honest disclosure because tick-count-green / digest-red long runs do not identify which lane, draw, or mark authority is inconsistent."
+    },
+    {
+      "id": "interesting",
+      "name": "Interesting",
+      "verdict": "PASS",
+      "reasoning": "Deterministic replay under fixed-timestep input consumption is paid production work in game engines and simulation harnesses."
+    },
+    {
+      "id": "outcome_verified",
+      "name": "Outcome-verified",
+      "verdict": "PASS",
+      "reasoning": "The tests accept any implementation producing correct long/short outcomes and do not require the oracle's exact code shape."
+    }
+  ],
+  "instruction_completeness_test": {
+    "verdict": "PASS",
+    "reasoning": "The instruction is sufficient to judge the final report and long/short outcomes but insufficient to locate or derive the three fixes without deeply reading and running the codebase."
+  },
+  "discovery_budget": [
+    {
+      "discovery": "The input lane advances or retires slots on a tick boundary that disagrees with the integrator's consume authority, so long traces accumulate phase error while short controls stay green.",
+      "planned_location": "environment/lane/knit.cpp::knit_u",
+      "why_instruction_must_not_reveal": "Naming a ring/lane tick-boundary mismatch would collapse the first diagnosis into a disclosed buffer-index edit."
+    },
+    {
+      "discovery": "The fixed-step draw path applies a mismatched number of buffered intents per step under long traces, producing digest drift while tick-count overlays remain green.",
+      "planned_location": "environment/draw/step.rs::pull_v",
+      "why_instruction_must_not_reveal": "Naming per-step consume count or draw skew would directly expose the Rust repair and convert the task into a recipe."
+    },
+    {
+      "discovery": "Seal-side digest samples are taken at a phase that does not match the post-apply body snapshot used for recorded outcomes, so reports stay wrong even when upstream consume looks repaired.",
+      "planned_location": "environment/mark/fold.cpp::fold_w",
+      "why_instruction_must_not_reveal": "Naming sample-phase drift or pre-apply hashing would reduce the seal work to a disclosed timing flip."
+    }
+  ],
+  "instruction_specificity": {
+    "level": "symptoms-only",
+    "reasoning": "The public draft describes long-replay digest divergence, green tick-count overlays, short healthy-control bit stability, and a cited report schema without naming algorithms, thresholds, ring desync, consume skew, sample phase, or causes."
+  },
+  "investigation_profile": {
+    "weakness_areas": [
+      "long_horizon_debugging",
+      "multi_component_reasoning",
+      "partial_failures",
+      "ambiguous_bug_report"
+    ],
+    "causal_chain": [
+      {
+        "stage": 1,
+        "evidence": "Run a bundled long same-seed replay beside its short healthy-control replay; compare tick-count overlays, entity-state digests, and report fields.",
+        "finding": "Tick-count overlays stay green on long runs while entity-state digests diverge; the short control stays bit-stable.",
+        "unlocks_next": "The duration-gated matrix justifies treating digest-wrong / overlay-green as one consume/sample incident rather than a general physics bug."
+      },
+      {
+        "stage": 2,
+        "evidence": "Inspect run traces, metrics counters, and replay_report.json for long versus short trajectories.",
+        "finding": "Disagreement concentrates on body-state digests after a few hundred ticks, not on short controls or tick counters.",
+        "unlocks_next": "Investigation can focus on authorities that accumulate error only under long consume sequences."
+      },
+      {
+        "stage": 3,
+        "evidence": "Trace lane enqueue/retire decisions against tick markers in deterministic probes.",
+        "finding": "Lane slot retirement disagrees with the integrator's consume boundary, seeding phase error that short traces hide.",
+        "unlocks_next": "Lane-boundary repair becomes necessary but not sufficient before draw and sample are trusted."
+      },
+      {
+        "stage": 4,
+        "evidence": "Compare per-step buffered-intent draw counts on long versus short traces.",
+        "finding": "Draw applies a mismatched number of intents per fixed step under long traces, explaining overlay-green / digest-wrong behavior.",
+        "unlocks_next": "Draw count must be repaired in concert with lane authority; seal sampling still remains unchecked."
+      },
+      {
+        "stage": 5,
+        "evidence": "Inspect seal-side sample timing relative to post-apply body snapshots and recorded outcome digests.",
+        "finding": "Digests sample a phase that disagrees with the recorded post-apply snapshot, so reports stay wrong even when upstream consume looks ordinary.",
+        "unlocks_next": "The three authorities can now be repaired as one coupled invariant and verified end-to-end."
+      },
+      {
+        "stage": 6,
+        "evidence": "Apply coordinated repairs at lane, draw, and mark locations; rebuild; rerun long/short matrices.",
+        "finding": "Failing long replays match recorded outcome digests; short healthy controls remain bit-identical; approximate physics shortcuts still fail.",
+        "unlocks_next": "This closes the incident with deterministic outcome evidence."
+      }
+    ],
+    "evidence_surfaces": [
+      {
+        "surface": "code",
+        "planned_location": "environment/lane/, environment/draw/, and environment/mark/",
+        "question_answered": "Which roots own lane authority, fixed-step draw, and digest sample/fold?"
+      },
+      {
+        "surface": "runtime-state",
+        "planned_location": "Deterministic observations from /app/bin/simlab long and short runs",
+        "question_answered": "Where do tick-count overlays stay green while entity-state digests diverge?"
+      },
+      {
+        "surface": "logs",
+        "planned_location": "environment/fixtures/logs/run_trace.ndjson",
+        "question_answered": "Which duration bands correlate with digest disagreement?"
+      },
+      {
+        "surface": "metrics",
+        "planned_location": "Emitted tick-count and digest fields in /app/output/replay_report.json",
+        "question_answered": "Do overlay metrics mask the digest failure mode?"
+      },
+      {
+        "surface": "filesystem",
+        "planned_location": "environment/fixtures/traces/ and recorded outcome shelves under /app/var/shelf/",
+        "question_answered": "What durable recordings exist for long failing traces versus short controls?"
+      }
+    ],
+    "competing_hypotheses": [
+      {
+        "hypothesis": "The integrator numerics themselves are nondeterministic or approximate under any duration.",
+        "why_plausible": "Entity-state digests disagree and the instruction forbids approximate physics.",
+        "falsifier": "Short healthy-control replays remain bit-identical, and tick-count overlays stay coherent on both long and short runs."
+      },
+      {
+        "hypothesis": "Recorded outcome digests on disk are corrupt or from a different seed.",
+        "why_plausible": "Only long replays disagree with recorded outcomes.",
+        "falsifier": "Recording identity keys and seed fields in replay_report.json match across long and short runs; disagreement tracks duration-gated consume/sample boundaries rather than random storage damage."
+      },
+      {
+        "hypothesis": "The harness compares different report slots or truncates long traces in the verifier only.",
+        "why_plausible": "Digest disagreement can look like a harness mismatch.",
+        "falsifier": "Solver-visible long/short runs regenerate the same report schema fields; verifier checks are metamorphic against regenerated properties, not a single golden slot."
+      }
+    ],
+    "conditional_failures": [
+      {
+        "scenario": "Long same-seed replay against recorded outcome digests",
+        "role": "failing",
+        "expected_behavior": "After repair, entity-state digests match recorded outcomes while tick-count overlays remain coherent."
+      },
+      {
+        "scenario": "Generated long-trace families with the same public contract",
+        "role": "failing",
+        "expected_behavior": "Long-replay digest parity generalizes beyond the bundled incident case."
+      },
+      {
+        "scenario": "Short healthy-control replay of the same harness",
+        "role": "healthy-control",
+        "expected_behavior": "Remains bit-identical across clean rebuilds before and after repair."
+      },
+      {
+        "scenario": "Approximate-physics shortcut attempts on long traces",
+        "role": "failing",
+        "expected_behavior": "Continue to fail digest parity; approximate integration is not an accepted solution."
+      }
+    ],
+    "estimated_meaningful_actions": 52,
+    "determinism_strategy": "Ship fixed C++/Rust sources, bundled traces, shelves, and logs in one offline container. Reset from immutable inputs before each scenario, avoid clocks and runtime entropy, sort filesystem traversal, pin reduction order for digests, and derive expected long/short properties from verifier-owned regeneration.",
+    "domain_reasoning": {
+      "domain": "Games / interactive simulation for fixed-timestep deterministic replay with buffered controller samples and entity-state digests.",
+      "why_not_trivia": "The solver does not need an obscure API quirk. They must reconcile lane authority, per-step draw, and sample phase across two languages while proving duration-gated long/short outcomes and rejecting approximate physics."
+    }
+  },
+  "attack_path": {
+    "summary": "Reproduce long digest disagreement beside a short healthy control, falsify approximate-numerics and corrupt-recording hypotheses, then reconcile lane-vs-tick authority, per-step draw count, and seal sample phase across three roots.",
+    "reasoning": "The path requires experiments and cross-root model building; no prompt noun, file name, or single failed assertion reveals all three locations."
+  },
+  "smallest_plausible_patch": {
+    "summary": "Coordinated substantive edits to one C++ lane-boundary function, one Rust draw/apply function, and one C++ seal/sample function, together exceeding a trivial patch.",
+    "reasoning": "Any strict subset leaves at least one long-digest, short-control, or anti-approximate property failing."
+  },
+  "collapse_audit": {
+    "verdict": "PASS",
+    "reasoning": "The editable frontier spans three non-obvious locations across three module roots and two languages, the instruction remains symptoms-only, no declarative cluster or reference digest exists, and the planned oracle adds substantive logic rather than deleting or toggling one feature.",
+    "residual_hardness": "After the complete file tree is visible, the solver must still identify why long traces cross different lane, draw, and sample authorities and then preserve one duration-gated invariant through three locations.",
+    "red_flags": []
+  },
+  "topology_enumeration": [
+    {
+      "id": "topology_a_selected",
+      "summary": "Lane-vs-tick authority, per-step draw count, and seal sample phase disagree across lane, draw, and mark roots.",
+      "locations": [
+        "lane/knit.cpp::knit_u",
+        "draw/step.rs::pull_v",
+        "mark/fold.cpp::fold_w"
+      ],
+      "why_no_single_location_suffices": "A correct lane boundary can still be consumed wrongly by draw, correct draw can still emit wrong digests under a pre-apply sample phase, and seal-only repairs leave long digests red when lane and draw disagree."
+    },
+    {
+      "id": "topology_b_lifecycle_chain",
+      "summary": "Enqueue, retire, draw/apply, and seal emission form a four-stage consume chain.",
+      "locations": [
+        "lane/knit.cpp::knit_u",
+        "lane/queue.cpp::retire_x",
+        "draw/step.rs::pull_v",
+        "mark/fold.cpp::fold_w"
+      ],
+      "why_no_single_location_suffices": "Correct enqueue is useless if retire disagrees with tick authority, correct retire is useless if draw applies the wrong count, and correct upstream consume is useless if digests sample the wrong phase."
+    },
+    {
+      "id": "topology_c_reduction_convention",
+      "summary": "Lane slot indices, draw batching, and seal reduction order use incompatible conventions under long traces.",
+      "locations": [
+        "lane/index.cpp::map_y",
+        "draw/step.rs::pull_v",
+        "mark/fold.cpp::fold_w"
+      ],
+      "why_no_single_location_suffices": "Changing one convention only moves the disagreement to another boundary; producers and consumers must represent the same post-apply sample map."
+    }
+  ],
+  "construction_manifest": {
+    "symbol_table": [
+      {
+        "path": "lane/knit.cpp",
+        "symbol": "knit_u",
+        "kind": "function",
+        "signature": "int32_t knit_u(const int32_t* a, int32_t b, uint64_t* c);",
+        "purpose": "Aligns lane slot retirement with the integrator consume boundary."
+      },
+      {
+        "path": "draw/step.rs",
+        "symbol": "pull_v",
+        "kind": "function",
+        "signature": "pub(crate) fn pull_v(a: u64, b: &mut DrawBuf) -> i8",
+        "purpose": "Selects how many buffered intents the fixed step applies."
+      },
+      {
+        "path": "mark/fold.cpp",
+        "symbol": "fold_w",
+        "kind": "function",
+        "signature": "int32_t fold_w(const uint64_t* a, int32_t b, uint64_t* c);",
+        "purpose": "Folds body samples into a stable digest at the post-apply phase."
+      }
+    ],
+    "flipping_point_contract": {
+      "locations": [
+        {
+          "id": "A",
+          "path": "lane/knit.cpp",
+          "controls_tests": [
+            "test_m01",
+            "test_m02",
+            "test_m06",
+            "test_m10"
+          ]
+        },
+        {
+          "id": "B",
+          "path": "draw/step.rs",
+          "controls_tests": [
+            "test_m03",
+            "test_m05",
+            "test_m07",
+            "test_m11"
+          ]
+        },
+        {
+          "id": "C",
+          "path": "mark/fold.cpp",
+          "controls_tests": [
+            "test_m04",
+            "test_m08",
+            "test_m09",
+            "test_m12"
+          ]
+        }
+      ],
+      "no_single_location_flips_majority": true,
+      "concentration_cap": 0.5
+    },
+    "decoy_manifest": [
+      {
+        "path": "lane/ledge.cpp",
+        "kind": "helper",
+        "rhymes_with": "knit_u",
+        "non_fix_purpose": "Computes ordinary lane occupancy banners for diagnostics."
+      },
+      {
+        "path": "draw/locker.rs",
+        "kind": "helper",
+        "rhymes_with": "pull_v",
+        "non_fix_purpose": "Maps display codes for status lines without changing draw counts."
+      },
+      {
+        "path": "mark/tally.cpp",
+        "kind": "helper",
+        "rhymes_with": "fold_w",
+        "non_fix_purpose": "Folds scalar diagnostic marks into aggregate counters."
+      }
+    ],
+    "code_forbidden_tokens": [
+      "headless",
+      "game",
+      "lab",
+      "app",
+      "inputs",
+      "deterministic",
+      "replay",
+      "live",
+      "sessions",
+      "seed",
+      "entity-state",
+      "digests",
+      "ticks",
+      "tick-count",
+      "overlays",
+      "healthy-control",
+      "bit-stable",
+      "pipeline",
+      "long",
+      "replays",
+      "recorded",
+      "outcome",
+      "short",
+      "control",
+      "approximate",
+      "physics",
+      "bin",
+      "simlab",
+      "output",
+      "replay_report",
+      "json",
+      "keys",
+      "layout",
+      "schema",
+      "docs",
+      "replay-report-schema",
+      "bundled",
+      "report",
+      "checks",
+      "compiled",
+      "healthy",
+      "bit-identical",
+      "normative"
+    ]
+  },
+  "naming_pass": {
+    "instruction_nouns_extracted": [
+      "headless",
+      "game",
+      "lab",
+      "app",
+      "inputs",
+      "deterministic",
+      "replay",
+      "live",
+      "sessions",
+      "seed",
+      "entity-state",
+      "digests",
+      "ticks",
+      "tick-count",
+      "overlays",
+      "healthy-control",
+      "bit-stable",
+      "pipeline",
+      "long",
+      "replays",
+      "recorded",
+      "outcome",
+      "short",
+      "control",
+      "approximate",
+      "physics",
+      "bin",
+      "simlab",
+      "output",
+      "replay_report",
+      "json",
+      "keys",
+      "layout",
+      "schema",
+      "docs",
+      "replay-report-schema",
+      "bundled",
+      "report",
+      "checks",
+      "compiled",
+      "healthy",
+      "bit-identical",
+      "normative"
+    ],
+    "renames_during_drafting": [
+      {
+        "original": "ring/input_buf.cpp",
+        "renamed_to": "lane/knit.cpp",
+        "reason": "Removed instruction-adjacent input/ring vocabulary from a selected fix path."
+      },
+      {
+        "original": "physics/consume.rs",
+        "renamed_to": "draw/step.rs",
+        "reason": "Removed instruction noun physics and cause-revealing consume naming from the Rust frontier."
+      },
+      {
+        "original": "digest/sample.cpp",
+        "renamed_to": "mark/fold.cpp",
+        "reason": "Removed digest/sample vocabulary from a selected fix path."
+      },
+      {
+        "original": "advance_tick_ring",
+        "renamed_to": "knit_u",
+        "reason": "Avoided tick/ring vocabulary and the bin substring present in bind_*."
+      },
+      {
+        "original": "apply_physics_inputs",
+        "renamed_to": "pull_v",
+        "reason": "Avoided physics/inputs vocabulary from the public instruction."
+      },
+      {
+        "original": "hash_entity_state",
+        "renamed_to": "fold_w",
+        "reason": "Avoided entity/state/digest vocabulary from the public instruction."
+      }
+    ],
+    "test_names_audited": [
+      "test_m01",
+      "test_m02",
+      "test_m03",
+      "test_m04",
+      "test_m05",
+      "test_m06",
+      "test_m07",
+      "test_m08",
+      "test_m09",
+      "test_m10",
+      "test_m11",
+      "test_m12"
+    ],
+    "concentration_math": {
+      "total_tests": 12,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    },
+    "recomputed_concentration": {
+      "total_tests": 12,
+      "concentration_cap": 0.5,
+      "per_location": [
+        {
+          "location_id": "A",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "B",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "location_id": "C",
+          "test_count": 4,
+          "ratio": 0.3333333333333333
+        }
+      ]
+    }
+  }
+}

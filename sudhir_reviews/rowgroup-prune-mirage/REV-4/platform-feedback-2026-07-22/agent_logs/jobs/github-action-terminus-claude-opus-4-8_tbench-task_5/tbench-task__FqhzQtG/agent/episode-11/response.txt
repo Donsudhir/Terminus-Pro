@@ -1,0 +1,11 @@
+```json
+{
+  "analysis": "I now understand the full picture. Origin encoding: 0=Retired, 1=Inherited, 2=Current. is_live: Retired->false, Inherited->true, Current->present!=0.\n\nTwo bugs to fix:\n1. C++ batch reader rill.cpp: admit uses only presence_lane; must use full is_live logic (origin + presence).\n2. Rust ingest fold.rs tilt_a: must compute low/high over live amounts only, has_absent when any non-live entry, and all-non-live slab -> low=0,high=0,has_absent=true.\n\nLet me verify the mixed store's markers to ensure the reader fix produces correct results for archived stores. Mixed store slab 0: markers low=100,high=100,has_absent=1. Rows: (retired,-999),(current present 10),(current present 20),(current absent 777). Live cells: 10,20. For range 10-40 skipping (m_range): gate uses low=100,high=100. Range 10-40 vs [100,100]: right=40 < low=100 -> range-away -> gate closed, no read. So both readers return 0 for that slab (skipping). But m_range is row path with skipping. Good — the gate uses markers; if the archived markers say [100,100] then it skips. This is 'incomplete markers' — but the contract says archived stores keep on-disk markers and readers interpret without rewriting. So skipping honors those (possibly loose/wrong) markers. The key requirement: equivalent modes must agree. Since gate logic is shared (turn_b), both row and batch use the same gate. The only divergence is the admit/is_live logic. Let me first verify current build works and see current output.",
+  "plan": "Build the project first to establish a baseline, then run the audit to see current divergence.",
+  "commands": [
+    {"keystrokes": "cat /app/tools/build-all\n", "duration": 0.1},
+    {"keystrokes": "cat /app/bin/loam\n", "duration": 0.1},
+    {"keystrokes": "cat /app/Makefile /app/cpp/Makefile\n", "duration": 0.1}
+  ]
+}
+```

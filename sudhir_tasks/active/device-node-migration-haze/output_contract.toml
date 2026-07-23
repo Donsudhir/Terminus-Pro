@@ -1,0 +1,33 @@
+user_visible_outputs = [
+  "/app/output/cutover_report.json",
+]
+
+internal_harness_files = [
+  "/app/build/libhaze.a",
+  "/app/tools/build_all.sh",
+]
+
+[structured_outputs.cutover_report]
+target = "/app/output/cutover_report.json"
+format = "json"
+instruction_checks = [
+  "schema_version",
+  "runs",
+  "family",
+  "tag",
+  "mode",
+  "entry_count",
+  "exit_code",
+  "open_ok",
+  "identity_ok",
+  "path_ok",
+  "mode_ok",
+  "rejected",
+  "probes",
+  "summary",
+  "failing_ok",
+  "control_stable",
+  "reject_stable",
+  "digest",
+  "cutover-report-schema",
+]

@@ -22,5 +22,7 @@
 | [ADR-0018](ADR-0018-proposal-check-before-uniqueness.md) | Accepted | Require Task Idea Proposal Check feedback before uniqueness and Step 2a | 2026-07-21 | Repository-wide |
 | [ADR-0019](ADR-0019-canonical-root-adapter-and-historical-read-only.md) | Accepted | Enforce canonical writes, historical read-only roots, transactional indexes and status views | 2026-07-21 | Repository-wide |
 | [ADR-0020](ADR-0020-official-ci-parity-and-delegation.md) | Accepted | Enforce deterministic official CI families and explicitly delegate unpublished semantic limits | 2026-07-21 | Repository-wide |
+| [ADR-0021](ADR-0021-strict-humanizer-gate-for-dsv-fields.md) | Accepted | Apply a pinned, atomic, non-bypassable Humanizer gate only to Difficulty/Solution/Verification | 2026-07-22 | Repository-wide |
+| [ADR-0022](ADR-0022-acceptance-safe-precedence-for-dsv-humanization.md) | Accepted | Make platform acceptance, task truth, and project rules outrank DSV Humanizer style | 2026-07-22 | Repository-wide |
 
 New durable decisions receive the next sequential ADR number. Accepted ADRs are not rewritten to change history. Add a superseding ADR instead.

@@ -1,0 +1,221 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.4.1, pluggy-1.6.0
+cachedir: /tmp/pytest_cache
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 15 items
+
+test_outputs.py .FF..F.F..F.FF.                                          [100%]
+
+=================================== FAILURES ===================================
+___________________________________ test_p02 ___________________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p020')
+
+    def test_p02(tmp_path: Path) -> None:
+        """Archived selective row execution returns the complete invoice window."""
+        row = _run_case(tmp_path, "p02", MIXED, "range", 10, 40, "row", True)
+>       _assert_tally(row, 4, 100)
+
+test_outputs.py:150: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'case_id': 'p02', 'pages_read': 1, 'pages_total': 4, 'path': 'row', ...}
+count = 4, total = 100
+
+    def _assert_tally(row: dict, count: int, total: int) -> None:
+>       assert row["row_count"] == count
+E       assert 2 == 4
+
+test_outputs.py:136: AssertionError
+___________________________________ test_p03 ___________________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p030')
+
+    def test_p03(tmp_path: Path) -> None:
+        """Fresh artifact evidence and archived selective answers agree together."""
+        source = _write_csv(tmp_path, "alpha-03", True)
+        produced = _ingest(tmp_path, source, "a3")
+        _assert_markers(produced, [(17, 43, 1), (107, 151, 1)])
+        row = _run_case(tmp_path, "p03", MIXED, "range", 10, 40, "row", True)
+>       _assert_tally(row, 4, 100)
+
+test_outputs.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'case_id': 'p03', 'pages_read': 1, 'pages_total': 4, 'path': 'row', ...}
+count = 4, total = 100
+
+    def _assert_tally(row: dict, count: int, total: int) -> None:
+>       assert row["row_count"] == count
+E       assert 2 == 4
+
+test_outputs.py:136: AssertionError
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+___________________________________ test_p06 ___________________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p060')
+
+    def test_p06(tmp_path: Path) -> None:
+        """The mixed selective-batch window preserves all qualifying values."""
+        row = _run_case(tmp_path, "p06", MIXED, "range", -1000, 25, "batch", True)
+>       _assert_tally(row, 3, 25)
+
+test_outputs.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'case_id': 'p06', 'pages_read': 1, 'pages_total': 4, 'path': 'batch', ...}
+count = 3, total = 25
+
+    def _assert_tally(row: dict, count: int, total: int) -> None:
+>       assert row["row_count"] == count
+E       assert 1 == 3
+
+test_outputs.py:136: AssertionError
+___________________________________ test_p08 ___________________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p080')
+
+    def test_p08(tmp_path: Path) -> None:
+        """Selective archived and healthy controls retain correct work avoidance."""
+        row = _run_case(tmp_path, "p08", MIXED, "range", 10, 20, "row", True)
+>       _assert_tally(row, 2, 30)
+
+test_outputs.py:197: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'case_id': 'p08', 'pages_read': 0, 'pages_total': 4, 'path': 'row', ...}
+count = 2, total = 30
+
+    def _assert_tally(row: dict, count: int, total: int) -> None:
+>       assert row["row_count"] == count
+E       assert 0 == 2
+
+test_outputs.py:136: AssertionError
+___________________________________ test_p11 ___________________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p110')
+
+    def test_p11(tmp_path: Path) -> None:
+        """Neighboring generations preserve the same selective numeric answer."""
+        row = _run_case(tmp_path, "p11", MIXED, "range", 10, 20, "row", True)
+>       _assert_tally(row, 2, 30)
+
+test_outputs.py:227: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'case_id': 'p11', 'pages_read': 0, 'pages_total': 4, 'path': 'row', ...}
+count = 2, total = 30
+
+    def _assert_tally(row: dict, count: int, total: int) -> None:
+>       assert row["row_count"] == count
+E       assert 0 == 2
+
+test_outputs.py:136: AssertionError
+___________________________________ test_p13 ___________________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p130')
+
+    def test_p13(tmp_path: Path) -> None:
+        """Selective absence probes agree across lanes on neighboring generations."""
+        row = _run_case(tmp_path, "p13", VAULT, "isnull", 0, 0, "row", True)
+>       _assert_tally(row, 2, 0)
+
+test_outputs.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'case_id': 'p13', 'pages_read': 1, 'pages_total': 3, 'path': 'row', ...}
+count = 2, total = 0
+
+    def _assert_tally(row: dict, count: int, total: int) -> None:
+>       assert row["row_count"] == count
+E       assert 1 == 2
+
+test_outputs.py:136: AssertionError
+___________________________________ test_p14 ___________________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p140')
+
+    def test_p14(tmp_path: Path) -> None:
+        """Selective text-code probes stay complete on neighboring generations."""
+        row = _run_case(tmp_path, "p14", VAULT, "region_eq", "east", 0, "row", True)
+>       _assert_tally(row, 2, 49)
+
+test_outputs.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'case_id': 'p14', 'pages_read': 1, 'pages_total': 3, 'path': 'row', ...}
+count = 2, total = 49
+
+    def _assert_tally(row: dict, count: int, total: int) -> None:
+>       assert row["row_count"] == count
+E       assert 1 == 2
+
+test_outputs.py:136: AssertionError
+==================================== PASSES ====================================
+___________________________________ test_p01 ___________________________________
+---------------------------- Captured stdout setup -----------------------------
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o build/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+---------------------------- Captured stderr setup -----------------------------
+warning: constant `RUNE_VOID` is never used
+ --> src/model.rs:1:1
+  |
+1 | pub(crate) const RUNE_VOID: u8 = 0;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: constant `RUNE_FIXED` is never used
+ --> src/model.rs:2:1
+  |
+2 | pub(crate) const RUNE_FIXED: u8 = 1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `loam-ingest` (bin "loam-ingest") generated 2 warnings
+    Finished release [optimized] target(s) in 0.00s
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+___________________________________ test_p05 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+___________________________________ test_p07 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=185
+___________________________________ test_p10 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+jobs=1 cells=8 bytes=182
+___________________________________ test_p15 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=12 bytes=265
+=========================== short test summary info ============================
+PASSED test_outputs.py::test_p01
+PASSED test_outputs.py::test_p04
+PASSED test_outputs.py::test_p05
+PASSED test_outputs.py::test_p07
+PASSED test_outputs.py::test_p09
+PASSED test_outputs.py::test_p10
+PASSED test_outputs.py::test_p12
+PASSED test_outputs.py::test_p15
+FAILED test_outputs.py::test_p02 - assert 2 == 4
+FAILED test_outputs.py::test_p03 - assert 2 == 4
+FAILED test_outputs.py::test_p06 - assert 1 == 3
+FAILED test_outputs.py::test_p08 - assert 0 == 2
+FAILED test_outputs.py::test_p11 - assert 0 == 2
+FAILED test_outputs.py::test_p13 - assert 1 == 2
+FAILED test_outputs.py::test_p14 - assert 1 == 2
+========================= 7 failed, 8 passed in 5.59s ==========================

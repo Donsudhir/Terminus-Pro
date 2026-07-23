@@ -1,0 +1,150 @@
+{
+    "id": "c7e4cc18-e7df-45f8-8c57-71aeab1dc496",
+    "task_name": "tbench-task",
+    "trial_name": "tbench-task__MECsnvj",
+    "trial_uri": "file:///root/jobs/github-action-terminus-claude-opus-4-8_tbench-task_3/tbench-task__MECsnvj",
+    "task_id": {
+        "path": "harbor_tasks/tbench-task"
+    },
+    "source": null,
+    "task_checksum": "80f98a44723129fd9166a33371675d054c523b6db3b69457fd77f2fe15114276",
+    "config": {
+        "task": {
+            "path": "harbor_tasks/tbench-task",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "tbench-task__MECsnvj",
+        "trials_dir": "jobs/github-action-terminus-claude-opus-4-8_tbench-task_3",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "anthropic/claude-opus-4-8",
+            "skills": [],
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {
+                "model_info": {
+                    "max_input_tokens": 200000,
+                    "max_output_tokens": 16384
+                }
+            },
+            "env": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "daytona",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "suppress_override_warnings": false,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "env": {},
+            "kwargs": {
+                "auto_stop_interval_mins": 120
+            }
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "717a239c-b45a-4f8b-8d26-4e68e2b022c0"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "claude-opus-4-8",
+            "provider": "anthropic"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 657868,
+        "n_cache_tokens": 614956,
+        "n_output_tokens": 16718,
+        "cost_usd": 0.9935904999999998,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 29,
+            "api_request_times_msec": [
+                17765.15555381775,
+                4945.104122161865,
+                4363.836050033569,
+                3772.9058265686035,
+                3159.229040145874,
+                3138.559579849243,
+                7698.557138442993,
+                5352.259159088135,
+                3091.2203788757324,
+                5106.5075397491455,
+                3891.0422325134277,
+                16381.423234939575,
+                3352.891445159912,
+                6851.098537445068,
+                4602.164030075073,
+                4681.875228881836,
+                15857.966184616089,
+                12892.715692520142,
+                3714.867353439331,
+                15104.115009307861,
+                18491.907835006714,
+                10641.249895095825,
+                3624.9029636383057,
+                14507.773637771606,
+                8677.886486053467,
+                9394.69027519226,
+                9969.47693824768,
+                9940.948247909546,
+                6569.422006607056
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-07-21T02:08:15.456944Z",
+    "finished_at": "2026-07-21T02:14:41.062582Z",
+    "environment_setup": {
+        "started_at": "2026-07-21T02:08:15.526269Z",
+        "finished_at": "2026-07-21T02:08:17.778253Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-07-21T02:08:17.778303Z",
+        "finished_at": "2026-07-21T02:08:20.658878Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-07-21T02:08:20.659003Z",
+        "finished_at": "2026-07-21T02:14:31.375242Z"
+    },
+    "verifier": {
+        "started_at": "2026-07-21T02:14:32.925613Z",
+        "finished_at": "2026-07-21T02:14:40.847230Z"
+    },
+    "step_results": null
+}

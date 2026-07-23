@@ -1,0 +1,9 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app# echo continue
+continue
+root@7aed3a99-a5bf-4e6f-82b7-b58237d56534:/app#

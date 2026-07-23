@@ -1,0 +1,1478 @@
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# clear
+[?2004l[H[J[3J[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# ls -la /app
+[?2004ltotal 4
+drwxr-xr-x 1 root root 90 Jul 21 02:06 .
+drwxr-xr-x 1 root root 71 Jul 21 02:08 ..
+-rw-r--r-- 1 root root 97 Jan  1  1970 Makefile
+drwxr-xr-x 2 root root 49 Jul 21 02:07 bin
+drwxr-xr-x 2 root root 30 Jul 21 02:06 config
+drwxr-xr-x 1 root root 10 Jul 21 02:07 cpp
+drwxr-xr-x 5 root root 63 Jul 21 02:06 data
+drwxr-xr-x 2 root root 92 Jul 21 02:06 docs
+drwxr-xr-x 2 root root 10 Jul 21 02:06 output
+drwxr-xr-x 1 root root 32 Jul 21 02:07 rust
+drwxr-xr-x 2 root root 52 Jul 21 02:06 tools
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# find /app -type f | head -100
+[?2004l/app/bin/loam-ingest
+/app/bin/loam
+/app/data/fresh/orders_a.csv
+/app/data/fresh/orders_b.csv
+/app/data/fresh/orders_c.csv
+/app/data/archive/current.store
+/app/data/archive/healthy.store
+/app/data/archive/mixed.store
+/app/data/archive/vault.store
+/app/data/cases/control.case
+/app/data/cases/incident.case
+/app/rust/Cargo.toml
+/app/rust/src/codec.rs
+/app/rust/src/ember/fold.rs
+/app/rust/src/ember/mod.rs
+/app/rust/src/ember/pale.rs
+/app/rust/src/ember/reed.rs
+/app/rust/src/main.rs
+/app/rust/src/model.rs
+/app/rust/src/report.rs
+/app/rust/Cargo.lock
+/app/cpp/Makefile
+/app/cpp/include/loam/exec.hpp
+/app/cpp/include/loam/plan.hpp
+/app/cpp/include/loam/report.hpp
+/app/cpp/include/loam/store.hpp
+/app/cpp/include/loam/types.hpp
+/app/cpp/src/digest.cpp
+/app/cpp/src/harbor/pale.cpp
+/app/cpp/src/harbor/veil.cpp
+/app/cpp/src/lattice/bay.cpp
+/app/cpp/src/lattice/rill.cpp
+/app/cpp/src/main.cpp
+/app/cpp/src/parse.cpp
+/app/cpp/src/report.cpp
+/app/cpp/src/row.cpp
+/app/cpp/src/store.cpp
+/app/tools/build-all
+/app/tools/reset-lab
+/app/docs/architecture.md
+/app/docs/format-notes.md
+/app/docs/report-schema.md
+/app/config/lab.conf
+/app/Makefile
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/docs/architecture.md
+[?2004l# Loam architecture
+
+Loam is a small offline columnar lab used by release engineering before storage
+changes reach the billing warehouse. `rust/` owns import and compaction. It emits
+self-describing slabs with value lanes, presence lanes, origin lanes, text codes,
+and compact markers. `cpp/` owns reads. The harbor stage decides which slabs are
+needed, then either the row reader or lattice reader computes a tally. The row
+reader walks record structs; the lattice reader consumes per-slab column lanes.
+
+The command front end reads every `.case` file in bytewise filename order and
+every record in source order. Structured counters come from the selected reader,
+not from estimates. Artifact files are append-free after creation; a reader must
+not repair them in place.
+
+`/app/tools/reset-lab` restores the bundled drill data before a clean replay.
+
+Older slabs are supported because disaster-recovery snapshots outlive the writer
+that created them. Newer writers can add header generations, but readers remain
+responsible for interpreting each slab according to its own header and local
+markers.
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/docs/format-notes.md
+[?2004l# Format notes from the v2 rollout
+
+These notes were copied from the rollout ticket and may lag the current reader.
+They are useful background only. The operational grading contract for audit JSON,
+per-case counters, ingest output naming, and live-value markers is
+`/app/docs/report-schema.md`.
+
+A file begins with `H|generation`. Each `P` record describes one slab, followed
+by the declared number of `R` records. The row record carries presence, origin,
+amount, and region. Marker fields let readers avoid opening slabs for predicates
+that cannot match.
+
+The v2 rollout assumed the amount lane remained sufficient to recognize missing
+historical values because old producers reserved one amount. The later writer
+kept origin and presence lanes to support mixed compaction and legitimate values
+that overlap old conventions. If these assumptions conflict, the artifact and a
+full reader are stronger evidence than this note.
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/docs/report-schema.md
+[?2004l# Loam audit report contract
+
+This document is the normative grading reference for `/app/bin/loam audit`
+JSON output and for fresh ingest artifacts. Architecture and rollout notes are
+background only; when they disagree with this file, this file wins.
+
+## Audit JSON
+
+UTF-8 JSON object written to the report path passed to `audit`.
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `status` | string | Always the literal `complete` when the run finishes successfully. |
+| `cases` | array | One object per `.case` file, in bytewise filename order. |
+| `digest` | string | Non-empty hex digest of the serialized `cases` body. |
+
+### Each element of `cases`
+
+| Key | Type | Meaning |
+| --- | --- | --- |
+| `case_id` | string | Identifier from the case line. |
+| `row_count` | integer | Number of qualifying live rows included in the answer. |
+| `sum_amount` | integer | Sum of amounts for those qualifying live rows. |
+| `pages_total` | integer | Number of slabs present in the store for the case. |
+| `pages_read` | integer | Number of slabs actually opened for the case. |
+| `path` | string | Execution lane used: `row` or `batch`. |
+| `skipping` | boolean | Whether selective admission was requested for the case. |
+
+`row_count`, `sum_amount`, `pages_total`, and `pages_read` are the per-case
+answer and work counters. Equivalent modes on the same store and probe must
+agree on `row_count` and `sum_amount`. Selective healthy controls must keep
+`pages_read` strictly below `pages_total` while still returning the correct
+answer. Repeated identical audits must emit byte-identical report files.
+
+## Fresh ingest artifact
+
+`/app/bin/loam ingest <CSV> <store-directory>` writes exactly:
+
+`<store-directory>/data.store`
+
+No other store filename is accepted for grading.
+
+## Faithful live-value markers
+
+Each slab in a store carries numeric markers `low`, `high`, and `has_absent`.
+
+- `low` and `high` span only live amounts in that slab.
+- `has_absent` is true when the slab contains any non-live entry.
+- A slab whose entries are all non-live records `low` 0, `high` 0, and
+  `has_absent` true.
+- Fresh ingest must keep those markers faithful to the live-value domain of the
+  CSV it wrote. Archived mixed-generation stores keep their on-disk markers;
+  readers must interpret them without rewriting the artifact.
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/include/loam/types.hpp
+[?2004l#pragma once
+
+#include <cstdint>
+#include <string>
+#include <vector>
+
+namespace loam {
+
+enum class Origin : std::uint8_t { Retired = 0, Inherited = 1, Current = 2 };
+
+struct Cell {
+    std::uint8_t present{};
+    Origin origin{Origin::Current};
+    std::int64_t amount{};
+    std::string region;
+};
+
+struct Slab {
+    std::size_t id{};
+    std::uint8_t generation{};
+    std::int64_t low{};
+    std::int64_t high{};
+    bool has_absent{};
+    std::string region_low;
+    std::string region_high;
+    std::vector<Cell> cells;
+    std::vector<std::int64_t> amount_lane;
+    std::vector<std::uint8_t> presence_lane;
+    std::vector<std::uint8_t> origin_lane;
+    std::vector<std::string> region_lane;
+};
+
+enum class Op { All, Equal, Range, IsNull, RegionEqual };
+enum class Lane { Row, Batch };
+
+struct Probe {
+    Op op{Op::All};
+    std::int64_t x{};
+    std::int64_t y{};
+    std::string text;
+    Lane lane{Lane::Row};
+    bool skipping{};
+};
+
+struct Gate {
+    bool read{true};
+    std::string note;
+};
+
+struct Tally {
+    std::int64_t row_count{};
+    std::int64_t sum_amount{};
+    std::int64_t pages_read{};
+};
+
+struct CaseSpec {
+    std::string case_id;
+    std::string store_path;
+    Probe probe;
+};
+
+struct CaseResult {
+    std::string case_id;
+    Tally tally;
+    std::int64_t pages_total{};
+    Lane lane{Lane::Row};
+    bool skipping{};
+};
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/include/loam/store.hpp
+[?2004l#pragma once
+
+#include "loam/types.hpp"
+
+#include <filesystem>
+#include <vector>
+
+namespace loam {
+
+std::vector<Slab> load_store(const std::filesystem::path& path);
+std::vector<CaseSpec> load_cases(const std::filesystem::path& directory);
+CaseResult run_case(const CaseSpec& spec);
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/include/loam/exec.hpp
+[?2004l#pragma once
+
+#include "loam/types.hpp"
+
+namespace loam {
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c);
+Tally sweep_c(const Slab& a, const Probe& b, const Gate& c);
+Tally sweep_e(const Tally& a, const Tally& b);
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/include/loam/plan.hpp
+[?2004l#pragma once
+
+#include "loam/types.hpp"
+
+namespace loam {
+
+Gate turn_b(const Slab& a, const Probe& b);
+std::string turn_d(const Gate& a, const Probe& b);
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/include/loam/report.hpp
+[?2004l#pragma once
+
+#include "loam/types.hpp"
+
+#include <filesystem>
+#include <string>
+#include <vector>
+
+namespace loam {
+
+void write_report(const std::filesystem::path& path, const std::vector<CaseResult>& cases);
+std::string digest_hex(const std::string& text);
+std::string lane_name(Lane lane);
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/src/row.cpp
+[?2004l#include "loam/exec.hpp"
+
+namespace loam {
+namespace {
+
+bool is_live(const Cell& cell) {
+    if (cell.origin == Origin::Retired) {
+        return false;
+    }
+    if (cell.origin == Origin::Inherited) {
+        return true;
+    }
+    return cell.present != 0;
+}
+
+bool matches(const Cell& cell, const Probe& probe) {
+    switch (probe.op) {
+        case Op::All:
+            return true;
+        case Op::Equal:
+            return cell.amount == probe.x;
+        case Op::Range:
+            return cell.amount >= probe.x && cell.amount <= probe.y;
+        case Op::IsNull:
+            return false;
+        case Op::RegionEqual:
+            return cell.region == probe.text;
+    }
+    return false;
+}
+
+}  // namespace
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+    for (const auto& cell : a.cells) {
+        const bool live = is_live(cell);
+        if (b.op == Op::IsNull) {
+            if (!live) {
+                ++tally.row_count;
+            }
+            continue;
+        }
+        if (live && matches(cell, b)) {
+            ++tally.row_count;
+            tally.sum_amount += cell.amount;
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/src/lattice/bay.cpp
+[?2004l#include "loam/exec.hpp"
+
+namespace loam {
+
+Tally sweep_e(const Tally& a, const Tally& b) {
+    return {
+        a.row_count + b.row_count,
+        a.sum_amount + b.sum_amount,
+        a.pages_read + b.pages_read,
+    };
+}
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/src/lattice/rill.cpp
+[?2004l#include "loam/exec.hpp"
+
+#include <cstddef>
+#include <vector>
+
+namespace loam {
+
+Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+
+    const std::size_t count = a.amount_lane.size();
+    std::vector<unsigned char> admit(count, 0);
+    for (std::size_t i = 0; i < count; ++i) {
+        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;
+    }
+
+    if (b.op == Op::IsNull) {
+        for (std::size_t i = 0; i < count; ++i) {
+            if (admit[i] == 0) {
+                ++tally.row_count;
+            }
+        }
+        return tally;
+    }
+
+    for (std::size_t i = 0; i < count; ++i) {
+        if (admit[i] == 0) {
+            continue;
+        }
+        bool keep = false;
+        switch (b.op) {
+            case Op::All:
+                keep = true;
+                break;
+            case Op::Equal:
+                keep = a.amount_lane[i] == b.x;
+                break;
+            case Op::Range:
+                keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+                break;
+            case Op::IsNull:
+                keep = false;
+                break;
+            case Op::RegionEqual:
+                keep = a.region_lane[i] == b.text;
+                break;
+        }
+        if (keep) {
+            ++tally.row_count;
+            tally.sum_amount += a.amount_lane[i];
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/src/harbor/pale.cpp
+[?2004l#include "loam/plan.hpp"
+
+namespace loam {
+
+std::string turn_d(const Gate& a, const Probe& b) {
+    const char* lane = b.lane == Lane::Batch ? "batch" : "row";
+    return std::string(lane) + ":" + (a.read ? "open:" : "closed:") + a.note;
+}
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/src/harbor/veil.cpp
+[?2004l#include "loam/plan.hpp"
+
+namespace loam {
+
+Gate turn_b(const Slab& a, const Probe& b) {
+    if (!b.skipping) {
+        return {true, "full"};
+    }
+    if (b.op == Op::All) {
+        return {true, "all"};
+    }
+    if (b.op == Op::IsNull) {
+        return {a.has_absent, a.has_absent ? "possible" : "empty"};
+    }
+    if (b.op == Op::RegionEqual) {
+        const bool read = b.text >= a.region_low && b.text <= a.region_high;
+        return {read, read ? "text-hit" : "text-away"};
+    }
+
+    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;
+    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;
+    const bool read = !(right < a.low || left > a.high);
+    return {read, read ? "range-hit" : "range-away"};
+}
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/cpp/src/store.cpp
+[?2004l#include "loam/store.hpp"
+
+#include "loam/exec.hpp"
+#include "loam/plan.hpp"
+
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
+namespace loam {
+namespace {
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> fields;
+    std::size_t start = 0;
+    while (true) {
+        const auto end = line.find('|', start);
+        fields.push_back(line.substr(start, end - start));
+        if (end == std::string::npos) {
+            break;
+        }
+        start = end + 1;
+    }
+    return fields;
+}
+
+}  // namespace
+
+std::vector<Slab> load_store(const std::filesystem::path& path) {
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("cannot open store: " + path.string());
+    }
+
+    std::vector<Slab> slabs;
+    std::string line;
+    while (std::getline(input, line)) {
+        if (line.empty() || line.rfind("H|", 0) == 0) {
+            continue;
+        }
+        const auto page = split(line);
+        if (page.size() != 9 || page[0] != "P") {
+            throw std::runtime_error("bad page record in " + path.string());
+        }
+        Slab slab;
+        slab.id = std::stoull(page[1]);
+        slab.generation = static_cast<std::uint8_t>(std::stoul(page[2]));
+        slab.low = std::stoll(page[3]);
+        slab.high = std::stoll(page[4]);
+        slab.has_absent = page[5] == "1";
+        slab.region_low = page[6];
+        slab.region_high = page[7];
+        const auto row_count = std::stoull(page[8]);
+        for (std::size_t i = 0; i < row_count; ++i) {
+            if (!std::getline(input, line)) {
+                throw std::runtime_error("short page in " + path.string());
+            }
+            const auto row = split(line);
+            if (row.size() != 5 || row[0] != "R") {
+                throw std::runtime_error("bad row record in " + path.string());
+            }
+            const auto presence = static_cast<std::uint8_t>(std::stoul(row[1]));
+            const auto origin = static_cast<std::uint8_t>(std::stoul(row[2]));
+            const auto amount = std::stoll(row[3]);
+            slab.cells.push_back({presence, static_cast<Origin>(origin), amount, row[4]});
+            slab.presence_lane.push_back(presence);
+            slab.origin_lane.push_back(origin);
+            slab.amount_lane.push_back(amount);
+            slab.region_lane.push_back(row[4]);
+        }
+        slabs.push_back(std::move(slab));
+    }
+    return slabs;
+}
+
+CaseResult run_case(const CaseSpec& spec) {
+    const auto slabs = load_store(spec.store_path);
+    Tally total;
+    for (const auto& slab : slabs) {
+        const Gate gate = turn_b(slab, spec.probe);
+        const auto label = turn_d(gate, spec.probe);
+        (void)label;
+        const Tally part = spec.probe.lane == Lane::Batch
+            ? sweep_c(slab, spec.probe, gate)
+            : walk_row(slab, spec.probe, gate);
+        total = sweep_e(total, part);
+    }
+    return {
+        spec.case_id,
+        total,
+        static_cast<std::int64_t>(slabs.size()),
+        spec.probe.lane,
+        spec.probe.skipping,
+    };
+}
+
+}  // namespace loam
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/data/cases/control.case /app/data/cases/incident.case
+[?2004l# id|store|operation|x|y|path|skipping|operator note
+c_legit|/app/data/archive/current.store|eq|-999|0|batch|1|legitimate overlap
+h_skip|/app/data/archive/healthy.store|range|100|130|batch|1|selective control
+h_full|/app/data/archive/healthy.store|range|100|130|row|0|full control
+h_region|/app/data/archive/healthy.store|region_eq|north|0|row|1|text control
+# id|store|operation|x|y|path|skipping|operator note
+m_range|/app/data/archive/mixed.store|range|10|40|row|1|invoice window
+m_narrow|/app/data/archive/mixed.store|range|10|20|row|1|narrow window
+m_null|/app/data/archive/mixed.store|isnull|0|0|batch|0|missing count
+m_interact|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed window
+m_neg|/app/data/archive/mixed.store|range|-100|-1|batch|0|negative window
+m_all|/app/data/archive/mixed.store|all|0|0|batch|0|full tally
+v_window|/app/data/archive/vault.store|range|10|50|row|1|vault window
+v_missing|/app/data/archive/vault.store|isnull|0|0|batch|1|vault absent probe
+v_check|/app/data/archive/vault.store|isnull|0|0|row|1|vault absent recheck
+v_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault full control
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# head -30 /app/data/archive/mixed.store
+[?2004lH|2
+P|0|2|100|100|1|east|west|4
+R|1|0|-999|east
+R|1|2|10|east
+R|1|2|20|west
+R|0|2|777|west
+P|1|3|30|600|0|north|south|4
+R|1|2|30|north
+R|1|2|40|north
+R|1|2|500|south
+R|1|2|600|south
+P|2|3|-5|-5|0|central|central|1
+R|1|2|-5|central
+P|3|3|200|400|0|east|west|3
+R|1|2|200|east
+R|1|2|300|north
+R|1|2|400|west
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/rust/src/main.rs
+[?2004lmod codec;
+mod ember;
+mod model;
+mod report;
+
+use ember::pale::{tilt_d, Dial};
+use std::path::{Path, PathBuf};
+
+fn main() {
+    if let Err(error) = run() {
+        eprintln!("loam-ingest: {error}");
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() != 3 {
+        return Err("usage: loam-ingest <csv> <store>".into());
+    }
+    let cells = codec::read_csv(Path::new(&args[1]))?;
+    let pages = ember::reed::gather(cells, 4)?;
+    let directory = PathBuf::from(&args[2]);
+    std::fs::create_dir_all(&directory)?;
+    let target = directory.join("data.store");
+    codec::write_pages(&target, &pages)?;
+
+    let size = std::fs::metadata(&target)?.len() as usize;
+    let mut dial = Dial::default();
+    let cell_count = pages.iter().map(|page| page.cells.len()).sum();
+    tilt_d(&mut dial, cell_count, size);
+    eprintln!("{}", report::line(&dial));
+    Ok(())
+}
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/rust/src/model.rs
+[?2004lpub(crate) const RUNE_VOID: u8 = 0;
+pub(crate) const RUNE_FIXED: u8 = 1;
+
+#[derive(Clone, Debug)]
+pub(crate) struct Cell {
+    pub origin: u8,
+    pub present: u8,
+    pub amount: i64,
+    pub region: String,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct Mark {
+    pub low: i64,
+    pub high: i64,
+    pub has_absent: bool,
+}
+
+#[derive(Clone, Debug)]
+pub(crate) struct Page {
+    pub id: usize,
+    pub generation: u8,
+    pub mark: Mark,
+    pub region_low: String,
+    pub region_high: String,
+    pub cells: Vec<Cell>,
+}
+
+#[derive(Debug)]
+pub(crate) enum FoldErr {
+    Empty,
+    Shape,
+}
+
+impl std::fmt::Display for FoldErr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Empty => write!(f, "empty lane set"),
+            Self::Shape => write!(f, "lane lengths differ"),
+        }
+    }
+}
+
+impl std::error::Error for FoldErr {}
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/rust/src/ember/mod.rs /app/rust/src/ember/fold.rs
+[?2004lpub(crate) mod fold;
+pub(crate) mod pale;
+pub(crate) mod reed;
+use crate::model::{FoldErr, Mark};
+
+pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+    if a.is_empty() {
+        return Err(FoldErr::Empty);
+    }
+    if a.len() != b.len() || a.len() != c.len() {
+        return Err(FoldErr::Shape);
+    }
+
+    let mut low = a[0];
+    let mut high = a[0];
+    let mut has_absent = false;
+    for (value, present) in a.iter().zip(b.iter()) {
+        low = low.min(*value);
+        high = high.max(*value);
+        has_absent |= *present == 0;
+    }
+
+    Ok(Mark {
+        low,
+        high,
+        has_absent,
+    })
+}
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/rust/src/ember/reed.rs
+[?2004luse crate::ember::fold::tilt_a;
+use crate::model::{Cell, FoldErr, Page};
+
+pub(crate) fn gather(cells: Vec<Cell>, width: usize) -> Result<Vec<Page>, FoldErr> {
+    let mut pages = Vec::new();
+    for (id, chunk) in cells.chunks(width).enumerate() {
+        let values: Vec<i64> = chunk.iter().map(|cell| cell.amount).collect();
+        let present: Vec<u8> = chunk.iter().map(|cell| cell.present).collect();
+        let origins: Vec<u8> = chunk.iter().map(|cell| cell.origin).collect();
+        let mark = tilt_a(&values, &present, &origins)?;
+
+        let mut regions: Vec<String> = chunk.iter().map(|cell| cell.region.clone()).collect();
+        regions.sort();
+        let region_low = regions.first().cloned().unwrap_or_default();
+        let region_high = regions.last().cloned().unwrap_or_default();
+        pages.push(Page {
+            id,
+            generation: 3,
+            mark,
+            region_low,
+            region_high,
+            cells: chunk.to_vec(),
+        });
+    }
+    Ok(pages)
+}
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/rust/src/ember/pale.rs
+[?2004l#[derive(Clone, Debug, Default)]
+pub(crate) struct Dial {
+    pub jobs: usize,
+    pub cells: usize,
+    pub bytes: usize,
+}
+
+pub(crate) fn tilt_d(a: &mut Dial, b: usize, c: usize) {
+    a.jobs += 1;
+    a.cells += b;
+    a.bytes += c;
+}
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/rust/src/codec.rs
+[?2004luse crate::model::{Cell, Page};
+use std::fs::File;
+use std::io::{BufRead, BufReader, BufWriter, Write};
+use std::path::Path;
+
+pub(crate) fn read_csv(path: &Path) -> Result<Vec<Cell>, Box<dyn std::error::Error>> {
+    let file = File::open(path)?;
+    let mut rows = Vec::new();
+    for (line_no, line) in BufReader::new(file).lines().enumerate() {
+        let line = line?;
+        if line_no == 0 && line.starts_with("origin,") {
+            continue;
+        }
+        if line.trim().is_empty() {
+            continue;
+        }
+        let fields: Vec<&str> = line.split(',').collect();
+        if fields.len() != 4 {
+            return Err(format!("{}:{}: expected four columns", path.display(), line_no + 1).into());
+        }
+        rows.push(Cell {
+            origin: fields[0].parse()?,
+            present: fields[1].parse()?,
+            amount: fields[2].parse()?,
+            region: fields[3].trim().to_owned(),
+        });
+    }
+    Ok(rows)
+}
+
+pub(crate) fn write_pages(path: &Path, pages: &[Page]) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    let file = File::create(path)?;
+    let mut out = BufWriter::new(file);
+    writeln!(out, "H|3")?;
+    for page in pages {
+        writeln!(
+            out,
+            "P|{}|{}|{}|{}|{}|{}|{}|{}",
+            page.id,
+            page.generation,
+            page.mark.low,
+            page.mark.high,
+            u8::from(page.mark.has_absent),
+            page.region_low,
+            page.region_high,
+            page.cells.len()
+        )?;
+        for cell in &page.cells {
+            writeln!(
+                out,
+                "R|{}|{}|{}|{}",
+                cell.present, cell.origin, cell.amount, cell.region
+            )?;
+        }
+    }
+    out.flush()?;
+    Ok(())
+}
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/rust/src/report.rs
+[?2004luse crate::ember::pale::Dial;
+
+pub(crate) fn line(a: &Dial) -> String {
+    format!("jobs={} cells={} bytes={}", a.jobs, a.cells, a.bytes)
+}
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/tools/build-all
+[?2004l#!/bin/bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+mkdir -p "$ROOT/bin"
+
+cargo build --manifest-path "$ROOT/rust/Cargo.toml" --release --offline
+make -C "$ROOT/cpp" clean all
+install -m 0755 "$ROOT/rust/target/release/loam-ingest" "$ROOT/bin/loam-ingest"
+install -m 0755 "$ROOT/cpp/build/loam" "$ROOT/bin/loam"
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/bin/loam
+[?2004lELF          >    `H@     @       ĞX         @ 8  @          @       @ @     @ @     Ø      Ø                         @     @                                          @       @      (       (                    0       0@      0@     QÏ      QÏ                            A       A     ?      ?                        *A     *A     ¸      h
+                   ¸     ¸-A     ¸-A                              8      8@     8@                                  X      X@     X@                            Såtd   8      8@     8@                            Påtd        A     A     ä      ä             Qåtd                                                  Råtd        *A     *A     p      p             /lib64/ld-linux-x86-64.so.2              GNU € À                   GNU               C   a   /   1   :   7   8       J   @      E   %              H          P      ^   G   0   U   L   ,   X      S   K   C   "       	   D       B   2          6   Z   $   <          .      N   5       >   T   A       9   '          \       =   ?   Q   3          #                                       ]           O                         F                  W                                        Y   
+                         )   +   *      I       _               4   &       !   -                              R   ;           V              [                                              `                  (                 M      F         „0$a€B ²¨'( P (	@   RF   I   J       K   M   O       R   T   W       Z   \       ]   `   ZÄ•.w(ş³Ü3Õ»HZ£±ídT
+_%mCùöÑk•´-"¾¯p¸yIk¶ÔS ƒMÇÌĞª‘<Â~Öc]¡/r¼:r…Lm/DRLtÕÏ‚‘˜Cø¼¯"¨Dªÿ¬ÊşY—ø                        l	                     r                     ô                     ù
+                     å	                     •                     ³                                          ñ                     ¢                     c                     ì                     o                     Ü                                          æ                                          M                     ]                                          W                      T                     A                     ¬                     Û                     «                     È                     &                     ™	                     [                     k                                          ­                     Æ                     
+                     L
+                     ß                     ½
+                     F                     	                     x	                     !                      8                     Ù                     x
+                     c                                           P                     ë
+                     !                     :                     $                     a                     _                     õ                                           n                     õ                      ­                     ç                                          İ                     ¹                     Ç                     Ê	                                            ¤                     ~                     œ                     Ó  "  ğS@     !       R  "  `ü@     è      C  !   -A            ]  "   T@     ¬      ó  !   ,A     €       µ  !  ğ,A            Y    à3A           1  !  °+A     P       3  !  8-A     €       c     Ğ0@             ÷  !  À*A     €       ~     à3@             “     2@             ñ  !   -A             u   !   ,A             ›  !   ,A     P         "   ©@     ·       R
+  !   *A             &  "  ğM@            µ   !  `+A     P         !  @+A             ì     3@                 À2A           >     P0@               "   ©@     ·       ı    €2A            ]  "  pÇ@     X       __gmon_start__ _ZNSt6localeD1Ev _ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_c _ZSt20__throw_length_errorPKc _ZTTNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEE _ZTVNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEE _ZNSt9basic_iosIcSt11char_traitsIcEE5clearESt12_Ios_Iostate _ZTVSt14basic_ifstreamIcSt11char_traitsIcEE _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE7replaceEmmPKcm _ZNSt8ios_baseD2Ev _ZTISt9exception _ZNSo9_M_insertIlEERSoT_ _ZdlPvm _ZNSolsEi _ZTTSt14basic_ifstreamIcSt11char_traitsIcEE _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC2EPKcmRKS3_ _ZNSt13runtime_errorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE _ZNKSt10filesystem7__cxx114path7compareERKS1_ _ZNSo9_M_insertImEERSoT_ _ZNSt13basic_filebufIcSt11char_traitsIcEE5closeEv _ZNKSt5ctypeIcE8do_widenEc _ZSt24__throw_invalid_argumentPKc _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE15_M_replace_coldEPcmPKcmm _ZNSt10filesystem7__cxx114path5_ListC1Ev _ZNSt13runtime_errorC1EPKc _ZTVSt15basic_streambufIcSt11char_traitsIcEE _ZNSt13basic_filebufIcSt11char_traitsIcEED1Ev _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE10_M_replaceEmmPKcm _ZTVSt14basic_ofstreamIcSt11char_traitsIcEE _ZSt7getlineIcSt11char_traitsIcESaIcEERSt13basic_istreamIT_T0_ES7_RNSt7__cxx1112basic_stringIS4_S5_T1_EES4_ _ZTVNSt7__cxx1115basic_stringbufIcSt11char_traitsIcESaIcEEE _ZNSt10filesystem6statusERKNS_7__cxx114pathE _ZNSt6localeC1Ev __cxa_throw _ZNKSt10filesystem7__cxx1118directory_iteratordeEv _ZSt17__throw_bad_allocv __cxa_begin_catch _ZTTSt14basic_ofstreamIcSt11char_traitsIcEE _ZTISt13runtime_error _ZSt4cerr _ZNSt10filesystem7__cxx1118directory_iteratorppEv _ZNKSt10filesystem7__cxx114path5_List13_Impl_deleterclEPNS2_5_ImplE _ZSt16__throw_bad_castv _ZNSt8ios_baseC2Ev __cxa_allocate_exception _ZNSt13basic_filebufIcSt11char_traitsIcEE4openEPKcSt13_Ios_Openmode _ZSt21ios_base_library_initv __gxx_personality_v0 _ZNSt13runtime_errorD1Ev _ZNSt10filesystem18create_directoriesERKNS_7__cxx114pathE _ZNKSt10filesystem7__cxx114path17_M_find_extensionEv _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1EPKcmRKS3_ _ZNKSt10filesystem7__cxx114path15has_parent_pathEv _ZNSt10filesystem7__cxx1118directory_iteratorC1ERKNS0_4pathENS_17directory_optionsEPSt10error_code _ZTVSt13basic_filebufIcSt11char_traitsIcEE _ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l _ZNSo3putEc _ZNKSt5ctypeIcE13_M_widen_initEv _ZNSt10filesystem7__cxx114path14_M_split_cmptsEv _ZNSt12__basic_fileIcED1Ev _ZNSt14basic_ifstreamIcSt11char_traitsIcEED1Ev _ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc _Znwm _ZTVSt9basic_iosIcSt11char_traitsIcEE _ZNSt9basic_iosIcSt11char_traitsIcEE4initEPSt15basic_streambufIcS1_E _ZNSt13basic_filebufIcSt11char_traitsIcEEC1Ev __cxa_rethrow _ZNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEED1Ev _ZSt24__throw_out_of_range_fmtPKcz _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_mutateEmmPKcm _ZNKSt10filesystem7__cxx114path11parent_pathEv _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE10_M_disposeEv _ZSt4cout _ZNSt14basic_ofstreamIcSt11char_traitsIcEED1Ev _ZSt20__throw_out_of_rangePKc __cxa_end_catch _ZNSt10filesystem7__cxx114path5_ListC1ERKS2_ _ZSt19__throw_logic_errorPKc __cxa_free_exception _Unwind_Resume strtoull memmove __libc_single_threaded fork strlen _exit __libc_start_main execl strtoll memchr memcmp memset waitpid strtoul memcpy __errno_location libstdc++.so.6 libm.so.6 libgcc_s.so.1 libc.so.6 GCC_3.0 GLIBC_2.32 GLIBC_2.14 GLIBC_2.34 GLIBC_2.2.5 GLIBCXX_3.4.32 GLIBCXX_3.4.20 GLIBCXX_3.4.31 GLIBCXX_3.4.11 CXXABI_1.3.9 GLIBCXX_3.4.9 CXXABI_1.3 GLIBCXX_3.4.26 GLIBCXX_3.4.21 GLIBCXX_3.4                                  	      
+                                                              œ         P&y   ´        ª     P   ²‘–   ¼     ”‘–  	 Ç     ´‘–   Ò     ui	   İ       
+ ƒ         Bø—   é     pø—   ø     Aø—        aø—        yÑ¯  
+ %     ‰)   2     Ó¯k   @     vø—   K     qø—   Z     t)’   i      È/A                   Ğ/A        B            *A        W           À*A        P           @+A        Z           `+A        Y           °+A        M            ,A        T            ,A        J            ,A        U           ğ,A        K            -A        S            -A        H           8-A        N           €2A        _           À2A        \           à3A        L            0A                   0A                   0A        ]           0A                    0A                   (0A                   00A                   80A                   @0A                   H0A        	           P0A        O           X0A        
+           `0A                   h0A                   p0A                   x0A                   €0A                   ˆ0A                   0A                   ˜0A                    0A                   ¨0A                   °0A                   ¸0A                   À0A                   È0A                   Ğ0A                   Ø0A                   à0A                   è0A                   ğ0A                   ø0A                    1A                    1A        !           1A        "           1A        #            1A        $           (1A        %           01A        R           81A        &           @1A        '           H1A        (           P1A        )           X1A        *           `1A        +           h1A        ,           p1A        [           x1A        -           €1A        .           ˆ1A        /           1A        0           ˜1A        1            1A        2           ¨1A        3           °1A        4           ¸1A        6           À1A        7           È1A        8           Ğ1A        9           Ø1A        Q           à1A        :           è1A        ;           ğ1A        <           ø1A        =            2A        >           2A        ?           2A        @           2A        A            2A        C           (2A        D           02A        E                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           HƒìH‹Åÿ  H…ÀtÿĞHƒÄÃ         ÿ5Êÿ  ÿ%Ìÿ  @ ÿ%Êÿ  h    éàÿÿÿÿ%Âÿ  h   éĞÿÿÿÿ%ºÿ  h   éÀÿÿÿÿ%²ÿ  h   é°ÿÿÿÿ%ªÿ  h   é ÿÿÿÿ%¢ÿ  h   éÿÿÿÿ%šÿ  h   é€ÿÿÿÿ%’ÿ  h   épÿÿÿÿ%Šÿ  h   é`ÿÿÿÿ%‚ÿ  h	   éPÿÿÿÿ%zÿ  h
+   é@ÿÿÿÿ%rÿ  h   é0ÿÿÿÿ%jÿ  h   é ÿÿÿÿ%bÿ  h   éÿÿÿÿ%Zÿ  h   é ÿÿÿÿ%Rÿ  h   éğşÿÿÿ%Jÿ  h   éàşÿÿÿ%Bÿ  h   éĞşÿÿÿ%:ÿ  h   éÀşÿÿÿ%2ÿ  h   é°şÿÿÿ%*ÿ  h   é şÿÿÿ%"ÿ  h   éşÿÿÿ%ÿ  h   é€şÿÿÿ%ÿ  h   épşÿÿÿ%
+ÿ  h   é`şÿÿÿ%ÿ  h   éPşÿÿÿ%úş  h   é@şÿÿÿ%òş  h   é0şÿÿÿ%êş  h   é şÿÿÿ%âş  h   éşÿÿÿ%Úş  h   é şÿÿÿ%Òş  h   éğıÿÿÿ%Êş  h    éàıÿÿÿ%Âş  h!   éĞıÿÿÿ%ºş  h"   éÀıÿÿÿ%²ş  h#   é°ıÿÿÿ%ªş  h$   é ıÿÿÿ%¢ş  h%   éıÿÿÿ%šş  h&   é€ıÿÿÿ%’ş  h'   épıÿÿÿ%Šş  h(   é`ıÿÿÿ%‚ş  h)   éPıÿÿÿ%zş  h*   é@ıÿÿÿ%rş  h+   é0ıÿÿÿ%jş  h,   é ıÿÿÿ%bş  h-   éıÿÿÿ%Zş  h.   é ıÿÿÿ%Rş  h/   éğüÿÿÿ%Jş  h0   éàüÿÿÿ%Bş  h1   éĞüÿÿÿ%:ş  h2   éÀüÿÿÿ%2ş  h3   é°üÿÿÿ%*ş  h4   é üÿÿÿ%"ş  h5   éüÿÿÿ%ş  h6   é€üÿÿÿ%ş  h7   épüÿÿÿ%
+ş  h8   é`üÿÿÿ%ş  h9   éPüÿÿÿ%úı  h:   é@üÿÿÿ%òı  h;   é0üÿÿÿ%êı  h<   é üÿÿÿ%âı  h=   éüÿÿÿ%Úı  h>   é üÿÿÿ%Òı  h?   éğûÿÿÿ%Êı  h@   éàûÿÿÿ%Âı  hA   éĞûÿÿÿ%ºı  hB   éÀûÿÿÿ%²ı  hC   é°ûÿÿÿ%ªı  hD   é ûÿÿÿ%¢ı  hE   éûÿÿÿ%šı  hF   é€ûÿÿE1ÉI‰ØL‰á1ÒL‰æH‰ïèzşÿÿL‹e é¡  H‹} H‰ÃI9ütH‹uHƒÆè¨ıÿÿH|$ èûÿÿH‰ßèFÿÿÿHÇD$(H-A H‹|$pL9÷uIHÇD$(Ğ*A H|$`è0şÿÿI‹EèL‰l$ H‹ğö  H‰L H¼$   HÇ„$   °*A è¢ûÿÿH‰ßèêşÿÿH‹„$€   Hpè)ıÿÿë¤L‰ÿè  HD$0H‰D$H‹|$è{  HD$H‰D$H‹|$èg  H‰ßèŸşÿÿ¿   èåûÿÿ¾RA H‰ÇI‰Äèuûÿÿº2@ ¾ -A L‰çèCşÿÿH|$pè¹%  H‰ïè!  L‰àHƒèH‰ß…«   èLûÿÿ¾§A ¿à3A H‰ÃèjüÿÿH‰ÅH‹H‰ßÿPH‰ïH‰ÆèSüÿÿH‰Ç¾
+   èÆüÿÿè±ıÿÿ¸   éÇ  H‰ïè¿  L‰÷è÷&  H|$èM&  L‰àëŠH‰ÃH‰Ğë‚L‰÷è()  H‰èérÿÿÿH|$pè%  H‰ïè~  ë½H‰ÕL‰çH‰ÃènûÿÿH‰èéHÿÿÿè¡ıÿÿ¿   èçúÿÿ¾sA H‰ÇI‰Äèwúÿÿº2@ ¾ -A L‰çèEıÿÿH‰ÃèıÿÿH‰ßèeıÿÿë§H¸ÿÿÿÿÿÿÿUSH‰ûQH‹H)øH9Ğs
+¿h A èœúÿÿH‹HKI‰ĞH,º   H9ÈtH‹SH9êrM…Àt)HøIƒøuŠˆëH‰ÇL‰Áó¤ëH‰ñ1ÒH‰şH‰ßèİ  H‹H‰kÆ( X[]ÃAWAVAUI‰õATI‰ÌUSH‰ûH‰÷L{HƒìH‰$è×ùÿÿ1ÒL‰;J, H‰SI‰ÆÆC HƒıvvH…íy
+¿ A èîùÿÿ¸   H9ÅHBèH‰ïHÿÇyèEùÿÿè°úÿÿH‹sH‹HNH…öuŠ
+ˆëH…ÉtH‰ÇH‰Öó¤I9×tH‰D$H‹CH‰×HpèƒúÿÿH‹D$H‰H‰kL‰òL‰îH‰ßè·şÿÿH‹4$L‰âH‰ßè¨şÿÿHƒÄH‰Ø[]A\A]A^A_ÃH‰ÅH‰ßè­  H‰ïèåûÿÿ¿   L¤$   H¬$À   èùÿÿL‰áH‰ïI‰ÅH‹D$8H‹PH‹0è¡p  H‰ê¾AA L‰çèQq  L‰æL‰ïèûÿÿL‰çèN  H‰ïèF  º2@ ¾ -A L‰ïèDûÿÿ¿   L¤$   è²øÿÿH‹MHH‹U@L‰ç¾mA I‰ÅèlşÿÿL‰æL‰ïè¯úÿÿL‰çè÷  º2@ ¾ -A L‰ïèõúÿÿH‰ÃH¼$Ø   èÕ  H¼$€   èv  H‹|$ è¾  H‹|$èD÷ÿÿH‹|$(èJ#  L‹d$`L‹l$hL‰åI9ítOH‹u H…öt	H} è&÷ÿÿH‹} HEH9ÇtH‹EHpèüøÿÿHƒÅ(ëÉL‰çH‰Ãè[  L‰ïèSøÿÿélÿÿÿH‰ÃëîH‹t$pL)æM…ätL‰çèÄøÿÿH‰ßèlúÿÿH‰ÃéOÿÿÿL‰çH‰Ãè  H‰ïè  L‰ïè	øÿÿé/ÿÿÿH‰ÃëæH‰Ãëé¿   L¤$   èx÷ÿÿH‹¨   ¾‡A L‰çH‹•    I‰Åè,ıÿÿL‰æL‰ïèoùÿÿL‰çè·  º2@ ¾ -A L‰ïèµùÿÿH‰ßH‰ëèš  H‹¼$¨   H…ÿtè(t  H‹¼$ˆ   H…ÿ„Íşÿÿèt  éÃşÿÿéÿÿÿéÿÿÿèöÿÿè9ùÿÿé«U  H¼$   è×   H‹|$è=  ë¡H¼$   è.  éGşÿÿH¼$   èLm  é5şÿÿL‰÷èŸ   L‰çè  H¼$À   èú  €|$ „UÿÿÿH¼$   èr   H¼$€  èÕ  é6ÿÿÿH¼$   èÃ  H¼$€   èt  ééıÿÿH¼$  èDøÿÿH‹µñ  H‹¶ñ  H‰„$€  H‹@èH‰Œ€  1ÀH‰„$ˆ  H¼$€  HÇ„$€  °*A èOõÿÿé¦ıÿÿ¿   H¬$À   èØõÿÿHŒ$    H‰ïI‰ÅH‹D$8H‹PH‹0èYm  L¤$   H‰ê¾)A L‰çèn  L‰æL‰ïè¶÷ÿÿL‰çèş  H‰ïèö  º2@ ¾ -A L‰ïèô÷ÿÿH‰ÃL‰ïèÙõÿÿéıÿÿH‰ÃéıÿÿL‰çH‰ÃèÁ  H‰ïè¹  ëÖH‰ÃëñH¼$°   è¥  H‹|$èôÿÿH‰ßèÓ÷ÿÿH‹¼$   H„$0  HÇ„$Ø   H-A H9ÇtH‹„$0  HpèñõÿÿH¼$  HÇ„$Ø   Ğ*A è˜öÿÿH‹Yï  H‹Zï  H‰„$Ğ   H‹@èH‰”Ğ   H¼$@  HÇ„$@  °*A èıóÿÿH‰ßèE÷ÿÿH‹´$ğ   H…ötH¼$ğ   è‹óÿÿH‹|$èá  H‰ßè÷ÿÿèôÿÿè¯öÿÿéë‡  H‰ÃH‹|$è=öÿÿH|$pè³  L‰çè«  H‰ßèãöÿÿH¼$Ø   è6öÿÿH‰èH‹SèH‰œ$Ğ   H‰ÃL‰¬Ğ   H¼$È  HÇ„$È  °*A èSóÿÿë¤¿   èçóÿÿHŒ$°   H¼$   H‰ÅH‹D$8H‹PH‹0èck  A¸   ¹<A 1Ò1öH¼$   è—‰  H”$À   L@H‹pH‰”$°   H‹L9Áu`NH‰×L‰Æó¤H‹PH´$°   H‰ïH‰”$¸   1ÒL‰ H‰PÆ@ èsõÿÿH¼$°   è¶  H¼$   è©  º2@ ¾ -A H‰ïè§õÿÿH‰Œ$°   H‹PH‰”$À   ë•H‰Ãë H‰ÃH‰ïèqóÿÿé¥şÿÿH¼$°   H‰Ãè\  H¼$   èO  ëÔL‰çèE  é›ıÿÿH¼$   è3  H¼$°   è&  é|ıÿÿH|$ è  H‰ïè_p  H‰ßèGõÿÿH¼$   èšôÿÿH‹î  H‹î  H‰„$ğ  H‹@èH‰Œğ  1ÀH‰„$ø  H¼$ğ  HÇ„$ğ  °*A è¥ñÿÿH‰ßèíôÿÿH‰Ãé  ¿   L¬$à   è#òÿÿHŒ$À   L‰ïH‰ÅH‹D$PH‹PH‹0è¤i  L¤$  L‰ê¾ÓA L‰çèLj  L‰æH‰ïèôÿÿL‰çèI  L‰ïèA  º2@ ¾ -A H‰ïè?ôÿÿ¿   L¬$à   L¤$À   è¥ñÿÿL‰éL‰çH‰ÅH‹D$PH‹PH‹0è+i  L‰â¾üA L‰ïèÛi  L‰îH‰ïèóÿÿL‰ïèØ  L‰çèĞ  º2@ ¾ -A H‰ïèÎóÿÿL‰ïH‰Ãè³  L‰çè«  H‰ïè£ñÿÿH¼$€   èæn  H¼$  èY°  H|$`èÏn  H‹|$èu  H‹|$@èû  H¼$ğ  èîïÿÿH‰ßè–óÿÿH‰Ãë»H¼$ğ   èD  ëŸ¿   L¤$  L¬$à   è¸ğÿÿL‰áL‰ïH‰ÅH‹D$PH‹PH‹0è>h  L‰ê¾¸A L‰çèîh  L‰æH‰ïè£òÿÿL‰çèë  L‰ïèã  º2@ ¾ -A H‰ïèáòÿÿH‰ÃéÿÿÿH‰Ãéÿÿÿ¿   L¤$À   è?ğÿÿHŒ$€   L‰çH‰ÅH‹D$PH‹PH‹0èÀg  L¬$à   L‰â¾íA L‰ïèhh  L‰îH‰ïèòÿÿL‰ïèe  L‰çè]  º2@ ¾ -A H‰ïè[òÿÿè†ïÿÿè!òÿÿé3™  L‰ïH‰Ãè1  L‰çè)  H‰ïè!ğÿÿé†şÿÿH‰ÃëæH‰ÃëéH‰ÃéşÿÿL‰çH‰Ãèÿ  L‰ïè÷  H‰ïèïïÿÿéaşÿÿH‰ÃëæH‰ÃëéH‰ÃémşÿÿL‰çH‰ÃèÍ  L‰ïèÅ  H‰ïè½ïÿÿéMşÿÿH‰ÃëæH‰ÃëéH¼$Ğ   è1  H‰ïè™  H‰ßèÑñÿÿH¼$Ğ   è  ëáH¼$   èu  H¼$¸   èh  H|$0èî  H‰ßè–ñÿÿfD  AWAVAUATI‰ôUSHì¨   ƒÿtIƒÿ„‘  ¾°A ¿à3A èïÿÿH‰Ç¾èA è‚ïÿÿH‰Ç¾ŠA èuïÿÿ¸   HÄ¨   []A\A]A^A_ÃLt$0Hl$PH‹vL‰òH‰ïè…  H‰ï¾LA è  H‰ï‰Ãè¾  „Û„•  It$º   H‰ïèÄ  H‰îH|$è<  H|$pè  H‰ïè…  L‰÷¹   1Àó«H‹t$Lt$0H+t$HÁşL‰÷è  H‹\$L‹|$L9û„Í   Ll$`ë|@ L@L‰ H‹T$PL9ê„õ   H‰H‹T$`H‰PH‹T$XHƒÀHH‰PÀfoD$p@ØH‹”$€   H‰PèH‹”$ˆ   H‰Pğ‹”$   ‰Pø¶”$”   ˆPüH‰D$8Hƒë€I9ßtOD  H‰ŞH‰ïèÍ§  H‹D$8H;D$@…mÿÿÿH‰êH‰ÆL‰÷èo  H‹|$PL9ït¿H‹D$`Hƒë€HpèîÿÿI9ßu¶It$º   H‰ïèŒ  L‰öH‰ïè!v  H|$pèç  H‰ïèO  L‰÷è‡  H|$èİ  1Àé6şÿÿH‹T$XL‰ÇL‰îJó¤éÿÿÿI‹t$L‰òH‰ïèÁ  H‰ï¾lA èT  H‰ï‰Ãèú  „Û„ÄıÿÿM‹l$I‹\$è£ëÿÿ‰Çƒøÿ„yğÿÿ…À„Ò  1À1ÒH‰î‰D$PèàìÿÿƒÀ„Vñÿÿ‹T$P¸   öÂ…¥ıÿÿ¶ÆéıÿÿLt$0Hl$PH‹vL‰òH‰ïè4  H‰ï¾‚A èÇ  H‰ï‰Ãèm  „Û„7ıÿÿIt$º   H‰ïès  H‰îL‰÷èhŠ  H|$pèÎ  H‰ïè6  H‹\$0L‹l$8I9İ„¹  I¿«ªªªªªªªéQ  @ º   Ht$L‰çèÎìÿÿI‰Ä¶sL‰çèîÿÿI‰ÄH‹ ÆD$|H‹@èIƒ| „Ä  º   Ht$L‰çè’ìÿÿI‰ÄH‹sL‰çèìÿÿI‰ÄH‹ ÆD$|H‹@èIƒ| „p  º   Ht$L‰çèVìÿÿI‰ÄH‹sL‰çè×ëÿÿI‰ÄH‹ ÆD$|H‹@èIƒ| „  º   Ht$L‰çèìÿÿI‰Ä¶s L‰çè[íÿÿÆD$|I‰ÄH‹ H‹@èIƒ| „È   º   Ht$L‰çèŞëÿÿI‰ÄH‹spH+shL‰çHÁşI¯÷èÓêÿÿÆD$P
+H‰ÇH‹ H‹@èHƒ| t\º   H‰îèŸëÿÿHÃà   I9İtYH‹3¿À2A è–êÿÿI‰ÄH‹ ÆD$|H‹@èIƒ| …‹şÿÿ¾|   L‰çèÎèÿÿéşÿÿf„     ¾
+   è¶èÿÿHÃà   I9İu§L‰÷èò  1Àé[ûÿÿ ¾|   L‰çè‹èÿÿé;ÿÿÿfD  ¾|   L‰çèsèÿÿéçşÿÿfD  ¾|   L‰çè[èÿÿé“şÿÿfD  ¾|   L‰çèCèÿÿé?şÿÿ¿^A E1ÀL‰éH‰Ú¾gA 1Àèäêÿÿ¿   èªëÿÿH‰ÃI‰ÔéœíÿÿH‰ÃI‰ÔéîÿÿéîÿÿH‰ÃH‰ÕéîÿÿH‰ÃI‰ÔéâíÿÿH‰ÃI‰ÔéîÿÿH‰ÃI‰Ôé`íÿÿ 1íI‰Ñ^H‰âHƒäğPTE1À1ÉHÇÇ B@ ÿGç  ôf.„     @ Ãf.„     D  ¸H2A H=H2A t¸    H…Àt	¿H2A ÿàfÃff.„     @ ¾H2A HîH2A H‰ğHÁî?HÁøHÆHÑşt¸    H…Àt¿H2A ÿàÃff.„     @ óú€=Õë   uUH‰åèzÿÿÿÆÃë  ]ÃÃff.„     @ óúëŠf.„     AWAVAUATUH‰ıSH»ƒs°eHì¨  H‹H‹Nó~»¶  HÁ¹¶  )$H9Át&H¾³     fD  ¶HƒÀH1ÚH‰ÓH¯ŞH9ÁuêH¼$   èıæÿÿL‹->â  1À1öfïÀf‰„$p  „$x  „$ˆ  I‹EèHÇ„$   °*A HƒÀ L‰l$ HÇ„$h      H<H‹öá  H‰èşèÿÿfo$fïÀH|$`HÇ„$    +A )D$0L´$€   )T$ )D$@)D$Pè3êÿÿHt$(L‰t$pH¼$   HÇD$(H-A ÇD$h   HÇD$x    Æ„$€    èŠèÿÿH‹D$ H‹@èHƒÀ L$A‹D$ƒàµƒÈA€¼$á    A‰D$L‰à„7  AÆ„$à   0H‰ŞH|$ HÇ@   èéæÿÿH‹\$PLeHÇE    L‰e ÆE H…Û„ß  H‹D$@H‰ÚL‹|$HH9ØHCØH…ÀHDÚL)ûˆ€  Hƒû‡ù   M9ç„`éÿÿH…ÛtHƒû„Š  H‰ÚL‰şL‰çèÃæÿÿ ó~Ğ´  H‰]AÆ H‹|$pË´  HÇ„$    +A )D$ L9÷tH‹„$€   HpèÜæÿÿHÇD$(Ğ*A H|$`è‰çÿÿI‹EèL‰l$ H¼$   H‹Aà  H‰L HÇ„$   °*A èûäÿÿHÄ¨  H‰è[]A\A]A^A_ÃfD  M‹¼$ğ   M…ÿ„°  A€8 „„   AÆ„$á   éŸşÿÿfD  Hƒû‡Ø   HÇ$   ¿   è$æÿÿH‰ÁM…ÿtH‰ÚL‰şH‰Çè¾åÿÿH‰ÁH‹} I9ütH‹EH‰L$Hpè æÿÿH‹L$H‹$H‰M I‰ÌH‰EéÇşÿÿ€    L‰ÿè(æÿÿI‹H‹@0H=ğM@ …Ş   H‹D$ H‹@èAÆ„$á   HƒÀ HàéğıÿÿA¶ˆEé{şÿÿ H‹\$xHƒûw5H…Û„dşÿÿH‹t$pHƒûun¶ˆEéNşÿÿH‰ßH‰$HƒÇ‰$ÿÿÿèØãÿÿH…Ûˆ†   HƒûvUH‰ßI‰ßHƒÇxeè(åÿÿH‹} I9ütH‰$H‹EHpèåÿÿH‹$H‰E H‹t$pL‰}ëL‰àH‰ÚH‰ÇèäÿÿL‹e éÔıÿÿA¿   ¿   ëª¾    L‰ÿÿĞéÿÿÿèSãÿÿ¿ A èÙãÿÿ¿ A èÏãÿÿè:åÿÿéôæÿÿH‰ÃéçÿÿH‰ÃéJçÿÿH‰Ãéõæÿÿf.„      ‰ğÃf.„      AW¸P A A¿b A AVAUI‰õATA¼V A USH‰ûHƒìxƒz8LDàHl$ €> H‰l$uA¿Z A L‰çèãÿÿ‰Æ…Àt1Ò‰ÑƒÂA¶<@ˆ| 9òríH‹T$H‰D$Æ L‹d$H¸ÿÿÿÿÿÿÿI9Ä„  H‹D$Mt$H9è„Ú  H‹T$ L9ò‚ô   BÆ :H‹D$L‰t$BÆD  H‹D$Ld$@L‰d$0H9è„¿  H‰D$0H‹D$ H‹t$H‰D$@L‰ÿH‰t$8H‰t$H‰l$HÇD$    ÆD$  è>âÿÿH‹t$I‰ÀH¸ÿÿÿÿÿÿÿH)ğL9À‚b  H‹D$0M40L9à„F  H‹T$@L9òr|HÆAƒø‚×  I‹HNHƒáøH‰D‰ÀI‹TøH‰TøH)ÎI)÷DÆƒæøƒşrZƒæø1À‰ÂƒÀI‹<H‰<9ğrïëB H|$A¸   1ÒL‰æ¹"A H‰|$èa  éíşÿÿ@ HD$0L‰ù1ÒH‰ÇH‰D$èA  H‹D$0L‰t$8BÆ0 H‹D$0Lt$`L‰t$PL9à„ê  H‰D$PH‹D$@H‹t$8H‰D$`M‹EI‹MH‰t$XH¸ÿÿÿÿÿÿÿH)ğL‰d$0HÇD$8    ÆD$@ L9À‚j  H‹|$PM,0L9÷„&  H‹D$`L9è‚    M…ÀtH÷Iƒø„  L‰ÂH‰Îè“áÿÿH‹|$PL‰l$XHSBÆ/ H‹D$PH‰L9ğ„  H‰H‹D$`H‰CH‹D$XH‹|$0H‰CL9çtH‹D$@Hpè¢áÿÿH‹|$H9ïtH‹D$ HpèŠáÿÿHƒÄxH‰Ø[]A\A]A^A_Ã„     L|$P1ÒL‰ÿè  H‹|$Péiÿÿÿ€    AöÀ…&  E…À„¡şÿÿA¶ˆH‹D$0AöÀ„ŒşÿÿE‰ÀC·DşfB‰DşH‹D$0ésşÿÿ€    º   é!ıÿÿfD  º   éµıÿÿfD  H‹t$L‰çH‰èHVƒúƒ€  1ÉöÂt	‹‰¹   öÂtD·fD‰HƒÁƒâ„ıÿÿ¶ˆéıÿÿ„     H‹t$8L‰÷L‰àHVƒúƒø   1ÉöÂt	‹‰¹   öÂtD·fD‰HƒÁƒâ„æıÿÿ¶ˆéÚıÿÿH‹D$XHHƒùsböÁ…%  …É„cşÿÿA¶6@ˆsöÁ„Rşÿÿ‰ÉA·tşf‰t
+şé@şÿÿfD  ¸   éÕıÿÿfD  ¶ˆH‹|$Péëıÿÿf„     I‹6H‰s‰ÎI‹|6øH‰|2øH{HƒçøH)úÑI)Öƒáøƒù‚ãıÿÿƒáø1Ò‰ÖƒÂM‹6L‰79ÊrïéÈıÿÿfD  A‰Ğ1ÀAƒàø‰ÁƒÀI‹<I‰<D9ÀrîI<Làéáşÿÿf„     A‰Ğ1ÀAƒàø‰ÁƒÀH‹| I‰<D9ÀríI<HèéXşÿÿ„     A‹E‰À‰C‹DüB‰DüH‹D$0éhüÿÿA‹6‰É‰sA‹tü‰t
+üé0ıÿÿHD$0¿h A H‰D$èêİÿÿHD$¿h A H‰D$èÖİÿÿ¿h A L|$PèÇİÿÿH‰ÃéšáÿÿH‰Ãé€áÿÿH‰Ãéáÿÿf.„     D  H‹HWH9ĞtH‹wH‰ÇHƒÆétŞÿÿ@ Ãf.„     D  AWAVLwAUATI‰ÌHUH‰õSH‰ûHƒì(H‹GH‰L$H‰ÆH)ÎL‰ÁH)ÑH‰t$L<L;7„  H‹GM…ÿˆO  L9øs HÀI9ÇsH…Àˆç   HxI‰ÇëfD  L‰ÿHƒÇˆË   L‰D$èÁİÿÿH…íL‹D$I‰Åt"H‹3Hƒı„¿   H‰êH‰ÇL‰D$èGİÿÿL‹D$M…ät)M…Àt$I|- Iƒø„¡   L‰ÂL‰æL‰D$èİÿÿL‹D$H‹D$L‹#H…Àu/M9ôtH‹CL‰çHpèRİÿÿL‰+L‰{HƒÄ([]A\A]A^A_Ã@ H‹t$IèK| LæHƒøtZH‹T$è¸Üÿÿë¯fD  è‹Ûÿÿ ¸   éèşÿÿfD  ¶AˆE éJÿÿÿ@ A¶$L‹#ˆH‹D$H…À„iÿÿÿë–fD  ¶ˆéWÿÿÿ¿ A èÄÛÿÿ@ AVAUATUS€z< H‰û„û   ‹…À„±   H‰õƒø„Õ  ƒø„  H‹rH‰ñƒøtH‹JH9M
+H9uÜ  HCÆ LSº© A H‰CA¸
+   H‹
+HxHƒçøH‰J‹LøJ‰L øH)øH‰ÑH)ÁDÀƒàøƒørƒàø1Ò‰ÖƒÂL‹1L‰79ÂrïI‹M‰BBÆ  H‰Ø[]A\A]A^Ã„     fïÀHGHÇG     H‰G¸al  GÆf‰GH‰ØÆGlHÇG   []A\A]A^ÃfïÀHGHÇG     GH‰GH‰ØÆÇGfullHÇG   []A\A]A^Ã€    L‹b L‹m0L‹rH‹v(M9ìL‰êIFÔH…ÒtL‰÷èÚÿÿ…À…é   L‰âL)êHúÿÿÿHú   €ŒÕ   ‰Ğ…Ò…Ã   H‹uHH‹mPL‰âL9åHFÕH…Ò„  L‰÷èÈÙÿÿ…À„€  …À‰˜   HCÆLSºŒ A H‰CA¸   é“   f„     ¶F HOH‰Oˆ„À„
+  ¸   ¾ƒ A ‰Âƒøƒ­   ¨…K  …Òt¶>@ˆ9öÂt
+·tşf‰tşH‹SH‰CÆ H‰Ø[]A\A]A^Ã@ …À‰5ÿÿÿHCÆ LSº• A H‰CA¸	   H‹
+HxHƒçøH‰J‹LøJ‰L øH)øH‰ÑH)ÁDÀƒàøƒø‚öıÿÿƒàø1Ò‰ÖƒÂL‹1L‰79ÂrïéÛıÿÿ H‹LAIƒàøH‰H‹TøH‰TøL)ÁH)Îƒâøƒú‚Gÿÿÿƒâø1É‰ÏƒÁL‹>M‰89Ñrïé,ÿÿÿ¸   ¾} A éñşÿÿHCÆLSºŸ A H‰CA¸	   éıÿÿI)ìIüÿÿÿÿÿÿIü   €ŒkşÿÿD‰àE…ä„_şÿÿéRşÿÿ‹>‰9‹tü‰tüé½şÿÿóo
+óoH‰øH‹RHVfÔÁH‰WÃAWfïÀAVAUATUSH‰ûHƒì¶)HÇG    @„íuHƒÄH‰Ø[]A\A]A^A_ÃfD  H‹†ˆ   H+†€   HÇG   I‰öI‰ÄIÁüH…Àˆ‹  H‰$M…ät¶L‰çèvØÿÿL‰â1öH‰ÇI‰Åè–×ÿÿI‹–˜   L‹$1Àf„     €< A•D HƒÀI9ÄuíA‹ƒùuEL‰èKL% 1ö1Òf„     €8 uHƒÂ‰îHƒÀH9Èuì@„ötH‰L‰æL‰ïè	Øÿÿé,ÿÿÿ@ ¸   E1ÿ1ífHnÈëJ€    …É„    ƒùu)I‹–€   I‹@J9:uóofoÁfHnĞflÂfÔÃHƒÅIƒÇL9ås‘A€|-  tëƒùth~®ƒùußH‰èHÁàI†È   H‹PI;P uÇH…Òt4I‹pH‹8‰L$L‰$è@ÖÿÿL‹$‹L$…À¸   fHnÈu˜f.„     I‹†€   J‹8éfÿÿÿI‹†€   J‹8I;@ŒiÿÿÿI;@GÿÿÿéZÿÿÿ¿¸ A èÖÿÿfH‹7H…ötéÕÿÿ Ãf.„     D  AULoATUSHƒìL‰/H…ötrH‰ıH‰÷I‰ôèŒÕÿÿH‰ÃHƒøw3HƒøtH…Àu<H‰]AÆD  HƒÄ[]A\A]Ã A¶$ˆEëŞfD  HxègÖÿÿH‰]H‰E I‰ÅL‰ïH‰ÚL‰æèşÕÿÿL‹m ë°¿ğ A è®Õÿÿf.„     @ ATUH‰ıSL‹gH‰÷H‰óèúÔÿÿH‰Â1ÀI9Ôt[]A\Ã ¸   M…ätîH‹} L‰âH‰ŞèßÔÿÿ[]…ÀA\”ÀÃD  ATI‰üUSH‹oH‹H9İt_D  H‹{XHChH9ÇtH‹ChHpè¾ÕÿÿH‹{ HC0H9ÇtH‹C0Hpè¤ÕÿÿH‹;HCH9ÇtH‹CHpè‹ÕÿÿHƒë€H9İuªI‹$H…ÛtI‹t$H‰ßH)Ş[]A\éeÕÿÿD  []A\Ãf.„     ATI‰üUSH‹oH‹H9İt+D  H‹;HCH9ÇtH‹CHpèÕÿÿHƒÃHH9İuŞI‹$H…ÛtI‹t$H‰ßH)Ş[]A\éùÔÿÿf„     []A\Ãf.„     H¸ÇqÇqÇAVAUATUSH9ğ‚¯  H‹H‹GI‰üH¹9ã8ã8H)ĞHÁøH¯ÁH9ğr[]A\A]A^Ã„     H,öH‹_HÁåH‰ïH)ÓèiÔÿÿM‹$M‹L$I‰ÅL‰êL‰ÀM9ÁuPé¥   D  H‰
+H‹HH‰JH‹xH‰zH‹H0HƒÀHHƒÂHóo@ØH‰JèH‹HğBØH‰Jğ‹Hø‰Jø¶HüˆJüI9ÁtZHrHxH‰2H‹H9ùu§H‹xLWAƒúsqAöÂ…·   E…Òt™¶9@ˆ>AöÂt‰E‰ÒB·LşfB‰LşH‹xéuÿÿÿfD  M…ÀtI‹t$L‰ÇL)Æè£ÓÿÿM‰,$LëIíI‰\$M‰l$[]A\A]A^ÃfD  H‹9H‰>D‰×L‹\9øL‰\>øHzHƒçøH)şAòH)ñAƒâøAƒú‚ÿÿÿAƒâø1öA‰óƒÆN‹4N‰4D9Öríéãşÿÿ‹9E‰Ò‰>B‹LüB‰LüH‹xéÍşÿÿ¿"A èÒÿÿf.„     fAVAUI‰ıATUSL‹gH‹/I9ì„H  D  L‹µĞ   H‹È   I9Şt.D  H‹;HCH9ÇtH‹CHpè¯ÒÿÿHƒÃ I9ŞuŞH‹È   H…ÛtH‹µØ   H‰ßH)ŞèˆÒÿÿH‹½°   H…ÿtH‹µÀ   H)şèmÒÿÿH‹½˜   H…ÿtH‹µ¨   H)şèRÒÿÿH‹½€   H…ÿtH‹µ   H)şè7ÒÿÿL‹upH‹]hI9Şt1f.„     H‹{HC H9ÇtH‹C HpèÒÿÿHƒÃ0I9ŞuİH‹]hH…ÛtH‹uxH‰ßH)ŞèåÑÿÿH‹}HHEXH9ÇtH‹EXHpèËÑÿÿH‹}(HE8H9ÇtH‹E8Hpè±ÑÿÿHÅà   I9ì…ÁşÿÿI‹m H…ítI‹u[H‰ïH)î]A\A]A^éÑÿÿ[]A\A]A^Ã„     ATUSL‹&H‰ûL‰çè.ĞÿÿH{H‰;H‰ÅHƒøw>Hƒøt(H…ÀuFH‰kÆ/ Hk H‰ïèOÏÿÿH‰ßè§Ğÿÿ[]A\ÃfA¶$ˆCëÓfD  Hxè÷ĞÿÿH‰kH‰H‰ÇH‰êL‰æè’ĞÿÿH‹;ëªI‰ÄëI‰ÄH‰ïèİùÿÿH‰ßèEòÿÿL‰çè}Òÿÿf.„      AWAVAUATUH‰ÕHº9ã8ã8SHƒìL‹gL‹/L‰àL)èHÁøH¯ÂHºÇqÇqÇH9Ğ„¿  H‰óI‰şL)îM9å„[  H H9Â‚>  H…Ò…y  ºH   1ÉE1ÿI7L‹E HuH‹}LHL‰I9ğ„K  L‰ L‹EL‰@H‰u H‹u0óoU H‰xH‰p0H‹u8HÇE    H‰p8‹u@ÆE ‰p@¶uDP @ˆpDL9ë„  L‰èL‰úëO@ H‰2H‹pH‰rL‹@L‰BH‹p0HƒÀHHƒÂHóo@ØH‰rèH‹pğBØH‰rğ‹pø‰rø¶pü@ˆrüH9Ã„   HzL@H‰:H‹0L9Æu¢L‹@MHAƒùƒø  AöÁ…D  E…ÉtD¶DˆAöÁ„{ÿÿÿE‰ÉB·tşfB‰tşL‹@égÿÿÿ„     H¹øÿÿÿÿÿÿH‰ÏH‰t$H‰$èõÎÿÿH‹$H‹t$I‰ÇHPHHÁé¢şÿÿD  HC¸L)èHƒàøI”   L9ã„½   H‰ØH‰ÖëG@ H‰>H‹xH‰~H‹x0HƒÀHL‰FHƒÆHóoHØH‰~èH‹xğNØH‰~ğ‹xø‰~ø¶xü@ˆ~üI9Ät]H‹8LVLHL‹@L‰L9Ïu¦MHAƒùƒ   AöÁ…$  E…Ét”D¶EˆAöÁt‡E‰ÉB·|şfC‰|
+şésÿÿÿ„     I)ÜID$¸HÁèHTÂHM…ít!I‹vL‰ïH‰L$H‰$L)îèòÍÿÿH‹L$H‹$M‰>I‰VI‰NHƒÄ[]A\A]A^A_Ã€    L‹M‰E‰ËJ‹løK‰løHnHƒåøI)êEÑL)×AƒáøAƒù‚áşÿÿH‰$AƒáøE1ÒE‰ÓAƒÂJ‹J‰D E9ÊrëH‹$é¸şÿÿD  L‹L‰E‰ÈN‹TøN‰TøLBIƒàøL)ÇAùH)şAƒáøAƒù‚qıÿÿAƒáø1ÿA‰úƒÇN‹O‰D9ÏríéSıÿÿ„     HƒÀ‚æıÿÿHºÇqÇqÇH9ĞHGÂHÀHÁáéÒıÿÿ„     LGAƒøs>AöÀ…Ö   E…À„£üÿÿD¶UDˆPAöÀ„üÿÿE‰ÀF·TşfG‰Tşé|üÿÿ@ L‹UL‰PE‰ÂN‹\øO‰\øLPI‰óIƒâøM)ÑEÈM)ËAƒàøAƒø‚AüÿÿH‰T$AƒàøI‰ÁD‰$E1ÀD‰ÀAƒÀI‹I‰‹$A9ÀréH‹T$L‰Èé
+üÿÿD‹E‰ÉE‰B‹|üC‰|
+üé]ıÿÿD‹E‰ÉD‰B‹tüB‰tüL‹@é5üÿÿD‹UE‰ÀD‰PF‹TüG‰Tüé¼ûÿÿH¸ÇqÇqÇH9ÂHGĞHÒHÁáé¨üÿÿ¿2A èÄÊÿÿ@ H9÷„h  AWHG(I‰ÿAVAUATUSHƒìXH9Æ„ó  HG H‰t$Ho8H‰D$Lt$0I‰í€    I]ğL‰şH‰ßèËÿÿ…À‰a  I‹EğI‹UøL‰t$ L9è„Ë  H‰D$ I‹E H‰D$0I‹EM‰mğH‰ßImIÇEø    AÆE  IÇE    H‰T$(H‰D$@èzÊÿÿH‰ÚL)úH…ÒÀ  MeØH‰l$L‰ãH)Óé   €    I9Ô„7  I‰T$I‹T$øI‹t$(I‰T$ I‹$I‰T$(H…À„¥   I‰D$ğI‰4$IÇD$ø    I‹D$ğÆ  I‹D$IÇD$    I‹t$8I‰D$8H…öt
+I|$8èpÈÿÿI‹D$ğH‰ïIƒì(IÇD$     Æ  èÃÉÿÿI9Ü„
+  I‹D$IT$(Il$ğH9ĞI‹T$ğ…MÿÿÿL9â„|  I‹D$øI‰T$I‰D$ I‹$I‰D$(M‰d$ğéZÿÿÿfI‹EğI‹UøL‰t$ L9è„Ò  H‰D$ I‹E H‰D$0I‹EM‰mğH‰ßI]ØIÇEø    AÆE  IÇE    H‰T$(H‰D$@èÉÿÿf„     HkğH|$ H‰îLcè;Éÿÿ…Àˆó   H‹{HƒÃ(H‹D$ H‹T$(H9ß„   L9ğ„  fHnÂI‹t$I‰$D$0AD$H…ÿ„ò  H‰|$ H‰t$0HÇD$(    Æ H‹D$@HÇD$@    I‹t$ I‰D$ H…öt
+I|$ è ÇÿÿH‹D$ H|$ HÇD$(    Æ  èUÈÿÿH‹t$@H…öt
+H|$@èÑÆÿÿH‹|$ L9÷tH‹D$0Hpè©ÈÿÿImIƒÅ(H9l$….ıÿÿHƒÄX[]A\A]A^A_Ã€    I9ì„   H‹{HC(H‹SøH‹sğH9ÇtzH9Ş„‘   H‹H‹K(H‰sH‰S H‰C(H…ÿtmH‰{ğH‰HÇCø    Æ H‹CH‹s8HÇC    H‰C8H…öt	H{8èÆÿÿH‹CğHÇCø    H‰ïÆ  èvÇÿÿHƒë(é]şÿÿD  H9ŞtH‹H‰sH‰S H‰C(H‰[ğH‰ßë‘ H…ÒtHƒú„™  èTÇÿÿH‹SøH‹{H‰S Æ H‹{ğéaÿÿÿ L‰âD  I‹t$øH…öt>Hƒş„,  ƒşƒC  @öÆ…å  …öt¶:@ˆ8@öÆ…p  I‹D$I‹t$ø I‰t$ Æ0 é¢üÿÿf.„     H‹l$I‹IwH‰ÂH9ğ„  H‹t$ ó~D$(L9ö„ì  D$0I‹I‰7AGH…À„ƒ  H‰D$ H‰|$0HÇD$(    Æ H‹D$@HÇD$@    I‹w I‰G H…öt
+H‹|$è¿ÄÿÿH‹D$ H|$ HÇD$(    Æ  èÆÿÿH‹t$@H…öt
+H|$@èÄÿÿH‹|$ L9÷„ÍıÿÿH‹D$0HpèdÆÿÿéºıÿÿ€    L9ğ„   fHnÂI‰$D$0AD$L‰t$ Lt$0L‰÷éıÿÿf„     ¶ˆH‹SøH‹{ébşÿÿfD  HrM‰ğL‰èƒşƒJ  1ÿ@öÆ…(  @öÆ…  ƒæ„
+üÿÿ¶8Aˆ8éıûÿÿf„     H…ÒtHƒú„  L‰öèIÅÿÿH‹T$(I‹<$I‰T$Æ H‹|$ éjüÿÿD  H‹T$ ó~D$(L9ò„S  I‰D$0AGL‰t$ Lt$0L‰òéuşÿÿD  ¶ˆI‹t$øI‹D$I‰t$ Æ0 é›úÿÿ H‹:H‰8‰÷L‹D:øL‰D8øHxHƒçøH)øH)Âğƒàøƒø‚­ıÿÿƒàø1ö‰ñƒÆL‹
+L‰9ÆrïI‹D$I‹t$øé•ıÿÿD·8fE‰8HƒÇƒæ„úúÿÿéëşÿÿ‹8A‰8¿   @öÆ„ÎşÿÿëÎA‰ñ1ÀAƒáø‰ÁƒÀI‹| I‰<D9ÈríM1ÿLè@öÆ„“şÿÿë¹f.„     HrM‰ğL‰èƒşƒö   1ÿ@öÆt
+‹8A‰8¿   @öÆtD·8fE‰8HƒÇƒæ„ùÿÿ¶8Aˆ8éôøÿÿH‰òfD  fH~ÆH…ötRHƒştsf~Áf~Æƒùƒ¹   fH~Áƒá…  …öt$A¶ˆ@öÆ„â   A·D6şf‰D2şI‹ó~D$(fH~ÆI‰wÆ0 H‹T$ éÊüÿÿ¶D$0ˆH‹T$(I‹<$éõıÿÿ¶D$0ˆH‹t$(I‹ëÈ‹:‰ö‰8‹T2ü‰T0üI‹D$I‹t$øéüÿÿA‰ñ1ÀAƒáø‰ÁƒÀI‹| I‰<D9ÈríMLèéâşÿÿÃI‹HzM‰ñHƒçøH‰f~ÀI‹tøH‰tøH)úf~ÀĞI)Ñ‰Æƒæøƒşrƒæø1À‰ÂƒÀI‹H‰9ğrïI‹ó~D$(é$ÿÿÿ‰ö·T2şf‰T0şI‹D$I‹t$øé‚ûÿÿA‹‰A‹D6ü‰D2üI‹ó~D$(éíşÿÿff.„      HBÿAWAVAUATI‰üUH‰ÅSHÁí?HÅH‰èHƒìXHÑøH‰t$H‰T$H‰L$H‰$H9Æ?  H‰õé‡   €    H9ğ„÷   H‰u L‹MH‰UH‹SH‰UH…ÿ„š  H‰;L‰KHÇC    Æ H‹C HÇC     H‹u H‰E H…öt	H} èÀÿÿH‹HÇC    H‰ßÆ  è`ÁÿÿH‹$I9ÇÃ   L‰ıHEL< MoÿIÇKt­ IÄM4ôH‰ßL‰öèhÁÿÿ…ÀHD­ IHŞI,ÄMHıH9İt°H‹} HEH‹SH‹3H9ÇHC…$ÿÿÿH9ğtH‰u H‰ÇH‰UH‹SH‰UH‰;é1ÿÿÿ@ H…ÒtHƒú„‘  èÜÀÿÿH‹SH‹} H‰UÆ H‹;éÿÿÿ@ L‹|$K¿HÇ H‹D$¨…»  H‰ÂHƒêH‰ĞHÁè?HĞHÑøL9ø„®  H‹L$Ll$0L‰l$ H‹HAH‹qH9Â„  H‹L$H‰T$ H‹QH‰T$0H‹L$H‰t$(H‰H‹A H‰ÏHÇA    ÆA HÇA     H‰D$@èş¿ÿÿIGÿI‰ÀIÁè?IÀH‹D$IÑøM‰ÆI9Çm  HD$ H‰$ K¶H‹4$I,ÄH‰ïèü¿ÿÿK¿IÔ…ÀˆÌ   H‹HSH9Ğ„¯  H‹T$ ó~D$(L9ê„ˆ  D$0H‹KH‰CH…À„¢  H‰D$ H‰L$0HÇD$(    Æ  H‹D$@HÇD$@    H‹s H‰C H…öt	H{ èÅ½ÿÿH‹D$ H‹<$HÇD$(    Æ  è¿ÿÿH‹t$@H…öt
+H|$@è—½ÿÿH‹|$ L9ïtH‹D$0Hpèo¿ÿÿHƒÄX[]A\A]A^A_ÃH9İ„   H‹;HCH‹u H‹UH9ÇHE„Ë   H9ğ„’   H‰3H‹KH‰SH‹UH‰SH…ÿ„Æ   H‰} H‰MHÇE    Æ H‹E HÇE     H‹s H‰C H…öt	H{ èñ¼ÿÿH‹E HÇE    H‰ïÆ  èJ¾ÿÿIVÿM‰÷H‰ĞHÁè?HĞHÑøL9t$+  I‰ÆéSşÿÿ H…ÒtHƒú„Á   è,¾ÿÿH‹UH‹;H‰SÆ H‹} éfÿÿÿ@ H9ğtËH‰3H‰ÇH‰SH‹UH‰SH‰} éBÿÿÿH‰Çëò H‹L$Ll$0L‰l$ H‹HAH‹qH9Ğ…bıÿÿH~M‰éH‰Âƒÿƒù  E1À@öÇtD‹E‰A¸   @öÇtF·fG‰IƒÀƒç„0ıÿÿB¶Cˆé"ıÿÿf¶ˆH‹UH‹;H‰SÆ H‹} é¥şÿÿ ¶ˆH‹SH‹} H‰UÆ H‹;épûÿÿ H‰Çé,üÿÿ„     H‰ëH‹HSH9Ğ…QıÿÿH‹D$ ó~D$(L9è„Ì   H‰D$0CL‰l$ Ll$0L‰èéVıÿÿ O|?K¿I,ÄH9İ„   H‹;HCH‹UH‹u H9ÇHE„Ğ  H9ğ„Ÿ  H‰3L‹CH‰SH‹UH‰SH…ÿ„Ë  H‰} L‰EHÇE    Æ H‹E HÇE     H‹s H‰C H…öt	H{ è¼ºÿÿH‹E HÇE    H‰ïÆ  è¼ÿÿH‰ëé§ûÿÿH‰Ğf.„     fH~ÂH…ÒtHHƒú„—   f~Áf~Âƒùƒ¢   fH~Áƒá…J  …Òt¶L$0ˆó~D$(öÂ…J  fH~ÂH‹H‰SÆ H‹D$ é4üÿÿA‰ú1ÒAƒâøA‰ĞƒÂN‹ O‰L D9ÒrìML HÂéİıÿÿH‹HSH9ĞtHL$ H‰$é¹ûÿÿ¶T$0ˆH‹T$(ë™HD$ H‰$éLşÿÿH‹T$0HpM‰èHƒæøH‰f~ÂI‹LøH‰LøH)ğH‰ÂI)Àf~ÀĞ‰Âƒâøƒúrƒâø1À‰ÁƒÀI‹<H‰<9Ğrïó~D$(é+ÿÿÿH…ÒtHƒútBèîºÿÿH‹UH‹;H‰SÆ H‹} é]şÿÿH9ğtÓH‰3H‰ÇH‰SH‹UH‰SH‰} é=şÿÿH‰Çëò¶ˆH‹UH‹;ë¼‹L$0‰A‹Lü‰Lüó~D$(é¶şÿÿA·Lşf‰Lşó~D$(é şÿÿ H‰ğH)øH=€  ‹  AWAVAUI‰ÕATUH‰ıSH‰óHƒìxH…Ò„O  HM(I‰öH‰L$HÁøH‹|$MfØIƒíH¹ÍÌÌÌÌÌÌÌH¯ÁHÑøH€H\Å H‰ŞèºÿÿL‰æ…À‰Å   H‰ßèºÿÿ…ÀˆÖ   H‹|$L‰æè÷¹ÿÿ…ÀxgH‹t$H‰ïèV<  H‹D$M‰ôfD  H‰îH‰ÇH‰ÃèÊ¹ÿÿ‰ÂHC(…ÒxèM|$Ø L‰şH‰ïM‰üIƒï(è¦¹ÿÿ…ÀxêL9ãs%L‰æH‰ßè<  HC(ë´L‰æH‰ïèñ;  ë™€    L‰êL‰öH‰ßèÚşÿÿH‰ØH)èH=€  ~>M…ítHI‰ŞéışÿÿH‹|$èE¹ÿÿ…ÀˆJÿÿÿL‰æH‰ßè2¹ÿÿ…Àx¢H‰ŞH‰ïè“;  é8ÿÿÿHƒÄx[]A\A]A^A_ÃHÁøLd$ Ll$PHºÍÌÌÌÌÌÌÌH¯ÂLxşH‰D$IÑÿK¿LtÅé  H‰T$I‹H‰T$ I‹VM‰vğIÇFø    AÆ IÇF    H‰T$0H‰L$èa¸ÿÿH‹T$L‰l$@L9â„"  H‰T$@H‹T$ H‹L$H‰T$PH‹T$0H|$H‰L$HL‰d$H‰T$`HÇD$    ÆD$  HÇD$0    è¸ÿÿH‹T$L‰şH‰ïHL$@èĞõÿÿH‹t$`H…öt
+H|$`èl¶ÿÿH‹|$@L9ïtH‹D$PHpèD¸ÿÿH‹t$0M…ÿ„Î   IƒïH…öt
+H|$0è3¶ÿÿH‹|$L9çtH‹D$ Hpè¸ÿÿIƒî(I‹VğL‰d$I~ğI‹NøL9ò…ÔşÿÿLAM‰áL‰òAƒøƒ  1öAöÀ…#  AöÀ…ü  Aƒà„­şÿÿ¶2Aˆ1é şÿÿH‹L$M‰èL‰âHyƒÿƒ  1ö@öÇ…«  @öÇ……  ƒç„»şÿÿ¶2Aˆ0é®şÿÿH…öt
+H|$0èiµÿÿH‹|$L9çtH‹D$ HpèA·ÿÿHEHƒë(E1ÿH‰D$é¼  H‰D$H‹CH‰D$ H‹CL‰3H‰ßHÇC    H‰D$H‹C ÆC HÇC     H‰D$0èm¶ÿÿH9ë„Ö  H‹H‹UH‹u H‰ÇI9Æ„\  H9t$„  H‰3H‹KH‰SH‹UH‰SH…À„¦  H‰E H‰MHÇE    Æ  H‹E HÇE     H‹s H‰C H…öt	H{ è´ÿÿH‹E HÇE    H‰ïÆ  èÚµÿÿH‹L$H‹D$L‰l$@H‰ÊL9à„L  H‰D$@H‹D$ H‰ÊH‰D$PH‹D$0I‰ŞH|$H‰T$HI)îL‰d$H‰D$`L‰|$ÆD$  L‰|$0èzµÿÿL‰ò1öHL$@H¸ÍÌÌÌÌÌÌÌHÁúH‰ïH¯Ğè6óÿÿH‹t$`H…öt
+H|$`èÒ³ÿÿH‹|$@L9ïtH‹D$PHpèªµÿÿH‹t$0H…öt
+H|$0è¦³ÿÿH‹|$L9çtH‹D$ Hpè~µÿÿHƒë(Iƒş(üÿÿH‹LsL‰d$L9ğ…/şÿÿH‹CL‰æHPL‰ğƒúƒ   1ÉöÂt	‹‰¹   öÂt·<f‰<HƒÁƒâ„üıÿÿ¶ˆéğıÿÿH‹L$H‹D$L‰l$@H‰ÊL9à…´şÿÿHrL‰ïL‰àƒşƒ“   1É@öÆt	‹‰¹   @öÆtD·fD‰HƒÁƒæ„…şÿÿ¶ˆéyşÿÿH9ë„k  H…ÒtHƒú„ú   è)´ÿÿH‹UH‹;H‰SÆ H‹E éÓıÿÿH9t$tÄH‰3H‰SH‹EH‰CH‹D$H‰E é¯ıÿÿA‰ñ1ÀAƒáø‰ÁƒÀI‹<I‰| D9ÈríI| LàéDÿÿÿ‰×1Àƒçø‰ÁƒÀI‹4I‰49ørïI4Lğé¼şÿÿH‹D$ë£D·2fE‰0HƒÆƒç„(ûÿÿéhüÿÿ‹2A‰0¾   @öÇ„KüÿÿëÎD·2fE‰1HƒÆAƒà„£úÿÿéñûÿÿ‹2A‰1¾   AöÀ„ÓûÿÿëÍ¶ˆH‹UH‹;éÿÿÿA‰ø1ÒAƒàø‰ÖƒÂM‹4M‰L5 D9ÂríMD LâéÆûÿÿE‰Á1ÒAƒáø‰ÖƒÂM‹6M‰4D9ÊrîMLòéZûÿÿÃH‰ğéŒüÿÿf.„     AWfïÀ1É1ÒAVAUATUSHì˜  H‰|$(H¼$€   HÇD$p    )D$`è‡´ÿÿfo„$€   èfH~ïH…ÿ„ã   €=Æ²   t\ƒGHW)„$    ƒGH¸      H‹
+H9Á„"  €=“²   „2  ‹GPÿ‰Wƒø…„   è.  H‹¼$¨   ë}@ ğƒGH‹„$ˆ   )„$    H…Àt_€=G²   HP…š&  ğƒ@H‰Çëƒ H¼$    èã³ÿÿH‰Å¶@(„À„d  <„\  <„d  H¼$    èg°ÿÿH‹¼$¨   H…ÿuºH‹¼$ˆ   H…ÿt:H‹WHOH¸      H9Â„÷  €=»±   „Ú  ‹GPÿ‰Wƒø„!  H‹D$hH‹L$`H‰D$0H‰L$@H9Á„  HºÍÌÌÌÌÌÌÌH‰ÃH)ËH‰ØHÁøH¯ÂHÇÂşÿÿÿH…Àt
+H½ÀH˜H L‹t$0L‹|$@L‰öL‰ÿèpöÿÿHû€  [  H‹t$0H‹|$@ètåÿÿH„$€  H‰D$H‹D$(fïÀHÇ@     H‹D$@H‰D$8H‹D$8H¼$€  H‹è$¯ÿÿH‹e«  1Ò1öfïÛf‰”$`  H‹V«  œ$h  L‹|$œ$x  H‰„$€  H‹@èHÇ„$€  °*A HÇ„$X      H‰Œ€  H‹«  HÇ„$ˆ      H‹xèLÿè±ÿÿH¼$  HÇ„$€  È+A HÇ„$€  ğ+A èa°ÿÿH´$  H¼$€  èÌ°ÿÿº   H‰ŞH¼$  èÇ¯ÿÿH‹”$€  H‹zèLÿH…À„O  1öèh±ÿÿö„$   …W%  H„$°   Æ„$°    H‰„$    H‹„$€  HÇ„$¨       H‹@èH‹œp  H„$    H‰D$ H…Û„Æ  €{8 „  ¾SCH‹t$ H‹|$èO±ÿÿH‹H‹RèöD …İ  L‹¬$¨   M…í„i  H‹œ$    €;#„X  fïÀE1öHÇ„$       )„$€   é   M)õN$3¾|   L‰êL‰çL¼$  è9¯ÿÿL‰¼$   H‰ÅH)İH…ÀHÇÀÿÿÿÿHDèH‰ëL)óL9ëIGİHƒû†  H…Ûˆ‘"  H‰ßHƒÇˆ  è«®ÿÿH‰„$   H‰ÇH‰œ$  H‰ÚL‰æè=®ÿÿH‹„$   H‰œ$  Æ H‹œ$ˆ   L‹¤$   L9ã„   H‹„$   HSH‹Œ$  H‰L9ø„
+  H‰H‹„$  H‰CLs H‰KL‰´$ˆ   Hƒıÿ„ù  €    H‹œ$    L‹¬$¨   LuM9î‚ÛşÿÿM9õ‚!  L¼$  1ÛHÇÅÿÿÿÿL‰¼$   é?ÿÿÿ@ L‰ÿM¿€  L¤$€  1íL‰şHœ$  èâÿÿL‰d$M9ş„üÿÿH‰\$H‰\$é  €    M9æ„ª   I‹>IM(H‹”$ˆ  H‹„$€  H9ÏH‹L$„š
+  H9È„Y  I‰I‹NI‰VH‹„$  I‰FH…ÿ„
+  H‰¼$€  H‰Œ$  H‰¬$ˆ  Æ H‹„$   H‰¬$   I‹v I‰F H…öt	I~ è«ÿÿH‹„$€  H‰¬$ˆ  L‰çÆ  è]¬ÿÿH‹´$   H…ötH¼$   èÓªÿÿH‹¼$€  H‹D$H9ÇtH‹„$  Hpè ¬ÿÿIƒÇ(L9|$0„zûÿÿH‹D$H‰„$€  I‹IGH9Â„L  H‰”$€  I‹WH‰”$  I‹WL‰ÿMoèH‰”$ˆ  I‰I‹G H‰„$   IÇG     IÇG    AÆG è¤«ÿÿ@ I]ğL‰çMuH‰ŞèÍ«ÿÿ…À‰uşÿÿI9Ş„ƒ   I‹}IE(I‹UøI‹uğH9ÇtwI9õ„Ş  I‹E M‹M(I‰uI‰U I‰E(H…ÿtnI‰}ğM‰M IÇEø    Æ I‹EI‹u8IÇE    I‰E8H…öt	I}8è ©ÿÿI‹EğIÇEø    H‰ßÆ  èùªÿÿIƒí(éPÿÿÿI9õ„g  I‹E I‰uI‰U I‰E(M‰mğL‰ïë‘fD  Hƒû…~  A¶$ˆ„$  éüÿÿD  H‹…    f8ro…Œ²ÿÿ€xw…‚²ÿÿ1À‰„$ø   1ÀHƒ½È   uH‹…À   €81”ÀH‹]L‹e ˆ„$ü   L‰¼$   Hƒû‡Q  Hƒû„  H…Û…#  L‰øH‰œ$  Æ H‹](H„$0  H‰„$   L‹e Hƒû‡e  Hƒû„¡  H…Û…  H„$0  H‰œ$(  Æ H„$h  ‹¼$À   H‹Œ$Ø   H‰„$X  H„$è   óo„$È   ‰¼$@  „$H  H9Á„ë  H‹„$è   H‰Œ$X  H‹”$à   H‰„$h  H„$è   ‹´$ø   ¶Œ$ü   H‰”$`  H‰„$Ø   H‹D$(HÇ„$à       Æ„$è    H‹X‰´$x  ˆŒ$|  H;X„Ú  HKH‰H‹„$   L9ø„Â  H‰H‹„$  H‰CH‹´$  HK0H‰sH”$0  L‰¼$   HÇ„$      Æ„$   H‰K H‹„$   H9Ğ„  H‰C H‹„$0  H‰C0H‹´$(  H„$0  H‰s(HKhóo´$H  H‰„$   ‹„$@  H”$h  HÇ„$(      Æ„$0   ‰C@H‰KXH‹„$X  sHH9Ğ„H  H‰CXH‹„$h  H‰ChH‹´$`  ‹„$x  H‰s`‰Cx¶„$|  ˆC|H‹D$(Hƒh€H‹¼$   L9ÿtH‹„$  HpèY¨ÿÿH‹¼$Ø   H„$è   H9ÇtH‹„$è   Hpè3¨ÿÿH‰ëL9õt% H‹;HCH9ÇtH‹CHpè¨ÿÿHƒÃ L9óuŞH‹´$   H‰ïH)îèó§ÿÿH‹„$€  H‹@èH‹œp  H…Û…:øÿÿèQ¨ÿÿL‹¬$€   H‰ØL)èI‰ÆH‰D$H¸ÿÿÿÿÿÿÿIÁşI9Æ„\  L9ë„š  K6L9ğ‚å  HÇD$    A¾    E1ÀH…À…Â  L‹T$H‹„$   H‹Œ$  MÂIRI‰L9ø„  I‰H‹„$  I‰BI‰JL‰¼$   HÇ„$      Æ„$   L9ët~IEHsL‰Âë$f„     H‰
+H‹H‰JHƒÀ L‰JHƒÂ H9ğtEHzL‹HøH‰:H‹HğH9ÈuÑIIƒùƒô  öÁ…©  …ÉtÁD¶DˆöÁ…Ú  L‹Høë«L)ëMt M…í„  L‰æL‰ïL‰D$L)îè|¦ÿÿL‹D$H‹D$L‰´$ˆ   H‹¼$   L‰„$€   H‰„$   L9ÿ„øÿÿH‹„$  Hpè8¦ÿÿHƒıÿ…øÿÿH‹¬$€   L‰ğH)èH=   …ß«ÿÿH„$è   fïäÇ„$À       H‰„$Ø   H‹EHHÇ„$à       Æ„$è    Ç„$ø       Æ„$ü    ¤$È   Hƒø„è  Hƒø…®  H‹E@f8eq…Û«ÿÿÇ„$À      H‹U`1É¾A ¿P0@ A¸
+   èy  H‹•€   A¸
+   1É¾A ¿P0@ H‰„$È   èS  H‰„$Ğ   H‹…¨   Hƒø„úÿÿHƒø…¦¬ÿÿH‹…    8batc…“¬ÿÿ€xh…‰¬ÿÿ¸   éÿùÿÿf„     H…ÒtHƒú„±  èŒ¤ÿÿI‹UøI‹}I‰U Æ I‹}ğéùÿÿ L‹L‰A‰ÉN‹TøN‰TøLJI‰ÂIƒáøL)ÏùI)úƒáøƒù‚÷ıÿÿƒáø1ÿA‰ûƒÇO‹4O‰49ÏrîéÛıÿÿfH‰ßèÈ¤ÿÿH‹º
+   H‹@0H=ğM@ „Òôÿÿ¾
+   H‰ßÿĞ¾ĞéÀôÿÿfD  HAƒøƒ£   ¨…n  …À„êõÿÿA¶7@ˆs¨„Úõÿÿ‰ÀA·tşf‰tşéÈõÿÿf„     IƒÆrRH¸ÿÿÿÿÿÿÿI9ÆLGğIÁæL‰÷èÍ£ÿÿI‰ÀJ0H‰D$Mp éVüÿÿ„     H…Û„õÿÿL‰ÿéõÿÿ€    I¾àÿÿÿÿÿÿë·@ I‹7M‰øH‰s‰ÆI‹|7øH‰|2øH{HƒçøH)úĞI)Ğƒàøƒø‚%õÿÿƒàø1Ò‰ÖƒÂM‹0L‰79Ârïé
+õÿÿ HAƒøƒÛ  ¨…ë  …À„ğûÿÿA¶7Aˆr¨„àûÿÿ‰ÀA·tşf‰tşéÎûÿÿf„     Hƒø…V  H‹E@8rang…"©ÿÿ€xe…©ÿÿÇ„$À      é8ıÿÿ@ H9È„¿  I‰I‰VH‹„$  I‰FH‹D$H‹|$H‰„$€  H‰|$égõÿÿH‹¼$    H„$°   H9ÇtH‹„$°   Hpèj¢ÿÿH¼$  HÇ„$€  È+A HÇ„$€  ğ+A HÇ„$  0,A è ÿÿH¼$ø  è¤ÿÿH¼$È  HÇ„$  Ğ*A èÓ¢ÿÿH‹”œ  H‹•œ  H¼$€  H‰„$€  H‹@èH‰Œ€  HÇ„$ˆ      HÇ„$€  °*A è, ÿÿHƒD$8(H‹D$8H9D$0…½ğÿÿH‹\$@H‹l$0@ H‹s H…öt	H{ è¦ŸÿÿH‹;HCH9ÇtH‹CHpè}¡ÿÿHƒÃ(H9İuÌH‹|$@H…ÿtH‹t$pH)şè]¡ÿÿH‹D$(HÄ˜  []A\A]A^A_ÃfD  ¶ˆI‹UøI‹}éJüÿÿfD  I‹OH‹|$H‰ÂHƒÁƒùƒ  1ööÁt	‹2‰7¾   öÁtD·2fD‰7HƒÆƒá„ƒôÿÿ¶2ˆ7éwôÿÿ€    H‹E@f8al…ı¦ÿÿ€xl…ó¦ÿÿéûÿÿfH‰ïè8Ÿÿÿ<…œîÿÿHœ$  H¼$   Ç„$  .casH‰œ$€  Æ„$”  eHÇ„$ˆ     Æ„$•   è|ÿÿH„$€  H‰ÇH‰D$èÇŸÿÿH‰ïèÿÿÿH…ÀA•ÅHƒúÿ•ÁA ÍDˆl$…t  L´$   L¼$  HÇ„$      L‰÷L‰¼$   L¤$   Æ„$   èÿÿH‹t$L‰çèšŸÿÿH‹´$   A‰ÄH…ötL‰÷èÒÿÿH‹¼$   L9ÿtH‹„$  Hpè¤ŸÿÿH‹´$   H…ötH¼$   èšÿÿH‹¼$€  H9ßtH‹„$  HpèlŸÿÿE…ä…_íÿÿH‹\$hH;\$p„ã	  L‹eH{H‰;L‹m Iƒü‡  Iƒü„ô
+  M…ä…  L‰cHu BÆ' H{ è¡ÿÿHƒÃ(H‰\$héÿìÿÿ M9æ„§  H…ÒtHƒú„R  H‹t$è~ÿÿH‹”$ˆ  I‹>I‰VÆ H‹¼$€  é•ñÿÿfD  è3ÿÿ ‹w ƒÎè ÿÿé¨îÿÿHƒø…Æ  H‹E@8isnu…Â¤ÿÿfxll…¶¤ÿÿÇ„$À      éÖøÿÿf.„     I‹7I‰r‰ÆI‹|7øH‰|2øIrL‰ÿHƒæøH)òĞH)×ƒàøƒø‚óöÿÿƒàø1ÒA‰ÑƒÂN‹N‰9Ârîé×öÿÿD‹‰ÉD‰D‹LüD‰LüL‹Høé÷ÿÿA‰È1ÒAƒàø‰ÖH‹\$ƒÂH‹<0H‰<3D9ÂréH<HÂé¼üÿÿH‹HÇG    H‹PHú ¨@ …8  H‹PHú¨@ …   ÿPéóëÿÿ¶„$  ˆH‹”$ˆ  I‹>é©şÿÿ@ H…Ûˆè  H‰ßHƒÇˆş  èMÿÿH‰„$   H‰ÇH‰œ$  H‰ÚL‰æèßœÿÿH‹„$   éòÿÿA¶$ˆ„$  ékòÿÿH…Ûˆj  H‰ßHƒÇˆ«  èõœÿÿH‰„$   H‰ÇH‰œ$0  H‰ÚL‰æè‡œÿÿH‹„$   épòÿÿA¶$ˆ„$0  éWòÿÿf„     H‹D$(I‰İI¸ÿÿÿÿÿÿÿ H‹ I)ÅH‰D$L‰èHÁøL9À„B  L‹\$L9Û„8  L I9À‚š  M…À…Ã  foøA¼€   E1ÛHÇD$H    fsßfoÏK+L‹Œ$   L‹”$  L@H‰D$L‰ M9ù„Ï
+  H‹D$L‹„$  L‰L‰@H‹D$L‹Œ$   L‰¼$   HÇ„$      L@0L‰PL‹”$(  L‰@ H„$0  Æ„$   I9Á„
+  H‹D$L‹„$0  L‰H L‰@0H‹D$L‹„$X  HÇ„$(      Æ„$0   ‰x@HxhL‰P(L”$0  H‰xXfÖ@HfÖHPH„$h  L‰”$   I9À„M
+  H‹D$H‹¼$h  L‰@XH‰xhH‹D$Æ„$h   HÇ„$`      H‰P`H”$h  ‰pxˆH|H‹D$H‰”$X  H9Ã„P  L`HƒÀ0H‰l$M‰İL‰\$PH‰Åé  fI‰M I‹$I‰MI‹L$øIu0M‰d$ğIÇD$ø    I‰MAÆ$ I‰u I‹L$H9é„’  I‰M I‹L$ I‰M0I‹L$I‰M(A‹L$0IuhI|$XI‰l$óAoT$8IÇD$    AÆD$  A‰M@I‰uXI‹L$HAUHH9ù„à   I‰MXI‹L$XI‰MhI‹|$PA‹L$hI‰}`I‹|$A‰MxA¶L$lAˆM|H9ıtI‹D$ HpèšÿÿI‹|$ğI9ütI‹$Hpèğ™ÿÿIŒ$€   IƒÄpIµ€   Hƒí€L9ã„  I‰ÌI‰õIuI‰u I‹L$ğI9Ì…ÔşÿÿI‹D$øHHƒùƒÜ  öÁ…œ  …É„½şÿÿA¶<$@ˆ>öÁ„¬şÿÿ‰ÉA·|şf‰|şéšşÿÿfD  I‹|$PLGAƒøƒ@  AöÀ…3  E…À„ÿÿÿ¶9@ˆ>AöÀ„÷şÿÿE‰ÀB·LşfB‰LşI‹|$Péãşÿÿf„     I‹L$Hyƒÿƒ…  @öÇ…Ã
+  …ÿ„\şÿÿ¶M ˆ@öÇ„Gşÿÿ‰ù·|şf‰|şI‹L$é6şÿÿfD  H‹l$L‹\$PM¥   H‹D$H…Àt&H‹L$(H‰ÇL‰\$H‹IH‰ÎH‰L$H)Æè„˜ÿÿL‹\$H‹D$(H‹L$HH‹¼$X  L‰L‰`H‰HH„$h  H9ÇtH‹„$h  HpèD˜ÿÿH‹¼$   H„$0  H9Ç„´ïÿÿH‹„$0  Hpè˜ÿÿéïÿÿH‹9H‰>D‰ÇL‹L9øL‰L>øI}pHƒçøH)şH)ñDÆƒæøƒş‚ªıÿÿƒæøE1ÀD‰ÀAƒÀH‹H‰A9ğrìé‹ıÿÿI‹<$H‰>‰ÏM‹D<øL‰D>øI}M‰àHƒçøH)şñI)ğƒáøƒù‚Àüÿÿƒáø1ö‰ğƒÆI‹ H‰9Îrïé¥üÿÿH‹M I‰éH‰‰ùL‹DøL‰DøME8IƒàøL)Æ7I)ñƒáøƒù‚±üÿÿƒáø1ö‰ğƒÆI‹I‰ 9Îrïé–üÿÿH‹”$à   HBƒøƒ`  ¨…«	  …À„íÿÿ¶Œ$è   ˆŒ$h  ¨„ùìÿÿ‰À·Œæ   f‰Œf  éâìÿÿ„     Hƒø	…ÿÿHºregion_eH‹E@H9…ëœÿÿ€xq…áœÿÿÇ„$À      H‹]hHƒû‡•  H…Û…o  H„$è   H‰œ$à   Æ éñÿÿH‹´$`  HVƒúƒÖ  öÂ…ï	  …Ò„ªíÿÿ¶„$h  ˆChöÂ„–íÿÿ‰Ò·„f  f‰Dşé‚íÿÿ@ H‹´$(  HVƒúƒá  öÂ…k	  …Ò„àìÿÿ¶„$0  ˆC0öÂ„Ììÿÿ‰Ò·„.  f‰Dşé¸ìÿÿf.„     H‹´$  HVƒúƒÜ  öÂ…/	  …Ò„/ìÿÿA¶ˆCöÂ„ìÿÿ‰ÒA·Dşf‰Dşéìÿÿ„     H‰êH‰ŞH|$`è  éWãÿÿ¸ÿÿÿÿğÁéÉâÿÿHƒÀ‚e  Hºÿÿÿÿÿÿÿ H9ĞHFĞI‰ÔIÁäL‰çè•ÿÿI‰ÃJ ‹¼$@  ó~„$H  H‰D$H‹´$x  M£€   ¶Œ$|  H‹”$`  ó~Œ$P  é‹øÿÿ¸ÿÿÿÿğÁé!ãÿÿ‰ÉD·LşfD‰LşL‹HøéÀíÿÿ‰ÆƒèL‹„4à   L‰„4`  ƒø‚¢êÿÿƒàø1öA‰ğƒÆN‹N‰Œh  9Ærêé‚êÿÿH‹HÇ    H‹PHú ¨@ …Ë  H‹PHú¨@ …«  ÿPH‹¼$¨   éMâÿÿA¶E ˆCéõÿÿM…äˆ‹  L‰çHƒÇˆ-  è”ÿÿH‰H‰ÇL‰cL‰âL‰îèŸ“ÿÿH‹;éĞôÿÿH‹D$(fïÀHÇ@     éjòÿÿI¼€ÿÿÿÿÿÿé¤şÿÿI‹M‰øH‰C‰ĞI‹|øH‰|øH{H‰ÈHƒçøH)øÂI)Àƒâøƒú‚/êÿÿƒâø1À‰ÁƒÀM‹L‰9ĞrïéêÿÿH‹„$h  L„$h  H‰Ch‰ĞH‹¼`  H‰|øH{pH‰ÈHƒçøH)øÂI)Àƒâøƒú‚£êÿÿƒâø1À‰ÁƒÀM‹L‰9ĞrïéˆêÿÿH‹„$0  L„$0  H‰C0‰ĞH‹¼(  H‰|øH{8H‰ÈHƒçøH)øÂI)Àƒâøƒú‚Îéÿÿƒâø1À‰ÁƒÀM‹L‰9Ğrïé³éÿÿA‹7‰À‰sA‹tü‰tüénäÿÿL‹`I9Ô‚á  L¬$Ğ   I)ÔL‰¬$À   L‹0IÖIƒü‡˜  Iƒü„Q  M…ä…:  L‰èL‰¤$È   L¼$  BÆ  H‹„$À   L‰¼$   L9è„û  H‰„$   H‹„$Ğ   H‹´$È   H‰„$  L´$   H‰´$  L‰÷L‰¬$À   HÇ„$È       Æ„$Ğ    èÿÿL¤$   L‰çèW‘ÿÿH‹¼$À   L9ï„ßñÿÿH‹„$Ğ   Hpèµ‘ÿÿéÉñÿÿMJAƒùƒü  AöÁ…Œ  E…É„ßõÿÿ¶„$0  L‹l$AˆE0AöÁ„ÄõÿÿE‰ÉB·„.  fC‰Dşé­õÿÿD  MJAƒùƒ/  AöÁ…  E…É„$õÿÿA¶L‹l$AˆEAöÁ„õÿÿE‰ÉC·DşfC‰Dşéùôÿÿ@ LBAƒøs}AöÀ…  E…À„«õÿÿD¶Œ$h  H‹D$DˆHhAöÀ„õÿÿE‰ÀF·Œf  fF‰Lşéxõÿÿ„     HºÿÿÿÿÿÿÿH9ĞHGÂHÁàI‰Æé®ìÿÿL‰ÿéAóÿÿè  éŞŞÿÿL‹Œ$h  H‹D$L¬$h  L‰HhE‰ÁN‹”`  N‰TøLPpIƒâøL)×I)ıDÇƒçøƒÿ‚ûôÿÿƒçøE1ÀD‰ÀAƒÀM‹L M‰A9ørëéÛôÿÿI‹L‹l$I‰EE‰ÍK‹D/øK‰D(øL‹l$L‰øIƒÅIƒåøM)èL)ÀEÈAƒàøH‰D$PAƒø‚ÃóÿÿH‰T$XAƒàøE1ÉH‹T$PD‰ÈAƒÁH‹I‰T E9ÁræH‹T$Xé“óÿÿH‹„$0  L‹l$I‰E0E‰ÍJ‹„,(  K‰D(øL‹l$H„$0  IƒÅ8IƒåøM)èL)ÀEÈAƒàøH‰D$PAƒø‚¤óÿÿH‰T$XAƒàøE1ÉH‹T$PD‰ÈAƒÁH‹I‰T E9ÁræH‹T$XétóÿÿA¶ˆ„$Ğ   é¨üÿÿH‹u`Hƒû…¬   ¶ˆ„$è   étøÿÿH…Ûˆ]  HƒûweA¼   ¿   èÈÿÿH‹¼$Ø   I‰ÅH„$è   H9ÇtH‹„$è   Hpè¯ÿÿL‰¬$Ø   H‹u`L‰¤$è   H‰ÚL‰ïè0ÿÿH‹„$Ø   éøÿÿH‰ßHƒÇˆ…  I‰Üë”H¼$0  érñÿÿèßŒÿÿèÚŒÿÿL¬$è   ëµH‰ÇéáÿÿA‹7‰ÀA‰rA‹tü‰tüéöæÿÿ‹M ‰‰ù‹|ü‰|üI‹L$éˆóÿÿ‹9E‰À‰>B‹LüB‰LüI‹|$PéÇóÿÿA‹<$‰É‰>A‹|ü‰|üéóÿÿM…äˆa  L‰çHƒÇˆ  è¼ÿÿH‰„$À   H‰ÇL‰¤$Ğ   L‰âL‰öèNÿÿH‹„$À   é8ûÿÿÿÒH‹¼$¨   é£ÛÿÿH‰|$ÿÒH‹|$H‹é!ùÿÿÿÒéÔÛÿÿH‰|$ÿÒH‹|$H‹é´ïÿÿ‹Œ$è   ‰À‰Œ$h  ‹Œä   ‰Œd  éJãÿÿH‹´$È   L‰ÿL‰èHNƒùsY1ÒöÁt	‹‰º   öÁtD·fD‰HƒÂƒá„âúÿÿ¶ˆéÖúÿÿèl‹ÿÿèg‹ÿÿL‰éL‰ò¾A ¿˜A 1ÀèĞÿÿ‰Ï1Àƒçø‰ÂƒÀM‹D M‰9ørî‰ÀI<LèëƒH¸ÿÿÿÿÿÿÿ I9ÀLGÀIÁàM‰Äéd÷ÿÿ‹„$0  ‰Ò‰C0‹„,  ‰DüéaãÿÿA‹‰Ò‰CA‹Dü‰Düéòâÿÿ‹„$h  ‰Ò‰Ch‹„d  ‰Düé§ãÿÿè¼Šÿÿ¿ A èB‹ÿÿL‰ïéqşÿÿA‹L‹l$E‰ÉA‰EC‹DüC‰Düéùïÿÿ‹„$0  L‹l$E‰ÉA‰E0B‹„,  C‰Düé7ğÿÿD‹Œ$h  H‹D$E‰ÀD‰HhF‹Œd  F‰LüéğÿÿL‰á¾A ¿˜A 1Àè­Œÿÿ¿ A è³ŠÿÿH‰ÇéçØÿÿ¿ A è¡Šÿÿ¿ A è—Šÿÿ¿ A èŠÿÿ¿ A èƒŠÿÿH‹D$L‰„$€   L‰´$ˆ   H‰„$   é İÿÿ¿2A èWŠÿÿ¿2A èMŠÿÿéÃ‘ÿÿH‰Ãé“ÿÿH‰Çé5“ÿÿH‰Ãéæ‘ÿÿH‰ÃH„$€  H‰D$é4“ÿÿH‰Ãé8“ÿÿH‰ÅéÆ’ÿÿH‰Ãé“ÿÿH‰Ãé2“ÿÿH‰ÃéY“ÿÿH‰Ãé4“ÿÿH‰ÃL¤$   é,“ÿÿH‰Ãék‘ÿÿH‰Ãéh“ÿÿH‰ÃéS“ÿÿH‰Ãé’ÿÿH‰Ãéo“ÿÿH‰ÃéZ“ÿÿH‰Ãé‹“ÿÿé¤“ÿÿf.„     @ Ãf.„     D  H‹ÿ`f.„     SH‰ûH‹XHChH9ÇtH‹ChHpèBŠÿÿH‹{ HC0H9ÇtH‹C0Hpè(ŠÿÿH‹;HCH9ÇtH‹s[HƒÆéŠÿÿfD  [ÃfD  AWI‰ÿAVE‰ÆAUATI‰ÌUH‰ÕSHƒì(H‰t$èœ‡ÿÿD‰òHt$H‰ïD‹(H‰ÃÇ     Aÿ×H‹T$H9êt3‹ƒù"t"M…ätH)êI‰$…ÉuD‰+HƒÄ([]A\A]A^A_ÃH‹|$èUŠÿÿH‹|$è«ˆÿÿH‰Çƒ; uD‰+è‹ÿÿf.„     ATI‰ôUH‰ıHƒÇSH‰ÓH‰} H…öuH…ÒuxHƒûwCHƒûuA¶$ˆEH‰]Æ []A\ÃH…ÛtîH‰ÚL‰æè°ˆÿÿH‹} H‰]Æ []A\Ã€    H…Ûx@H‰ßHƒÇx2èÕˆÿÿH‰]H‰ÚL‰æH‰E H‰ÇèoˆÿÿH‹} ë½¿ğ A èˆÿÿ€    è3‡ÿÿ¿ A è¹‡ÿÿf„     AWAVI‰öAUATUH‰ıH‰÷SH‰ÓHƒì(èQ‡ÿÿL‹KI‰ÄH¸ÿÿÿÿÿÿÿL)ÈL9à‚Ş  L‹+LSO<M9Õ„°  H‹CL9ø‚ë   M9îƒª   M…É„y  M…ätIK|% Iƒù„  L‰ÊL‰îL‰T$è=‰ÿÿL‹T$Iƒü„^  L‰ïL‰âL‰öL‰T$è‹‡ÿÿL‹+L‹T$HUL‰{CÆD=  H‰U H‹L9Ğ„Å  H‰E H‹CH‰EH‹CH‰EH‰èL‰HÇC    ÆC HƒÄ([]A\A]A^A_ÃKD L9ğ‚HÿÿÿL‰îM‰àL‰ñ1ÒH‰ßL‰T$èˆÿÿL‹+L‹T$ézÿÿÿD  M…ÿˆÓ  H I9Ï‚2  L‰ÿHƒÇˆ.  L‰T$L‰L$è‡ÿÿM…äL‹L$L‰ùL‹T$I‰Å…µ   H‹3K|% Iƒù„Ë  L‰ÊL‰T$H‰L$è‰†ÿÿL‹T$H‹L$H‹;I9út!H‹CL‰T$H‰L$HpèÀ†ÿÿL‹T$H‹L$L‰+H‰KéÇşÿÿf.„     Iƒÿ†SşÿÿM…ÿˆ  Iƒÿ‡s  ¿   L‰T$L‰L$è_†ÿÿL‹L$L‹T$¹   I‰ÅD  Iƒü„.  L‰âL‰öL‰ïL‰T$H‰L$L‰L$èÑ…ÿÿL‹T$H‹L$L‹L$M…É„:ÿÿÿéÿÿÿ@ H…É‰(  è‚„ÿÿfH‹CHHƒùssöÁ…J  …É„-şÿÿ¶CˆEöÁ„şÿÿ‰ÉA·D
+şf‰D
+şH‹Céşÿÿ@ M…ä„Ìıÿÿé¢ıÿÿf.„     A¶AˆE L‹+é­ıÿÿA¶E ˆé|ıÿÿ@ H‹CM‰ĞH‰E‰ÈI‹tøH‰tøHuHƒæøH)òÑI)Ğƒáøƒù‚”ıÿÿƒáø1À‰ÂƒÀI‹<H‰<9Èrïéyıÿÿf¶ˆéGşÿÿfD  A¶AˆE éñşÿÿ L‰ÿHƒÇˆüşÿÿL‰T$L‰L$èä„ÿÿL‹L$L‹T$L‰ùI‰Åé‡şÿÿHyL‰T$L‰L$H‰L$è·„ÿÿM…äH‹L$L‹L$L‹T$I‰Å„ŸıÿÿéOşÿÿ€    ‹C‰É‰EA‹D
+ü‰D
+üH‹CéÑüÿÿ¿ A èŒƒÿÿ¿ A è‚ƒÿÿfHƒìH‹H‹@H= ¨@ uM€=V„   t4‹GPÿ‰WƒøtHƒÄÃH‹H‹PHú¨@ u0H‹@HƒÄÿàfD  ¸ÿÿÿÿğÁGëÉ@ H‰|$ÿĞH‹|$ë¥fHƒÄÿâf.„     H¸      H‹WH9Ât-€=Öƒ   t‹GPÿ‰WƒøtFÃD  HO¸ÿÿÿÿğÁëæH‹HÇG    H‹PHú ¨@ u H‹PHú¨@ uCÿ`„     éÿÿÿ HƒìH‰|$ÿÒH‹|$H‹H‹PHú¨@ uH‹@HƒÄÿàfD  ÿâHƒÄÿâATI‰üUSH‹oH‹H9İt+D  H‹;HCH9ÇtH‹CHpèƒÿÿHƒÃ H9İuŞI‹$H…ÛtI‹t$H‰ßH)Ş[]A\éé‚ÿÿf„     []A\Ãf.„     AWAVAUATUSHƒì(H‹oL‹7H‰T$HºÍÌÌÌÌÌÌÌH‰èL)ğHÁøH¯ÂHº3333333H9Ğ„[  I‰õI‰üH‰óM)õI9î„f  H H‰L$H9Á‚d  H…É…ş  HÇ$    H‹$IÅH‹D$I}H‹L‹xI‰} H‰L$Iƒÿ‡I  Iƒÿ„  M…ÿ…X  M‰}H‹t$BÆ? I} HƒÆ èûƒÿÿL‹<$MnL9ó…ƒ   é  D  I‰I‹E I‰GI‹EøI‰GI‹EM‰mğI‰G IÇE    IÇEø    AÆE  è'ÿÿI‹uH…öt	I}è¥ÿÿI‹}ğL9ïtI‹E HpèÿÿIE(IƒÅIƒÇ(L9ë„Š   I‰ÅIWI}ğI‰I‹EğL9è…oÿÿÿI‹EøHHƒùƒÖ  öÁ…¹  …É„\ÿÿÿA¶E ˆöÁ„Hÿÿÿ‰ÉA·Dşf‰D
+şI‹Eøé6ÿÿÿ€    H¿øÿÿÿÿÿÿH‰T$èÜ€ÿÿH‰$éşÿÿ IƒÇ(H9ë„Ó   HƒÃërD  I‰H‹I‰GH‹CI‰OH‰[ğHÇCø    Æ I‰G HÇC    è€ÿÿH‹sH…öt	H{è”~ÿÿH‹{ğH9ßtH‹Hpèo€ÿÿHC(HƒÃIƒÇ(H9İt^H‰ÃH‹CğIWH‹KøH{ğI‰H9Ø…wÿÿÿHAƒøs~¨…Ÿ  …À„hÿÿÿ¶3@ˆ2¨„Zÿÿÿ‰À·tşf‰tşéIÿÿÿ€    M…ötI‹t$L‰÷L)öèëÿÿH‹D$H‹$M‰|$H€I‰$HÁI‰D$HƒÄ([]A\A]A^A_ÃD  H‹3H‰2‰ÆL‹D3øL‰D2øIwI‰ØHƒæøH)òĞI)Ğƒàøƒø‚Éşÿÿƒàø1ÒA‰ÑƒÂO‹N‰9Ârîé­şÿÿ I‹E H‰‰ÈI‹tøH‰tøIGL‰îHƒàøH)ÂÑH)Öƒáøƒù‚aıÿÿƒáø1ÒA‰ĞƒÂN‹N‰ 9ÊrîéEıÿÿf.„     HƒÀ‚şÿÿHº3333333H9ĞHFĞH<’H‰T$HÁçéòıÿÿ M…ÿˆ   L‰ÿHƒÇxlè¹~ÿÿI‰E H‰ÇM‰}H‹t$L‰úèQ~ÿÿI‹} é’üÿÿ„     H‹D$¶ AˆEéyüÿÿ‹3‰À‰2‹tü‰tüé¾ıÿÿA‹E ‰É‰A‹Dü‰D
+üI‹Eøé‘üÿÿèİ|ÿÿH¸3333333H9ÁHFÁH<€H‰D$HÁçéIıÿÿ¿ A è@}ÿÿ¿2A è6}ÿÿH‰ÇëH‰ÃL‰ïè†ŸÿÿH‰ßè¾|ÿÿHƒ<$ tHkt$(H‹<$èø}ÿÿèÓ~ÿÿI} èê¦ÿÿL‰ïèRŸÿÿëèH‰Ãè(ÿÿH‰ßè€ÿÿH‰øH‰òH9şt]UL@SH‹?H‹6L9ÇtdHJL‹HH9Î„Ã   H‰0H‹JH‰:H‰HH‹JL‰JL‹HH‰HL‰JH‹H H‹r H‰p [H‰J ]ÃfD  H‹O H‹v H‰w H‰J Ã€    LRL‹XI9ò„_  IKH‹jƒùƒö   öÁ…  …Ét)D¶DˆBöÁ„"  ‰É·|şfA‰|
+şL‹X€    H‰0M‰ÙL‰H‰hH‹JéYÿÿÿfH‹JLQAƒúsBAöÂ…•  E…Òt#¶ˆHAöÂtrE‰ÒB·LşfC‰LşH‹J@ H‰:L‰ éÿÿÿD  H‹HXHƒãøH‰HD‰ÑL‹\øM‰\øL‰ÁH)ÙAÊH)ÎAƒâøAƒúrAƒâø1ÉA‰ËƒÁJ‹,J‰,D9ÑríH‹JëŸ€    L‹LZIƒãøL‰BA‰ÈN‹LøO‰LøM‰ĞM)ØDÁL)ÇƒáøƒùrƒáøE1ÀE‰ÁAƒÀJ‹K‰A9ÈrìL‹XéíşÿÿD  L‹JL‰ÉM…ÛtTI[M…É…Ñ   ƒûƒ  öÃ…  …Ût¶ˆJöÃ…7  H‹8L‹XL‰ZHÇ@    Æ éşÿÿ€    M…Ét~MAAƒøƒ  AöÀ…£  E…Àt¶JˆAöÀ…È  H‹2H‹JH‰HHÇB    Æ é²ıÿÿ‹E‰Ò‰HB‹LüC‰LüH‹JéxşÿÿD‹‰ÉD‰B‹|üA‰|
+üL‹Xéşÿÿ1ÉémıÿÿLL$èHƒÁH‰÷M‰Ëƒùƒ  E1ÒöÁtD‹E‰Aº   öÁtB·,fC‰,IƒÂöÁt	B¶<Cˆ<ƒûƒ¢   öÃ…ª  …Ût¶x@ˆ>öÃ…1  ƒùƒ@  öÁ…™  …Ét¶t$è@ˆpöÁ…  L‹HH‹JéÅüÿÿH‹JLHIƒáøH‰D‰ÁI‹t
+øH‰tøL)ÏAøI)úAƒàøAƒø‚ÍşÿÿAƒàø1É‰ÎƒÁI‹<2I‰<1D9Árîé°şÿÿH‹xL^L‰ÅIƒãøH‰>‰ßM‹T8øL‰T>øH‰÷L)ßH)ıßƒçøƒÿ‚Fÿÿÿƒçø1öA‰òƒÆJ‹\ K‰9şríé)ÿÿÿH‹LJIƒáøH‰J‰ÙH‹tøI‰t
+øM)ÊBL)×ƒáøƒù‚Ùıÿÿƒáø1öA‰ğƒÆN‹O‰9Îrîé½ıÿÿ‰Í1ÿƒåøA‰úƒÇN‹O‰9ïrîM9H÷é\şÿÿH‹t$èMPIƒâøH‰p‰ÎI‹|1øI‰|0øM)ĞDÁM)Áƒáøƒù‚­şÿÿƒáø1ö‰÷ƒÆM‹9M‰:9Îrïé’şÿÿ‹x‰Û‰>A‹|ü‰|üéUşÿÿ‹t$è‰É‰pA‹t	üA‰tüéeşÿÿ‹JE‰À‰B‹LüB‰LüH‹2H‹Jé[ıÿÿ‹‰J‰Ù‹tüA‰t
+üH‹8L‹XéëüÿÿE‰ÀB·LşfB‰LşH‹2H‹Jé$ıÿÿ‰Ù·tşfA‰t
+şH‹8L‹Xé·üÿÿ‰ÛA·|şf‰|şé½ıÿÿ‰ÉA·t	şfA‰tşéÒıÿÿf.„      ƒşHwH‰ø¹   H‰7A¸P A t¹   A¸V A A‰É…Ét1Ò‰×ƒÂE¶8Dˆ>D9ÊríH‹H‰HÆ
+ Ã AWAVAUATUSHìØ  ó~ÏH  H‰|$8ËH  H‰t$0)$èvÿÿ„ÀH„$Ğ   …­  H‰D$H¼$@  è»uÿÿ1öfïÀH‹|$H‹ñp  f‰´$   1ö„$(  H‰„$Ğ   „$8  HxèH‹Ìp  HÇ„$@  °*A HÇ„$      H‰è¼wÿÿfo$fïÀH¼$  HÇ„$@   +A )„$à   )”$Ğ   )„$ğ   )„$   èêxÿÿH„$0  H´$Ø   HÇ„$Ø   H-A H¼$@  Ç„$     H‰„$   HÇ„$(      Æ„$0   è*wÿÿH‹„$Ğ   ÆD$O[H‹@èHƒ¼à    „ú  H‹|$º   Ht$Oè–vÿÿHÇD$    H‹T$0H‹H;B„  H‹T$H‹|$¾ÚA HÒHĞº   H‰D$(H‰ÃèRvÿÿL´$À   Æ„$À    L‰´$°   H‹+HÇ„$¸       H‹SHêH‰$H9Õ„	  L‰ñ1Ûë7Dˆ,H‹„$°   HƒÅL‰¤$¸   BÆ  H9,$„Ù  H‹œ$¸   H‹Œ$°   D¶m A€ı"„š   A€ı\„   LcL9ñ„×   L‹¼$À   M9çs–M…äˆÂ	  MÿM9ü‚ù  H‰ßHƒÇˆõ  M‰çè,uÿÿL‹„$°   H‰ÁH…Û…±   M9ğtH‹„$À   L‰ÇH‰L$ Hpè
+uÿÿH‹L$ H‰Œ$°   L‰¼$À   é ÿÿÿLcL9ñ„[  H‹„$À   L9à‚Š   Æ\H‹„$°   L‰¤$¸   BÆ  H‹œ$¸   H‹Œ$°   LcL9ñ…)ÿÿÿIƒü…Âşÿÿ¿   èxtÿÿL‹„$°   H‰ÁA¿   Hƒû„U  L‰ÆH‰ÏH‰ÚL‰D$ èúsÿÿL‹D$ H‰Áé%ÿÿÿD  M…äˆš  L< M9ü‚z  H‰ßHƒÇˆr  M‰çètÿÿL‹„$°   H‰ÁH…Û…¦  M9ğtH‹„$À   L‰ÇH‰L$ HpèësÿÿH‹L$ H‰Œ$°   L‰¼$À   éÿşÿÿH‹”$¸   H‹´$°   H‹|$èösÿÿº   ¾çA H‰ÇH‰ÃèásÿÿL‹|$(H‰ßI‹w è`sÿÿº   ¾öA H‰ÇH‰Ãè»sÿÿI‹w(H‰ßè?sÿÿº   ¾A H‰ÇH‰ÃèšsÿÿI‹w8H‰ßèsÿÿº   ¾A H‰ÇH‰ÃèysÿÿI‹w0H‰ßèırÿÿº	   ¾$A H‰ÇH‰ÃèXsÿÿH¬$    Aƒ@H‰¬$   „  ¹   ¿V A ‰Î…Ét1À‰ÂƒÀD¶DˆD 9ğríH‹„$   H‰Œ$˜   H‰ßÆ H‹”$˜   H‹´$   èìrÿÿº   ¾.A H‰ÇH‰Ãè×rÿÿH‹D$(¾ÏA H‰ß¶PDöÚHÒHƒÂ€xD ¸ÔA HDğè«rÿÿÆD$p}H‹H‹@èHƒ| „#  º   Ht$pH‰ßèrÿÿH‹¼$   H9ïtH‹„$    Hpè#rÿÿH‹¼$°   L9÷tH‹„$À   HpèrÿÿH‹t$0HƒD$H¹9ã8ã8H‹T$H‹FH+HÁøH¯ÁH9Âƒ£  H‹„$Ğ   Æ„$   ,H‹@èHƒ¼à    „¨   H‹|$º   H´$   èÙqÿÿH‹D$0H‹ éQûÿÿ@ Iƒü…¬üÿÿ¿   èdqÿÿL‹„$°   H‰ÁA¿   Hƒû„  L‰ÆH‰ÏH‰ÚL‰D$ èæpÿÿL‹D$ H‰Áé0ıÿÿf„     ¾}   H‰ßèÓnÿÿéİşÿÿfD  A¶ ˆéåûÿÿD  H‹|$¾,   è©nÿÿé[ÿÿÿ@ ¹   ¿P A éîıÿÿH‹t$8H‰ÃH‰ÇH‰D$è»rÿÿH‰ßèpÿÿH‹´$ğ   H…ötH¼$ğ   è¹nÿÿH‹¼$Ğ   H„$à   H9Ç„ùÿÿH‹„$à   Hpèpÿÿéòøÿÿf.„     H‹|$¾[   ènÿÿéúÿÿ@ M…ÿ‰ú  èÊnÿÿf.„     A¶ ˆé,üÿÿD  H‹„$Ğ   Æ„$°   ]H‹@èHƒ¼à    …_  H‹|$¾]   è®mÿÿL‹„$   Hl$`ÆD$` H‰l$PHÇD$X    M…À„S  H‹„$ğ   L‰ÂLd$PH‹Œ$ø   L‰çL9ÀLCÀH…ÀLDÂ1Ò1öI)Èè  H‹¼$   ó~¨@  H„$0  HÇ„$@   +A @  )„$Ğ   H9ÇtH‹„$0  HpèWoÿÿH¼$  HÇ„$Ø   Ğ*A èşoÿÿH‹¿h  H‹Àh  H¼$@  H‰„$Ğ   H‹@èH‰”Ğ   HÇ„$@  °*A ècmÿÿL‰æH|$pèÆ…ÿÿH‹D$8H¼$È  L‹0è!mÿÿH‹¢g  1É1öfïÀf‰Œ$¨  L‹|$)„$°  L‹-†g  )„$À  H‹{èHÇ„$È  °*A LÿH‰œ$Ğ   HÇ„$       L‰/èoÿÿH¼$Ø   HÇ„$Ğ   ¸,A HÇ„$È  à,A èznÿÿH´$Ø   H¼$È  èånÿÿº4   L‰öH¼$Ø   èàmÿÿH‹”$Ğ   H‹zèLÿH…À„†  1öèoÿÿö„$è  …¦  L‹t$º   ¾RA L‰÷è,nÿÿH‹T$XH‹t$PL‰÷ènÿÿº   ¾pA H‰ÇI‰ÆènÿÿH‹T$xH‹t$pL‰÷èómÿÿH‰Çº   ¾|A èámÿÿ¸¸,A H¼$Ø   HÇ„$È  à,A fHnÀ¬>  )„$Ğ   èOkÿÿH¼$@  èBoÿÿH¼$  HÇ„$Ø   Ğ*A è	nÿÿH‹CèH¼$È  H‰œ$Ğ   L‰¬Ğ   HÇ„$È  °*A è|kÿÿH‹|$pH„$€   H9ÇtH‹„$€   HpèùlÿÿH‹|$PH9ïtH‹D$`HpèálÿÿHÄØ  []A\A]A^A_Ã€    L‰ö1ÒéşøÿÿfD  M…ÿygè.kÿÿH‹|$º   H´$°   è×lÿÿé”üÿÿ‹w ƒÎè÷mÿÿéqşÿÿH‹œ$(  Hƒûw4H…Û…‘   H‰èH‰\$XLd$PÆ éµüÿÿIé÷ÿÿIé!øÿÿ H…Ûˆ¦   HƒûwqA½   ¿   Ld$PèlÿÿH‹|$PI‰ÄH9ïtH‹D$`HpèlÿÿL‰d$PH‹´$   L‰l$`H‰ÚL‰çè„kÿÿH‹D$PérÿÿÿH‹´$   Hƒûu"¶ˆD$`éUÿÿÿH‰ßI‰İHƒÇyLd$Pè*jÿÿI‰ìë¶¿ A è«jÿÿ¿ A è¡jÿÿ¿ A Ld$Pè’jÿÿH‰ÃéEuÿÿH‰Ãé¼uÿÿH‰ÃéÕuÿÿH‰ÇéùuÿÿévÿÿégvÿÿH‰Åévÿÿé(vÿÿH‰Ãé7vÿÿH‰ÃéøuÿÿH‰ÃéVwÿÿH‰ÃéuÿÿH‰ÃéátÿÿH‰ÃéXwÿÿH‰ÃéCwÿÿ AUI‰ÍATUSHƒìH‹OI‰ÉI)ñL9ÊIGÑH9ñ‚  H¸ÿÿÿÿÿÿÿH)ÈHĞL9À‚  H‹H‰ûM$HI)ÔH9ø„¶   H‹{L9ç‚™   H,0I)ÑI9ÅsmM…Ét+I9Ğt&Ht J| Iƒù„   L‰ÊL‰D$è¢kÿÿL‹D$M…ÀtIƒø„~   L‰ÂL‰îH‰ïèğiÿÿH‹L‰cBÆ  HƒÄH‰Ø[]A\A]ÃfD  HÈL9èr‹L‰éH‰îH‰ßèÊjÿÿëÈ„     L‰éH‰ßè¥‹ÿÿë³ ¿   éDÿÿÿfD  ¶ˆM…Àt–éyÿÿÿA¶E ˆE ë†H‰ò¿˜A ¾€A 1ÀèÂjÿÿ¿ A èÈhÿÿ„     fïÀ€9 AVAUATUH‰ıSHÇG    „®   H‹^hL‹vpHÇG   I9Ş„•   ¸   D‹"I‰ÕfHnÈëgf<„ˆ   ¶Aƒü„ë   „ÀtCAƒü„õ      E…ä„¾   Aƒüu$I‹EH9Cuóo] foÁfHnĞflÂfÔÃE HƒÃ0I9Şt¶C„Àu“AƒüuéHƒE HƒÃ0I9Şuä[H‰è]A\A]A^Ã AƒüuƒHƒÃ0I9Ştâ¶C„ÀtÌ<…Yÿÿÿëå€    AƒüuH‹SI;U u”H…Òt#I‹uH‹{èfgÿÿ…À¸   fHnÈ…pÿÿÿ@ H‹CéIÿÿÿ€    „À…TÿÿÿHƒE éfÿÿÿfD  H‹CI;EŒ6ÿÿÿI;Eÿÿÿé'ÿÿÿf.„     AWfïÀE1ÿAVAUATUH‰ıSHƒìHHÇG    H‰t$éê    M)şN,;¾|   L‰òL‰ïLd$0èhÿÿL‰d$ H‰ÂH)ÚH…ÀHÇÀÿÿÿÿHEÂH‰ÃH‰$L)ûL9óIGŞHƒû†Ğ   H…ÛˆŞ  H‰ßHƒÇˆ
+  èugÿÿH‰D$ H‰ÇH‰\$0H‰ÚL‰îègÿÿH‹D$ H‰\$(Æ H‹]H;]„¡   HSH‰H‹D$ L9à„d  H‰H‹D$0H‰CH‹D$(H‰CHƒE H‹$Hƒøÿ„Õ  @ HƒÀI‰ÇH‹D$L‹pH‹M9÷‚ÿÿÿM9ş‚ş  Ld$0HÇ$ÿÿÿÿ1ÛL‰d$ éeÿÿÿfHƒû…Š  A¶E ˆD$0éKÿÿÿ„     L‹m I‰ŞH¸ÿÿÿÿÿÿÿM)îM‰÷IÁÿI9Ç„ó  L9ë„  K?L9ø‚†  H…À…—  HÇD$    A¿    E1ÀMÆH‹D$ H‹L$(IVI‰L9à„^  I‰H‹D$0I‰FI‰NL‰d$ HÇD$(    ÆD$0 L9ëtzL)ëIUL‰ÀLÃë"€    H‰H‹
+H‰HH‰xHƒÀ HƒÂ H9ÃtEHpH‹zøH‰0H‹JğH9ÊuÑHOƒùƒœ   öÁ…s  …ÉtÁ¶:@ˆ>öÁ…w  H‹zøë¬fL{ M…í„ä  H‹uL‰ïL‰D$L)îèeÿÿL‹D$H‹D$L‰}H‹|$ L‰E H‰EL9ç„9şÿÿH‹D$0HpèMeÿÿH‹$Hƒøÿ…/şÿÿHƒÄHH‰è[]A\A]A^A_ÃD  H‹:I‰ÒH‰>‰ÏL‹L:øL‰L>øLHIƒáøL)ÎñI)òƒáøƒù‚Oÿÿÿƒáø1ö‰÷ƒÆM‹:M‰99Îrïé4ÿÿÿ@ H‹D$(HHƒù‚   I‹4$H‰s‰ÎI‹|4øH‰|2øH{HƒçøH)úÑI)Ôƒáøƒù‚kıÿÿƒáø1Ò‰ÖƒÂM‹4L‰79ÊrïéPıÿÿ IƒÇ‚~   H¸ÿÿÿÿÿÿÿI9ÇLGøIÁçL‰ÿèAdÿÿI‰ÀJ8H‰D$Mx éáıÿÿH…Û„ÆüÿÿL‰çé³üÿÿ öÁ…  …É„ìüÿÿA¶4$@ˆsöÁ„Úüÿÿ‰ÉA·tşf‰t
+şéÈüÿÿ I¿àÿÿÿÿÿÿë‹@ HAƒør\I‹4$I‰v‰ÆI‹|4øH‰|2øIvL‰çHƒæøH)òĞH)×ƒàøƒø‚rıÿÿƒàø1ÒA‰ÑƒÂN‹N‰9ÂrîéVıÿÿ„     èûaÿÿ¨ur…À„=ıÿÿA¶4$Aˆv¨„,ıÿÿ‰ÀA·tşf‰tşéıÿÿ@ ‹:‰É‰>‹|
+ü‰|üH‹zøé;ıÿÿ‰É·|
+şf‰|şH‹zøé&ıÿÿA‹4$‰É‰sA‹tü‰t
+üéÚûÿÿA‹4$‰ÀA‰vA‹tü‰tüé»üÿÿL‰ñL‰ú¾A ¿˜A 1ÀèÖcÿÿHºÿÿÿÿÿÿÿH9ĞHGÂHÁàI‰Çé`şÿÿ¿ A è¿aÿÿH‹D$L‰E L‰}H‰Eéwûÿÿ¿2A èŸaÿÿH‰ÃéÖnÿÿH‰ÃéØnÿÿff.„     @ AWAVAUATUSHì  H‹H‰|$@H¼$ğ  H‰t$Pè…`ÿÿH‹Æ\  1Ò1öfïÀf‰”$Ğ  H‹·\  H¼$ğ  „$Ø  „$è  H‰„$ğ  H‹@èHÇ„$ğ  °*A HÇ„$È      H‰Œğ  H‹d\  HÇ„$ø      HxèègbÿÿH¼$   HÇ„$ğ  È+A HÇ„$ğ  ğ+A èÂaÿÿH´$   H¼$ğ  è-bÿÿº   H‰ŞH¼$   è(aÿÿH‹”$ğ  H¼$ğ  HzèH…À„  1öèÄbÿÿö„$  …¹  H‹D$@fïÀHÇ„$¨       Æ„$°    HÇ@     H„$°   H‰„$    H‹„$ğ  H‹@èH‹œà  H„$    H‰D$H…Ûuoép   ¾SCH‹t$H¼$ğ  èšbÿÿH‹H‹RèöD …È  H‹„$¨   H…ÀtH‹”$    Hƒøt]f:H|uVH‹„$ğ  H‹@èH‹œà  H…Û„  €{8 u“H‰ßè»`ÿÿH‹º
+   H‹@0H=ğM@ „wÿÿÿ¾
+   H‰ßÿĞ¾ĞéeÿÿÿH‹t$H|$`èøÿÿH‹D$hH‹L$`H‰D$HH)ÈH‰L$(H=   …ÙlÿÿHƒy…ÎlÿÿH‹H‰Ë€8P…¿lÿÿH„$H  fïÀÆ„$   A¸
+   H‰„$8  H„$h  ¾ÌA ¿3@ Æ„$H   H‰„$X  Æ„$h   „$x  „$ˆ  „$˜  „$¨  „$¸  „$È  „$Ø  H‹Q 1ÉHÇ„$      Æ„$0   HÇ„$@      HÇ„$`      HÇ„$è      )„$   èE  H‹S@1É¾çA ¿Ğ0@ A¸
+   H‰„$  è‚  H‹\$(ˆ„$  1É¾A A¸
+   ¿P0@ H‹S`èÛÔÿÿH‹“€   A¸
+   1É¾A ¿P0@ H‰„$   èµÔÿÿH‰„$(  1ÀHƒ»¨   uH‹D$(H‹€    €81”ÀH‹L$(ˆ„$0  H”$8  HÀ   H9ÂtGL‹¤$8  H„$H  H‹™È   I9Ä„‰  H‹¬$H  H9İ‚l  H…Û…Æ  H‰œ$@  AÆ H‹L$(H”$X  Hà   H9ÂtGL‹¤$X  H„$h  H‹™è   I9Ä„3  H‹¬$h  H9İ‚­  H…Û…  H‰œ$`  AÆ H‹D$(A¸
+   1É¾ÌA ¿3@ H‹   èÅ  H‰D$8HÇD$    H…À„  fD  H‹„$ğ  H‹@èH‹œà  H…Û„“  €{8 „Q  ¾SCH‹t$H¼$ğ  è_ÿÿH‹H‹RèöD …èkÿÿH‹t$H¼$€   èõÿÿH‹¬$ˆ   H‹œ$€   H‰èH)ØH=    …FjÿÿH‹CH‰D$0Hƒø…3jÿÿH‹€8R…'jÿÿH‹S 1É¾çA ¿Ğ0@ A¸
+   èK  H‹S@A¸
+   1ÉI‰Å¾çA ¿Ğ0@ è-  H‹S`A¸
+   1ÉI‰Ç¾A ¿P0@ èÒÿÿL´$   Dˆ¬$à   H‰„$è   L‹£ˆ   H‰D$L‰´$ğ   H‹ƒ€   Dˆ¼$á   H‰D$ Iƒü‡m  Iƒü„«  M…ä…"  L‰ğL‰¤$ø   BÆ  H‹´$€  H;´$ˆ  „”  ·„$à   HV f‰H‹„$è   H‰VH‰FH‹„$ğ   L9ğ„Œ  H‰FH‹„$   H‰F H‹„$ø   H‰FHƒ„$€  0L‹¤$°  L;¤$¸  „á  Eˆ,$Hƒ„$°  L‹¤$È  L;¤$Ğ  „¶  Eˆ<$Hƒ„$È  H‹„$˜  L‹¼$   L9ø„p  H‹L$HƒÀH‰HøH‰„$˜  L‹¤$à  L;¤$è  „õ  L‹«ˆ   I|$I‰<$L‹³€   Iƒı‡ô  Iƒı„*  M…í…  M‰l$BÆ/ Hƒ„$à   I‰ÜH9İt+fD  I‹<$ID$H9ÇtI‹D$Hpè¼ZÿÿIƒÄ L9åuÛH‹´$   H‰ßH)Şè ZÿÿHƒD$H‹L$8H‹D$H9È…ÿüÿÿH‹D$@H‹XH;X„À	  H‹„$  HS8HŒ$H  H‰¶„$  ˆC¶„$0  fo”$   H‰S(ˆC H‹„$8  SH9È„  H‰C(H‹„$H  H‰C8H‹Œ$@  H„$H  HSXH‰K0H‰„$8  HŒ$h  HÇ„$@      Æ„$H   H‰SHH‹„$X  H9È„  H‰CHH‹„$h  H‰CXH‹Œ$`  H„$h  H‰KPfïÀH‰„$X  H‹„$x  HÇ„$`      Æ„$h   H‰ChH‹„$€  H‰CpH‹„$ˆ  H‰CxH‹„$  H‰ƒ€   H‹„$˜  H‰ƒˆ   H‹„$   H‰ƒ   H‹„$¨  H‰ƒ˜   H‹„$°  H‰ƒ    H‹„$¸  H‰ƒ¨   H‹„$À  H‰ƒ°   H‹„$È  H‰ƒ¸   H‹„$Ğ  H‰ƒÀ   H‹„$Ø  H‰ƒÈ   H‹„$à  H‰ƒĞ   H‹„$è  H‰ƒØ   H‹D$@HÇ„$è      H@à   „$x  „$ˆ  „$˜  „$¨  „$¸  „$È  „$Ø  H¼$  èŠ  H‹D$(H‹L$HH‹l$HH‰ÃH9Èt% H‹;HCH9ÇtH‹CHpèXÿÿHƒÃ H9İuŞH‹t$pH‹|$(H)şèüWÿÿéa÷ÿÿ€    H‹¼$    H„$°   H9ÇtH‹„$°   HpèÊWÿÿH¼$   HÇ„$ğ  È+A HÇ„$ğ  ğ+A HÇ„$   0,A èyUÿÿH¼$h  èlYÿÿH¼$8  HÇ„$   Ğ*A è3XÿÿH‹ôQ  H‹õQ  H¼$ğ  H‰„$ğ  H‹@èH‰Œğ  HÇ„$ø      HÇ„$ğ  °*A èŒUÿÿH‹D$@HÄ  []A\A]A^A_ÃD  H‰ßèXWÿÿH‹º
+   H‹@0H=ğM@ „“ùÿÿ¾
+   H‰ßÿĞ¾ĞéùÿÿfD  M…äˆ  L‰çHƒÇˆ÷
+  è­VÿÿH‰„$ğ   H‰ÇL‰¤$   H‹t$ L‰âè=VÿÿH‹„$ğ   éaúÿÿH‹D$ ¶ ˆ„$   éJúÿÿ@ H”$à   H¼$x  èc  H‹¼$ğ   L9÷„›úÿÿH‹„$   HpèAVÿÿé…úÿÿ@ H“€   L‰æH¼$Ø  èá  é6ûÿÿ@ M…íˆ<  L‰ïHƒÇˆè
+  èíUÿÿI‰$H‰ÇM‰l$L‰êL‰öè†UÿÿI‹<$éäúÿÿD  A¶AˆD$éÑúÿÿf.„     L‹´$¨  HºÿÿÿÿÿÿÿM)ôI9Ô„  M…ä„š   H¸ÿÿÿÿÿÿÿK$H9ÁHFÁL9áHCĞH‰×H‰T$ è`UÿÿFˆ, L‹„$¸  H‰ÁM…ä~vM)ğL‰âL‰öH‰ÇL‰D$XNl èqVÿÿL‹D$XH‰ÁL‰ÆL‰÷H‰L$Xè)UÿÿH‹L$XH‹D$ H‰Œ$¨  L‰¬$°  HÁH‰Œ$¸  ékùÿÿ¿   èåTÿÿDˆ(H‰ÁHÇD$    Nl!M…öt¸L‹„$¸  M)ğë–€    L‹¬$À  HºÿÿÿÿÿÿÿM)ìI9Ô„°  M…ä„   H¸ÿÿÿÿÿÿÿK$H9ÁHFÁL9áHCĞH‰×H‰T$0èhTÿÿFˆ< H‹Œ$Ğ  I‰ÆM…ä~`L)éL‰âL‰îH‰ÇH‰L$ N| èyUÿÿH‹L$ H‰ÎL‰ïè9TÿÿH‹D$0L‰´$À  L‰¼$È  IÆL‰´$Ğ  é£øÿÿ¿   èúSÿÿDˆ8I‰ÆO|&M…ítÁH‹Œ$Ğ  L)éë©D  L‹¬$  I‰ÆH¹ÿÿÿÿÿÿÿM)îL‰òHÁúH9Ê„Š  L9è„g  HH9Ğ‚ê  HÇD$     1ÉH…À…(
+  H‹D$Nd1J‰1M…ö   M…í…‡   H‹D$ H‰Œ$  L‰¤$˜  H‰„$   éøÿÿ@ H‹„$ø   HHƒùƒ›  öÁ…‚
+  …É„f÷ÿÿ¶¼$   @ˆ~ öÁ„Q÷ÿÿ‰ÉA·|şf‰|
+şé?÷ÿÿ H‰ÏL‰òL‰îè"TÿÿH‰ÁL‰şL‰ïH‰L$L)îèÜRÿÿH‹L$é\ÿÿÿH…ÛˆÙ  HíH9ë‚ë  H‰ßHƒÇˆ=	  H‰İè˜RÿÿH‹¼$8  I‰ÄH„$H  H9ÇtH‹„$H  HpèRÿÿL‰¤$8  H‰¬$H  H‹D$(H‹°À   Hƒû„M  L‰çH‰ÚèîQÿÿL‹¤$8  éôÿÿ‹w ƒÎè¦SÿÿéİğÿÿH…ÛˆB  HíH9ë‚8  H‰ßHƒÇˆ—  H‰İè÷QÿÿH‹¼$X  I‰ÄH„$h  H9ÇtH‹„$h  HpèŞQÿÿL‰¤$X  H‰¬$h  H‹D$(H‹°à   Hƒû„À   L‰çH‰ÚèMQÿÿL‹¤$X  éËóÿÿH‹¼$   H‰~ ‰ÏM‹D>øL‰D:øH~(HƒçøH)úÑI)Öƒáøƒù‚¨õÿÿƒáø1ÒA‰ĞƒÂO‹N‰9ÊrîéŒõÿÿHƒÂ‚†   H¸ÿÿÿÿÿÿÿH9ÂHGĞL$Õ    L‰çèQÿÿH‰ÁJ L‹¼$   H‰D$ évıÿÿ¶Aˆ$L‹¤$8  éÃòÿÿ¶Aˆ$L‹¤$X  éóÿÿH…íˆc  H}éÆşÿÿH…íˆV  H}éşÿÿI¼øÿÿÿÿÿÿë‡H‹D$@H‰İHº·mÛ¶mÛ¶mL‹(L)íH‰èHÁøH¯ÂHº’$I’$I’ H9Ğ„R	  L9ë„  H H9Â‚  A¾à   E1äE1ÿH…Ò…»  H‹„$  Lıfoœ$   H´$H  HM8H‹”$@  H‰E ¶„$  H‰M(ˆE¶„$0  ]ˆE H‹„$8  H9ğ„·  H‰E(H‹„$H  H‰E8H„$H  HMXH‰U0H‹”$`  H‰„$8  H‹„$X  H´$h  HÇ„$@      Æ„$H   H‰MHH9ğ„Ÿ  H‰EHH‹„$h  H‰EXH„$h  fïÀóo¤$x  óo¬$ˆ  óo´$˜  H‰„$X  óo¼$¨  H‹„$è  ehóoœ$¸  mxóo¤$È  óo¬$Ø  H‰UPHÇ„$`      Æ„$h   H‰…Ø   HÇ„$è      µˆ   ½˜   ¨   ¥¸   ­È   „$x  „$ˆ  „$˜  „$¨  „$¸  „$È  „$Ø  L9ë„”  L‰íM‰şé§  f.„     I‰V(H‹U8I‰V8H‹U0INXI‰V0H‰E(HEXHÇE0    ÆE8 I‰NHH‹UHH9Â„ã  I‰VHH‹UXI‰VXH‹UPH‰EHH‹EhH‰ïHÅà   I‰VPHÇ…pÿÿÿ    Æ…xÿÿÿ I‰FhH‹EHÇEˆ    I‰FpH‹E˜HÇE    I‰FxH‹E HÇE˜    I‰†€   H‹E¨HÇE     I‰†ˆ   H‹E°HÇE¨    I‰†   H‹E¸HÇE°    I‰†˜   H‹EÀHÇE¸    I‰†    H‹EÈHÇEÀ    I‰†¨   H‹EĞHÇEÈ    I‰†°   H‹EØHÇEĞ    I‰†¸   H‹EàHÇEØ    I‰†À   H‹EèHÇEà    I‰†È   H‹EğHÇEè    I‰†Ğ   H‹EøHÇEğ    I‰†Ø   HÇEø    è6  I†à   H9ë„Ş   I‰ÆH‹E IN8óoMI‰¶EANAˆF¶E I‰N(H‹U(AˆF HE8H9Â…)şÿÿH‹U0Hrƒşƒæ   @öÆ…¬  …ö„şÿÿ¶ˆ@öÆ„şÿÿ‰ö·T0şf‰T1şH‹U0éòıÿÿfH‹UPHrƒşƒé   @öÆ…z  …ö„
+şÿÿ¶ˆ@öÆ„÷ıÿÿ‰ö·T0şf‰T1şH‹UPéæıÿÿf„     L‰÷é^õÿÿIÆÀ  M…ítH‹D$@L‰ïH‹@H‰ÆH‰D$L)îèàKÿÿH‹D$@L‰8L‰pL‰`étóÿÿèFJÿÿ½   éuíÿÿ½   éËíÿÿH‹I‰ÀH‰‰òH‹|øH‰|øI~@HƒçøH)ùÎI)Èƒæøƒş‚ıÿÿƒæø1Ò‰ÑƒÂM‹L‰9òrïéòüÿÿH‹I‰ÀH‰‰òH‹|øH‰|øI~`HƒçøH)ùÎI)Èƒæøƒş‚şüÿÿƒæø1Ò‰ÑƒÂM‹L‰9òrïéãüÿÿè•IÿÿH‹Œ$@  HAƒøƒ.  ¨…Š  …À„ãğÿÿ¶´$H  @ˆs8¨„Ïğÿÿ‰À·´F  f‰tşé»ğÿÿ„     H‹Œ$`  HAƒøƒ   ¨…ï  …À„ïğÿÿ¶´$h  @ˆsX¨„Ûğÿÿ‰À·´f  f‰tşéÇğÿÿ HƒÀ‚  Hº’$I’$I’ H9ĞHGÂL$Å    I)ÄIÁäL‰çè.JÿÿI‰ÇIÄL°à   éÙùÿÿH‹´$h  L„$h  H‰sX‰ÆH‹¼4`  H‰|2øHs`HƒæøH)òĞI)Ğƒàøƒø‚Ağÿÿƒàø1Ò‰×ƒÂM‹8L‰>9Ârïé&ğÿÿH‹´$H  L„$H  H‰s8‰ÆH‹¼4@  H‰|2øHs@HƒæøH)òĞI)Ğƒàøƒø‚†ïÿÿƒàø1Ò‰×ƒÂM‹8L‰>9ÂrïékïÿÿèóGÿÿèîGÿÿHºÿÿÿÿÿÿÿH9ĞHGÂL$Å    é#øÿÿI¼ÀÿÿÿÿÿÿéûşÿÿHBƒøƒø   ¨…Ú  …À„<ùÿÿ¶´$H  @ˆu8¨„(ùÿÿ‰À·´F  f‰tşéùÿÿ@ HBƒøsY¨…Ç  …À„Xùÿÿ¶´$h  @ˆuX¨„Dùÿÿ‰À·´f  f‰tşé0ùÿÿ€    ‹¼$   ‰É‰~ A‹|ü‰|
+üéÒìÿÿH‹´$h  L„$h  H‰uX‰ÆH‹¼4`  H‰|1øHu`HƒæøH)ñÈI)Èƒàøƒø‚Ğøÿÿƒàø1É‰ÏƒÁM‹8L‰>9ÁrïéµøÿÿH‹´$H  L„$H  H‰u8‰ÆH‹¼4@  H‰|1øHu@HƒæøH)ñÈI)Èƒàøƒø‚øÿÿƒàø1É‰ÏƒÁM‹8L‰>9Árïéú÷ÿÿ‹‰ö‰‹T0ü‰T1üH‹U0é[ùÿÿ‹‰ö‰‹T0ü‰T1üH‹UPéùÿÿ‹´$h  ‰À‰sX‹´d  ‰tüéìíÿÿH¸’$I’$I’ H9ÂHGĞL$Õ    I)ÔIÁäé-ıÿÿèîGÿÿ‹´$H  ‰À‰s8‹´D  ‰tüéEíÿÿ‹´$H  ‰À‰u8‹´D  ‰tüéN÷ÿÿ¿2A è<Fÿÿ¿2A è2Fÿÿf‹´$h  ‰À‰uX‹´d  ‰tüé}÷ÿÿ¿2A è
+Fÿÿ¿2A è Fÿÿ¿ A èöEÿÿ¿ A èìEÿÿ@ èSGÿÿ¿ A èÙEÿÿ¿ A èÏEÿÿH‰Ãé-SÿÿH‰ÃéQSÿÿH‰ÃéSÿÿéeSÿÿH‰Çé¿UÿÿH‰Ãé±Tÿÿé§Tÿÿé¶TÿÿH‰ÃéqTÿÿAWI‰÷AVAUATUSHìè   H‹n H‹^(L¤$À   H‰<$L‰¤$°   H…íu	H…Û…6  Hƒû‡·  Hƒû…  ¶E ˆ„$À   L‰àH‰œ$¸   H¼$Ğ   Æ è'DÿÿH¬$°   H‰ïèwEÿÿH‰îH|$0èzãÿÿH‹´$Ğ   H…ötH¼$Ğ   èàCÿÿH‹¼$°   L9çtH‹„$À   Hpè²EÿÿH‹D$0L‹t$8fïÀHÇD$`    )D$PMg@H‰D$H‰ÃL9ğ…   éä   @ èÃÛÿÿL‰êHt$PH|$èAlÿÿH‹D$ óoL$H‹¼$   H‰D$`H„$    )L$PH9ÇtH‹„$    Hpè&EÿÿH‹¼$¸   H„$È   H9ÇtH‹„$È   Hpè EÿÿHÃà   I9Şt\L‰âH‰ŞH‰ïè6hÿÿL‰âH‰îH¼$   èS`ÿÿLl$pAƒxH‰éL‰âH‰ŞL‰ï…?ÿÿÿè²kÿÿé:ÿÿÿH…Û„şÿÿL‰çéA  @ H‹$I‹_HxH‰8I‹/Hƒû‡9  Hƒû…Ñ  ¶E H‹$ˆAH‹$H‹t$Hº·mÛ¶mÛ¶mH‰YH‰õÆ H‹D$`foT$PH‰A0L‰ğH)ğQ HÁøH¯ÂH‰A8A‹Gx‰A@A¶G|ˆADL9ö„;  @ L‹¥Ğ   H‹È   I9Üt.D  H‹;HCH9ÇtH‹CHpè×CÿÿHƒÃ I9ÜuŞH‹È   H…ÛtH‹µØ   H‰ßH)Şè°CÿÿH‹½°   H…ÿtH‹µÀ   H)şè•CÿÿH‹½˜   H…ÿtH‹µ¨   H)şèzCÿÿH‹½€   H…ÿtH‹µ   H)şè_CÿÿL‹epH‹]hI9Üt)fH‹{HC H9ÇtH‹C Hpè6CÿÿHƒÃ0I9ÜuİH‹]hH…ÛtH‹uxH‰ßH)ŞèCÿÿH‹}HHEXH9ÇtH‹EXHpèûBÿÿH‹}(HE8H9ÇtH‹E8HpèáBÿÿHÅà   I9î…ÉşÿÿHƒ|$ tH‹t$@H‹|$H)şè·BÿÿH‹$HÄè   []A\A]A^A_ÃH…Û„1şÿÿH‰ÚH‰îè-BÿÿH‹$H‹8éşÿÿH…ÛxfH‰ßHƒÇxXè^BÿÿH‰œ$À   H‰„$°   H‰ÇH‰ÚH‰îèğAÿÿH‹„$°   é#üÿÿH…Ûx<H‰ßHƒÇxè BÿÿH‰ÇH‹$H‰8H‰Xëˆè›@ÿÿè–@ÿÿ¿ A èAÿÿ¿ğ A èbAÿÿ¿ A èAÿÿH‰Ãé²QÿÿH‰ÃéÇQÿÿH‰ÃH¬$°   é§QÿÿH‰Ãé¾QÿÿH‰ÃéĞQÿÿH‰Ãé»QÿÿATUH‰ıSL‹§Ğ   H‹ŸÈ   I9Üt/fD  H‹;HCH9ÇtH‹CHpè‡AÿÿHƒÃ I9ÜuŞH‹È   H…ÛtH‹µØ   H‰ßH)Şè`AÿÿH‹½°   H…ÿtH‹µÀ   H)şèEAÿÿH‹½˜   H…ÿtH‹µ¨   H)şè*AÿÿH‹½€   H…ÿtH‹µ   H)şèAÿÿL‹epH‹]hI9Üt)fH‹{HC H9ÇtH‹C Hpèæ@ÿÿHƒÃ0I9ÜuİH‹]hH…ÛtH‹uxH‰ßH)ŞèÅ@ÿÿH‹}HHEXH9ÇtH‹EXHpè«@ÿÿH‹}(HE8H9ÇtH‹u8[]A\HƒÆé@ÿÿD  []A\Ã AWI‰ÿAVE‰ÆAUATI‰ÌUH‰ÕSHƒì(H‰t$è>ÿÿD‰òHt$H‰ïD‹(H‰ÃÇ     Aÿ×H‹T$H9êt3‹ƒù"t"M…ätH)êI‰$…ÉuD‰+HƒÄ([]A\A]A^A_ÃH‹|$èÕ@ÿÿH‹|$è+?ÿÿH‰Çƒ; uD‰+è›Aÿÿf.„     AWI‰ÿAVE‰ÆAUATI‰ÌUH‰ÕSHƒì(H‰t$è|=ÿÿD‰òHt$H‰ïD‹(H‰ÃÇ     Aÿ×H‹T$H9êt3‹ƒù"t"M…ätH)êI‰$…ÉuD‰+HƒÄ([]A\A]A^A_ÃH‹|$è5@ÿÿH‹|$è‹>ÿÿH‰Çƒ; uD‰+èû@ÿÿf.„     AWAVI‰ÖHºÿÿÿÿÿÿÿAUATUSHƒì(L‹H‹/L‰øH)èHÁøH9Ğ„°  I‰õI‰üH‰óI)íL9ı„–  H< H‰|$H9Ç‚Ô   H…ÿ…T  HÇD$    H‹D$IÅI‹M‹vI}I‰} H‰D$Iƒş‡|  Iƒş„Â  M…ö…‹  M‰uBÆ7 H9ë„œ  H‹T$HELCë#„     H‰
+H‹H‰JHƒÀ H‰zHƒÂ I9ÀteHrH‹xøH‰2H‹HğH9ÁuÑHOƒùƒ„  öÁ…s  …ÉtÁ¶8@ˆ>öÁ…|  H‹xøë¬fH¿àÿÿÿÿÿÿH‰T$èì=ÿÿH‰D$é ÿÿÿfH‹D$I‰İI)íIÅIƒÅ L9û„†   HCIL‰êë#„     H‰
+H‹H‰JHƒÀ L‰BHƒÂ H9ÇtMH‹HğHrL‹@øH‰2H9ÈuÑIHƒùƒ|   öÁ…¬  …ÉtÁD¶DˆöÁtµ‰ÉD·LşfD‰Lşë¥ L‰øH)ØIÅH…ítI‹t$H‰ïH)îè:=ÿÿH‹D$H‹\$M‰l$HÁàI‰$HØI‰D$HƒÄ([]A\A]A^A_Ã@ L‹L‰A‰ÉN‹TøN‰TøLJI‰ÂIƒáøL)ÎñI)òƒáøƒù‚ ÿÿÿƒáø1öA‰óƒÆO‹4O‰49Îrîéÿÿÿf.„     H‹8I‰ÂH‰>‰ÏL‹L8øL‰L>øLJIƒáøL)ÎñI)òƒáøƒù‚gşÿÿƒáø1ö‰÷ƒÆM‹:M‰99ÎrïéLşÿÿ@ HƒÀ‚FşÿÿHºÿÿÿÿÿÿÿH9ĞHFĞH‰×H‰T$HÁçé3şÿÿ@ M…öˆÂ   L‰÷HƒÇx}è	<ÿÿI‰E H‰ÇM‰uH‹t$L‰òè¡;ÿÿI‹} M‰uBÆ7 H9ë…dıÿÿL‹l$éÿıÿÿH‹D$¶ AˆEé6ıÿÿD‹‰ÉD‰D‹LüD‰Lüéşÿÿ‹8‰É‰>‹|ü‰|üH‹xøé;ıÿÿè:ÿÿ‰É·|şf‰|şH‹xøé!ıÿÿH¸ÿÿÿÿÿÿÿH9ÇHFÇH‰D$HÁàH‰Çédıÿÿ¿ A èk:ÿÿ¿2A èa:ÿÿH‰Çèù9ÿÿHƒ|$ uL‰ïè©\ÿÿè<ÿÿH‹t$H‹|$HÁæè!;ÿÿëæH‰Ãèg<ÿÿH‰ßè¿<ÿÿf.„     D  AWAVAUATI‰ÔHº«ªªªªªªªUSHƒìH‹oL‹/H‰èL)èHÁøH¯ÂHºªªªªªªªH9Ğ„‘  H‰óI‰şL)îI9í„+  H H9Â‚  H…Ò…K  º0   1ÉE1ÿI7A·4$M‹D$LH I‹|$f‰0I‹t$L‰HH‰pIt$ I9ğ„  L‰@M‹D$ L‰@ H‰xI‰t$IÇD$    AÆD$  L9ë„à   L‰èL‰úë%H‰rH‹p H‰r L‹@HƒÀ0L‰BHƒÂ0H9Ø„£   ·0Hz L@ f‰2H‹pH‰zH‰rH‹pL9Æu¸L‹@MHAƒùƒî  AöÁ…;  E…Ét§D¶DˆAöÁt–E‰ÉB·tşfB‰tşL‹@ë…D  H¹àÿÿÿÿÿÿH‰ÏH‰t$H‰$èe9ÿÿH‹$H‹t$I‰ÇHP0HÁéÒşÿÿD  HCĞL)èHƒàğIT`H9ë„Á   H‰ØH‰Öë$€    H‰~H‹x H‰~ HƒÀ0L‰FHƒÆ0H9ètc·8LV LH L‹@L‰Vf‰>H‹xH‰~H‹xL9Ïu¼MHAƒùƒ¦   AöÁ…;  E…Ét«D¶EˆAöÁtE‰ÉB·|şfC‰|
+şëH¾«ªªªªªª
+H)ØHƒè0HÁèH¯ÆH¾ÿÿÿÿÿÿÿH!ğHD@HÁàHÂM…ít!I‹vL‰ïH‰L$H‰$L)îèa8ÿÿH‹L$H‹$M‰>I‰VI‰NHƒÄ[]A\A]A^A_ÃfD  L‹M‰E‰ËN‹døO‰døLf(IƒäøM)âEÑL)×AƒáøAƒù‚âşÿÿH‰$AƒáøE1ÒE‰ÓAƒÂJ‹K‰E9ÊrìH‹$éºşÿÿfD  L‹L‰E‰ÈN‹TøN‰TøLB(IƒàøL)ÇAùH)şAƒáøAƒù‚’ıÿÿAƒáø1ÿA‰úƒÇN‹O‰D9Ïríétıÿÿ„     HƒÀ‚æıÿÿHºªªªªªªªH9ĞHGÂH@HÁáéÒıÿÿ„     LGAƒøs>AöÀ…×   E…À„êüÿÿE¶T$ DˆP AöÀ„ÖüÿÿE‰ÀF·TşfG‰TşéÂüÿÿ M‹T$ L‰P E‰ÂN‹\øO‰\øLP(I‰óIƒâøM)ÑEÈM)ËAƒàøAƒø‚‡üÿÿH‰T$AƒàøI‰ÁD‰$E1ÀD‰ÀAƒÀI‹I‰‹$A9ÀréH‹T$L‰ÈéPüÿÿD‹E‰ÉE‰B‹|üC‰|
+üé]ıÿÿD‹E‰ÉD‰B‹tüB‰tüL‹@éUüÿÿE‹T$ E‰ÀD‰P F‹TüG‰TüéüÿÿH¸ªªªªªªªH9ÂHGĞHRHÁáé¦üÿÿ¿2A è25ÿÿfAWH‰ĞHºÿÿÿÿÿÿÿAVHÂAUATUSHƒì(L‹oL)êL9Â‚¦  M‰ÇI‰ñH‹7L‰ÅI)ÇLGH‰ûMïI9ğ„  L‹wM9ş‚³   N$L‰êIÁL)ÊH9ñsyH…Òt$H9ètI4I<,Hƒú„  H‰$è¼6ÿÿH‹$H…ít*HƒıtL‰çH‰êH‰Îè5ÿÿL‹#ëf.„     ¶Aˆ$L‹#L‰{H‰ØCÆ< HƒÄ([]A\A]A^A_Ã LîH9Î‚{ÿÿÿI‰ÑL‰æI‰èH‰ÂH‰ßèÈ5ÿÿL‹#ë½ M…ÿˆÅ  LÈMöH‰D$I)ÅM9÷‚  L‰ÿM‰şHƒÇˆ  H‰L$L‰L$L‰$è½4ÿÿL‹L$L‹$H‹L$I‰ÄM…Ét4H‹3Iƒù„R  L‰ÊH‰ÇH‰L$L‰D$L‰$è14ÿÿH‹L$L‹D$L‹$H…Ét6H…ít1K<Hƒı„  H‰êH‰ÎL‰L$L‰$è÷3ÿÿL‹L$L‹$fD  H‹M…íu(I9ÈtH‹CH‰ÏHpè+4ÿÿL‰#L‰séÉşÿÿ€    H‹t$LÍI<,HÎIƒı„‡   L‰êH‰L$L‰$è3ÿÿH‹L$L‹$ë£ I~M…ö‰óşÿÿèN2ÿÿfD  Iƒÿ†ûıÿÿM…ÿxwLÈH‰D$I)ÅIƒÿ‡´şÿÿ¿   A¾   é´şÿÿ@ ¶ˆH…í…ÿıÿÿé$şÿÿD  ¶ˆé.ÿÿÿfD  ¶ˆéÿÿÿfD  ¶Aˆ$éÉşÿÿ¿ A èR2ÿÿ¿ A èH2ÿÿHƒìHƒÄÃ                                                                                                                                                                                 basic_string::_M_replace basic_string::_M_create    x+A     Ğ*A     H-A     batch row closed: open: basic_string::append empty possible text-hit text-away range-hit range-away     cannot create std::vector larger than max_size()        basic_string: construction from null is not valid vector::reserve vector::_M_realloc_insert audit fork failed /app/bin/loam-ingest waitpid failed inspect        loam inspect <store>
+ loam:    usage: loam audit <case-directory> <report-path>
+              loam ingest <csv> <store-directory>
+ basic_string::substr cannot open case file:  bad case row in  all range isnull region_eq unknown operation:  stoll unknown path:    %s: __pos (which is %zu) > this->size() (which is %zu) true false {"case_id":" ","row_count": ,"sum_amount": ,"pages_total": ,"pages_read": ,"path":" ","skipping": cannot write report:  {"status":"complete","cases": ,"digest":" "}
+ basic_string::replace   x+A     Ğ*A     H-A     0,A     cannot open store:  stoull bad page record in  stoul short page in  bad row record in   ;ä  ;   ,ÿÿ@  0ÿÿğ  I1ÿÿÌ  1ÿÿ8  ¾2ÿÿ¸	  B3ÿÿà	  ;4ÿÿl  .8ÿÿ4  ¿:ÿÿÄ  Ù:ÿÿ$  2>ÿÿœ  >ÿÿè  PDÿÿ   €Dÿÿ,  @Eÿÿœ  àIÿÿh  ğIÿÿx  àOÿÿ  Pÿÿ,  ÀQÿÿğ  PUÿÿh  pUÿÿ€  pWÿÿĞ  Wÿÿä  0Xÿÿ   €XÿÿX   Yÿÿ  YÿÿÈ  p[ÿÿ   ]ÿÿh  °]ÿÿœ  Àbÿÿˆ  Ğkÿÿô   sÿÿ¬
+  P{ÿÿ  ğ£ÿÿ`   ¤ÿÿt  ¤ÿÿH  p¤ÿÿh  ¥ÿÿ¸  Ğ¥ÿÿğ   ªÿÿ<	  €ªÿÿ`	  0«ÿÿ€	   «ÿÿ0
+   °ÿÿ€
+  P¶ÿÿ   ¶ÿÿà  `Ãÿÿ¤  ÀÄÿÿX  PÆÿÿp   ÌÿÿĞ  ğçÿÿH  °ìÿÿ˜  ğíÿÿĞ  îÿÿ   0ïÿÿè  póÿÿ8  Pøÿÿ„             zR x      HBÿÿ"              zR x        LBÿÿ       $   0   È)ÿÿ€   FJw€ ?;*3$"       X   pGÿÿ              zPLR xà3@   P   $   œBÿÿ“  ÔA BBB B(ŒA0†D8ƒQà~
+8D0A(B BBBG   $   x   ˜-ÿÿ¹   A àƒ†Œ         ÀLÿÿ!       H     ÜLÿÿ¬   BBF B(ŒH0†D8ƒG`ú
+8A0A(B BBBE P      pFÿÿá  A BMB E(ŒG0†A8ƒG°Õ
+8D0A(B BBBI       T  u-ÿÿ8   BA °ƒ†Œt   à  ÈMÿÿ   BBB ŒA(†A0ƒ¸
+(A BBBIw
+(A BBBBq
+(A BBBH
+(A BBBE      X  àPÿÿ           L   p  èPÿÿş   BFB B(ŒA0†A8ƒGPW
+8D0A(B BBBG         À  ˜Rÿÿ       8   Ô  ¤Rÿÿ’    BFŒA †A(ƒD0x
+(A ABBD  4     SÿÿK    BŒA†D ƒZ
+ABDZAD   4   H   Sÿÿ•    BŒD†A ƒ|
+ABJAAB  4   €  ˆSÿÿe    BŒD†A ƒH
+ABNAAB  L   ¸  ÀSÿÿÔ   LBB ŒA(†A0ƒn
+(A BBBI
+(A BBBGL     PUÿÿˆ   BBE ŒA(†A0ƒb
+(G BBBEA(A BBB   0   ğ  Vÿÿ£   JA BŒA†A ƒF
+ABC   H   Œ  Wÿÿ   BBB B(ŒA0†N8ƒDPË
+8A0A(B BBBHL   p   7ÿÿ½  \A BBB B(ŒD0†A8ƒGàC
+8A0A(B BBBA$   À  A*ÿÿ<  ¨A àƒ†Œ       P  ˆœÿÿ          d  „œÿÿ       h     0[ÿÿ	  ÜA KIB B(ŒA0†A8ƒD 
+8A0A(B BBBHAÃÆÌÍÎÏAƒ†ŒP   |  ÔcÿÿÍ  àA FBB B(ŒD0†D8ƒN
+8A0A(B BBBA      8  À›ÿÿZ    AƒH
+OAL   ğ   œÿÿ•   äA BEE B(ŒD0†D8ƒD`L
+8A0A(B BBBA 4   ¨  Pœÿÿ·    BŒD†H ƒn
+ABA]
+ABHH   à  Øœÿÿ.   BBE B(ŒA0†G8ƒG`ë
+8A0A(B BBBA     ,  ¼ ÿÿv    D j
+BX
+Hd    P  ¡ÿÿ°    | dJ D  4   p  ¨¡ÿÿe    BŒD†A ƒH
+ABNAAB  $   ¨  ş(ÿÿ„    K†AƒD qAAL   h  Z)ÿÿù   òA BBB E(ŒD0†A8ƒNPº
+8D0A(B BBBA L   ¸  h¡ÿÿ   A BBB B(ŒA0†A8ƒD`ú
+8A0A(B BBBF(   p  ¦ÿÿ£   L†EƒKEGÃÆXƒ†h   4  ìhÿÿ¦  4A TBB E(ŒA0†D8ƒG°M
+8A0A(B BBBAÃÆÌÍÎÏA°ƒ†ŒP      0pÿÿ’(  8A BJB B(ŒA0†A8ƒGĞ¶
+8A0A(B BBBG       ô  Ç(ÿÿó  4A Ğƒ†Œ   €	  ¸ªÿÿM       8   ”	  ´·ÿÿX   BEŒA †A(ƒD@Ã
+(D ABBG P   h	  ¸ªÿÿ½  ”A BBB B(ŒA0†A8ƒGå
+
+8A0A(B BBBH       ¼	  ò+ÿÿ‘  LA ƒ†Œ<   H
+  `¸ÿÿ…   IBB ŒA(†D0ƒÀ
+(D BBBD   4   ˆ
+  àÿÿ=   BŒA†D ƒ 
+ABNAAB L   X
+  áÿÿ•   |A BEE B(ŒD0†D8ƒD`L
+8A0A(B BBBA L   ¨
+  háÿÿ•   ŠA BEE B(ŒD0†D8ƒD`L
+8A0A(B BBBA P   ø
+  Ø¸ÿÿ¡  ˜A BIB B(ŒA0†D8ƒD€Í
+8D0A(B BBBF       L  ó,ÿÿ   µA €ƒ†ŒL   p  @áÿÿ1  ÀA BBO B(ŒA0†A8ƒD`
+8A0A(B BBBEH   (  0åÿÿŞ   BBB B(ŒN0†A8ƒDPœ
+8A0A(B BBBGH   t  Äéÿÿè   BOE B(ŒA0†A8ƒD`¼
+8A0A(B BBBD P   X  (½ÿÿğ  èA BBB B(ŒA0†A8ƒGÀ?
+8A0A(B BBBF       ¬  ­+ÿÿY  €A Àƒ†ŒP   Ğ   ØÿÿÀ  ôA BEB B(ŒA0†A8ƒG À
+8A0A(B BBBA       $  .ÿÿX   7A  ƒ†Œ    ÿÿ6Íƒ	 Áû ’‹	 ÷ö Ó‹	 Ó%ö Ñ‹	 Øö ñ‹	 ÿÿ Ea  ÿÿ$ºÙ ÚÉ šÑ ¡É µÙ ÄÑ ÿÿ3  ÿÿ<ƒ Dˆ d?  ÿI?,€Œ´ö
+í¦¬œßê§ºÃŒƒ²Í€‘ñ
+Œ  }ğ,A ÿ1%ã'·`)ª ù  “º¥·µ    }  ğ,A ÿÿ ÿÿ ÿÿ
+;J…   ÿÿK‰æ ô     ÿ-"Ğ¯	ß  ‚ª	¥	  Ø	ğ	 û	    }     ÿÿ ÿøï4øO ¤èO µ…Q ÚõP ï9ıP œÕP àİP ÊÕP ¢+ãO £'ÕP ¾åP â!ğOó$íP ¿%€P Ô%¥P Š(P è(İP ö(ıP ¾+ãO –,•P »;èO ø;­P ‡>èO ´BÅP ÄB½P ÃH~ãO ÁI•P ÏJµP ¯LãO ´LèO ËLİP ßMµP éMİP îNµP øN•P ŠOèO ”OãO ¨OµP ÔO­P ŞOåP      ÿ]U/¦ ?¡ J lù –× ¡¿ »À ô  Ö½ á¸ ûÀ ÷Á î šÙ ¼Ñ      ÿ´©¯Ö Á õIÎ ¤¥ •£­ Ÿ
+pµ ²Î ×¥ ¨µ ÒÎ €  ˆŞ êÎ ¥ ÍÎ «• Õ Ì… ñ€ †9ø ßPî Üæ¥ ´Î Äø ¯w• °¥ É•        ÿ-"¿  Š  ú¶ –± êÆ –è         ÿÿ
+;J…   ÿÿ
+;J…   ÿÿ–™ Ê‘  	Ñ™ Œ‘ ÿÿ     ÿ%¿  ¢Ãïê  ‡¡ ¬        ÿ”‰¤¹7 É±7 Ş>Á7 ¡è7 ÆƒŞ7  AÉ7 ÒÎ7ã'Ş7 ®É7 ˆÖ7 ÊœÉ7 ÃŞ7 µ Á7 ä Ş7 Æ"•É7 ­0ÕŞ7 ı5è7 ¿6É7 É6Ş7 ñ6É7 …7Ş7 ¢7É7        ÿqhU  ¢ ¦ ±ı Óõ ‡¾ —¶ ¢É ÄZ ¬  ôÔ „Ï ¯ ±§ òğ Šë •Ë ·±       ÿÿ?t˜	 „ˆ	 ‘	 ˆ¨	 •°	 ¨¸	 É¨	   Ë°	 å  ƒ	°	 ÿÿ@                                                                                                                                                                                                                                                                                                                                                   @I@     I@                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ƒ             ’             œ             ª              0@            Hÿ@            *A                          ˜*A                          x@     õşÿo    @            @            ğ@     
+       u                                          è/A            ¨                           ø!@            ` @            ˜      	              şÿÿo    @@     ÿÿÿo           ğÿÿo    ~@                                                                                                                                     ¸-A                     60@     F0@     V0@     f0@     v0@     †0@     –0@     ¦0@     ¶0@     Æ0@     Ö0@     æ0@     ö0@     1@     1@     &1@     61@     F1@     V1@     f1@     v1@     †1@     –1@     ¦1@     ¶1@     Æ1@     Ö1@     æ1@     ö1@     2@     2@     &2@     62@     F2@     V2@     f2@     v2@     †2@     –2@     ¦2@     ¶2@     Æ2@     Ö2@     æ2@     ö2@     3@     3@     &3@     63@     F3@     V3@     f3@     v3@     †3@     –3@     ¦3@     ¶3@     Æ3@     Ö3@     æ3@     ö3@     4@     4@     &4@     64@     F4@     V4@     f4@     v4@     †4@     –4@                     GCC: (GNU) 13.4.0                                   ñÿ                     X@                 ñÿ                      4@     ¹       n    ñÿ                w     Y5@     8       «    ñÿ                ´     ‘5@     <      ¾    ñÿ                È     Ğf@     	      a    ào@     Í          Î6@     „       J    R7@     ù            °w@     ¦      =    K8@     ó      w   ñÿ                ‚    ><@     ‘      â   ñÿ                ì    `Ê@     ¡      @    Ï>@            ™    é>@     Y      Ó    BB@     X       ú   ñÿ                     H@                 ĞH@                 I@             0    ğ4A            <    ˜*A             c    @I@             o    *A                ñÿ                —   ñÿ                Ÿ   ñÿ                ¨   ñÿ                ú   ñÿ                °    ĞA                  ñÿ                ¾     A             Ñ    ¸-A             Ú    è/A             ğ                       "  ğS@     !       L                     i  "  €[@            ¾  "  ®@     v            P0@             %  !   *A             W    Ğ@     ğ      Œ                     Ê                       "  0]@     e       G    H2A             N                     ‰                     Ü                     	                     %	                     D	  "   ¨@            Š	     Ğ0@             	  "   ¨@     Z       ³     82A             ´	                     Ó	                     
+      A            #
+                     H
+  "  €÷@     Ş      ³
+                     ï
+                       "  ¨@            ^    ĞÈ@     …      “                     °                     ô                                              `Y@            ;  "  €[@                                 Ò     B@     ½      ×                     û                     %                     8  "  Àğ@     =      J   @2A             W  "  Àa@           É  "  0]@     e       ö                     $    PI@     “      p  !  À*A     €       ©                     ò                                          B                     b  "  @¯@     e       °   Hÿ@             ¶                     Ó  !  @+A                H@            #     N@     á      R                     ’                     ¦  "  ®@     °       ë  "  `ü@     è      4                     F  "  ğM@            a  "  \@     •       ‹                     Û    `º@     M       ÿ                     <  "  °¯@            º                     á  !  `+A     P       ·    `H@     "       0  !  °+A     P       h                     ¬  "   ò@     •       ì                     ş                          2@             8                     r  "  €¨@     •       ²  !   ,A                                      0@               "  °´@     £      ˆ   H2A             ”                     ğ                        "  Àğ@     =      2                     t     ì@     À      –  "  @ó@     1      +  "   ©@     ·       m                                          £    €2A            Å    À2A           Û  "   [@     ’       !     3@             6                     ‡  "  \@     •       ±    82A             ¾  "  €_@     ˆ      ä    `@     ’(        "   T@     ¬      `    ø4A             e  "  @¯@     e       ³                                          /    ĞU@           W    €Y@     ş      ‹                     µ                     Î                     	  "  a@     £       B    H2A             N                     €  !   ,A     €       ·  !   ,A     P       ï  "  pÇ@     X      4                     n                     š  "   ©@     ·       Ü                     9                     M                     _                     z     à3@             š  "  à©@     .      è                     0  "   [@     ’       v                                          £  "   ]@     Ô      Ö                     H  "  €_@     ˆ      n                     …    °º@     ½      à                     "                                            Ä   "   ¨@     Z       Ú   !  ğ,A            ÷                       !                     D!  "  a@     £       }!  "   ò@     •       ½!    à3A           Ó!                     "  !   -A             G"  !   -A            i"  !  8-A     €       ´"  "  @\@     K       #                      crt1.o __abi_tag digest.cpp _ZN4loam10digest_hexERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE.cold pale.cpp _ZN4loam6turn_dB5cxx11ERKNS_4GateERKNS_5ProbeE.cold main.cpp main.cold parse.cpp _ZSt16__insertion_sortIN9__gnu_cxx17__normal_iteratorIPNSt10filesystem7__cxx114pathESt6vectorIS4_SaIS4_EEEENS0_5__ops15_Iter_less_iterEEvT_SC_T0_.isra.0 _ZSt13__adjust_heapIN9__gnu_cxx17__normal_iteratorIPNSt10filesystem7__cxx114pathESt6vectorIS4_SaIS4_EEEElS4_NS0_5__ops15_Iter_less_iterEEvT_T0_SD_T1_T2_.isra.0 _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE6appendEPKcm.isra.0 _ZStplIcSt11char_traitsIcESaIcEENSt7__cxx1112basic_stringIT_T0_T1_EEPKS5_RKS8_.isra.0 _ZSt16__introsort_loopIN9__gnu_cxx17__normal_iteratorIPNSt10filesystem7__cxx114pathESt6vectorIS4_SaIS4_EEEElNS0_5__ops15_Iter_less_iterEEvT_SC_T0_T1_.isra.0 _ZN4loam10load_casesERKNSt10filesystem7__cxx114pathE.cold report.cpp _ZN4loam12write_reportERKNSt10filesystem7__cxx114pathERKSt6vectorINS_10CaseResultESaIS6_EE.cold store.cpp _ZN4loam12_GLOBAL__N_15splitERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE _ZN4loam12_GLOBAL__N_15splitERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE.cold _ZN4loam10load_storeERKNSt10filesystem7__cxx114pathE.cold _ZN4loam8run_caseERKNS_8CaseSpecE.cold crtstuff.c deregister_tm_clones __do_global_dtors_aux completed.0 __do_global_dtors_aux_fini_array_entry frame_dummy __frame_dummy_init_array_entry veil.cpp bay.cpp rill.cpp row.cpp __FRAME_END__ __GNU_EH_FRAME_HDR _DYNAMIC _GLOBAL_OFFSET_TABLE_ _ZNSo3putEc@GLIBCXX_3.4 _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE10_M_disposeEv __errno_location@GLIBC_2.2.5 _ZNSt10unique_ptrINSt10filesystem7__cxx114path5_List5_ImplENS3_13_Impl_deleterEED1Ev _ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE24_M_release_last_use_coldEv strtoll@GLIBC_2.2.5 _ZTVSt9basic_iosIcSt11char_traitsIcEE@GLIBCXX_3.4 _ZN4loam10load_storeERKNSt10filesystem7__cxx114pathE _ZNSt13basic_filebufIcSt11char_traitsIcEE5closeEv@GLIBCXX_3.4 _ZNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEED1Ev@GLIBCXX_3.4.21 _ZNSt6vectorIN4loam10CaseResultESaIS1_EED2Ev _edata _ZNSt14basic_ifstreamIcSt11char_traitsIcEED1Ev@GLIBCXX_3.4 _ZNKSt10filesystem7__cxx114path5_List13_Impl_deleterclEPNS2_5_ImplE@GLIBCXX_3.4.26 _ZNSt10filesystem7__cxx114path5_ListC1Ev@GLIBCXX_3.4.26 fork@GLIBC_2.2.5 _ZNSt8ios_baseC2Ev@GLIBCXX_3.4 _ZNSt15_Sp_counted_ptrIDnLN9__gnu_cxx12_Lock_policyE2EE10_M_disposeEv strtoul@GLIBC_2.2.5 _ZN4loam8CaseSpecD1Ev _ZNSt8ios_baseD2Ev@GLIBCXX_3.4 _ZNSt10filesystem7__cxx1118directory_iteratorppEv@GLIBCXX_3.4.26 _IO_stdin_used _ZSt17__throw_bad_allocv@GLIBCXX_3.4 _ZNSt6vectorIN4loam4CellESaIS1_EE17_M_realloc_insertIJS1_EEEvN9__gnu_cxx17__normal_iteratorIPS1_S3_EEDpOT_ _ZNSt10filesystem6statusERKNS_7__cxx114pathE@GLIBCXX_3.4.26 _ZNSt13runtime_errorC1EPKc@GLIBCXX_3.4.21 _ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE10_M_destroyEv _ZN4loam8walk_rowERKNS_4SlabERKNS_5ProbeERKNS_4GateE __cxa_begin_catch@CXXABI_1.3 _ZNKSt10filesystem7__cxx114path17_M_find_extensionEv@GLIBCXX_3.4.26 strlen@GLIBC_2.2.5 memcmp@GLIBC_2.2.5 _ZN4loam7sweep_eERKNS_5TallyES2_ _ZNSt10unique_ptrINSt10filesystem7__cxx114path5_List5_ImplENS3_13_Impl_deleterEED2Ev _ZNKSt10filesystem7__cxx114path15has_parent_pathEv@GLIBCXX_3.4.26 main __cxa_allocate_exception@CXXABI_1.3 _ZSt20__throw_length_errorPKc@GLIBCXX_3.4 memset@GLIBC_2.2.5 _ZN4loam4SlabD2Ev __dso_handle _ZNSt6vectorIN4loam10CaseResultESaIS1_EE17_M_realloc_insertIJS1_EEEvN9__gnu_cxx17__normal_iteratorIPS1_S3_EEDpOT_ _ZNSt6vectorIN4loam10CaseResultESaIS1_EED1Ev _ZSt24__throw_invalid_argumentPKc@GLIBCXX_3.4 _ZN4loam10digest_hexERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE _ZTVSt15basic_streambufIcSt11char_traitsIcEE@GLIBCXX_3.4 _ZNSt10filesystem18create_directoriesERKNS_7__cxx114pathE@GLIBCXX_3.4.26 _ZNSo9_M_insertImEERSoT_@GLIBCXX_3.4.9 _ZSt19__throw_logic_errorPKc@GLIBCXX_3.4 __cxa_free_exception@CXXABI_1.3 _ZNSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EED2Ev _fini __libc_start_main@GLIBC_2.34 _ZTTSt14basic_ofstreamIcSt11char_traitsIcEE@GLIBCXX_3.4 _dl_relocate_static_pie _ZN4loam6turn_dB5cxx11ERKNS_4GateERKNS_5ProbeE _ZNSt10filesystem7__cxx114path14_M_split_cmptsEv@GLIBCXX_3.4.26 waitpid@GLIBC_2.2.5 _ZNSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE10_M_releaseEv _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE10_M_replaceEmmPKcm memcpy@GLIBC_2.14 _ZNKSt5ctypeIcE8do_widenEc _ZNSt6vectorIN4loam8CaseSpecESaIS1_EED2Ev _ZNSt13basic_filebufIcSt11char_traitsIcEE4openEPKcSt13_Ios_Openmode@GLIBCXX_3.4 _ZN4loam9lane_nameB5cxx11ENS_4LaneE _ZNKSt10filesystem7__cxx114path7compareERKS1_@GLIBCXX_3.4.26 _ZNSt6vectorINSt10filesystem7__cxx114pathESaIS2_EE17_M_realloc_insertIJRKS2_EEEvN9__gnu_cxx17__normal_iteratorIPS2_S4_EEDpOT_ _ZNSo9_M_insertIlEERSoT_@GLIBCXX_3.4.9 _ZTVNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEE@GLIBCXX_3.4.21 _ZTVSt14basic_ifstreamIcSt11char_traitsIcEE@GLIBCXX_3.4 _ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc@GLIBCXX_3.4 _ZN9__gnu_cxx6__stoaImmcJiEEET0_PFT_PKT1_PPS3_DpT2_EPKcS5_PmS9_ _Znwm@GLIBCXX_3.4 _ZdlPvm@CXXABI_1.3.9 _ZNSt13runtime_errorD1Ev@GLIBCXX_3.4 _ZNSt13basic_filebufIcSt11char_traitsIcEEC1Ev@GLIBCXX_3.4 _ZN9__gnu_cxx6__stoaIxxcJiEEET0_PFT_PKT1_PPS3_DpT2_EPKcS5_PmS9_ _ZTTNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEE@GLIBCXX_3.4.21 memchr@GLIBC_2.2.5 _init _ZSt9iter_swapIN9__gnu_cxx17__normal_iteratorIPNSt10filesystem7__cxx114pathESt6vectorIS4_SaIS4_EEEES9_EvT_T0_ __TMC_END__ _ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l@GLIBCXX_3.4.9 _ZNKSt5ctypeIcE13_M_widen_initEv@GLIBCXX_3.4.11 _ZN4loam4SlabD1Ev _ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_c@GLIBCXX_3.4 _ZN4loam8run_caseERKNS_8CaseSpecE _ZNSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EE17_M_realloc_insertIJRKS5_EEEvN9__gnu_cxx17__normal_iteratorIPS5_S7_EEDpOT_ _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1EPKcmRKS3_ execl@GLIBC_2.2.5 _ZSt16__throw_bad_castv@GLIBCXX_3.4 __libc_single_threaded@GLIBC_2.32 _ZSt4cout@GLIBCXX_3.4 _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC1IS3_EEPKcRKS3_ strtoull@GLIBC_2.2.5 _ZNSt9basic_iosIcSt11char_traitsIcEE4initEPSt15basic_streambufIcS1_E@GLIBCXX_3.4 _ZNSt6vectorIN4loam8CaseSpecESaIS1_EED1Ev __data_start _ZNSt6vectorIN4loam4SlabESaIS1_EED1Ev _ZN4loam10load_casesERKNSt10filesystem7__cxx114pathE _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE9_M_mutateEmmPKcm _end _ZNSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EED1Ev _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE15_M_replace_coldEPcmPKcmm@GLIBCXX_3.4.31 _ZNSt6localeD1Ev@GLIBCXX_3.4 _ZN4loam6turn_bERKNS_4SlabERKNS_5ProbeE _ZN4loam7sweep_cERKNS_4SlabERKNS_5ProbeERKNS_4GateE _ZSt20__throw_out_of_rangePKc@GLIBCXX_3.4 __cxa_rethrow@CXXABI_1.3 _ZNSt14basic_ofstreamIcSt11char_traitsIcEED1Ev@GLIBCXX_3.4 _ZNSt10filesystem7__cxx114pathC1IPcS1_EERKT_NS1_6formatE __bss_start _ZSt24__throw_out_of_range_fmtPKcz@GLIBCXX_3.4.20 _ZTVSt13basic_filebufIcSt11char_traitsIcEE@GLIBCXX_3.4 _ZTVSt14basic_ofstreamIcSt11char_traitsIcEE@GLIBCXX_3.4 _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE7replaceEmmPKcm _ZNSt13basic_filebufIcSt11char_traitsIcEED1Ev@GLIBCXX_3.4 _ZSt21ios_base_library_initv@GLIBCXX_3.4.32 _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC2EPKcmRKS3_ _ZNSt13runtime_errorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE@GLIBCXX_3.4.21 memmove@GLIBC_2.2.5 _exit@GLIBC_2.2.5 __cxa_end_catch@CXXABI_1.3 __gxx_personality_v0@CXXABI_1.3 _ZStplIcSt11char_traitsIcESaIcEENSt7__cxx1112basic_stringIT_T0_T1_EEPKS5_OS8_ _ZNSt9basic_iosIcSt11char_traitsIcEE5clearESt12_Ios_Iostate@GLIBCXX_3.4 _ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEC2IS3_EEPKcRKS3_ __cxa_throw@CXXABI_1.3 _ZNSolsEi@GLIBCXX_3.4 _ZNSt6vectorIN4loam10CaseResultESaIS1_EE7reserveEm _ZNSt10filesystem7__cxx1118directory_iteratorC1ERKNS0_4pathENS_17directory_optionsEPSt10error_code@GLIBCXX_3.4.26 _ZNSt6vectorIN4loam4SlabESaIS1_EED2Ev _Unwind_Resume@GCC_3.0 _ZN4loam12write_reportERKNSt10filesystem7__cxx114pathERKSt6vectorINS_10CaseResultESaIS6_EE _ZNKSt10filesystem7__cxx1118directory_iteratordeEv@GLIBCXX_3.4.26 _ZSt7getlineIcSt11char_traitsIcESaIcEERSt13basic_istreamIT_T0_ES7_RNSt7__cxx1112basic_stringIS4_S5_T1_EES4_@GLIBCXX_3.4.21 _ZNSt12__basic_fileIcED1Ev@GLIBCXX_3.4 _ZN4loam8CaseSpecD2Ev _ZTISt9exception@GLIBCXX_3.4 __gmon_start__ _ZNKSt10filesystem7__cxx114path11parent_pathEv@GLIBCXX_3.4.26 _ZNSt10filesystem7__cxx114pathC2IPcS1_EERKT_NS1_6formatE _ZN9__gnu_cxx6__stoaIyycJiEEET0_PFT_PKT1_PPS3_DpT2_EPKcS5_PmS9_ _ZSt4cerr@GLIBCXX_3.4 _ZNSt10filesystem7__cxx114path5_ListC1ERKS2_@GLIBCXX_3.4.26 _ZTTSt14basic_ifstreamIcSt11char_traitsIcEE@GLIBCXX_3.4 _ZTISt13runtime_error@GLIBCXX_3.4 _ZTVNSt7__cxx1115basic_stringbufIcSt11char_traitsIcESaIcEEE@GLIBCXX_3.4.21 _ZSteqIcSt11char_traitsIcESaIcEEbRKNSt7__cxx1112basic_stringIT_T0_T1_EEPKS5_ _ZNSt6localeC1Ev@GLIBCXX_3.4  .symtab .strtab .shstrtab .interp .note.gnu.property .note.ABI-tag .gnu.hash .dynsym .dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt .init .text .fini .rodata .eh_frame_hdr .eh_frame .gcc_except_table .init_array .fini_array .data.rel.ro .dynamic .got .got.plt .data .bss .comment                                                                              @                                         #             8@     8                                     6             X@     X                                     H             x@     x      ˜                           D   öÿÿo       @           à                             N             ğ@     ğ      	                          V             @           u                             ^   ÿÿÿo       ~@     ~      Â                            k   şÿÿo       @@     @                                  z             ` @     `       ˜                           „      B       ø!@     ø!      ¨                                        0@      0                                    ‰              0@      0      €                            ”              4@      4      ¨Ê                             š             Hÿ@     Hÿ      	                                              A                                         ¨             A          ä                             ¶             øA     ø     Ü                             À             ÔA     Ô     k                             Ò             *A                                       Ş             ˜*A     ˜                                  ê              *A                                         ÷             ¸-A     ¸                                             È/A     È                                              è/A     è     P                                        82A     8"                                               €2A     H"     x              @                    0               H"                                                        `"     0         )                 	                      4     #                                                   ®W     "                             [?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/Makefile /app/cpp/Makefile
+[?2004l.PHONY: all clean
+
+all:
+	./tools/build-all
+
+clean:
+	$(MAKE) -C cpp clean
+	rm -rf rust/target bin
+CXX ?= g++
+CXXFLAGS ?= -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude
+LDFLAGS ?=
+
+SOURCES := $(shell find src -type f -name '*.cpp' | sort)
+OBJECTS := $(patsubst src/%.cpp,build/%.o,$(SOURCES))
+TARGET := build/loam
+
+.PHONY: all clean
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) $(LDFLAGS) -o $@
+
+build/%.o: src/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+clean:
+	rm -rf build
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/tools/build-all 2>&1 | tail -20
+[?2004l  |
+2 | pub(crate) const RUNE_FIXED: u8 = 1;
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `loam-ingest` (bin "loam-ingest") generated 2 warnings
+    Finished release [optimized] target(s) in 1.10s
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o build/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json; echo EXIT:$?
+[?2004lEXIT:0
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/output/audit.json
+[?2004l{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_skip","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_full","row_count":4,"sum_amount":460,"pages_total":3,"pages_read":3,"path":"row","skipping":false},{"case_id":"h_region","row_count":3,"sum_amount":430,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"m_range","row_count":2,"sum_amount":70,"pages_total":4,"pages_read":1,"path":"row","skipping":true},{"case_id":"m_narrow","row_count":0,"sum_amount":0,"pages_total":4,"pages_read":0,"path":"row","skipping":true},{"case_id":"m_null","row_count":1,"sum_amount":0,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_interact","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":1,"path":"batch","skipping":true},{"case_id":"m_neg","row_count":1,"sum_amount":-5,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"m_all","row_count":11,"sum_amount":1096,"pages_total":4,"pages_read":4,"path":"batch","skipping":false},{"case_id":"v_window","row_count":4,"sum_amount":132,"pages_total":3,"pages_read":3,"path":"row","skipping":true},{"case_id":"v_missing","row_count":1,"sum_amount":0,"pages_total":3,"pages_read":1,"path":"batch","skipping":true},{"case_id":"v_check","row_count":1,"sum_amount":0,"pages_total":3,"pages_read":1,"path":"row","skipping":true},{"case_id":"v_full","row_count":2,"sum_amount":0,"pages_total":3,"pages_read":3,"path":"row","skipping":false}],"digest":"386f5d5d6e94d3e9"}
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat -A /app/data/archive/mixed.store
+[?2004lH|2$
+P|0|2|100|100|1|east|west|4$
+R|1|0|-999|east$
+R|1|2|10|east$
+R|1|2|20|west$
+R|0|2|777|west$
+P|1|3|30|600|0|north|south|4$
+R|1|2|30|north$
+R|1|2|40|north$
+R|1|2|500|south$
+R|1|2|600|south$
+P|2|3|-5|-5|0|central|central|1$
+R|1|2|-5|central$
+P|3|3|200|400|0|east|west|3$
+R|1|2|200|east$
+R|1|2|300|north$
+R|1|2|400|west$
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# echo '---VAULT---'; cat -A /app/data/archive/vault.store
+[?2004l---VAULT---
+H|2$
+P|0|2|5|30|0|north|west|4$
+R|1|2|5|east$
+R|1|0|12|east$
+R|1|2|18|west$
+R|1|2|30|west$
+P|1|3|40|70|0|north|south|4$
+R|1|2|40|north$
+R|1|2|55|north$
+R|1|2|63|south$
+R|1|2|70|south$
+P|2|2|-20|90|1|central|east|3$
+R|1|2|-20|central$
+R|0|2|90|east$
+R|1|2|44|east$
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat -A /app/data/archive/current.store
+[?2004lH|3$
+P|0|3|-999|20|1|east|west|4$
+R|1|2|-999|east$
+R|0|2|777|west$
+R|1|2|10|east$
+R|1|2|20|west$
+P|1|3|100|130|0|north|south|4$
+R|1|2|100|north$
+R|1|2|110|north$
+R|1|2|120|south$
+R|1|2|130|south$
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# echo '---HEALTHY---'; cat -A /app/data/archive/healthy.store
+[?2004l---HEALTHY---
+H|3$
+P|0|3|0|30|0|east|west|4$
+R|1|2|0|east$
+R|1|2|10|east$
+R|1|2|20|west$
+R|1|2|30|west$
+P|1|3|100|130|0|north|south|4$
+R|1|2|100|north$
+R|1|2|110|north$
+R|1|2|120|south$
+R|1|2|130|south$
+P|2|3|200|230|0|central|west|4$
+R|1|2|200|central$
+R|1|2|210|east$
+R|1|2|220|north$
+R|1|2|230|west$
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat > /app/cpp/src/lattice/rill.cpp << 'EOF'
+[?2004l[?2004h> #include "loam/exec.hpp"
+[?2004l[?2004h> 
+[?2004l[?2004h> #include <cstddef>
+[?2004l[?2004h> #include <cstdint>
+[?2004l[?2004h> #include <vector>
+[?2004l[?2004h> 
+[?2004l[?2004h> namespace loam {
+[?2004l[?2004h> namespace {
+[?2004l[?2004h> 
+[?2004l[?2004h> bool lane_live(std::uint8_t origin, std::uint8_t present) {
+[?2004l[?2004h>     if (origin == static_cast<std::uint8_t>(Origin::Retired)) {
+[?2004l[?2004h>         return false;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if (origin == static_cast<std::uint8_t>(Origin::Inherited)) {
+[?2004l[?2004h>         return true;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return present != 0;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> }  // namespace
+[?2004l[?2004h> 
+[?2004l[?2004h> Tally sweep_c(const Slab& a, const Probe& b, const Gate& c) {
+[?2004l[?2004h>     Tally tally;
+[?2004l[?2004h>     if (!c.read) {
+[?2004l[?2004h>         return tally;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     tally.pages_read = 1;
+[?2004l[?2004h> 
+[?2004l[?2004h>     const std::size_t count = a.amount_lane.size();
+[?2004l[?2004h>     std::vector<unsigned char> admit(count, 0);
+[?2004l[?2004h>     for (std::size_t i = 0; i < count; ++i) {
+[?2004l[?2004h>         admit[i] = lane_live(a.origin_lane[i], a.presence_lane[i]) ? 1 : 0;
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     if (b.op == Op::IsNull) {
+[?2004l[?2004h>         for (std::size_t i = 0; i < count; ++i) {
+[?2004l[?2004h>             if (admit[i] == 0) {
+[?2004l[?2004h>                 ++tally.row_count;
+[?2004l[?2004h>             }
+[?2004l[?2004h>         }
+[?2004l[?2004h>         return tally;
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     for (std::size_t i = 0; i < count; ++i) {
+[?2004l[?2004h>         if (admit[i] == 0) {
+[?2004l[?2004h>             continue;
+[?2004l[?2004h>         }
+[?2004l[?2004h>         bool keep = false;
+[?2004l[?2004h>         switch (b.op) {
+[?2004l[?2004h>             case Op::All:
+[?2004l[?2004h>                 keep = true;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>             case Op::Equal:
+[?2004l[?2004h>                 keep = a.amount_lane[i] == b.x;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>             case Op::Range:
+[?2004l[?2004h>                 keep = a.amount_lane[i] >= b.x && a.amount_lane[i] <= b.y;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>             case Op::IsNull:
+[?2004l[?2004h>                 keep = false;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>             case Op::RegionEqual:
+[?2004l[?2004h>                 keep = a.region_lane[i] == b.text;
+[?2004l[?2004h>                 break;
+[?2004l[?2004h>         }
+[?2004l[?2004h>         if (keep) {
+[?2004l[?2004h>             ++tally.row_count;
+[?2004l[?2004h>             tally.sum_amount += a.amount_lane[i];
+[?2004l[?2004h>         }
+[?2004l[?2004h>     }
+[?2004l[?2004h>     return tally;
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> }  // namespace loam
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat > /app/rust/src/ember/fold.rs << 'EOF'
+[?2004l[?2004h> use crate::model::{FoldErr, Mark};
+[?2004l[?2004h> 
+[?2004l[?2004h> // Origin lane encoding (mirrors the reader): 0 = Retired, 1 = Inherited, 2 = Current.
+[?2004l[?2004h> const ORIGIN_RETIRED: u8 = 0;
+[?2004l[?2004h> const ORIGIN_INHERITED: u8 = 1;
+[?2004l[?2004h> 
+[?2004l[?2004h> fn is_live(origin: u8, present: u8) -> bool {
+[?2004l[?2004h>     if origin == ORIGIN_RETIRED {
+[?2004l[?2004h>         return false;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if origin == ORIGIN_INHERITED {
+[?2004l[?2004h>         return true;
+[?2004l[?2004h>     }
+[?2004l[?2004h>     present != 0
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004l[?2004h> pub(crate) fn tilt_a(a: &[i64], b: &[u8], c: &[u8]) -> Result<Mark, FoldErr> {
+[?2004l[?2004h>     if a.is_empty() {
+[?2004l[?2004h>         return Err(FoldErr::Empty);
+[?2004l[?2004h>     }
+[?2004l[?2004h>     if a.len() != b.len() || a.len() != c.len() {
+[?2004l[?2004h>         return Err(FoldErr::Shape);
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     let mut low: Option<i64> = None;
+[?2004l[?2004h>     let mut high: Option<i64> = None;
+[?2004l[?2004h>     let mut has_absent = false;
+[?2004l[?2004h>     for ((value, present), origin) in a.iter().zip(b.iter()).zip(c.iter()) {
+[?2004l[?2004h>         if is_live(*origin, *present) {
+[?2004l[?2004h>             low = Some(match low {
+[?2004l[?2004h>                 Some(current) => current.min(*value),
+[?2004l[?2004h>                 None => *value,
+[?2004l[?2004h>             });
+[?2004l[?2004h>             high = Some(match high {
+[?2004l[?2004h>                 Some(current) => current.max(*value),
+[?2004l[?2004h>                 None => *value,
+[?2004l[?2004h>             });
+[?2004l[?2004h>         } else {
+[?2004l[?2004h>             has_absent = true;
+[?2004l[?2004h>         }
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l[?2004h>     match (low, high) {
+[?2004l[?2004h>         (Some(low), Some(high)) => Ok(Mark {
+[?2004l[?2004h>             low,
+[?2004l[?2004h>             high,
+[?2004l[?2004h>             has_absent,
+[?2004l[?2004h>         }),
+[?2004l[?2004h>         _ => Ok(Mark {
+[?2004l[?2004h>             low: 0,
+[?2004l[?2004h>             high: 0,
+[?2004l[?2004h>             has_absent: true,
+[?2004l[?2004h>         }),
+[?2004l[?2004h>     }
+[?2004l[?2004h> }
+[?2004l[?2004h> EOF
+[?2004l[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/tools/build-all 2>&1 | tail -5
+[?2004lg++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o build/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json; echo EXIT:$?
+[?2004lEXIT:0
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/output/audit.json | python3 -m json.tool
+[?2004l{
+    "status": "complete",
+    "cases": [
+        {
+            "case_id": "c_legit",
+            "row_count": 1,
+            "sum_amount": -999,
+            "pages_total": 2,
+            "pages_read": 1,
+            "path": "batch",
+            "skipping": true
+        },
+        {
+            "case_id": "h_skip",
+            "row_count": 4,
+            "sum_amount": 460,
+            "pages_total": 3,
+            "pages_read": 1,
+            "path": "batch",
+            "skipping": true
+        },
+        {
+            "case_id": "h_full",
+            "row_count": 4,
+            "sum_amount": 460,
+            "pages_total": 3,
+            "pages_read": 3,
+            "path": "row",
+            "skipping": false
+        },
+        {
+            "case_id": "h_region",
+            "row_count": 3,
+            "sum_amount": 430,
+            "pages_total": 3,
+            "pages_read": 3,
+            "path": "row",
+            "skipping": true
+        },
+        {
+            "case_id": "m_range",
+            "row_count": 2,
+            "sum_amount": 70,
+            "pages_total": 4,
+            "pages_read": 1,
+            "path": "row",
+            "skipping": true
+        },
+        {
+            "case_id": "m_narrow",
+            "row_count": 0,
+            "sum_amount": 0,
+            "pages_total": 4,
+            "pages_read": 0,
+            "path": "row",
+            "skipping": true
+        },
+        {
+            "case_id": "m_null",
+            "row_count": 2,
+            "sum_amount": 0,
+            "pages_total": 4,
+            "pages_read": 4,
+            "path": "batch",
+            "skipping": false
+        },
+        {
+            "case_id": "m_interact",
+            "row_count": 1,
+            "sum_amount": -5,
+            "pages_total": 4,
+            "pages_read": 1,
+            "path": "batch",
+            "skipping": true
+        },
+        {
+            "case_id": "m_neg",
+            "row_count": 1,
+            "sum_amount": -5,
+            "pages_total": 4,
+            "pages_read": 4,
+            "path": "batch",
+            "skipping": false
+        },
+        {
+            "case_id": "m_all",
+            "row_count": 10,
+            "sum_amount": 2095,
+            "pages_total": 4,
+            "pages_read": 4,
+            "path": "batch",
+            "skipping": false
+        },
+        {
+            "case_id": "v_window",
+            "row_count": 4,
+            "sum_amount": 132,
+            "pages_total": 3,
+            "pages_read": 3,
+            "path": "row",
+            "skipping": true
+        },
+        {
+            "case_id": "v_missing",
+            "row_count": 1,
+            "sum_amount": 0,
+            "pages_total": 3,
+            "pages_read": 1,
+            "path": "batch",
+            "skipping": true
+        },
+        {
+            "case_id": "v_check",
+            "row_count": 1,
+            "sum_amount": 0,
+            "pages_total": 3,
+            "pages_read": 1,
+            "path": "row",
+            "skipping": true
+        },
+        {
+            "case_id": "v_full",
+            "row_count": 2,
+            "sum_amount": 0,
+            "pages_total": 3,
+            "pages_read": 3,
+            "path": "row",
+            "skipping": false
+        }
+    ],
+    "digest": "9afb5931d59cd42b"
+}
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam audit /app/data/cases /app/output/a1.json; /app/bin/loam audit /app/data/cases /app/output/a2.json; diff /app/output/a1.json /app/output/a2.json && echo IDENTICAL
+[?2004lIDENTICAL
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/data/fresh/orders_a.csv
+[?2004lorigin,presence,amount,region
+0,1,-999,east
+2,1,10,east
+2,1,20,west
+2,1,30,west
+2,1,100,north
+2,0,555,north
+2,1,120,south
+2,1,130,south
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/store_a; echo EXIT:$?
+[?2004ljobs=1 cells=8 bytes=182
+EXIT:0
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat -A /tmp/store_a/data.store
+[?2004lH|3$
+P|0|3|10|30|1|east|west|4$
+R|1|0|-999|east$
+R|1|2|10|east$
+R|1|2|20|west$
+R|1|2|30|west$
+P|1|3|100|130|1|north|south|4$
+R|1|2|100|north$
+R|0|2|555|north$
+R|1|2|120|south$
+R|1|2|130|south$
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# cat /app/data/fresh/orders_b.csv; echo '---C---'; cat /app/data/fresh/orders_c.csv
+[?2004lorigin,presence,amount,region
+2,1,-999,east
+2,1,5,east
+2,0,777,west
+2,1,15,west
+0,1,-999,north
+2,1,200,north
+2,1,210,south
+2,1,220,south
+---C---
+origin,presence,amount,region
+2,1,-999,east
+2,1,8,east
+2,1,21,west
+2,1,34,west
+0,1,301,north
+2,0,317,north
+0,0,329,south
+0,1,343,south
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam ingest /app/data/fresh/orders_b.csv /tmp/store_b; cat -A /tmp/store_b/data.store
+[?2004ljobs=1 cells=8 bytes=185
+H|3$
+P|0|3|-999|15|1|east|west|4$
+R|1|2|-999|east$
+R|1|2|5|east$
+R|0|2|777|west$
+R|1|2|15|west$
+P|1|3|200|220|1|north|south|4$
+R|1|0|-999|north$
+R|1|2|200|north$
+R|1|2|210|south$
+R|1|2|220|south$
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam ingest /app/data/fresh/orders_c.csv /tmp/store_c; cat -A /tmp/store_c/data.store
+[?2004ljobs=1 cells=8 bytes=179
+H|3$
+P|0|3|-999|34|0|east|west|4$
+R|1|2|-999|east$
+R|1|2|8|east$
+R|1|2|21|west$
+R|1|2|34|west$
+P|1|3|0|0|1|north|south|4$
+R|1|0|301|north$
+R|0|2|317|north$
+R|0|0|329|south$
+R|1|0|343|south$
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# mkdir -p /tmp/tc; printf '# hdr\nfb_row|/tmp/store_b/data.store|all|0|0|row|0|x\nfb_bat|/tmp/store_b/data.store|all|0|0|batch|0|x\nfb_rng_r|/tmp/store_b/data.store|range|0|300|row|1|x\nfb_rng_b|/tmp/store_b/data.store|range|0|300|batch|1|x\nfc_null_r|/tmp/store_c/data.store|isnull|0|0|row|0|x\nfc_null_b|/tmp/store_c/data.store|isnull|0|0|batch|0|x\n' > /tmp/tc/t.case
+[?2004l[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam audit /tmp/tc /tmp/tc/out.json; python3 -c "import json;d=json.load(open('/tmp/tc/out.json'));[print(c['case_id'],c['row_count'],c['sum_amount'],c['pages_read'],c['pages_total'],c['path']) for c in d['cases']]"
+[?2004lfb_row 6 -349 2 2 row
+fb_bat 6 -349 2 2 batch
+fb_rng_r 5 650 2 2 row
+fb_rng_b 5 650 2 2 batch
+fc_null_r 4 0 2 2 row
+fc_null_b 4 0 2 2 batch
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/s1 2>/dev/null; /app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/s2 2>/dev/null; diff /tmp/s1/data.store /tmp/s2/data.store && echo INGEST_IDENTICAL
+[?2004lINGEST_IDENTICAL
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# rm -rf /tmp/store_a /tmp/store_b /tmp/store_c /tmp/tc /tmp/s1 /tmp/s2 /app/output/a1.json /app/output/a2.json
+[?2004l[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/tools/build-all 2>&1 | tail -3
+[?2004lg++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o build/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json; echo EXIT:$?; head -c 200 /app/output/audit.json; echo
+[?2004lEXIT:0
+{"status":"complete","cases":[{"case_id":"c_legit","row_count":1,"sum_amount":-999,"pages_total":2,"pages_read":1,"path":"batch","skipping":true},{"case_id":"h_skip","row_count":4,"sum_amount":460,"pa
+[?2004hroot@50e6e43b-7274-4d6c-9364-8f2f0de5585a:/app# 

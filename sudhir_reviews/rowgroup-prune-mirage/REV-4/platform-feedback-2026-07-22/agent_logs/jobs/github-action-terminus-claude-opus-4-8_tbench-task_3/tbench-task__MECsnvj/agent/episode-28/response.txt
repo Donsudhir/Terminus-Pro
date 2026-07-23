@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "I've completed all fixes and validated them thoroughly:\n1. cpp/src/lattice/rill.cpp - batch reader now uses the same is_live rule as the row reader (origin-aware), fixing the disagreement on mixed-generation stores with varied origin lanes.\n2. cpp/src/harbor/veil.cpp - skip fast path no longer trusts legacy (gen<3) slab markers that carry non-live amounts/unreliable has_absent, so selective and full reads agree while gen-3 skipping is preserved.\n3. rust/src/ember/fold.rs - fresh ingest markers now span only live amounts with faithful has_absent, including the all-non-live 0/0/true edge case.\n\nValidated: equivalent modes agree on row_count and sum_amount across all cases, healthy selective controls still skip (pages_read<pages_total), audit is byte-identical/deterministic with status=complete, cases, digest, archive stores are unchanged, and both fast paths remain in use.",
+  "plan": "Task is complete.",
+  "commands": [],
+  "task_complete": true
+}
+```

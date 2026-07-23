@@ -1,0 +1,84 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.2, pytest-8.4.1, pluggy-1.6.0
+cachedir: /tmp/pytest_cache
+rootdir: /tests
+plugins: json-ctrf-0.3.5
+collected 15 items
+
+test_outputs.py .............F.                                          [100%]
+
+=================================== FAILURES ===================================
+___________________________________ test_p14 ___________________________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-0/test_p140')
+
+    def test_p14(tmp_path: Path) -> None:
+        """Selective text-code probes stay complete on neighboring generations."""
+        row = _run_case(tmp_path, "p14", VAULT, "region_eq", "east", 0, "row", True)
+>       _assert_tally(row, 2, 49)
+
+test_outputs.py:255: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+row = {'case_id': 'p14', 'pages_read': 1, 'pages_total': 3, 'path': 'row', ...}
+count = 2, total = 49
+
+    def _assert_tally(row: dict, count: int, total: int) -> None:
+>       assert row["row_count"] == count
+E       assert 1 == 2
+
+test_outputs.py:136: AssertionError
+==================================== PASSES ====================================
+___________________________________ test_p01 ___________________________________
+---------------------------- Captured stdout setup -----------------------------
+make: Entering directory '/app/cpp'
+rm -rf build
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/digest.cpp -o build/digest.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/pale.cpp -o build/harbor/pale.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/harbor/veil.cpp -o build/harbor/veil.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/bay.cpp -o build/lattice/bay.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/lattice/rill.cpp -o build/lattice/rill.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/main.cpp -o build/main.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/parse.cpp -o build/parse.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/report.cpp -o build/report.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/row.cpp -o build/row.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude -c src/store.cpp -o build/store.o
+g++ -std=c++20 -O2 -Wall -Wextra -Wpedantic -Werror -Iinclude build/digest.o build/harbor/pale.o build/harbor/veil.o build/lattice/bay.o build/lattice/rill.o build/main.o build/parse.o build/report.o build/row.o build/store.o  -o build/loam
+make: Leaving directory '/app/cpp'
+---------------------------- Captured stderr setup -----------------------------
+    Finished release [optimized] target(s) in 0.00s
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+___________________________________ test_p03 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+___________________________________ test_p05 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+___________________________________ test_p07 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=185
+___________________________________ test_p10 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=8 bytes=182
+jobs=1 cells=8 bytes=182
+___________________________________ test_p15 ___________________________________
+----------------------------- Captured stderr call -----------------------------
+jobs=1 cells=12 bytes=265
+=========================== short test summary info ============================
+PASSED test_outputs.py::test_p01
+PASSED test_outputs.py::test_p02
+PASSED test_outputs.py::test_p03
+PASSED test_outputs.py::test_p04
+PASSED test_outputs.py::test_p05
+PASSED test_outputs.py::test_p06
+PASSED test_outputs.py::test_p07
+PASSED test_outputs.py::test_p08
+PASSED test_outputs.py::test_p09
+PASSED test_outputs.py::test_p10
+PASSED test_outputs.py::test_p11
+PASSED test_outputs.py::test_p12
+PASSED test_outputs.py::test_p13
+PASSED test_outputs.py::test_p15
+FAILED test_outputs.py::test_p14 - assert 1 == 2
+========================= 1 failed, 14 passed in 5.55s =========================

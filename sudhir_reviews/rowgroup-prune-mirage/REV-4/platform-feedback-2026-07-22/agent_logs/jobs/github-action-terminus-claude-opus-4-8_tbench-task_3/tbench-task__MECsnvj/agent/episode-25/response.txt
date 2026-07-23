@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "All fresh-ingest markers are now faithful:\n\norders_c slab0: live {-999,8,21,34} all Current present1 => low=-999,high=34,has_absent=false. Output P|0|3|-999|34|0. Correct (note -999 here is a legitimate live Current amount).\norders_c slab1: all non-live (301 Retired, 317 Current-present0, 329 Retired, 343 Retired) => low=0,high=0,has_absent=true. Output P|1|3|0|0|1. Correct!\n\norders_b slab0: live {-999,5,15} (777 Current present0 nonlive) => low=-999,high=15,has_absent=true. Output P|0|3|-999|15|1. Correct!\norders_b slab1: (-999 Retired nonlive), live {200,210,220} => low=200,high=220,has_absent=true. Output P|1|3|200|220|1. Correct!\n\nNow let me confirm the fresh store audits correctly with equivalent modes. Let me create a case file for a fresh store testing row vs batch equivalence, and also do a final validation that archived stores are unchanged (not rewritten).",
+  "plan": "Create a test case dir pointing at the fresh store, running both row and batch on the same probe, verify agreement. Then confirm archived stores untouched.",
+  "commands": [
+    {"keystrokes": "mkdir -p /tmp/fcases; printf 'fa_row|/tmp/store_a/data.store|range|0|200|row|1|x\\nfa_bat|/tmp/store_a/data.store|range|0|200|batch|1|x\\nfa_all_r|/tmp/store_a/data.store|all|0|0|row|0|x\\nfa_all_b|/tmp/store_a/data.store|all|0|0|batch|0|x\\nfa_null_r|/tmp/store_a/data.store|isnull|0|0|row|1|x\\nfa_null_b|/tmp/store_a/data.store|isnull|0|0|batch|1|x\\n' > /tmp/fcases/f.case; /app/bin/loam audit /tmp/fcases /tmp/fout.json; python3 -m json.tool /tmp/fout.json | grep -E 'case_id|row_count|sum_amount|pages_read'\n", "duration": 1.0}
+  ]
+}
+```

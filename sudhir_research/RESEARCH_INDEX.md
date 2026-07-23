@@ -70,3 +70,9 @@ Full uniqueness dossier: `sudhir_research/TASK-RPM-001-RESEARCH.md`.
 ## Community research queue
 
 Recent social and community research is not yet captured. It requires a separate consented setup if browser-authenticated sources are used. The first pass will prioritize public GitHub issues and discussions, official Discord guidance when accessible, task-contribution feedback, common rejection reasons, reproducibility pain points, and what task authors report as the largest time sinks.
+- `TASK-MCOS-001-RESEARCH.md` — mesh-checkpoint-operator-skew uniqueness (2026-07-23)
+- `TASK-DNMH-001-RESEARCH.md` — device-node-migration-haze uniqueness (2026-07-23)
+- `TASK-IRPD-001-RESEARCH.md` — input-ring-physics-desync uniqueness (2026-07-23)
+- `TASK-KCLS-001-RESEARCH.md` — kv-cache-layout-serve-rift uniqueness (2026-07-23)
+- `TASK-ACPR-001-RESEARCH.md` — amg-coarsen-parity-rift uniqueness (2026-07-23)
+- `TASK-DHDR-001-RESEARCH.md` — domain-halo-digest-rift uniqueness (2026-07-23)

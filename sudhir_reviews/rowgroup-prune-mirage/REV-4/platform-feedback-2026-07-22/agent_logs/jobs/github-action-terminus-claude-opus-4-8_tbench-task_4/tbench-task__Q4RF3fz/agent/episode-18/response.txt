@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Build succeeded. Let me run my test cases to verify skip vs no-skip now agree.",
+  "plan": "Run the test probe cases again and check agreement.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam audit /tmp/t /tmp/t/out.json; echo; python3 -c \"import json;d=json.load(open('/tmp/t/out.json'));[print(c['case_id'],c['row_count'],c['sum_amount'],c['pages_read'],c['pages_total']) for c in d['cases']]\"\n", "duration": 1.0}
+  ]
+}
+```

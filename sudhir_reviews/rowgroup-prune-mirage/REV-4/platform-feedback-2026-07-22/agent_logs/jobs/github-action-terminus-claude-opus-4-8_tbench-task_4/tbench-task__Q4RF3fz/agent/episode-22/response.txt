@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Found the ingest bug in tilt_a (fold.rs). It computes low/high over ALL amounts (including non-live), not just live amounts. Per the contract:\n- low/high must span only LIVE amounts\n- has_absent true when any non-live entry present\n- a slab with all non-live records low=0, high=0, has_absent=true\n\nCurrent tilt_a: low/high = min/max over all values regardless of liveness. has_absent = any present==0. This is wrong: (1) it includes non-live amounts in low/high, (2) has_absent only checks present==0, not origin (Retired should count as absent/non-live).\n\nI need the same is_live definition as readers: origin Retired(0)->not live, Inherited(1)->live, Current(2)->present!=0. \n\nLet me check codec.rs to understand how origin/present values map and the RUNE constants.",
+  "plan": "Read codec.rs to confirm CSV parsing and origin encoding.",
+  "commands": [
+    {"keystrokes": "cat /app/rust/src/codec.rs\n", "duration": 0.1},
+    {"keystrokes": "cat /app/data/fresh/orders_a.csv /app/data/fresh/orders_b.csv /app/data/fresh/orders_c.csv\n", "duration": 0.1}
+  ]
+}
+```

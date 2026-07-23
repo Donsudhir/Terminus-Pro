@@ -1,24 +1,24 @@
-# REV-4 reviewer feedback — rowgroup-prune-mirage
+# Platform feedback — rowgroup-prune-mirage (fac356b4) — 2026-07-22
 
-Platform difficulty run for rowgroup-prune-mirage (submission fac356b4, REV-3 zip rowgroup-prune-mirage.zip uploaded 2026-07-20).
+Source: `stb submissions feedback fac356b4-6394-4023-b296-30308827b30e`
+Assignment state: NEEDS_REVISION
+Zip on platform: rowgroup-prune-mirage (folder); difficulty MEDIUM after REV-4 reupload.
 
-Difficulty: TRIVIAL — requires at least MEDIUM.
-Status: Solvable (all tests passed by at least one agent run).
+## Revision Notes (blocking)
 
-Agent performance:
-- terminus-claude-opus-4-8: 100.0% (5/5 runs)
-- terminus-gpt5-5: 100.0% (5/5 runs)
+This task is a banned shape under every honest reading, so it cannot be accepted as is. The instruction says to repair the system, and environment/cpp/src/harbor/veil.cpp line 20 carries a clear planted bug, the ternary reads b.op == Op::Equal ? b.x : b.x with both branches identical, which is debugging. Beyond that seeded defect the three supplied modules are missing the real mixed-generation logic, so the oracle rewrites environment/rust/src/ember/fold.rs, veil.cpp and environment/cpp/src/lattice/rill.cpp to add generation, origin-lane and liveness-marker handling. Building out a query operator and storage engine graded by functional behavior is software-engineering, and the category field is data-processing, all three of which are banned and blocked for net-new submissions. The reward comes from the loam audit output matching expected rows and totals, that is candidate code behavior, not a domain invariant recomputed by an independent oracle. Please redesign this around a genuine reasoning or derivation task with a neutral stub and a domain-invariant verifier, under an active non-banned category. Instruction length, rubric structure, writeups and determinism are otherwise fine.
 
-Reference agents:
-- nop: 0.0% (0/1 runs)
-- oracle: 100.0% (3/3 runs)
+## Difficulty (non-blocking relative to shape)
 
-Failure breakdown: nop 1 other.
+Difficulty: MEDIUM. Solvable. Claude 80% (4/5), GPT-5.5 40% (2/5). Oracle 100%, NOP 0%.
+Instruction sufficiency: FAIL — convergent agent miss on veil.cpp RegionEqual/legacy conservatism (test_p14).
 
-Unit tests: test_p01..test_p12 all 10 passed / 10 runs.
+## QC
 
-Analysis on agent failures: Task Instruction Sufficiency NOT_APPLICABLE (debug output not available).
+All quality_check axes PASS (behavior, schema, file refs, anti-cheat, etc.).
 
-Reviewer feedback panel additionally shows a stale AutoEval Execution Summary: "AutoEval execution failed. Build status: FAILED. Build ID: CodeExecutionEnvironment:57f842c802-4bd9-adef-b8717b350414" — superseded by the populated difficulty run above (CM-004 stale-banner pattern; agent stats exist, so CM-008 applies, not CM-019).
+## Local classification
 
-Action requested by Sudhir: resolve and make the task at least medium or hard.
+Primary blocker: banned shape (debugging flypaper + SE/query-engine construction + data-processing category + functional/candidate-code grading). Not a small instruction patch.
+Secondary: remove identical ternary; instruction salience for region_eq if a redesign still keeps this mechanism (unlikely to clear acceptance alone).
+In-flight data-processing exemption does not override the reviewer's shape/verifier redesign demand.

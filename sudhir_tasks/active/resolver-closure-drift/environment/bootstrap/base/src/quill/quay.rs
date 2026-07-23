@@ -39,10 +39,14 @@ pub(crate) fn lace_quay(a: Cairn<Admitted>, b: &Wick) -> Result<Trellis, GraphEr
         parents.entry(right).or_default().push(left);
     }
     let mut nodes = a.nodes;
-    nodes.sort_by_key(|node| node.serial);
-    if b.salt % 2 == 1 {
-        nodes.reverse();
-    }
+    let _ = b.salt;
+    nodes.sort_by(|left, right| {
+        right
+            .key
+            .cmp(&left.key)
+            .then_with(|| right.release.cmp(&left.release))
+            .then_with(|| right.origin.cmp(&left.origin))
+    });
     let rows: Vec<LockRow> = nodes
         .into_iter()
         .map(|node| LockRow {

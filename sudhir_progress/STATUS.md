@@ -1,7 +1,7 @@
 # Current Status
 
-Generated: 2026-07-22T03:00:34Z by `sudhir_task.py board`.
-Generation: `1f2e9872dc25662de295998ba95124236c5aeab28106dc27177a7082a0ff0cef`
+Generated: 2026-07-23T13:29:08Z by `sudhir_task.py board`.
+Generation: `0c255f96a92f4493835bcbbdc2f45d435486443a1996dd3c25f46e36a4b2cc43`
 
 This file is generated from `sudhir_progress/registry.json` in the same
 view transaction as BOARD and IDEA_INDEX. Do not edit it by hand.
@@ -12,15 +12,18 @@ view transaction as BOARD and IDEA_INDEX. Do not edit it by hand.
 | --- | --- | --- | --- |
 | envelope-rotation-shear | Feedback | NEEDS REVISION | Platform rated difficulty MEDIUM; increase hardness or accept and resubmit. |
 | resolver-closure-drift | Feedback | NEEDS REVISION | Platform rated difficulty ?; increase hardness or accept and resubmit. |
-| musl-sysroot-splice | Package/approve | IN REVIEW | Wait for human review outcome |
-| rowgroup-prune-mirage | Package/approve | NEEDS REVISION | Re-upload REV-4 zip + form pastes; wait for difficulty remeasure (≥MEDIUM) |
-| sparse-jacobian-color-contract | Package/approve | NEEDS REVISION | Run oracle 1x + NOP (needs Docker), then review. |
+| rowgroup-prune-mirage | Feedback | NEEDS REVISION | Decide: redesign under allowed category with neutral stub + domain-invariant verifier, or archive and start a new idea. Do not spend another harden-only revision. |
+| sparse-jacobian-color-contract | Feedback | NEEDS REVISION | Platform rated difficulty TRIVIAL; increase hardness or accept and resubmit. |
+| device-node-migration-haze | Package/approve | NOT SUBMITTED | Upload zip to Snorkel; paste REV-2 DSV+RUBRIC. |
+| domain-halo-digest-rift | Package/approve | NOT SUBMITTED | Upload zip to Snorkel; paste REV-1 DSV+RUBRIC |
+| mesh-checkpoint-operator-skew | Package/approve | NOT SUBMITTED | Upload the zip to the Snorkel platform, then `sudhir_task.py phase <slug> submitted`. Store form paste fields with `form-capture` if not already in the REV dossier. |
+| musl-sysroot-splice | Package/approve | NEEDS REVISION | Re-upload sudhir_tasks_ready_to_submit/musl-sysroot-splice.zip to submission 29a821f1; paste REV-3 DSV+RUBRIC |
 | reproducible-reduction-parity | Step 2a | NOT SUBMITTED | Complete Step 2a evidence and obtain GO before construction |
 
 ## Summary
 
-- Active tasks: 7
-- Active ideas: 26
+- Active tasks: 10
+- Active ideas: 36
 - Step 2a: 1
-- Package/approve: 4
-- Feedback: 2
+- Package/approve: 5
+- Feedback: 4

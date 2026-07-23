@@ -1,0 +1,19 @@
+{
+  "analysis": "The fresh ingest inspection shown on screen indicates the Rust marker fix is behaving as intended: low/high now exclude retired and absent non-live rows, and an all-non-live slab records low=0 high=0 has_absent=1. Need confirm build/audit completed successfully and inspect the final bundled audit after C++ changes. Then run a small ad hoc equivalent-mode audit matrix on archived stores to verify selective/full and row/batch agree on answer counters where probes are equivalent, while healthy selective skipping still reads fewer pages.",
+  "plan": "Print the saved audit outputs and compare determinism. Create a temporary case directory with paired row/batch and skipping/full probes for mixed, vault, healthy, and fresh stores. Run audit on those cases and inspect rows/totals/pages_read. This validates both fast paths and archived/fresh behavior without rewriting archived stores.",
+  "commands": [
+    {
+      "keystrokes": "echo '--- bundled audit ---'; cat /app/output/audit.json; echo; echo '--- deterministic cmp ---'; cmp -s /app/output/audit.1.json /app/output/audit.2.json && echo OK || echo MISMATCH\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "rm -rf /app/output/checkcases; mkdir -p /app/output/checkcases\ncat > /app/output/checkcases/equiv.case <<'EOF'\n# id|store|operation|x|y|path|skipping|operator note\nmix_range_row_skip|/app/data/archive/mixed.store|range|10|40|row|1|mixed row selective\nmix_range_batch_full|/app/data/archive/mixed.store|range|10|40|batch|0|mixed batch full\nmix_interact_batch_skip|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed batch selective\nmix_interact_row_full|/app/data/archive/mixed.store|range|-1000|25|row|0|mixed row full\nmix_null_batch_skip|/app/data/archive/mixed.store|isnull|0|0|batch|1|mixed null selective\nmix_null_row_full|/app/data/archive/mixed.store|isnull|0|0|row|0|mixed null full\nmix_all_batch_full|/app/data/archive/mixed.store|all|0|0|batch|0|mixed all batch\nmix_all_row_full|/app/data/archive/mixed.store|all|0|0|row|0|mixed all row\nvault_null_batch_skip|/app/data/archive/vault.store|isnull|0|0|batch|1|vault null selective batch\nvault_null_row_skip|/app/data/archive/vault.store|isnull|0|0|row|1|vault null selective row\nvault_null_row_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault null full\nhealthy_range_batch_skip|/app/data/archive/healthy.store|range|100|130|batch|1|healthy selective\nhealthy_range_row_full|/app/data/archive/healthy.store|range|100|130|row|0|healthy full\nfresh_a_range_row_skip|/app/output/fresh_a/data.store|range|10|130|row|1|fresh selective row\nfresh_a_range_batch_full|/app/output/fresh_a/data.store|range|10|130|batch|0|fresh full batch\nfresh_c_null_batch_skip|/app/output/fresh_c/data.store|isnull|0|0|batch|1|fresh null selective\nfresh_c_null_row_full|/app/output/fresh_c/data.store|isnull|0|0|row|0|fresh null full\nEOF\n/app/bin/loam audit /app/output/checkcases /app/output/checkcases/report.json && cat /app/output/checkcases/report.json\n",
+      "duration": 2.0
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\nimport json\np='/app/output/checkcases/report.json'\nr=json.load(open(p))\nfor c in r['cases']:\n    print(c['case_id'], c['row_count'], c['sum_amount'], 'pages', c['pages_read'], '/', c['pages_total'], c['path'], c['skipping'])\nPY\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

@@ -1,0 +1,35 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app# mkdir -p /tmp/fcases; printf 'fa_row|/tmp/store_a/data.store|range|0|200|row|1|x\nfa_bat|/tmp/store_a/data.store
+|range|0|200|batch|1|x\nfa_all_r|/tmp/store_a/data.store|all|0|0|row|0|x\nfa_all_b|/tmp/store_a/data.store|all|0|0|batch|0|x\nfa_null_r|/tmp/store_a/data.store|
+isnull|0|0|row|1|x\nfa_null_b|/tmp/store_a/data.store|isnull|0|0|batch|1|x\n' > /tmp/fcases/f.case; /app/bin/loam audit /tmp/fcases /tmp/fout.json; python3 -m j
+son.tool /tmp/fout.json | grep -E 'case_id|row_count|sum_amount|pages_read'
+            "case_id": "fa_row",
+            "row_count": 6,
+            "sum_amount": 410,
+            "pages_read": 2,
+            "case_id": "fa_bat",
+            "row_count": 6,
+            "sum_amount": 410,
+            "pages_read": 2,
+            "case_id": "fa_all_r",
+            "row_count": 6,
+            "sum_amount": 410,
+            "pages_read": 2,
+            "case_id": "fa_all_b",
+            "row_count": 6,
+            "sum_amount": 410,
+            "pages_read": 2,
+            "case_id": "fa_null_r",
+            "row_count": 2,
+            "sum_amount": 0,
+            "pages_read": 2,
+            "case_id": "fa_null_b",
+            "row_count": 2,
+            "sum_amount": 0,
+            "pages_read": 2,
+root@fe722ac7-9c23-4e6d-8058-20e8defc1436:/app#

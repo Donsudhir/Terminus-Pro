@@ -1,0 +1,23 @@
+{
+  "analysis": "We are at a shell prompt in /app with no prior commands shown. Need inspect repository, run tests/audit, locate bug. Task involves archived store markers, selective reads vs batch, ingest markers. We'll examine files, schema, source, run audit/build.",
+  "plan": "List /app, inspect docs and source layout, run the bundled audit before changes to see failures if any, then inspect relevant code for store reading/ingest and marker handling.",
+  "commands": [
+    {
+      "keystrokes": "ls -la\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "find . -maxdepth 3 -type f | sed 's#^./##' | sort | head -200\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/docs/report-schema.md\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && cat /app/output/audit.json\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+}

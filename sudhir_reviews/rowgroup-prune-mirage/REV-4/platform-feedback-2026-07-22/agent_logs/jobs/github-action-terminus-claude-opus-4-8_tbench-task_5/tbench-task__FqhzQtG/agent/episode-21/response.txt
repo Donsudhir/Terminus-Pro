@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Repeated audits are byte-identical. Now test ingest with orders_a.csv. This CSV: header, then rows. 8 data rows, chunked into pages of 4:\nPage0: (0,1,-999)retired->not live; (2,1,10)live; (2,1,20)live; (2,1,30)live. Live amounts: 10,20,30. low=10,high=30, has_absent=true (retired -999 present).\nPage1: (2,1,100)live; (2,0,555)absent->not live; (2,1,120)live; (2,1,130)live. Live amounts:100,120,130. low=100,high=130, has_absent=true (555 absent).\n\nLet me run ingest and check the produced markers.",
+  "plan": "Run ingest for orders_a into a fresh dir and inspect the store markers.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/store_a; echo EXIT:$?\n", "duration": 2.0},
+    {"keystrokes": "cat -A /tmp/store_a/data.store\n", "duration": 0.1}
+  ]
+}
+```

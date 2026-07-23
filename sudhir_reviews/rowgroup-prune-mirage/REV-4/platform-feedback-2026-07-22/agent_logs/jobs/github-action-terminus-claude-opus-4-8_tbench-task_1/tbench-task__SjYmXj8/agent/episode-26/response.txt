@@ -1,0 +1,11 @@
+```json
+{
+  "analysis": "Deterministic output confirmed (IDENTICAL). CSV format is origin,presence,amount,region. Let me test the fresh ingest and verify the markers are faithful. Let me view the full CSV and ingest it.",
+  "plan": "View orders_a.csv fully, ingest it, and inspect the resulting data.store to confirm faithful markers.",
+  "commands": [
+    {"keystrokes": "cat /app/data/fresh/orders_a.csv\n", "duration": 0.1},
+    {"keystrokes": "/app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/store_a\n", "duration": 1.0},
+    {"keystrokes": "cat /tmp/store_a/data.store\n", "duration": 0.1}
+  ]
+}
+```

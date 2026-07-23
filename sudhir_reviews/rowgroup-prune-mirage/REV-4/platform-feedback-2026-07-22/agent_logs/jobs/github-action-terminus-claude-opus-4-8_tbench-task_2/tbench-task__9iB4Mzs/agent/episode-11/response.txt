@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "CSV format: origin,present,amount,region. Header H|3 for fresh. Now let me read the ember module (fold.rs computes markers, pale.rs, reed.rs) to understand faithful marker generation and the definition of 'live'.",
+  "plan": "Read the ember module files and main.rs, report.rs.",
+  "commands": [
+    {"keystrokes": "cat /app/rust/src/ember/mod.rs /app/rust/src/ember/fold.rs\n", "duration": 0.1}
+  ]
+}
+```

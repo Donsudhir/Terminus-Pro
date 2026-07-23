@@ -1,0 +1,3 @@
+# DIFFICULTY — mesh-checkpoint-operator-skew REV-1
+
+This task is hard because a remesh and resume path can look numerically ordinary while solution field digests still diverge from a never interrupted twin on the same case. Residual norms and iteration counts do not locate the break by themselves. The solver has to keep native geometry lifecycle aligned with host shelf reuse after restore while pack side fold ordering stays consistent in the same mixed language pipeline. Fixing only one authority leaves twin or control checks red. A healthy no checkpoint control must stay byte identical under clean paired evaluation.

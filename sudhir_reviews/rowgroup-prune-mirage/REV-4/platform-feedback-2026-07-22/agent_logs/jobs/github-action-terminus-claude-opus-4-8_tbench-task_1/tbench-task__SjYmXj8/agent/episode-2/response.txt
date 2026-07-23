@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "I understand the architecture: rust/ handles import/compaction (ingest), cpp/ handles reads (both row reader and lattice/batch reader). The bug is in how non-live entries are detected. The v2 rollout assumed a reserved amount value meant missing, but the later writer kept origin and presence lanes. Mixed-generation stores need to interpret presence lanes properly.",
+  "plan": "Explore the source code in rust and cpp directories to find the reader logic.",
+  "commands": [
+    {"keystrokes": "ls -R /app/rust /app/cpp /app/src /app/tools /app/bin\n", "duration": 0.1},
+    {"keystrokes": "cat /app/Makefile\n", "duration": 0.1}
+  ]
+}
+```

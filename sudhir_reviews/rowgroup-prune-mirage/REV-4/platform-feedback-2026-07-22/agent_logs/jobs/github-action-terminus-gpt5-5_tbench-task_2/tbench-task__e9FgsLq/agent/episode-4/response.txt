@@ -1,0 +1,19 @@
+{
+  "analysis": "We identified two likely root causes. First, batch execution only uses presence_lane for admission, ignoring origin_lane, while row execution treats Retired as non-live and Inherited as live. This makes batch count retired rows (e.g. -999 in mixed). Second, selective gates trust archived generation-2 numeric markers even when mixed/incomplete, so pages with current live values outside stale markers are skipped. Fresh ingest marker code also computes low/high over all values instead of only live values and ignores origins for has_absent.",
+  "plan": "Inspect full row.cpp to mirror its live semantics precisely in batch. Then edit rill.cpp batch live mask, veil.cpp selective gate safety for archived mixed-generation markers, and Rust fold/reed marker generation to use live-value domain. Build and audit. Also create fresh stores from bundled CSVs and inspect markers.",
+  "commands": [
+    {
+      "keystrokes": "cat /app/cpp/src/row.cpp\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np=Path('/app/cpp/src/lattice/rill.cpp')\ns=p.read_text()\ns=s.replace('''#include <cstddef>\\n#include <vector>\\n''','''#include <cstddef>\\n#include <vector>\\n''')\ns=s.replace('''    const std::size_t count = a.amount_lane.size();\\n    std::vector<unsigned char> admit(count, 0);\\n    for (std::size_t i = 0; i < count; ++i) {\\n        admit[i] = a.presence_lane[i] != 0 ? 1 : 0;\\n    }\\n''','''    const std::size_t count = a.amount_lane.size();\\n    std::vector<unsigned char> admit(count, 0);\\n    for (std::size_t i = 0; i < count; ++i) {\\n        const auto origin = static_cast<Origin>(a.origin_lane[i]);\\n        if (origin == Origin::Retired) {\\n            admit[i] = 0;\\n        } else if (origin == Origin::Inherited) {\\n            admit[i] = 1;\\n        } else {\\n            admit[i] = a.presence_lane[i] != 0 ? 1 : 0;\\n        }\\n    }\\n''')\np.write_text(s)\nPY\n\ngrep -n . /app/cpp/src/lattice/rill.cpp | sed -n '1,120p'\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np=Path('/app/cpp/src/harbor/veil.cpp')\ns=p.read_text()\ns=s.replace('''    if (b.op == Op::RegionEqual) {\\n        const bool read = b.text >= a.region_low && b.text <= a.region_high;\\n        return {read, read ? \"text-hit\" : \"text-away\"};\\n    }\\n\\n    const std::int64_t left = b.op == Op::Equal ? b.x : b.x;\\n    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;\\n    const bool read = !(right < a.low || left > a.high);\\n    return {read, read ? \"range-hit\" : \"range-away\"};\\n''','''    if (b.op == Op::RegionEqual) {\\n        const bool read = b.text >= a.region_low && b.text <= a.region_high;\\n        return {read, read ? \"text-hit\" : \"text-away\"};\\n    }\\n\\n    // Generation 3 stores carry faithful live-value numeric markers.  Some\\n    // archived generation 2 slabs were written with incomplete mixed-origin\\n    // markers; if a slab also records absent/non-live entries, its low/high\\n    // cannot safely exclude a numeric probe.  Keep selective reads fast on\\n    // healthy slabs, but open these legacy mixed slabs conservatively.\\n    if (a.generation < 3 && a.has_absent) {\\n        return {true, \"legacy-open\"};\\n    }\\n\\n    const std::int64_t left = b.x;\\n    const std::int64_t right = b.op == Op::Equal ? b.x : b.y;\\n    const bool read = !(right < a.low || left > a.high);\\n    return {read, read ? \"range-hit\" : \"range-away\"};\\n''')\np.write_text(s)\nPY\n\ngrep -n . /app/cpp/src/harbor/veil.cpp | sed -n '1,120p'\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+} 

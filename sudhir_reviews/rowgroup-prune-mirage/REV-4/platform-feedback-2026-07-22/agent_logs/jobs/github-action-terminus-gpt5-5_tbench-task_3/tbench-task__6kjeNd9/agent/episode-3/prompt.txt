@@ -1,0 +1,309 @@
+New Terminal Output:
+
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# echo '--- cases'; for f in /app/data/cases/*.case; do echo "### $f"; cat "$f"; done
+--- cases
+### /app/data/cases/control.case
+# id|store|operation|x|y|path|skipping|operator note
+c_legit|/app/data/archive/current.store|eq|-999|0|batch|1|legitimate overlap
+h_skip|/app/data/archive/healthy.store|range|100|130|batch|1|selective control
+h_full|/app/data/archive/healthy.store|range|100|130|row|0|full control
+h_region|/app/data/archive/healthy.store|region_eq|north|0|row|1|text control
+### /app/data/cases/incident.case
+# id|store|operation|x|y|path|skipping|operator note
+m_range|/app/data/archive/mixed.store|range|10|40|row|1|invoice window
+m_narrow|/app/data/archive/mixed.store|range|10|20|row|1|narrow window
+m_null|/app/data/archive/mixed.store|isnull|0|0|batch|0|missing count
+m_interact|/app/data/archive/mixed.store|range|-1000|25|batch|1|mixed window
+m_neg|/app/data/archive/mixed.store|range|-100|-1|batch|0|negative window
+m_all|/app/data/archive/mixed.store|all|0|0|batch|0|full tally
+v_window|/app/data/archive/vault.store|range|10|50|row|1|vault window
+v_missing|/app/data/archive/vault.store|isnull|0|0|batch|1|vault absent probe
+v_check|/app/data/archive/vault.store|isnull|0|0|row|1|vault absent recheck
+v_full|/app/data/archive/vault.store|isnull|0|0|row|0|vault full control
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# echo '--- architecture'; cat /app/docs/architecture.md; echo '--- format'; cat /app/docs/format-notes.md
+--- architecture
+# Loam architecture
+
+Loam is a small offline columnar lab used by release engineering before storage
+changes reach the billing warehouse. `rust/` owns import and compaction. It emits
+self-describing slabs with value lanes, presence lanes, origin lanes, text codes,
+and compact markers. `cpp/` owns reads. The harbor stage decides which slabs are
+needed, then either the row reader or lattice reader computes a tally. The row
+reader walks record structs; the lattice reader consumes per-slab column lanes.
+
+The command front end reads every `.case` file in bytewise filename order and
+every record in source order. Structured counters come from the selected reader,
+not from estimates. Artifact files are append-free after creation; a reader must
+not repair them in place.
+
+`/app/tools/reset-lab` restores the bundled drill data before a clean replay.
+
+Older slabs are supported because disaster-recovery snapshots outlive the writer
+that created them. Newer writers can add header generations, but readers remain
+responsible for interpreting each slab according to its own header and local
+markers.
+--- format
+# Format notes from the v2 rollout
+
+These notes were copied from the rollout ticket and may lag the current reader.
+They are useful background only. The operational grading contract for audit JSON,
+per-case counters, ingest output naming, and live-value markers is
+`/app/docs/report-schema.md`.
+
+A file begins with `H|generation`. Each `P` record describes one slab, followed
+by the declared number of `R` records. The row record carries presence, origin,
+amount, and region. Marker fields let readers avoid opening slabs for predicates
+that cannot match.
+
+The v2 rollout assumed the amount lane remained sufficient to recognize missing
+historical values because old producers reserved one amount. The later writer
+kept origin and presence lanes to support mixed compaction and legitimate values
+that overlap old conventions. If these assumptions conflict, the artifact and a
+full reader are stronger evidence than this note.
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# sed -n '1,220p' /app/cpp/include/loam/store.hpp; sed -n '1,220p' /app/cpp/include/loam/plan.hpp; sed -n '1,180p'
+ /app/cpp/include/loam/exec.hpp; sed -n '1,180p' /app/cpp/include/loam/types.hpp
+#pragma once
+
+#include "loam/types.hpp"
+
+#include <filesystem>
+#include <vector>
+
+namespace loam {
+
+std::vector<Slab> load_store(const std::filesystem::path& path);
+std::vector<CaseSpec> load_cases(const std::filesystem::path& directory);
+CaseResult run_case(const CaseSpec& spec);
+
+}  // namespace loam
+#pragma once
+
+#include "loam/types.hpp"
+
+namespace loam {
+
+Gate turn_b(const Slab& a, const Probe& b);
+std::string turn_d(const Gate& a, const Probe& b);
+
+}  // namespace loam
+#pragma once
+
+#include "loam/types.hpp"
+
+namespace loam {
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c);
+Tally sweep_c(const Slab& a, const Probe& b, const Gate& c);
+Tally sweep_e(const Tally& a, const Tally& b);
+
+}  // namespace loam
+#pragma once
+
+#include <cstdint>
+#include <string>
+#include <vector>
+
+namespace loam {
+
+enum class Origin : std::uint8_t { Retired = 0, Inherited = 1, Current = 2 };
+
+struct Cell {
+    std::uint8_t present{};
+    Origin origin{Origin::Current};
+    std::int64_t amount{};
+    std::string region;
+};
+
+struct Slab {
+    std::size_t id{};
+    std::uint8_t generation{};
+    std::int64_t low{};
+    std::int64_t high{};
+    bool has_absent{};
+    std::string 
+[... output limited to 10000 bytes; 69 interior bytes omitted ...]
+ane::Row};
+    bool skipping{};
+};
+
+struct Gate {
+    bool read{true};
+    std::string note;
+};
+
+struct Tally {
+    std::int64_t row_count{};
+    std::int64_t sum_amount{};
+    std::int64_t pages_read{};
+};
+
+struct CaseSpec {
+    std::string case_id;
+    std::string store_path;
+    Probe probe;
+};
+
+struct CaseResult {
+    std::string case_id;
+    Tally tally;
+    std::int64_t pages_total{};
+    Lane lane{Lane::Row};
+    bool skipping{};
+};
+
+}  // namespace loam
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app# sed -n '1,260p' /app/cpp/src/store.cpp; sed -n '1,260p' /app/cpp/src/row.cpp
+#include "loam/store.hpp"
+
+#include "loam/exec.hpp"
+#include "loam/plan.hpp"
+
+#include <fstream>
+#include <stdexcept>
+#include <string>
+
+namespace loam {
+namespace {
+
+std::vector<std::string> split(const std::string& line) {
+    std::vector<std::string> fields;
+    std::size_t start = 0;
+    while (true) {
+        const auto end = line.find('|', start);
+        fields.push_back(line.substr(start, end - start));
+        if (end == std::string::npos) {
+            break;
+        }
+        start = end + 1;
+    }
+    return fields;
+}
+
+}  // namespace
+
+std::vector<Slab> load_store(const std::filesystem::path& path) {
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("cannot open store: " + path.string());
+    }
+
+    std::vector<Slab> slabs;
+    std::string line;
+    while (std::getline(input, line)) {
+        if (line.empty() || line.rfind("H|", 0) == 0) {
+            continue;
+        }
+        const auto page = split(line);
+        if (page.size() != 9 || page[0] != "P") {
+            throw std::runtime_error("bad page record in " + path.string());
+        }
+        Slab slab;
+        slab.id = std::stoull(page[1]);
+        slab.generation = static_cast<std::uint8_t>(std::stoul(page[2]));
+        slab.low = std::stoll(page[3]);
+        slab.high = std::stoll(page[4]);
+        slab.has_absent = page[5] == "1";
+        slab.region_low = page[6];
+        slab.region_high = page[7];
+        const auto row_count = std::stoull(page[8]);
+        for (std::size_t i = 0; i < row_count; ++i) {
+            if (!std::getline(input, line)) {
+                throw std::runtime_error("short page in " + path.string());
+            }
+            const auto row = split(line);
+            if (row.size() != 5 || row[0] != "R") {
+                throw std::runtime_error("bad row record in " + path.string());
+            }
+            const auto presence = static_cast<std::uint8_t>(std::stoul(row[1]));
+            const auto origin = static_cast<std::uint8_t>(std::stoul(row[2]));
+            const auto amount = std::stoll(row[3]);
+            slab.cells.push_back({presence, static_cast<Origin>(origin), amount, row[4]});
+            slab.presence_lane.push_back(presence);
+            slab.origin_lane.push_back(origin);
+            slab.amount_lane.push_back(amount);
+            slab.region_lane.push_back(row[4]);
+        }
+        slabs.push_back(std::move(slab));
+    }
+    return slabs;
+}
+
+CaseResult run_case(const CaseSpec& spec) {
+    const auto slabs = load_store(spec.store_path);
+    Tally total;
+    for (const auto& slab : slabs) {
+        const Gate gate = turn_b(slab, spec.probe);
+        const auto label = turn_d(gate, spec.probe);
+        (void)label;
+        const Tally part = spec.probe.lane == Lane::Batch
+            ? sweep_c(slab, spec.probe, gate)
+            : walk_row(slab, spec.probe, gate);
+        total = sweep_e(total, part);
+    }
+    return {
+        spec.case_id,
+        total,
+        static_cast<std::int64_t>(slabs.size()),
+        spec.probe.lane,
+        spec.probe.skipping,
+    };
+}
+
+}  // namespace loam
+#include "loam/exec.hpp"
+
+namespace loam {
+namespace {
+
+bool is_live(const Cell& cell) {
+    if (cell.origin == Origin::Retired) {
+        return false;
+    }
+    if (cell.origin == Origin::Inherited) {
+        return true;
+    }
+    return cell.present != 0;
+}
+
+bool matches(const Cell& cell, const Probe& probe) {
+    switch (probe.op) {
+        case Op::All:
+            return true;
+        case Op::Equal:
+            return cell.amount == probe.x;
+        case Op::Range:
+            return cell.amount >= probe.x && cell.amount <= probe.y;
+        case Op::IsNull:
+            return false;
+        case Op::RegionEqual:
+            return cell.region == probe.text;
+    }
+    return false;
+}
+
+}  // namespace
+
+Tally walk_row(const Slab& a, const Probe& b, const Gate& c) {
+    Tally tally;
+    if (!c.read) {
+        return tally;
+    }
+    tally.pages_read = 1;
+    for (const auto& cell : a.cells) {
+        const bool live = is_live(cell);
+        if (b.op == Op::IsNull) {
+            if (!live) {
+                ++tally.row_count;
+            }
+            continue;
+        }
+        if (live && matches(cell, b)) {
+            ++tally.row_count;
+            tally.sum_amount += cell.amount;
+        }
+    }
+    return tally;
+}
+
+}  // namespace loam
+root@771690eb-7154-42c4-9dbd-ecb2505d85b4:/app#

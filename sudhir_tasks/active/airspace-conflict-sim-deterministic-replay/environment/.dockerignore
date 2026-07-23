@@ -1,0 +1,12 @@
+*.log
+tmp/
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/target/
+**/dist/
+**/build/
+.git
+.gitignore
+tests/
+solution/

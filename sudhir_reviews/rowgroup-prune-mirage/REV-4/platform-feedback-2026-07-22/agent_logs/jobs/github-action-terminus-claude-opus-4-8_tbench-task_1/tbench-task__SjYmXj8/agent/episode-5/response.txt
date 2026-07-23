@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "The row reader's is_live function: Retired=not live, Inherited=live (always), Current=present!=0. Now let me see the lattice (batch) reader to compare its liveness logic. The discrepancy is likely between these two.",
+  "plan": "Read the lattice readers bay.cpp and rill.cpp.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/lattice/bay.cpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/src/lattice/rill.cpp\n", "duration": 0.1}
+  ]
+}
+```

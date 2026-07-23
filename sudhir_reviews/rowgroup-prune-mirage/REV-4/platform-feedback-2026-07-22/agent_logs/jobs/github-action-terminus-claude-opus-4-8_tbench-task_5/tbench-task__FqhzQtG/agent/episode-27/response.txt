@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "The system is fully repaired and rebuilt. Final state confirmed:\n\n1. **Batch reader fix** (/app/cpp/src/lattice/rill.cpp): The lattice/batch reader now determines row admission using the same liveness rule as the row reader (Retired = not live, Inherited = live, Current = live only when present), based on origin_lane + presence_lane. Previously it only checked presence_lane, which caused it to over-count Retired-origin rows (like the sentinel -999) on archived mixed-generation stores.\n\n2. **Ingest marker fix** (/app/rust/src/ember/fold.rs): tilt_a now computes low/high spanning only live amounts, sets has_absent when any non-live entry exists, and records low=0/high=0/has_absent=true for all-non-live slabs — as required by the contract.\n\nVerification results:\n- Row and batch modes now agree on row_count and sum_amount for both archived (mixed/vault) and freshly ingested stores.\n- Healthy control cases unchanged (h_skip=4/460=h_full, selective still reads fewer pages than total).\n- Legitimate overlapping values (-999 as a live Current value) are still counted correctly.\n- Fresh ingest markers are faithful, including the all-non-live edge case.\n- Audit output and ingest output are byte-identical across repeated runs.\n- Work stays offline (cargo --offline, no network).\n- Archived stores are read without rewriting.\n\nThe task is complete.",
+  "plan": "No further steps required. The repair is complete and verified.",
+  "commands": [],
+  "task_complete": true
+}
+```

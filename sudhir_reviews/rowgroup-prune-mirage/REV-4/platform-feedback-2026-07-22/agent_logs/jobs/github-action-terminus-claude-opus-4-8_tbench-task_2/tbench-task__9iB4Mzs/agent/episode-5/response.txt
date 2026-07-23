@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "run_case uses turn_b (gate/skip decision from harbor), walk_row (row reader) or sweep_c (batch/lattice reader). The 'live' logic differs between the two paths. Let me read the reader implementations and the harbor gate logic.",
+  "plan": "Read exec.hpp, plan.hpp, row.cpp, lattice/bay.cpp, lattice/rill.cpp, harbor/pale.cpp, harbor/veil.cpp.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/include/loam/exec.hpp /app/cpp/include/loam/plan.hpp\n", "duration": 0.1},
+    {"keystrokes": "cat /app/cpp/src/row.cpp\n", "duration": 0.1}
+  ]
+}
+```

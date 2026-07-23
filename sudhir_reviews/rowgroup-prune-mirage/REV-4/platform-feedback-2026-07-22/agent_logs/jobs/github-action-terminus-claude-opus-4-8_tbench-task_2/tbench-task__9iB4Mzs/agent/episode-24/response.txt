@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "orders_a markers correct: slab0 low=10 high=30 has_absent=1 (retired -999 excluded); slab1 low=100 high=130 has_absent=1 (555 present=0 excluded). Note: the write_pages writes R|present|origin|... so the row (0,1,-999) from CSV origin=0,present=1 -> written R|1|0|-999. Correct. Now check b and c (c has all-dead slab).",
+  "plan": "Inspect b and c stores.",
+  "commands": [
+    {"keystrokes": "echo '--- b ---'; cat /tmp/s_b/data.store\n", "duration": 0.1},
+    {"keystrokes": "echo '--- c ---'; cat /tmp/s_c/data.store\n", "duration": 0.1}
+  ]
+}
+```

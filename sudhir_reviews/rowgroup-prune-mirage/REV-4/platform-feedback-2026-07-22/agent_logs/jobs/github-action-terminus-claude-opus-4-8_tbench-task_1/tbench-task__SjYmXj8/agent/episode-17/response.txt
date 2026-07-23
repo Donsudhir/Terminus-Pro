@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Build succeeded. Let me run the audit and inspect the output to see the current (buggy) behavior.",
+  "plan": "Run audit and view the JSON output.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json\n", "duration": 1.0},
+    {"keystrokes": "cat /app/output/audit.json | python3 -m json.tool\n", "duration": 0.5}
+  ]
+}
+```

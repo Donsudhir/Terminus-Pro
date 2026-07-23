@@ -1,0 +1,13 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# cd /app && make clean >/dev/null 2>&1; ./tools/build-all >/dev/null 2>&1 && echo BUILD_OK
+BUILD_OK
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# /app/bin/loam audit /app/data/cases /app/output/audit.json && md5sum /app/output/audit.json; /app/bin/loam audit
+ /app/data/cases /tmp/re.json; diff /app/output/audit.json /tmp/re.json && echo DETERMINISTIC
+fca4de189dd399b71689806dd41ee1e4  /app/output/audit.json
+DETERMINISTIC
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app#

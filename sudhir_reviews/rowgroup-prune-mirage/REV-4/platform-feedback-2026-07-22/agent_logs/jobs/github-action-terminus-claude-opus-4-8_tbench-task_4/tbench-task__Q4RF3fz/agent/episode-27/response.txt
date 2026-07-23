@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "Determinism confirmed - byte-identical. Let me view the full audit output to verify all bundled cases are correct now, especially the ones that changed (m_range, v_missing, etc).",
+  "plan": "View the final audit output and verify the healthy controls still have pages_read < pages_total.",
+  "commands": [
+    {"keystrokes": "python3 -c \"import json;d=json.load(open('/app/output/audit.json'));print('status',d['status'],'digest',d['digest']);[print(c['case_id'],'rc',c['row_count'],'sum',c['sum_amount'],'read',c['pages_read'],'/',c['pages_total'],c['path'],'skip',c['skipping']) for c in d['cases']]\"\n", "duration": 0.1}
+  ]
+}
+```

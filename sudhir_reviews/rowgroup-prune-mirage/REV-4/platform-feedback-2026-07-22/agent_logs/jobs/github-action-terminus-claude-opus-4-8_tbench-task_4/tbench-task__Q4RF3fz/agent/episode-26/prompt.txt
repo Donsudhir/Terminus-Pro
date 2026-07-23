@@ -1,0 +1,28 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+- Extra text detected after JSON object
+
+New Terminal Output:
+
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# cat > /tmp/t/probe.case << 'EOF'
+> fa_rs|/tmp/fresh/a/data.store|range|10|130|row|1|x
+> fa_rn|/tmp/fresh/a/data.store|range|10|130|row|0|x
+> fa_bs|/tmp/fresh/a/data.store|range|10|130|batch|1|x
+> fa_bn|/tmp/fresh/a/data.store|range|10|130|batch|0|x
+> fc_ns|/tmp/fresh/c/data.store|isnull|0|0|batch|1|x
+> fc_nn|/tmp/fresh/c/data.store|isnull|0|0|batch|0|x
+> fc_nrs|/tmp/fresh/c/data.store|isnull|0|0|row|1|x
+> fc_nrn|/tmp/fresh/c/data.store|isnull|0|0|row|0|x
+> EOF
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app# /app/bin/loam audit /tmp/t /tmp/t/out.json; echo; python3 -c "import json;d=json.load(open('/tmp/t/out.json'));[
+print(c['case_id'],c['row_count'],c['sum_amount'],c['pages_read'],c['pages_total']) for c in d['cases']]"
+
+fa_rs 6 410 2 2
+fa_rn 6 410 2 2
+fa_bs 6 410 2 2
+fa_bn 6 410 2 2
+fc_ns 4 0 1 2
+fc_nn 4 0 2 2
+fc_nrs 4 0 1 2
+fc_nrn 4 0 2 2
+root@ab71cc61-9b44-46bc-9c89-6cec028100d9:/app#

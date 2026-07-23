@@ -1,0 +1,8 @@
+```json
+{
+  "analysis": "All fixes are verified and applied. The three root causes were: (1) the batch/lattice reader (sweep_c) computed liveness from presence alone, ignoring the origin lane, causing disagreement with the row reader on mixed-generation stores; (2) the harbor gate (turn_b) trusted incomplete on-disk markers of archived older-generation (gen<3) slabs for selective admission, wrongly skipping slabs that actually contained qualifying live rows; (3) the Rust ingest marker computation (tilt_a) spanned all amounts and only checked presence, producing unfaithful low/high/has_absent markers. All three are fixed, the build succeeds, equivalent modes agree and are correct on archived and fresh stores, healthy selective controls still skip pages, both fast paths remain in use, fresh markers are faithful (including the all-non-live 0/0/true rule), archived stores are read without rewriting, work is offline, and repeated audits are byte-identical.",
+  "plan": "Task complete.",
+  "commands": [],
+  "task_complete": true
+}
+```

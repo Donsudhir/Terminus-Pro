@@ -1,0 +1,27 @@
+{
+  "analysis": "We are at /app with no prior commands shown. Need inspect repository, understand implementation and failing audit behavior, then patch, rebuild, and verify bundled drill plus likely fresh ingest cases.",
+  "plan": "List files, read schema/docs, inspect source tree and build/test commands. Then run the audit to capture current discrepancies if possible and inspect relevant code paths for selective reads, batch execution, archived marker handling, and ingest marker writing.",
+  "commands": [
+    {
+      "keystrokes": "ls -la\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "find . -maxdepth 3 -type f | sed 's#^./##' | sort | head -200\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/docs/report-schema.md\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json; echo EXIT:$?\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "cat /app/output/audit.json 2>/dev/null | head -80\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

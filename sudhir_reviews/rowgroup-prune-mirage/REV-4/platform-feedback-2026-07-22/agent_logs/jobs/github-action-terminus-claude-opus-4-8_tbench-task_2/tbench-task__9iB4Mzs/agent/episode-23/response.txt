@@ -1,0 +1,13 @@
+```json
+{
+  "analysis": "CSV header is 'origin,presence,amount,region' - wait, codec.rs checks line.starts_with(\"origin,\") to skip header. Good. Fields: origin,present,amount,region.\n\nLet me predict orders_a markers (width 4):\n  Slab0 rows: (0,1,-999)retired dead; (2,1,10)live; (2,1,20)live; (2,1,30)live. Live amounts:10,20,30 -> low=10,high=30, has_absent=true (retired -999). \n  Slab1 rows: (2,1,100)live; (2,0,555)dead; (2,1,120)live; (2,1,130)live. Live:100,120,130 -> low=100,high=130, has_absent=true.\n\norders_c slab1: (0,1,301)retired dead; (2,0,317)dead; (0,0,329)dead; (0,1,343)dead -> all dead -> low=0,high=0,has_absent=true.\n\nLet me ingest and inspect.",
+  "plan": "Ingest all three into store dirs and inspect via loam inspect.",
+  "commands": [
+    {"keystrokes": "mkdir -p /tmp/s_a /tmp/s_b /tmp/s_c\n", "duration": 0.1},
+    {"keystrokes": "/app/bin/loam ingest /app/data/fresh/orders_a.csv /tmp/s_a\n", "duration": 0.3},
+    {"keystrokes": "/app/bin/loam ingest /app/data/fresh/orders_b.csv /tmp/s_b\n", "duration": 0.3},
+    {"keystrokes": "/app/bin/loam ingest /app/data/fresh/orders_c.csv /tmp/s_c\n", "duration": 0.3},
+    {"keystrokes": "echo '--- a ---'; cat /tmp/s_a/data.store; echo '--- inspect a ---'; /app/bin/loam inspect /tmp/s_a/data.store\n", "duration": 0.3}
+  ]
+}
+```

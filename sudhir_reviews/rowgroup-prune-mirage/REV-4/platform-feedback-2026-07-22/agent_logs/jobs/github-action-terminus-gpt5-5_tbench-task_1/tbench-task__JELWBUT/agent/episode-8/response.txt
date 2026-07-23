@@ -1,0 +1,6 @@
+{
+  "analysis": "The system has been repaired and rebuilt successfully. The bundled audit now produces stable, byte-identical JSON across repeated runs. Row and batch execution now agree on live/non-live handling, archived mixed-generation stores are read without rewriting them, and selective reads still skip healthy generation-3 cases such as h_skip. Fresh ingest was also verified: generated stores write data.store and their slab markers now span only live values, with all-non-live slabs using low=0 high=0 has_absent=1.",
+  "plan": "No further commands are needed. The final verification steps have already completed: /app/tools/build-all succeeded, bundled audit succeeded twice with cmp equality, and fresh sample ingests produced faithful markers.",
+  "commands": [],
+  "task_complete": true
+}

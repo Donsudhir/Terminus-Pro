@@ -1,0 +1,10 @@
+```json
+{
+  "analysis": "Build works. Now let me run the audit to see baseline output and understand the current divergence.",
+  "plan": "Run the audit command and view output.",
+  "commands": [
+    {"keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json; echo EXIT:$?\n", "duration": 2.0},
+    {"keystrokes": "cat /app/output/audit.json\n", "duration": 0.1}
+  ]
+}
+```

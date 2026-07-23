@@ -1,0 +1,19 @@
+{
+  "analysis": "The main fixes are in place and built: batch now uses the same live/non-live rules as row execution, legacy selective numeric/null gates no longer trust incomplete generation-2 markers, and fresh ingest writes live-value amount markers. Fresh sample audits show row and batch agreeing. One final hardening step remains: make selective region predicates on legacy slabs safe too, since generation-2 text markers may also have been made with stale origin assumptions. This will not affect healthy generation-3 fast paths.",
+  "plan": "Patch generation<3 region_eq gating to read the slab instead of trusting text markers, rebuild, then run the bundled audit twice and byte-compare the JSON reports. Also inspect fresh stores again to confirm generated markers are faithful.",
+  "commands": [
+    {
+      "keystrokes": "python3 - <<'PY'\nfrom pathlib import Path\np=Path('cpp/src/harbor/veil.cpp')\ns=p.read_text()\ns=s.replace('''    if (b.op == Op::RegionEqual) {\\n        const bool read = b.text >= a.region_low && b.text <= a.region_high;\\n        return {read, read ? \"text-hit\" : \"text-away\"};\\n    }\\n''','''    if (b.op == Op::RegionEqual) {\\n        if (a.generation < 3) {\\n            return {true, \"legacy-open\"};\\n        }\\n        const bool read = b.text >= a.region_low && b.text <= a.region_high;\\n        return {read, read ? \"text-hit\" : \"text-away\"};\\n    }\\n''')\np.write_text(s)\nPY\n/app/tools/build-all\n",
+      "duration": 10.0
+    },
+    {
+      "keystrokes": "/app/bin/loam audit /app/data/cases /app/output/audit.json && cp /app/output/audit.json /tmp/audit1.json && /app/bin/loam audit /app/data/cases /tmp/audit2.json && cmp /tmp/audit1.json /tmp/audit2.json && cat /app/output/audit.json\n",
+      "duration": 1.0
+    },
+    {
+      "keystrokes": "rm -rf /tmp/loam-fresh-check && mkdir -p /tmp/loam-fresh-check\nfor csv in /app/data/fresh/*.csv; do name=$(basename \"$csv\" .csv); /app/bin/loam ingest \"$csv\" \"/tmp/loam-fresh-check/$name\" >/tmp/loam-ingest-$name.out 2>/tmp/loam-ingest-$name.err; echo \"--- $name\"; /app/bin/loam inspect \"/tmp/loam-fresh-check/$name/data.store\"; done\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+} 

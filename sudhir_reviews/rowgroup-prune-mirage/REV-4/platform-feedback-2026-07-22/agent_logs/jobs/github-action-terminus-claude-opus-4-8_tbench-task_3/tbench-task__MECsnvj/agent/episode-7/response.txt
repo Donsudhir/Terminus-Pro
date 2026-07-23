@@ -1,0 +1,9 @@
+```json
+{
+  "analysis": "veil.cpp is the skip/admission logic (harbor stage). It uses markers low/high/has_absent to decide whether to read a slab. For IsNull: reads only if has_absent. For Range/Equal: reads if [left,right] overlaps [low,high]. The concern: for archived mixed-gen stores with 'incomplete markers', the markers may not cover Inherited live values (present==0 but live). If low/high only span some values, a Range probe might skip a slab containing a live Inherited row whose amount is outside [low,high], causing the batch/skipping path to miss it. But per the schema, low/high span only live amounts. The main bug is rill.cpp ignoring origin. Let me look at store.cpp and parse.cpp to understand how origin_lane and markers are loaded.",
+  "plan": "Read store.cpp and parse.cpp.",
+  "commands": [
+    {"keystrokes": "cat /app/cpp/src/parse.cpp\n", "duration": 0.1}
+  ]
+}
+```
