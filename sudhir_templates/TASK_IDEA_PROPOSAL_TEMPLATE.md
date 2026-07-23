@@ -3,6 +3,7 @@
 Generated: <UTC timestamp>
 Platform check: <PENDING | PASSED | FAILED>
 Evidence: <platform screenshot/export/note reference>
+Pre-proposal conflict screen: <path; SCREEN ONLY, not uniqueness PASS>
 
 ## Paste-ready fields
 

@@ -209,6 +209,9 @@ Connect tasks, mathematical concepts, rules, decisions, evidence, failures, sour
 | EVIDENCE-DSV-2026-07-22        | EVIDENCE | Acceptance-safe DSV Humanizer and scope-isolation certification                               | PASS                                     | 366 passed, 26 skipped; Ruff PASS                                                      |
 | DECISION-0022                  | DECISION | Platform acceptance and task truth outrank DSV Humanizer style                               | accepted                                 | `sudhir_decisions/ADR-0022-acceptance-safe-precedence-for-dsv-humanization.md`        |
 | RULE-DSV-ACCEPTANCE-001        | RULE     | DSV Humanizer may change wording and rhythm only inside the accepted contract                | active                                   | ADR-0022; `terminus-dsv-humanizer` skill                                               |
+| DECISION-0023                  | DECISION | Pre-proposal ownership and structural-collision veto for clones                              | accepted                                 | `sudhir_decisions/ADR-0023-preproposal-conflict-screen-for-clones.md`                 |
+| RULE-PREPROPOSAL-CONFLICT-001  | RULE     | Obvious local/clone collision must be cleared before proposal fields                         | active                                   | ADR-0023; `docs/CLONER-START-HERE.md`                                                  |
+| PATTERN-CLONE-COLLISION-001    | PATTERN  | Preserve clone-origin fingerprints while separating the active fork portfolio                | active                                   | ADR-0023; `sudhir_templates/PREPROPOSAL_CONFLICT_SCREEN_TEMPLATE.md`                  |
 
 ## Edges
 
@@ -456,6 +459,10 @@ Connect tasks, mathematical concepts, rules, decisions, evidence, failures, sour
 | FAILURE-CM-002         | MITIGATED_BY            | IDEA-0006                       | REV-3 instruction: ledger exactly marker/thread/errno; LANE_TAG stdout-only                               |
 | IDEA-0006              | PACKAGED_AS             | EVIDENCE-MUSL-REV3              | zip sha256 `e42ffbc6…ab47`; oracle 10x 10/10                                                              |
 | IDEA-0006              | READY_FOR               | GATE-UPLOAD-001                 | re-upload to `29a821f1` with REV-3 DSV+RUBRIC                                                             |
+| DECISION-0023          | PRODUCED                | RULE-PREPROPOSAL-CONFLICT-001   | local veto precedes the four-field platform proposal without becoming uniqueness PASS                     |
+| DECISION-0023          | PRODUCED                | PATTERN-CLONE-COLLISION-001     | independent forks retain source fingerprints as upstream collision evidence                               |
+| RULE-PREPROPOSAL-CONFLICT-001 | PREVENTS              | FAILURE-PORTFOLIO-001           | mechanism/topology/verifier comparison catches domain-swapped archetype reuse before proposal             |
+| PATTERN-CLONE-COLLISION-001 | PRESERVES             | RULE-PIPELINE-001               | an empty fork portfolio does not erase source-repository conflict memory                                   |
 
 ## Update protocol
 

@@ -5,8 +5,8 @@ Edition 2. Read `docs/ARCHITECTURE.md` and `sudhir_knowledge/TASK_LIFECYCLE.md`.
 ## Pipeline (every chat)
 
 Run `sudhir_task.py board`, then `ingest`; registry JSON is truth. Before
-packaging read `COMMON_MISTAKES.md` and `WHAT_WORKED.md`. New work first outputs
-the 4 proposal fields and stops for Check feedback,
+packaging read `COMMON_MISTAKES.md` and `WHAT_WORKED.md`. New work first veto-screens
+local/clone conflicts, then outputs 4 proposal fields and stops for Check feedback,
 then run `idea new` + `idea proposal`. Construction needs proposal PASS,
 uniqueness + Step 2a GO. `outcome` requires evidence;
 evaluation-passed is not acceptance. Inbox: `sudhir_snorkel/inbox/`.

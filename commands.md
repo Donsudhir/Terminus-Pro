@@ -4,6 +4,13 @@ All harbor, CI, validation, and debug commands for Terminal-Bench 3 task develop
 
 ## Task Idea Proposal (first gate)
 
+Before generating the four fields, complete
+`sudhir_templates/PREPROPOSAL_CONFLICT_SCREEN_TEMPLATE.md`. This is an
+ADR-0023 ownership/obvious-collision veto, not formal uniqueness: it compares
+domain, mechanism, topology, and verifier against active, rejected, retired,
+legacy, quarantined, archived, and clone-origin records. Only `PROCEED TO
+PROPOSAL` continues; never record uniqueness PASS from this screen.
+
 Generate the four paste-ready fields first, then let Sudhir run Snorkel
 **Check feedback**. After the platform result returns, capture the permanent
 idea and proposal evidence before uniqueness:

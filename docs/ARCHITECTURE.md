@@ -78,6 +78,8 @@ No UI scaffold is shipped; exempt revisions use pytest + Playwright Python.
 
 - `AGENTS.md` — only always-on file. Routing + must-fire bullets.
 - `docs/ARCHITECTURE.md` — this file.
+- `docs/CLONER-START-HERE.md` — clone modes, ownership, ADR-0023 conflict veto.
+- `docs/TERMINUS-FRAMEWORK-BUILD-GUIDE.md` — reusable-fork architecture blueprint.
 - `.cursor/rules/00-authoring-critical.mdc` — agent-requested
   expanded discipline.
 - `.cursor/rules/{task-creation,idea-validation,

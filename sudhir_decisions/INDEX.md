@@ -24,5 +24,6 @@
 | [ADR-0020](ADR-0020-official-ci-parity-and-delegation.md) | Accepted | Enforce deterministic official CI families and explicitly delegate unpublished semantic limits | 2026-07-21 | Repository-wide |
 | [ADR-0021](ADR-0021-strict-humanizer-gate-for-dsv-fields.md) | Accepted | Apply a pinned, atomic, non-bypassable Humanizer gate only to Difficulty/Solution/Verification | 2026-07-22 | Repository-wide |
 | [ADR-0022](ADR-0022-acceptance-safe-precedence-for-dsv-humanization.md) | Accepted | Make platform acceptance, task truth, and project rules outrank DSV Humanizer style | 2026-07-22 | Repository-wide |
+| [ADR-0023](ADR-0023-preproposal-conflict-screen-for-clones.md) | Accepted | Require a local ownership and structural-collision veto before producing proposal fields | 2026-07-23 | Repository-wide |
 
 New durable decisions receive the next sequential ADR number. Accepted ADRs are not rewritten to change history. Add a superseding ADR instead.

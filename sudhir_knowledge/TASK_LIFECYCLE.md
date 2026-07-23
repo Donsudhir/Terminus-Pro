@@ -103,7 +103,15 @@ Read `web/idea-inspiration-sources.md` before generating the candidate. Use the
 source ladder for inspiration, but never copy issue text, benchmark instances,
 patches, tests, or book exercises.
 
-Generate exactly these paste-ready fields first:
+Before producing proposal fields, run the ADR-0023 pre-proposal conflict screen
+from `sudhir_templates/PREPROPOSAL_CONFLICT_SCREEN_TEMPLATE.md`. It is a local
+ownership and obvious-collision veto across active, rejected, retired, legacy,
+quarantined, archived, and clone-origin records. Compare domain, mechanism,
+distributed topology, and verifier/invariant surface. The only outcomes are
+PROCEED, REWORK, DROP, or HOLD. This screen is not the six-scope uniqueness
+dossier and cannot record uniqueness PASS.
+
+For a candidate marked PROCEED, generate exactly these paste-ready fields first:
 
 1. **Task Idea Summary** — 2–5 sentences;
 2. **Idea Category** — one exact platform display label;

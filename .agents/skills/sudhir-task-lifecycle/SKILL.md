@@ -34,19 +34,24 @@ Before uniqueness research, Step 2a, task registration, or file creation:
 1. Read `web/idea-inspiration-sources.md` and use its source ladder as the
    default inspiration pool. Sources are leads, not task/test/patch content to
    copy; current eligibility and uniqueness rules always win.
-2. For the single candidate selected to enter the lifecycle, output only these
+2. Run the ADR-0023 pre-proposal conflict veto using
+   `sudhir_templates/PREPROPOSAL_CONFLICT_SCREEN_TEMPLATE.md`. Check ownership
+   and obvious collisions against active/rejected/retired/legacy/quarantined
+   records and any clone-origin snapshot. Compare domain, mechanism, topology,
+   and verifier. This is not six-scope uniqueness and can never record PASS.
+3. For the single candidate marked `PROCEED TO PROPOSAL`, output only these
    four paste-ready Snorkel fields first:
    - **Task Idea Summary** — 2–5 clear sentences;
    - **Idea Category** — one exact platform display label;
    - **Associated Skills** — 5–10 comma-separated skills;
    - **Task Tags** — 3–6 comma-separated tags.
-3. Stop. Ask Sudhir to paste the fields into **Task Idea Proposal** and run
+4. Stop. Ask Sudhir to paste the fields into **Task Idea Proposal** and run
    **Check feedback**. Do not continue merely because the draft sounds strong.
-4. After Sudhir returns the platform result, capture the idea permanently and
+5. After Sudhir returns the platform result, capture the idea permanently and
    record the fields/verdict/evidence with `idea proposal`. Failed proposals
    are revised and rechecked or retained as rejected; they are not silently
    recycled.
-5. Only proposal=`passed` may proceed to uniqueness and Step 2a. A proposal
+6. Only proposal=`passed` may proceed to full six-scope uniqueness and Step 2a. A proposal
    pass is an early signal, not uniqueness PASS, Step 2a GO, difficulty, or
    acceptance.
 

@@ -124,8 +124,12 @@ tasks/<task-name> -a nop`. Failure → return to drafting; the
 ## Inspiration and Task Idea Proposal gate
 
 Read `web/idea-inspiration-sources.md` every time. Source hunting and optional
-seed-bank generation happen before the formal lifecycle, but the first output
-for the single candidate selected to proceed is always the four-field proposal:
+seed-bank generation happen before the formal lifecycle. Before proposal,
+complete the ADR-0023 local conflict veto with
+`sudhir_templates/PREPROPOSAL_CONFLICT_SCREEN_TEMPLATE.md`; compare ownership,
+domain, mechanism, topology, and verifier against every local/clone-origin
+status. This veto is not formal uniqueness and cannot record PASS. The first
+output for a candidate marked PROCEED is always the four-field proposal:
 
 1. Task Idea Summary — 2–5 sentences;
 2. Idea Category — one exact platform label;
